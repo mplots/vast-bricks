@@ -1,7 +1,6 @@
-<div style="text-align: center;">
-  <img width="300" src="./vb-portal/public/logo.png" alt="Vast Bricks Logo" />
-   <h1>Vast Bricks</h1> 
-</div>
+<p align="center">
+  <img src="./vb-portal/public/logo.png" />
+</p>
 
 ## About
 
