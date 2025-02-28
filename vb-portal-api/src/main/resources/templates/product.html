@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" th:content="'New Price! ' + ${offer.setName}">
+    <meta property="og:description" th:content="'Price: €' + ${offer.price} + ' Ratio: ' + ${offer.partOutRatio}">
+    <meta property="og:image" th:content="${offer.image}">
+    <meta property="og:url" th:content="'/product?set=' + ${offer.setNumber}">
+    <meta property="og:type" content="website">
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        /* General Page Styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 10px; /* Reduced padding */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 18px; /* Slightly smaller */
+            font-weight: 600;
+            margin-bottom: 15px; /* Reduced margin */
+            color: #333;
+        }
+
+        /* Product Grid */
+        .product-container {
+            max-width: 800px;
+            margin: auto;
+        }
+
+        /* Modern Product Card */
+        .product-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 16px;
+            margin-top: 20px;
+        }
+
+        .product-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .product-image {
+            display: flex;
+            justify-content: center;
+            padding: 10px; /* Reduced padding */
+        }
+
+        .product-image img {
+            max-height: 150px; /* Reduced max height */
+            width: auto;
+            max-width: 100%;
+            border-radius: 8px; /* Slightly rounded corners */
+            object-fit: contain;
+        }
+
+        .product-details {
+            padding: 15px; /* Reduced padding */
+            text-align: center;
+        }
+
+        /* Typography */
+        .product-title {
+            font-size: 16px; /* Smaller title */
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px; /* Reduced margin */
+        }
+
+        .profit, .price, .ratio, .store {
+            font-size: 14px; /* Smaller font size for compactness */
+            margin: 3px 0; /* Reduced vertical margin for all paragraphs */
+        }
+
+        .profit {
+            font-weight: bold;
+            color: #28a745; /* Green for profit */
+        }
+
+        .price {
+            font-weight: bold;
+            color: #007BFF;
+        }
+
+        .store {
+            font-size: 12px; /* Smaller */
+        }
+
+        /* Modern Links */
+        .modern-link {
+            color: #007BFF;
+            font-weight: 500;
+            text-decoration: none;
+            transition: color 0.3s ease-in-out;
+        }
+
+        .modern-link:hover {
+            color: #0056b3;
+        }
+
+        .product-links {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-top: 6px;
+        }
+        .product-links a {
+            text-decoration: none;
+            font-size: 14px;
+            color: #1976d2;
+            padding: 4px 6px;
+            border-radius: 4px;
+            background-color: #e3f2fd;
+        }
+        .product-links a:hover {
+            background-color: #bbdefb;
+        }
+        .product-metas {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px; /* Reduced gap */
+            padding-top: 10px;
+        }
+        .product-meta {
+            display: flex;
+            gap: 10px;
+            margin: 6px 0;
+        }
+        .product-meta .material-icons {
+            font-size: 24px;
+            color: #1976d2;
+        }
+        .meta-info {
+            display: flex;
+            flex-direction: column;
+        }
+        .meta-title {
+            font-size: 12px;
+            color: #888;
+        }
+        .meta-value {
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .product-date {
+            font-size: 12px;
+            color: #666;
+            margin-top: 6px;
+        }
+
+        .store-list {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 16px;
+            margin-top: 20px;
+        }
+        .store-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+        .store-item:last-child {
+            border-bottom: none;
+        }
+        .store-logo {
+            height: 24px;
+            margin-right: 10px;
+        }
+        .store-info {
+            display: flex;
+            align-items: center;
+        }
+        .store-name {
+            font-weight: bold;
+        }
+        .store-price {
+            font-size: 16px;
+            font-weight: bold;
+            color: #1976d2;
+        }
+        .store-date {
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .product-card {
+                width: 90%; /* Keep responsiveness */
+            }
+        }
+    </style>
+    <title>Product List</title>
+</head>
+<body>
+
+<h1>Product Details</h1>
+
+<div class="product-container">
+    <div class="product-card">
+        <div class="product-image">
+            <div>
+                <img th:src="${offer.image}" alt="Product Image"/>
+            </div>
+        </div>
+        <div class="product-details">
+            <h2 class="product-title" th:text="${offer.setName.replace('LEGO', '')}"></h2>
+
+            <div class="product-metas">
+
+                <div class="product-meta">
+                    <i class="material-icons">shopping_cart</i>
+                    <div class="meta-info">
+                        <span class="meta-title">Price</span>
+                        <span class="meta-value" th:text="'€'+ ${offer.price}"/>
+                    </div>
+                </div>
+
+                <div class="product-meta">
+                    <i class="material-icons">trending_up</i>
+                    <div class="meta-info">
+                        <span class="meta-title">Ratio</span>
+                        <span class="meta-value" style="color: #28a745" th:text="${offer.partOutRatio}"/>
+                    </div>
+                </div>
+
+                <div class="product-meta">
+                    <i class="material-icons">monetization_on</i>
+                    <div class="meta-info">
+                        <span class="meta-title">Profit</span>
+                        <span class="meta-value" th:text="'€'+ ${offer.price.multiply(offer.partOutRatio).subtract(offer.price).setScale(2,2)}"/>
+                    </div>
+                </div>
+
+                <div class="product-meta">
+                    <i class="material-icons">link</i>
+                    <div class="meta-info">
+                        <span class="meta-title">Shop</span>
+                        <span class="meta-value">
+                            <a th:href="${offer.purchaseLink}" target="_blank" th:text="${offer.webStore}" class="modern-link"/>
+                        </span>
+                    </div>
+                </div>
+
+            </div>
+
+            <p class="product-date"><span th:text="${offer.priceTimestamp}"></span></p>
+            <div class="product-links">
+                <a th:href="|https://www.salidzini.lv/cena?q=lego+${offer.getSetNumber()}!|" target="_blank">Salidzini</a>
+                <a th:href="${offer.partOutLink}" target="_blank">Part Out Value</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="store-list">
+        <div th:each="price : ${prices}" class="store-item">
+            <div class="store-info">
+<!--                <img src="https://www.iizii.eu/image/catalog/1.png" alt="Store Logo" class="store-logo">-->
+                <a class="modern-link" th:href="'/product?store=' + ${price.getWebStore()} + '&set=' + ${offer.getSetNumber()}"><span class="store-name" th:text="${price.getWebStore()}"/></a>
+
+            </div>
+            <div>
+                <span class="store-price" th:text="'' + ${price.price}"/>
+                <div class="store-date" th:text="${price.timestamp}"/>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

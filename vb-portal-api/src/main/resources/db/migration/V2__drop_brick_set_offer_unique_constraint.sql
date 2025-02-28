@@ -1,0 +1,2 @@
+ALTER TABLE brick_set_offer DROP CONSTRAINT brick_set_offer_price_web_store_brick_set_number_key;
+CREATE INDEX brick_set_offer_set_number_ix ON brick_set_offer USING btree(brick_set_number);

@@ -1,0 +1,26 @@
+server:
+  port : 6161
+
+#logging:
+#  level:
+#    root: debug
+
+spring:
+  flyway:
+    enabled: true
+    url: 'jdbc:postgresql://localhost:2345/bricks'
+    user: bricks
+    password: bricks
+    locations: classpath:/db/migration,classpath:/db/migration/data
+    clean-disabled: false
+
+  datasource:
+    url: jdbc:postgresql://localhost:2345/bricks
+    username: bricks
+    password: bricks
+    driver-class-name: org.postgresql.Driver
+
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    generate-ddl: false
