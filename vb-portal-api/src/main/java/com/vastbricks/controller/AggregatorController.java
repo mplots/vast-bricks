@@ -46,4 +46,9 @@ public class AggregatorController {
         }
     }
 
+    @GetMapping("/splash")
+    public String splash() {
+        return "splash";
+    }
+
 }

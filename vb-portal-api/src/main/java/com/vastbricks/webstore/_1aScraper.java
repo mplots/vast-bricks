@@ -3,12 +3,14 @@ package com.vastbricks.webstore;
 import com.vastbricks.jpa.entity.WebStore;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class _1aScraper extends HtmlScraper {
     @Override
     protected ScraperArgs scraperArgs() {
         return ScraperArgs.builder()
-            .url("https://www.1a.lv/c/berniem-mazuliem/lego-rotallietas-un-lelles/lego/37h?page_per=72&page={page}")
+            .urls(List.of("https://www.1a.lv/c/berniem-mazuliem/lego-rotallietas-un-lelles/lego/37h?page_per=72&page={page}"))
             .page(0)
             .itemsCssQuery("div.catalog-taxons-product")
             .itemProcessor(element ->

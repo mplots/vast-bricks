@@ -24,6 +24,7 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -43,16 +44,18 @@ public class CatalogSynchronizationJob {
     private BrickSetRepository brickSetRepository;
     private BrickSetPartOutPriceRepository brickSetPartOutPriceRepository;
     private EntityManager entityManager;
+    private PartOutValueJob partOutValueJob;
 
     @Scheduled(cron = "0 5 * * * *")
     public void runJob() {
         log.info("Starting Catalog Synchronization Job");
-        var owlClient = new OwlClient(env.getBrickOwlApiKey());
+        var owlClient = new OwlClient(env.getBrickOwlApiKey(), env.getBrickOwlCookie());
         var existingBoids = owlSetRepository.findAllBoids();
         var newBoids = owlClient.catalog().list(ItemType.SET).stream()
                 .filter(e->!existingBoids.contains(e.getBoid()))
                 .map(ListItem::getBoid).toList();
 
+        var newSets = new ArrayList<String>();
         chunkList(newBoids, 100).forEach(chunk -> {
             var newOwlSets = owlClient.catalog().bulkLookup(chunk).stream().map(item -> {
                 var owlSet = new OwlSet();
@@ -60,6 +63,14 @@ public class CatalogSynchronizationJob {
                 owlSet.setContents(item);
                 return owlSet;
             }).toList();
+
+            newSets.addAll(
+                    newOwlSets.stream()
+                        .map(e -> e.getSetNumber())
+                        .filter(Objects::nonNull)
+                        .map(Object::toString)
+                        .toList()
+            );
 
             owlSetRepository.saveAll(newOwlSets);
             log.info("New owl sets stored %s".formatted(chunk));
@@ -69,7 +80,7 @@ public class CatalogSynchronizationJob {
                 var owlWebSetInventory = new OwlWebSetInventory();
                 owlWebSetInventory.setBoid(e.getBoid());
                 log.info("Fetching web inventory: %s".formatted(url));
-                owlWebSetInventory.setContents(owlClient.web().webSetInventory(url));
+                owlWebSetInventory.setContents(owlClient.internal().webSetInventory(url));
                 return owlWebSetInventory;
             }).toList();
 
@@ -77,7 +88,7 @@ public class CatalogSynchronizationJob {
         });
 
         synchronizeBrickSets();
-        synchronizeBrickSetPartOutPrices();
+        partOutValueJob.synchronizeBrickSetPartOutPrices(newSets);
 
         log.info("Catalog Synchronization Job Completed");
     }

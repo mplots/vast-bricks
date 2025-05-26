@@ -4,13 +4,15 @@ package com.vastbricks.webstore;
 import com.vastbricks.jpa.entity.WebStore;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class IiziiScraper extends HtmlScraper {
 
     @Override
     protected ScraperArgs scraperArgs() {
         return ScraperArgs.builder()
-            .url("https://www.iizii.eu/lego?limit=100&page={page}")
+            .urls(List.of("https://www.iizii.eu/lego?limit=100&page={page}"))
             .page(1)
             .itemsCssQuery("div.product-link-2")
             .itemProcessor(element ->

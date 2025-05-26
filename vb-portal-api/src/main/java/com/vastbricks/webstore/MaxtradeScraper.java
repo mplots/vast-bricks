@@ -3,13 +3,15 @@ package com.vastbricks.webstore;
 import com.vastbricks.jpa.entity.WebStore;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class MaxtradeScraper extends HtmlScraper {
 
     @Override
     protected ScraperArgs scraperArgs() {
         return ScraperArgs.builder()
-            .url("https://maxtrade.lv/lego.922.g?i=all&p={page}")
+            .urls(List.of("https://maxtrade.lv/lego.922.g?i=all&p={page}"))
             .page(0)
             .itemsCssQuery("div.-product")
             .itemProcessor(element ->

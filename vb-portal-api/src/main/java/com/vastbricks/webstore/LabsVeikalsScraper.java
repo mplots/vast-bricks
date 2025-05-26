@@ -3,13 +3,15 @@ package com.vastbricks.webstore;
 import com.vastbricks.jpa.entity.WebStore;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class LabsVeikalsScraper extends HtmlScraper {
 
     @Override
     protected ScraperArgs scraperArgs() {
          return ScraperArgs.builder()
-            .url("https://labsveikals.lv/lv/products?m=3295")
+            .urls(List.of("https://labsveikals.lv/lv/products?m=3295"))
             .itemsCssQuery("div.p")
             .itemProcessor(element ->
                 WebSet.builder()

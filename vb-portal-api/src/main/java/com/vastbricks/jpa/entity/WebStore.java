@@ -20,7 +20,14 @@ public enum WebStore {
     XS("XS Rotaļlietas"),
     DEPO("Depo"),
     KSENUKAI("Ksenukai"),
-    _220("220")
+    _220("220"),
+    RIMI("RIMI"),
+    OREOL("Oreol"),
+    TOYS_PLANET("Toys Planet"),
+    DATEKS("Dateks"),
+    PIGU("Pigu"),
+    BERNIEM("Berniem"),
+    BALTIC_GURU("Baltic Guru")
     ;
 
     private final String name;

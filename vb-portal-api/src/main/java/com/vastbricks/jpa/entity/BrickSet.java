@@ -4,6 +4,7 @@ import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.Entity;
 
 import jakarta.persistence.Id;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
@@ -30,4 +31,8 @@ public class BrickSet {
 
     @Type(JsonType.class)
     private Set<String> eanIds;
+
+    private Integer pieces;
+
+    private Integer lots;
 }

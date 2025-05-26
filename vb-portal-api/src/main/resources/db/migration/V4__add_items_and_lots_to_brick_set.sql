@@ -1,0 +1,3 @@
+ALTER TABLE brick_set ADD COLUMN pieces INTEGER;
+ALTER TABLE brick_set ADD COLUMN lots INTEGER;
+

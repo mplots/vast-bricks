@@ -13,6 +13,9 @@ public class Env {
     @Value("#{environment.BRICK_OWL_API_KEY}")
     private String brickOwlApiKey;
 
+    @Value("#{environment.BRICK_OWL_COOKIE}")
+    private String brickOwlCookie;
+
     @Value("#{environment.DISCORD_BOT_TOKEN}")
     private String discordBotToken;
 

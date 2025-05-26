@@ -31,17 +31,20 @@ public interface BrickSetRepository extends JpaRepository<BrickSet, Long> {
             WHERE timestamp >= NOW() - INTERVAL '3 hours'
             ORDER BY brick_set_number, price ASC 
         ), highest_part_out AS (
-            SELECT DISTINCT ON (marketplace, brick_set_number) *
+            SELECT DISTINCT ON (brick_set_number) *
             FROM brick_set_part_out_price
-            ORDER BY marketplace, brick_set_number, timestamp, price DESC
+            ORDER BY brick_set_number, marketplace, timestamp, price DESC
         ), best_prices AS (
             SELECT
                 lo.id as lowest_offer_id,
                 bs.name as set_name,
                 bs.number as set_number,
                 bs.theme as theme,
+                bs.pieces as pieces,
+                bs.lots as lots,
                 p.web_store as web_store,
                 lo.price as price,
+                ROUND(hpo.price, 2) as part_out_price,
                 ROUND(hpo.price / lo.price, 2) as part_out_ratio,
                 p.image as image,
                 p.link as purchase_link,

@@ -1,26 +1,23 @@
 package com.vastbricks.webstore;
 
-
 import com.vastbricks.jpa.entity.WebStore;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
-public class M79Scraper extends HtmlScraper {
-
+public class ToysPlanetScraper extends HtmlScraper {
     @Override
     protected ScraperArgs scraperArgs() {
         return ScraperArgs.builder()
-            .urls(List.of("https://m79.lv/rotallietasspeles/lego/{page}"))
+            .urls(List.of("https://www.toysplanet.lv/lv/lego-un-konstruktori/konstruktori/tx-S802?page={page}&limit=24"))
             .page(1)
-            .itemsCssQuery("div.item")
+            .itemsCssQuery("div.category-product")
             .itemProcessor(element ->
-                element.selectFirst("h3") == null ? null :
                 WebSet.builder()
-                    .name(element.selectFirst("h3").text())
-                    .price(parsePrice(element.selectFirst("div.price").selectFirst("b").text()))
-                    .link(element.selectFirst("h3").selectFirst("a").attr("href"))
+                    .name(element.selectFirst("h4.card-title").text() )
+                    .price(parsePrice(element.selectFirst("div.price__primary").text()))
+                    .link(element.selectFirst("a.card-link").attr("href"))
                     .image(element.selectFirst("img").attr("src"))
                 .build()
             )
@@ -29,6 +26,6 @@ public class M79Scraper extends HtmlScraper {
 
     @Override
     public WebStore getWebStore() {
-        return WebStore.M79;
+        return WebStore.TOYS_PLANET;
     }
 }

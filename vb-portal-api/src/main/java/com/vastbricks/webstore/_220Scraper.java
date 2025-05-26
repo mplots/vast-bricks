@@ -9,8 +9,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.util.List;
 
-//@Component
+@Component
 @Slf4j
 public class _220Scraper extends HtmlScraper {
 
@@ -37,9 +38,10 @@ public class _220Scraper extends HtmlScraper {
         var mapper = new ObjectMapper();
         mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
         return ScraperArgs.builder()
-            .url("https://220.lv/lv/rotallietas-un-preces-berniem/rotallietas-un-speles/konstruktori/f/lego?page={page}")
+            .urls(List.of("https://220.lv/lv/rotallietas-un-preces-berniem/rotallietas-un-speles/konstruktori/f/lego?page={page}"))
             .page(1)
             .itemsCssQuery("div.c-product-card")
+            .userAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36")
             .itemProcessor(element -> {
                 try {
                     var json = element.attr("widget-data");

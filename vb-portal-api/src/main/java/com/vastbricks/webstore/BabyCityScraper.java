@@ -3,13 +3,15 @@ package com.vastbricks.webstore;
 import com.vastbricks.jpa.entity.WebStore;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class BabyCityScraper extends HtmlScraper {
 
     @Override
     protected ScraperArgs scraperArgs() {
         return ScraperArgs.builder()
-            .url("https://www.babycity.lv/lv/lego-un-konstruktori/tx-S8?taxonCode%5B0%5D=2539%7CS801%7C2%7C2641&limit=24&page={page}")
+            .urls(List.of("https://www.babycity.lv/lv/lego-un-konstruktori/tx-S8?taxonCode%5B0%5D=2539%7CS801%7C2%7C2641&limit=24&page={page}"))
             .page(1)
             .itemsCssQuery("div.product-box")
             .itemProcessor(element ->

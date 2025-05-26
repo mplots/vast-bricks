@@ -9,4 +9,7 @@ public interface Scraper {
     Pattern ID_PATTERN = Pattern.compile("\\b\\d{5}\\b");
     List<WebSet> scrape();
     WebStore getWebStore();
+
+
+
 }

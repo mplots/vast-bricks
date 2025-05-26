@@ -50,6 +50,7 @@
             display: flex;
             justify-content: center;
             padding: 10px; /* Reduced padding */
+            position: relative;
         }
 
         .product-image img {
@@ -58,6 +59,31 @@
             max-width: 100%;
             border-radius: 8px; /* Slightly rounded corners */
             object-fit: contain;
+            display: block;
+        }
+
+
+        .badge {
+            position: absolute;
+            right: 8px;
+            padding: 4px 8px;
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+            border-radius: 12px;
+            min-width: 28px;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .badge-top {
+            top: 8px;
+            background-color: #728875;
+        }
+
+        .badge-bottom {
+            background-color: #AAA081;
+            top: 35px;
         }
 
         .product-details {
@@ -174,6 +200,8 @@
         <div class="product-image">
             <div>
                 <img th:src="${offer.image}" alt="Product Image"/>
+                <span class="badge badge-top" th:if="${offer.pieces != null}" th:text="${offer.pieces + ' pcs'}"></span>
+                <span class="badge badge-bottom" th:if="${offer.lots != null}" th:text="${offer.lots + ' lots'}"></span>
             </div>
         </div>
         <div class="product-details">
@@ -198,10 +226,34 @@
                 </div>
 
                 <div class="product-meta">
+                    <i class="material-icons">add_business</i>
+                    <div class="meta-info">
+                        <span class="meta-title">Part out</span>
+                        <span class="meta-value" th:text="'€'+ ${offer.partOutPrice}"/>
+                    </div>
+                </div>
+
+                <div class="product-meta" th:if="${offer.pieces != null}">
+                    <i class="material-icons">scatter_plot</i>
+                    <div class="meta-info">
+                        <span class="meta-title">Pear piece</span>
+                        <span class="meta-value" th:text="'€'+ ${offer.price / (offer.pieces == null ? 1 : offer.pieces)}"/>
+                    </div>
+                </div>
+
+                <div class="product-meta">
                     <i class="material-icons">monetization_on</i>
                     <div class="meta-info">
                         <span class="meta-title">Profit</span>
-                        <span class="meta-value" th:text="'€'+ ${offer.price.multiply(offer.partOutRatio).subtract(offer.price).setScale(2,2)}"/>
+                        <span class="meta-value"  style="color: #28a745" th:text="'€'+ ${offer.price.multiply(offer.partOutRatio).subtract(offer.price).setScale(2,2)}"/>
+                    </div>
+                </div>
+
+                <div class="product-meta">
+                    <i class="material-icons">merge_type</i>
+                    <div class="meta-info">
+                        <span class="meta-title">Theme</span>
+                        <span class="meta-value" th:text="${offer.theme}"/>
                     </div>
                 </div>
 
