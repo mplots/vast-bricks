@@ -10,6 +10,7 @@ public interface BestOffer {
     String getTheme();
     String getWebStore();
     BigDecimal getPrice();
+    BigDecimal getLowestPrice();
     BigDecimal getPartOutPrice();
     BigDecimal getPartOutRatio();
     String getImage();

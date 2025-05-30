@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StopWatch;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -50,6 +51,11 @@ public class WebStoreScraperJob {
         var brickSets = brickSetRepository.findByNumberIn(webSetNumbers);
         var brickSetOffers = new ArrayList<BrickSetOffer>();
 
+
+        var watch = new StopWatch();
+        watch.start();
+        log.info("Starting to save web sets");
+
         for (var webSet : webSets) {
             var brickSet = brickSets.stream().filter(e->e.getNumber().equals(webSet.getNumber())).findFirst();
             if (brickSet.isPresent()) {
@@ -69,7 +75,7 @@ public class WebStoreScraperJob {
                 brickSetOffers.add(brickSetOffer);
                 brickSetOfferRepository.upsert(brickSetOffer);
                 if (!result.getUpdated()) {
-                    var offers = brickSetRepository.findBestOffers(brickSet.get().getNumber(), null);
+                    var offers = brickSetRepository.findBestOffers(null, brickSet.get().getNumber(), null, false, null, null);
                     var prices = brickSetRepository.findSingleBestPrices(brickSet.get().getNumber());
                     if (offers.size() == 1 &&
                         offers.get(0).getPartOutRatio().compareTo(new BigDecimal("4.00")) >= 0 &&
@@ -82,6 +88,9 @@ public class WebStoreScraperJob {
                 log.warn("Owl set with number %s not found".formatted(webSet.getNumber()));
             }
         }
+
+        watch.stop();
+        log.info("Completed saving web sets. Time elapsed: %s seconds.".formatted(watch.getTotalTimeSeconds()));
     }
 
 }

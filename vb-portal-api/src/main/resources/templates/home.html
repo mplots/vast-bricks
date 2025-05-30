@@ -6,7 +6,7 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
         /* General Page Styles */
-        body {
+        .content {
             font-family: 'Inter', sans-serif;
             background-color: #f8f9fa;
             margin: 0;
@@ -193,8 +193,159 @@
 </head>
 <body>
 
-<h1>Product List</h1>
+<div id="filter-container" style="font-family: 'Inter', sans-serif; background-color: #f8f9fa;">
+    <style>
+        #filter-header {
+            display: flex;
+            justify-content: flex-end;
+            padding: 1rem;
+        }
 
+        #filter-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            background: #e0e0e0;
+            color: #333;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #filter-toggle i.material-icons {
+            font-size: 1.2rem;
+        }
+
+        #filter-drawer {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 90%;
+            max-width: 320px;
+            height: 100%;
+            background: #fff;
+            box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+            transition: right 0.3s ease;
+            padding: 1rem;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        #filter-drawer.open {
+            right: 0;
+        }
+
+        #filter-drawer form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .filter-section {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .filter-section label {
+            font-size: 0.95rem;
+        }
+
+        #filter-backdrop {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 999;
+        }
+
+        #filter-backdrop.show {
+            display: block;
+        }
+    </style>
+
+    <!-- Filter Button -->
+    <div id="filter-header">
+        <button id="filter-toggle">
+            <i class="material-icons">tune</i>
+            Filters
+        </button>
+    </div>
+
+
+    <div id="filter-backdrop"></div>
+    <div id="filter-drawer">
+        <form id="filter-form" method="GET" action="/">
+            <div class="filter-section">
+                <strong>Stores</strong>
+                <label th:each="store : ${stores}"><input type="checkbox" name="stores" th:value="${store}" th:text="${store}" ></label>
+            </div>
+            <div class="filter-section">
+                <strong>Flags</strong>
+                <label><input type="checkbox" name="atl" value="true">All-Time Lowest Price</label>
+            </div>
+            <div class="filter-section">
+                <strong>Themes</strong>
+                <label th:each="theme : ${themes}"><input type="checkbox" name="themes" th:value="${theme}" th:text="${theme}" ></label>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        const drawer = document.getElementById('filter-drawer');
+        const toggle = document.getElementById('filter-toggle');
+        const backdrop = document.getElementById('filter-backdrop');
+
+        toggle.addEventListener('click', () => {
+            drawer.classList.add('open');
+            backdrop.classList.add('show');
+        });
+
+        backdrop.addEventListener('click', () => {
+            drawer.classList.remove('open');
+            backdrop.classList.remove('show');
+        });
+
+        document.querySelectorAll('#filter-form input').forEach(input => {
+            input.addEventListener('change', () => {
+                document.getElementById('filter-form').submit();
+            });
+        });
+
+        function getQueryParams() {
+            const params = new URLSearchParams(window.location.search);
+            const map = {};
+            for (const [key, value] of params.entries()) {
+                if (map[key]) {
+                    map[key] = Array.isArray(map[key]) ? [...map[key], value] : [map[key], value];
+                } else {
+                    map[key] = value;
+                }
+            }
+            return map;
+        }
+
+        (function populateFormFromQuery() {
+            const query = getQueryParams();
+            const form = document.getElementById("filter-form");
+            Object.entries(query).forEach(([key, value]) => {
+                const values = Array.isArray(value) ? value : [value];
+                values.forEach(val => {
+                    const checkbox = form.querySelector(`input[name="${key}"][value="${val}"]`);
+                    if (checkbox) checkbox.checked = true;
+                });
+            });
+        })();
+    </script>
+</div>
+
+
+<div class="content">
 <div class="product-container">
     <div th:each="offer : ${bestPrices}" class="product-card">
         <div class="product-image">
@@ -214,6 +365,14 @@
                     <div class="meta-info">
                         <span class="meta-title">Price</span>
                         <span class="meta-value" th:text="'€'+ ${offer.price}"/>
+                    </div>
+                </div>
+
+                <div class="product-meta">
+                    <i class="material-icons">trending_down</i>
+                    <div class="meta-info">
+                        <span class="meta-title">ATL Price</span>
+                        <span class="meta-value" th:text="'€'+ ${offer.getLowestPrice()}"/>
                     </div>
                 </div>
 
@@ -278,6 +437,6 @@
         </div>
     </div>
 </div>
-
+</div>
 </body>
 </html>

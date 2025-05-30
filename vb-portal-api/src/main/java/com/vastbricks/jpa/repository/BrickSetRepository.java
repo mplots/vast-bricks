@@ -19,6 +19,11 @@ public interface BrickSetRepository extends JpaRepository<BrickSet, Long> {
     List<String> findAllSetNumbers();
 
     @Query(value = """
+      SELECT DISTINCT ON (theme) theme FROM brick_set; 
+    """, nativeQuery = true)
+    List<String> getAllThemes();
+
+    @Query(value = """
         WITH lowest_offer AS (
             SELECT DISTINCT ON (brick_set_number)
                 bso.price,
@@ -30,7 +35,19 @@ public interface BrickSetRepository extends JpaRepository<BrickSet, Long> {
             JOIN product p ON bso.product_id = p.id
             WHERE timestamp >= NOW() - INTERVAL '3 hours'
             ORDER BY brick_set_number, price ASC 
-        ), highest_part_out AS (
+        ),
+        all_time_lowest_offer AS (
+            SELECT DISTINCT ON (brick_set_number)
+                bso.price,
+                bso.id,
+                bso.timestamp,
+                p.brick_set_number,
+                bso.product_id
+            FROM brick_set_offer bso
+            JOIN product p ON bso.product_id = p.id
+            ORDER BY brick_set_number, price ASC
+        ), 
+        highest_part_out AS (
             SELECT DISTINCT ON (brick_set_number) *
             FROM brick_set_part_out_price
             ORDER BY brick_set_number, marketplace, timestamp, price DESC
@@ -44,6 +61,7 @@ public interface BrickSetRepository extends JpaRepository<BrickSet, Long> {
                 bs.lots as lots,
                 p.web_store as web_store,
                 lo.price as price,
+                atlo.price as lowest_price,
                 ROUND(hpo.price, 2) as part_out_price,
                 ROUND(hpo.price / lo.price, 2) as part_out_ratio,
                 p.image as image,
@@ -56,6 +74,7 @@ public interface BrickSetRepository extends JpaRepository<BrickSet, Long> {
                 ) AS price_timestamp
             FROM brick_set bs
             JOIN lowest_offer lo ON lo.brick_set_number = bs.number
+            JOIN all_time_lowest_offer atlo ON atlo.brick_set_number = bs.number
             JOIN highest_part_out hpo ON hpo.brick_set_number = bs.number
             JOIN product p ON lo.product_id = p.id
         ) SELECT * FROM best_prices 
@@ -64,11 +83,23 @@ public interface BrickSetRepository extends JpaRepository<BrickSet, Long> {
                 (:set IS NULL AND :ean IS NULL) OR 
                 set_number = :set OR
                 ean_ids @> ('["' || :ean || '"]')::jsonb
+            ) AND (
+                NOT :atl OR price = lowest_price
+            ) AND (
+                CAST(:stores AS TEXT) IS NULL OR web_store IN (:stores)
+            ) AND (
+                CAST(:themes AS TEXT) IS NULL OR theme IN (:themes)
             )
-        ORDER BY part_out_ratio DESC;
+        ORDER BY part_out_ratio DESC
+        LIMIT :limit
+        ;
     """, nativeQuery = true)
-    List<BestOffer> findBestOffers(@Param("set") Long set, @Param("ean") Long ean);
-
+    List<BestOffer> findBestOffers(@Param("limit") Integer limit,
+                                   @Param("set") Long set,
+                                   @Param("ean") Long ean,
+                                   @Param("atl") Boolean atl,
+                                   @Param("stores") String[] stores,
+                                   @Param("themes") String[] themes);
 
     @Query(value = """
         SELECT 
