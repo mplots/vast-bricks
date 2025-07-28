@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "1a Auto Crawler",
+  "version": "1.0",
+  "description": "Auto-submits LEGO set numbers and sends data to API",
+  "permissions": ["scripting"],
+  "host_permissions": ["https://www.1a.lv/c/berniem-mazuliem/lego-rotallietas-un-lelles/lego/37h*"],
+  "content_scripts": [
+    {
+      "matches": ["https://www.1a.lv/c/berniem-mazuliem/lego-rotallietas-un-lelles/lego/37h*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

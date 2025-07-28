@@ -1,11 +1,9 @@
 package com.vastbricks.webstore;
 
-import com.vastbricks.jpa.entity.WebStore;
-import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.List;
 
-@Component
 public class Ksenukai extends HtmlScraper {
 
    @Override
@@ -27,7 +25,7 @@ public class Ksenukai extends HtmlScraper {
     }
 
     @Override
-    public WebStore getWebStore() {
-        return WebStore.KSENUKAI;
+    public String getWebStore() {
+        return "ksenukai.lv";
     }
 }

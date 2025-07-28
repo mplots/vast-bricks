@@ -1,7 +1,6 @@
 package com.vastbricks.webstore;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.vastbricks.jpa.entity.WebStore;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -121,7 +120,7 @@ public class XSScraper implements Scraper {
     }
 
     @Override
-    public WebStore getWebStore() {
-        return WebStore.XS;
+    public String getWebStore() {
+        return "xsrotallietas.lv";
     }
 }

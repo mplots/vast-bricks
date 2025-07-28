@@ -1,16 +1,18 @@
 package com.vastbricks.webstore;
 
-import com.vastbricks.jpa.entity.WebStore;
-import org.springframework.stereotype.Component;
+import org.springframework.http.HttpHeaders;
 
 import java.util.List;
+import java.util.Map;
 
-@Component
 public class _1aScraper extends HtmlScraper {
     @Override
     protected ScraperArgs scraperArgs() {
         return ScraperArgs.builder()
             .urls(List.of("https://www.1a.lv/c/berniem-mazuliem/lego-rotallietas-un-lelles/lego/37h?page_per=72&page={page}"))
+            .headers(Map.of(
+                HttpHeaders.USER_AGENT, "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36"
+            ))
             .page(0)
             .itemsCssQuery("div.catalog-taxons-product")
             .itemProcessor(element ->
@@ -26,7 +28,7 @@ public class _1aScraper extends HtmlScraper {
     }
 
     @Override
-    public WebStore getWebStore() {
-        return WebStore._1A;
+    public String  getWebStore() {
+        return "1a.lv";
     }
 }

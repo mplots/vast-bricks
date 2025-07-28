@@ -1,7 +1,6 @@
 package com.vastbricks.webstore;
 
 
-import com.vastbricks.jpa.entity.WebStore;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -27,7 +26,7 @@ public class IiziiScraper extends HtmlScraper {
     }
 
     @Override
-    public WebStore getWebStore() {
-        return WebStore.IIZII;
+    public String getWebStore() {
+        return "iizii.eu";
     }
 }

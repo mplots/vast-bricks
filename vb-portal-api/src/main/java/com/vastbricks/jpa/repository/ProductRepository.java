@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 public interface ProductRepository extends JpaRepository<OwlWebSetInventory, Integer> {
 
     @Query(value = """
@@ -41,4 +43,9 @@ public interface ProductRepository extends JpaRepository<OwlWebSetInventory, Int
         SELECT id, updated FROM i
     """, nativeQuery = true)
     Upsert upsert(@Param("product") Product product);
+
+    @Query(value = """
+        SELECT web_store FROM product GROUP BY web_store;
+    """, nativeQuery = true)
+    List<String> findWebStores();
 }

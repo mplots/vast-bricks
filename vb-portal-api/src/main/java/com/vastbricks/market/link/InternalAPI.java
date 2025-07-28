@@ -1,59 +1,67 @@
 package com.vastbricks.market.link;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.vastbricks.config.LoggingInterceptor;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import lombok.AllArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.jsoup.Jsoup;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.web.client.RestTemplate;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
+import java.util.Collections;
+
 
 @Slf4j
+@AllArgsConstructor
 public class InternalAPI {
-    private static final String BASE_URL = "https://bricklink.com";
-    private BigDecimal currencyRate = new BigDecimal("0.88");
 
-    private static TorRestTemplate template = new TorRestTemplate();
+    private String cookie;
 
-    public PartOutValue partOutValue(String set) {
-        var url = "%s/catalogPOV.asp?itemType=S&itemNo=%s&itemSeq=1&itemQty=1&bl=M&itemCondition=N&incInstr=Y&incParts=Y".formatted(BASE_URL, set);
-        var headers = new HttpHeaders();
-        log.info("Fetching BrickLink Part Out: %s".formatted(url));
-        var response = template.exchange(url, HttpMethod.GET, new HttpEntity<>(null, headers), String.class);
-        if (response == null) {
-            return null;
-        }
-        var form = Jsoup.parse(response.getBody());
-        var priceString = form.selectXpath("//tr[3]/td[1]//font[2]").text();
-        if (StringUtils.isBlank(priceString)) {
-            log.warn("Part out value for set '%s' not found".formatted(set));
-            return null;
-        } else {
-            var last6monthsSalesAvg =  parsePrice(form.selectXpath("//tr[3]/td[1]//font[2]").text());
-            return PartOutValue.builder()
-                    .last6monthsSalesAvg(last6monthsSalesAvg)
-                    .pieces(Integer.valueOf(form.selectXpath("//tr[3]/td[1]//font[3]//b[1]").text()))
-                    .lots(Integer.valueOf(form.selectXpath("//tr[3]/td[1]//font[3]//b[2]").text()))
-                    .link(url)
-                    .build();
-        }
+    private final RestTemplate template = new RestTemplate();
+    private static final String BASE_URL = "https://www.bricklink.com";
 
+    public ShippingMethod getShippingMethod(Integer id) {
+        var url = "%s/ajax/renovate/mystore/shipping_method.ajax?action=get&id=%s".formatted(BASE_URL, id);
+        var ajaxHeaders = new HttpHeaders();
+        ajaxHeaders.add("x-requested-with", "XMLHttpRequest");
+        ajaxHeaders.add(HttpHeaders.COOKIE, cookie);
+        return template.exchange(url, HttpMethod.GET, new HttpEntity<>(ajaxHeaders), ShippingMethod.class).getBody();
     }
 
-    protected BigDecimal parsePrice(String price) {
-        if (StringUtils.isBlank(price)) {
-            return null;
-        }
-        if (price.contains(",") && price.contains(".")) {
-            price = price.replace(",", "");
-        }
-        var trimmed = price.replace(" ", "").replace(",", ".");
-        if (price.contains("EUR")) {
-            return new BigDecimal(trimmed.replace("EUR","")).setScale(2, RoundingMode.HALF_UP);
-        } else {
-            return new BigDecimal(trimmed.replace("US", "").replace("$", "")).multiply(currencyRate).setScale(2, RoundingMode.HALF_UP);
-        }
+    public Countries getCountries() {
+        var url = "%s/ajax/renovate/mystore/country_list.ajax".formatted(BASE_URL);
+        var ajaxHeaders = new HttpHeaders();
+        ajaxHeaders.add("x-requested-with", "XMLHttpRequest");
+        return template.getForObject(url, Countries.class);
+    }
+
+    @SneakyThrows
+    public ShippingMethod updateShippingMethod(Integer id, ShippingMethod shippingMethod) {
+
+        var url = "%s/ajax/renovate/mystore/shipping_method.ajax".formatted(BASE_URL);
+        var ajaxHeaders = new HttpHeaders();
+        ajaxHeaders.add("x-requested-with", "XMLHttpRequest");
+        ajaxHeaders.add(HttpHeaders.COOKIE, cookie);
+        ajaxHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        var objectMapper = new ObjectMapper();
+        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        var body = objectMapper.writeValueAsString(shippingMethod.getMethod());
+
+        var shipmentFormData = new LinkedMultiValueMap<String, Object>();
+        shipmentFormData.add("id", id);
+        shipmentFormData.add("unitType", 0);
+        shipmentFormData.add("action", "update");
+        shipmentFormData.add("method", body);
+        // Add logging interceptor
+        template.setInterceptors(Collections.singletonList(new LoggingInterceptor()));
+
+        return template.exchange(url, HttpMethod.POST, new HttpEntity<>(shipmentFormData, ajaxHeaders), ShippingMethod.class).getBody();
     }
 }

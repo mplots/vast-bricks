@@ -1,7 +1,5 @@
 package com.vastbricks.webstore;
 
-import com.vastbricks.jpa.entity.WebStore;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 
@@ -16,7 +14,7 @@ public class PiguScraper extends _220Scraper {
     }
 
     @Override
-    public WebStore getWebStore() {
-        return WebStore.PIGU;
+    public String  getWebStore() {
+        return "pigu.lt";
     }
 }

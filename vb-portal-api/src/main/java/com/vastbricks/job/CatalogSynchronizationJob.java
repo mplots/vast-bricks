@@ -8,6 +8,7 @@ import com.vastbricks.jpa.entity.OwlSet;
 import com.vastbricks.jpa.entity.OwlWebSetInventory;
 import com.vastbricks.jpa.repository.BrickSetPartOutPriceRepository;
 import com.vastbricks.jpa.repository.BrickSetRepository;
+import com.vastbricks.jpa.repository.MaterializedViewRefresh;
 import com.vastbricks.jpa.repository.OwlSetRepository;
 import com.vastbricks.jpa.repository.OwlWebSetInventoryRepository;
 import com.vastbricks.market.owl.IdType;
@@ -45,6 +46,7 @@ public class CatalogSynchronizationJob {
     private BrickSetPartOutPriceRepository brickSetPartOutPriceRepository;
     private EntityManager entityManager;
     private PartOutValueJob partOutValueJob;
+    private MaterializedViewRefresh materializedViewRefresh;
 
     @Scheduled(cron = "0 5 * * * *")
     public void runJob() {
@@ -89,6 +91,8 @@ public class CatalogSynchronizationJob {
 
         synchronizeBrickSets();
         partOutValueJob.synchronizeBrickSetPartOutPrices(newSets);
+
+        materializedViewRefresh.refreshCheapestOfferView();
 
         log.info("Catalog Synchronization Job Completed");
     }

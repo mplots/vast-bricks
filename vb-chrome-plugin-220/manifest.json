@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "220 Auto Crawler",
+  "version": "1.0",
+  "description": "Auto-submits LEGO set numbers and sends data to API",
+  "permissions": ["scripting"],
+  "host_permissions": ["https://220.lv/lv/rotallietas-un-preces-berniem/rotallietas-un-speles/konstruktori/f/legoblma*"],
+  "content_scripts": [
+    {
+      "matches": ["https://220.lv/lv/rotallietas-un-preces-berniem/rotallietas-un-speles/konstruktori/f/lego*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

@@ -355,7 +355,7 @@
                 <span class="badge badge-bottom" th:if="${offer.lots != null}" th:text="${offer.lots + ' lots'}"></span>
             </div>
         </div>
-        <div class="product-details">
+        <div class="product-details" th:id="${'product-' + offer.productId}">
             <h2 class="product-title" th:text="${offer.setName.replace('LEGO', '')}"></h2>
 
             <div class="product-metas">
@@ -396,7 +396,7 @@
                     <i class="material-icons">scatter_plot</i>
                     <div class="meta-info">
                         <span class="meta-title">Pear piece</span>
-                        <span class="meta-value" th:text="'€'+ ${offer.price / (offer.pieces == null ? 1 : offer.pieces)}"/>
+                        <span class="meta-value" th:text="'€'+ ${offer.pricePeerPeace}"/>
                     </div>
                 </div>
 

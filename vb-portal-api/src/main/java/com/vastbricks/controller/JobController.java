@@ -3,7 +3,6 @@ package com.vastbricks.controller;
 import com.vastbricks.job.CatalogSynchronizationJob;
 import com.vastbricks.job.PartOutValueJob;
 import com.vastbricks.job.WebStoreScraperJob;
-import com.vastbricks.jpa.entity.WebStore;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,9 +23,12 @@ public class JobController {
     private PartOutValueJob partOutValueJob;
 
     @GetMapping("trigger-web-store-scraper-job")
-    public String triggerWebStoreScraperJob(@RequestParam(value = "stores", required = false) List<WebStore> stores) {
-        stores = stores == null ? List.of(WebStore.values()) : stores;
-        webStoreScraperJob.runJobAsync(stores);
+    public String triggerWebStoreScraperJob(@RequestParam(value = "stores", required = false) List<String> stores) {
+        if (stores == null) {
+            webStoreScraperJob.runJobAsync();
+        } else {
+            webStoreScraperJob.runJobAsync(stores);
+        }
         return "ok";
     }
 

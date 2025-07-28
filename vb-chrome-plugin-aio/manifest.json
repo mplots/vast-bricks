@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "aio.lv Auto Crawler",
+  "version": "1.0",
+  "description": "Auto-submits LEGO set numbers and sends data to API",
+  "permissions": ["scripting"],
+  "host_permissions": ["https://aio.lv/lv/category--kubi-bloki-lego--331*"],
+  "content_scripts": [
+    {
+      "matches": ["https://aio.lv/lv/category--kubi-bloki-lego--331*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

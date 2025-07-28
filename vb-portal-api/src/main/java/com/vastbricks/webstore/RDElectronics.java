@@ -1,6 +1,5 @@
 package com.vastbricks.webstore;
 
-import com.vastbricks.jpa.entity.WebStore;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -25,7 +24,7 @@ public class RDElectronics extends HtmlScraper {
     }
 
     @Override
-    public WebStore getWebStore() {
-        return WebStore.RD_ELECTRONIC;
+    public String getWebStore() {
+        return "rdveikals.lv";
     }
 }

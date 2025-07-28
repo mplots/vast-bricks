@@ -1,0 +1,9 @@
+{
+  "scripts": {
+      "cy:open": "cypress open --browser chrome"
+  },
+  "devDependencies": {
+    "cypress-iframe": "^1.0.1"
+  }
+
+}

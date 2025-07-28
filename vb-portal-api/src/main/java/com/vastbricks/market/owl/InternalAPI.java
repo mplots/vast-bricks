@@ -359,7 +359,7 @@ public class InternalAPI {
         formData.add("advanced_max_price_limit", "");
         formData.add("advanced_volume", "");
         formData.add("advanced_total_dimensions", "");
-        formData.add("advanced_note", "");
+        formData.add("advanced_note", shippingMethod.getNote());
         formData.add("restrictions_dimensions_length", "");
         formData.add("restrictions_dimensions_width", "");
         formData.add("restrictions_dimensions_height", "");

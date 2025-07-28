@@ -1,6 +1,5 @@
 package com.vastbricks.webstore;
 
-import com.vastbricks.jpa.entity.WebStore;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -26,7 +25,7 @@ public class MaxtradeScraper extends HtmlScraper {
     }
 
     @Override
-    public WebStore getWebStore() {
-        return WebStore.MAXTRADE;
+    public String  getWebStore() {
+        return "maxtrade.lv";
     }
 }

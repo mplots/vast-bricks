@@ -1,5 +1,6 @@
 package com.vastbricks.shipping;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -9,11 +10,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Tariff {
 
     private Type type;
@@ -25,10 +28,35 @@ public class Tariff {
     private boolean mansPasts;
 
     private Result result;
+    private Input data;
 
     @Data
     @Getter
+    public static class Input {
+        @JsonProperty("lp_tariffs_modes")
+        private List<ModeInput> modes;
+    }
+
+    @Data
+    @Getter
+    public static class ModeInput {
+        @JsonProperty("lp_tariffs_modes_id")
+        private Integer id;
+
+        @JsonProperty("lp_tariffs_modes_title")
+        private String title;
+    }
+
+    @Data
+    @Getter
+    @NoArgsConstructor
     public static class Result {
+        private Result(Boolean success) {
+            this.success = success;
+        }
+
+        private boolean success;
+
         @JsonProperty("lp_tariffs_id")
         private Integer id;
 
@@ -138,7 +166,7 @@ public class Tariff {
         private String  ax;
 
         @JsonProperty("lp_tariffs_group")
-        private Integer group;
+        private String group;
   }
 
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -154,24 +182,26 @@ public class Tariff {
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
     @Getter
     public enum Mode {
-        SIMPLE(1, "Simple"),
-        RECORDED(2, "Recorded"),
-        INSURED(3, "Insured"),
-        TRACEABLE(4, "Traceable")
+        SIMPLE(1, "Simple", "V"),
+        RECORDED(2, "Recorded", "R"),
+        INSURED(3, "Insured", "I"),
+        TRACEABLE(4, "Traceable", "T")
         ;
 
         private Integer id;
         private String name;
+        private String code;
     }
 
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
     @Getter
     public enum Type {
-        DOCUMENT(2),
-        SMALL_PACKAGE(4),
-        PACKAGE(5)
+        DOCUMENT(2, "KD"),
+        SMALL_PACKAGE(4, "KP"),
+        PACKAGE(5, "P")
         ;
         private Integer id;
+        private String code;
     }
 
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -264,7 +294,7 @@ public class Tariff {
         KUWAIT("KUVEITA","KW",127,false,false),
         KYRGYZSTAN("KIRGĪZU REPUBLIKA","KG",115,false,false),
         LAOS("LAOSA","LA",129,false,false),
-//        LATVIA("LATVIJA","LV",1,false,false),
+        LATVIA("LATVIJA","LV",1,false,false),
         LEBANON("LIBĀNA","LB",131,false,false),
         LESOTHO("LESOTO","LS",130,false,false),
         MACAO("MAKAO","MO",137,false,false),

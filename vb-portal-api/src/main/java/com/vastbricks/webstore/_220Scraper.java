@@ -3,15 +3,12 @@ package com.vastbricks.webstore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.vastbricks.jpa.entity.WebStore;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-@Component
 @Slf4j
 public class _220Scraper extends HtmlScraper {
 
@@ -41,7 +38,6 @@ public class _220Scraper extends HtmlScraper {
             .urls(List.of("https://220.lv/lv/rotallietas-un-preces-berniem/rotallietas-un-speles/konstruktori/f/lego?page={page}"))
             .page(1)
             .itemsCssQuery("div.c-product-card")
-            .userAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36")
             .itemProcessor(element -> {
                 try {
                     var json = element.attr("widget-data");
@@ -63,7 +59,7 @@ public class _220Scraper extends HtmlScraper {
     }
 
     @Override
-    public WebStore getWebStore() {
-        return WebStore._220;
+    public String getWebStore() {
+        return "220.lv";
     }
 }

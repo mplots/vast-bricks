@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public interface BestOffer {
+    Long getProductId();
     Long getLowestOfferId();
     String getSetName();
     Long getSetNumber();
@@ -13,6 +14,7 @@ public interface BestOffer {
     BigDecimal getLowestPrice();
     BigDecimal getPartOutPrice();
     BigDecimal getPartOutRatio();
+    BigDecimal getPricePeerPeace();
     String getImage();
     String getPurchaseLink();
     String getPartOutLink();

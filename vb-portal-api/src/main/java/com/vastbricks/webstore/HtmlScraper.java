@@ -1,5 +1,6 @@
 package com.vastbricks.webstore;
 
+import com.vastbricks.config.LoggingInterceptor;
 import com.vastbricks.market.link.TorRestTemplate;
 import lombok.Builder;
 import lombok.Setter;
@@ -11,12 +12,19 @@ import org.jsoup.nodes.Element;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.client.BufferingClientHttpRequestFactory;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Slf4j
 public abstract class HtmlScraper implements Scraper {
@@ -30,7 +38,8 @@ public abstract class HtmlScraper implements Scraper {
         private DocumentProcessor documentProcessor;
         private ItemProcessor itemProcessor;
         private boolean useTor;
-        private String userAgent;
+        private Map<String, String> headers;
+        private Boolean randomThinkTime = false;
     }
 
     interface DocumentProcessor {
@@ -55,18 +64,29 @@ public abstract class HtmlScraper implements Scraper {
                 try {
 
                     var headers = new HttpHeaders();
-                    if (args.userAgent != null) {
-                        headers.set("User-Agent", args.userAgent);
+                    if (args.headers!=null) {
+                        args.headers.forEach(headers::add);
                     }
 
                     var entity = new HttpEntity<>(headers);
 
                     log.info("Scrapping %s Page: %s".formatted(getWebStore(), (page)));
-                    var html = args.useTor
-                            ?
-                             new TorRestTemplate().getForEntity(url, String.class, page !=null ?Map.of("page", page) : Map.of()).getBody() :
-                             new RestTemplate().exchange(url, HttpMethod.GET, entity, String.class, page !=null ? Map.of("page", page) : Map.of()).getBody()
-                            ;
+                    if (args.randomThinkTime !=null) {
+                        int seconds = ThreadLocalRandom.current().nextInt(2, 8);
+                        Thread.sleep(seconds * 1000);
+                    }
+                    var html = getHtml();
+                    if (html == null) {
+                        html = args.useTor ? new TorRestTemplate().getForEntity(url, String.class, page != null ? Map.of("page", page) : Map.of()).getBody() :
+                                             getRestTemplate().exchange(url, HttpMethod.GET, entity, String.class, page != null ? Map.of("page", page) : Map.of()).getBody()
+                        ;
+                    }else {
+                        hasMorePages = false;
+                    }
+
+                    html = modifyBody(html);
+
+
                     var doc = Jsoup.parse(html);
 
                     if (args.documentProcessor!=null && !args.documentProcessor.process(doc, page)){
@@ -87,8 +107,10 @@ public abstract class HtmlScraper implements Scraper {
                                 var matcher = ID_PATTERN.matcher(name);
                                 if (matcher.find() && name.toLowerCase().contains("lego") && !name.toLowerCase().contains("duplo") ) {
                                     webSet.setNumber(Long.valueOf(matcher.group()));
-                                    webSet.setStore(getWebStore());
-                                    result.add(webSet);
+                                    webSet.setStore(webSet.getStore() == null ? getWebStore() : webSet.getStore());
+                                    if (webSet.getStore() != null) {
+                                        result.add(webSet);
+                                    }
                                 }
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -118,4 +140,27 @@ public abstract class HtmlScraper implements Scraper {
     }
 
     protected abstract ScraperArgs scraperArgs();
+
+    protected String getHtml() {
+        return null;
+    }
+
+    protected String modifyBody(String string) {
+        return string;
+    }
+
+
+    private RestTemplate getRestTemplate() {
+        var template = new RestTemplate();
+//        // Allow multiple reads of the response body
+//        template.setRequestFactory(new BufferingClientHttpRequestFactory(new SimpleClientHttpRequestFactory()));
+//
+//        // Add logging interceptor
+//        template.setInterceptors(Collections.singletonList(new LoggingInterceptor()));
+//
+//        var jsonConverter = new MappingJackson2HttpMessageConverter();
+//        jsonConverter.setSupportedMediaTypes(Arrays.asList(MediaType.APPLICATION_JSON, MediaType.TEXT_HTML));
+//        template.getMessageConverters().add(jsonConverter);
+        return template;
+    }
 }

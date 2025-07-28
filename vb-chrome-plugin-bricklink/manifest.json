@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "BrickLink Latvijas Pasts Shipping",
+  "version": "1.0",
+  "description": "Send out shipping information to Latvijas Pasts",
+  "permissions": ["scripting"],
+  "host_permissions": ["https://www.bricklink.com/orderDetail.asp*"],
+  "content_scripts": [
+    {
+      "matches": ["https://www.bricklink.com/orderDetail.asp*"],
+      "js": ["content.js"]
+    }
+  ]
+}

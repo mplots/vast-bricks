@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "Salidzini Auto Crawler",
+  "version": "1.0",
+  "description": "Auto-submits LEGO set numbers and sends HTML to local API",
+  "permissions": ["scripting"],
+  "host_permissions": ["https://www.salidzini.lv/cena*"],
+  "content_scripts": [
+    {
+      "matches": ["https://www.salidzini.lv/cena*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

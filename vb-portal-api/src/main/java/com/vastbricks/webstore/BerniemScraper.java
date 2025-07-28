@@ -1,6 +1,5 @@
 package com.vastbricks.webstore;
 
-import com.vastbricks.jpa.entity.WebStore;
 import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -141,7 +140,7 @@ public class BerniemScraper implements Scraper {
     }
 
     @Override
-    public WebStore getWebStore() {
-        return WebStore.BERNIEM;
+    public String getWebStore() {
+        return "berniem.eu";
     }
 }

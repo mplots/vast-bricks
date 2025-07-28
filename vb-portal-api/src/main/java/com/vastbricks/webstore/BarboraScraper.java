@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.vastbricks.jpa.entity.WebStore;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
@@ -61,7 +60,7 @@ public class BarboraScraper implements Scraper {
                                 .name(e.title)
                                 .price(e.price)
                                 .image(e.image)
-                                .store(WebStore.BARBORA)
+                                .store("barbora.lv")
                                 .link("https://www.barbora.lv/produkti/" + e.url)
                                 .number(Long.valueOf(matcher.group()))
                             .build();
@@ -80,7 +79,7 @@ public class BarboraScraper implements Scraper {
     }
 
     @Override
-    public WebStore getWebStore() {
-        return WebStore.BARBORA;
+    public String getWebStore() {
+        return "barbora.lv";
     }
 }

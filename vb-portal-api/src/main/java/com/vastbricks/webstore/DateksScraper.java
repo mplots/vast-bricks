@@ -1,6 +1,5 @@
 package com.vastbricks.webstore;
 
-import com.vastbricks.jpa.entity.WebStore;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -26,7 +25,7 @@ public class DateksScraper extends HtmlScraper{
     }
 
     @Override
-    public WebStore getWebStore() {
-        return WebStore.DATEKS;
+    public String getWebStore() {
+        return "dateks.lv";
     }
 }

@@ -1,16 +1,12 @@
 package com.vastbricks.controller;
 
-import com.vastbricks.jpa.entity.WebStore;
 import com.vastbricks.jpa.repository.BrickSetRepository;
+import com.vastbricks.jpa.repository.ProductRepository;
 import lombok.AllArgsConstructor;
-import org.apache.catalina.Store;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
-import java.util.Arrays;
-import java.util.List;
 
 
 @Controller
@@ -18,6 +14,7 @@ import java.util.List;
 public class AggregatorController {
 
     private BrickSetRepository brickSetRepository;
+    private ProductRepository productRepository;
 
     @GetMapping("/")
     public String home(
@@ -30,7 +27,8 @@ public class AggregatorController {
             Model model) {
         var offers = brickSetRepository.findBestOffers(limit, set, ean, atl, stores, themes);
         model.addAttribute("bestPrices", offers);
-        model.addAttribute("stores", Arrays.stream(WebStore.values()).map(e->e.getName()).toList());
+
+        model.addAttribute("stores", productRepository.findWebStores());
         model.addAttribute("themes", brickSetRepository.getAllThemes());
         return "home";
     }

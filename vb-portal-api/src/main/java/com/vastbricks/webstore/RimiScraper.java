@@ -1,9 +1,10 @@
 package com.vastbricks.webstore;
 
-import com.vastbricks.jpa.entity.WebStore;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class RimiScraper extends HtmlScraper {
@@ -14,7 +15,9 @@ public class RimiScraper extends HtmlScraper {
             .urls(List.of("https://www.rimi.lv/e-veikals/en/products/babies-and-children/toys/lego-construction-sets/c/SH-15-8-27?currentPage={page}&pageSize=80"))
             .page(1)
             .itemsCssQuery("li.product-grid__item")
-            .userAgent("MyCustomUserAgent/1.0")
+            .headers(Map.of(
+                HttpHeaders.USER_AGENT, "MyCustomUserAgent/1.0"
+            ))
             .itemProcessor(element -> {
                 var discounted = element.selectFirst("div.price-per-unit");
                 var regular = element.selectFirst("p.card__price-per");
@@ -33,7 +36,7 @@ public class RimiScraper extends HtmlScraper {
     }
 
     @Override
-    public WebStore getWebStore() {
-        return WebStore.RIMI;
+    public String getWebStore() {
+        return "rimi.lv";
     }
 }

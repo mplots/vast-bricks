@@ -1,6 +1,5 @@
 package com.vastbricks.webstore;
 
-import com.vastbricks.jpa.entity.WebStore;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -87,7 +86,7 @@ public class DepoScraper implements Scraper {
 
     @Override
     public List<WebSet> scrape() {
-       var restTemplate = new RestTemplate();
+        var restTemplate = new RestTemplate();
         var url = "https://online.depo.lv/graphql";
         var page = 1;
         var start = 1;
@@ -123,7 +122,7 @@ public class DepoScraper implements Scraper {
     }
 
     @Override
-    public WebStore getWebStore() {
-        return WebStore.DEPO;
+    public String getWebStore() {
+        return "depo.lv";
     }
 }

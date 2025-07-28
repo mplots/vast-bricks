@@ -3,9 +3,9 @@ package com.vastbricks.job;
 import com.vastbricks.discord.DiscordClient;
 import com.vastbricks.jpa.entity.BrickSetOffer;
 import com.vastbricks.jpa.entity.Product;
-import com.vastbricks.jpa.entity.WebStore;
 import com.vastbricks.jpa.repository.BrickSetOfferRepository;
 import com.vastbricks.jpa.repository.BrickSetRepository;
+import com.vastbricks.jpa.repository.MaterializedViewRefresh;
 import com.vastbricks.jpa.repository.ProductRepository;
 import com.vastbricks.webstore.Scraper;
 import com.vastbricks.webstore.WebSet;
@@ -32,6 +32,8 @@ public class WebStoreScraperJob {
     private BrickSetOfferRepository brickSetOfferRepository;
     private ProductRepository productRepository;
     private DiscordClient discordClient;
+    private MaterializedViewRefresh materializedViewRefresh;
+//    private SalidziniScraper salidziniScraper;
 
     @Scheduled(fixedRate=60*60*1000, initialDelay =60*60*1000)
     public void runJob() {
@@ -40,13 +42,19 @@ public class WebStoreScraperJob {
 
     @Async
     public void runJobAsync() {
-        runJobAsync(List.of(WebStore.values()));
+        var stores = scrapers.stream().map(e->e.getWebStore()).toList();
+        runJobAsync(stores);
     }
 
     @Async
-    public void runJobAsync(List<WebStore> webStore) {
+    public void runJobAsync(List<String> webStore) {
         var webSets = scrapers.stream().filter(e->webStore.contains(e.getWebStore())).map(Scraper::scrape).flatMap(List::stream).toList();
+//        webSets.addAll(salidziniScraper.scrape(webSets.stream().map(e->e.getNumber()).collect(Collectors.toSet()).stream().toList()));
+        storeWebSets(webSets, true);
 
+    }
+
+    public void storeWebSets(List<WebSet> webSets, boolean refreshView) {
         var webSetNumbers = webSets.stream().map(WebSet::getNumber).collect(Collectors.toSet());
         var brickSets = brickSetRepository.findByNumberIn(webSetNumbers);
         var brickSetOffers = new ArrayList<BrickSetOffer>();
@@ -64,7 +72,7 @@ public class WebStoreScraperJob {
                 product.setLink(webSet.getLink());
                 product.setImage(webSet.getImage());
                 product.setBrickSet(brickSet.get());
-                product.setWebStore(webSet.getStore().getName());
+                product.setWebStore(webSet.getStore());
                 var result = productRepository.upsert(product);
                 product.setId(result.getId());
 
@@ -78,8 +86,8 @@ public class WebStoreScraperJob {
                     var offers = brickSetRepository.findBestOffers(null, brickSet.get().getNumber(), null, false, null, null);
                     var prices = brickSetRepository.findSingleBestPrices(brickSet.get().getNumber());
                     if (offers.size() == 1 &&
-                        offers.get(0).getPartOutRatio().compareTo(new BigDecimal("4.00")) >= 0 &&
-                        prices.get(0).getOfferId().equals(offers.get(0).getLowestOfferId())
+                            offers.get(0).getPartOutRatio().compareTo(new BigDecimal("4.00")) >= 0 &&
+                            prices.get(0).getOfferId().equals(offers.get(0).getLowestOfferId())
                     ) {
                         discordClient.publishMessage("https://vastbricks.com/product?set=%s&store=%s".formatted(brickSet.get().getNumber(), prices.get(0).getWebStore()));
                     }
@@ -90,6 +98,9 @@ public class WebStoreScraperJob {
         }
 
         watch.stop();
+        if (refreshView) {
+            materializedViewRefresh.refreshCheapestOfferView();
+        }
         log.info("Completed saving web sets. Time elapsed: %s seconds.".formatted(watch.getTotalTimeSeconds()));
     }
 

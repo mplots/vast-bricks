@@ -1,6 +1,5 @@
 package com.vastbricks.webstore;
 
-import com.vastbricks.jpa.entity.WebStore;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -25,7 +24,7 @@ public class BabyCityScraper extends HtmlScraper {
         .build();
     }
     @Override
-    public WebStore getWebStore() {
-        return WebStore.BABY_CITY;
+    public String getWebStore() {
+        return "babycity.lv";
     }
 }
