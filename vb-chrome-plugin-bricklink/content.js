@@ -18,54 +18,62 @@ function getBuyerInfoTable() {
 }
 
 (function () {
-
     const buyerInfoTable = getBuyerInfoTable();
+    if (!buyerInfoTable) return;
 
     const newRow = document.createElement('tr');
-    newRow.bgColor = '#EEEEEE'
+    newRow.bgColor = '#EEEEEE';
     newRow.innerHTML = `
-    <td><label for="weightInput">&nbsp;Weight (g):</label></td>
-    <td>
-      <input id="weightInput" type="number" style="width: 100px;" />
-      <button id="submitWeightBtn">Submit</button>
-    </td>
-  `;
+      <td><label for="weightInput">&nbsp;Weight (g):</label></td>
+      <td>
+        <input id="weightInput" type="number" style="width: 100px;" />
+        <button id="submitWeightBtn">Submit</button>
+        <span id="statusMsg" style="margin-left: 10px; font-weight: bold;"></span>
+      </td>
+    `;
     buyerInfoTable.querySelector('tbody').appendChild(newRow);
 
-    // 5. Helper to extract text safely
-    function getText(td) {
-        return td ? td.textContent.trim() : '';
-    }
+    const btn = document.getElementById('submitWeightBtn');
+    const statusMsg = document.getElementById('statusMsg');
 
-    document.getElementById('submitWeightBtn').addEventListener('click', () => {
+    btn.addEventListener('click', () => {
         const weight = document.getElementById('weightInput').value;
+        const id = new URL(window.location.href).searchParams.get("ID");
+        const payload = { orderId: id, weight: weight };
 
-        const rows = buyerInfoTable.querySelectorAll('tr');
-        const username = getText(rows[0]?.children[1]);
-        const email = rows[1]?.children[1]?.textContent.trim();
-        const address = rows[2]?.children[1]?.innerText.trim();
-        const phone = getText(rows[3]?.children[1]);
+        // Show loading indicator
+        statusMsg.style.color = "blue";
+        statusMsg.textContent = "Submitting...";
 
-        const payload = {
-            username,
-            email,
-            address,
-            phone,
-            weight
-        };
-
-        fetch('https://example.com/api/submit', {
+        fetch('https://vastbricks.com/api/bricklink/shipping-request', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         })
-            .then(res => res.json())
-            .then(data => alert('Submitted successfully!'))
-            .catch(err => {
-                console.error(err);
-                alert('Submission failed!');
-            });
+        .then(res => {
+            if (!res.ok) {
+                throw new Error(`HTTP error! status: ${res.status}`);
+            }
+            return res.blob();
+        })
+        .then(blob => {
+            // Create a download link for PDF
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `shipping-label-${id}.pdf`; // file name
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(url);
+
+            statusMsg.style.color = "green";
+            statusMsg.textContent = `PDF downloaded successfully!`;
+        })
+        .catch(err => {
+            console.error(err);
+            statusMsg.style.color = "red";
+            statusMsg.textContent = "Submission failed!";
+        });
     });
 })();

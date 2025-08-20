@@ -20,7 +20,7 @@ sudo docker build -t vastbricks.com/bricksync:latest .
 sudo docker run -d --cpus=".1" -v /home/ubuntu/bricksync/data:/opt/bricksync/data --name bricksync vastbricks.com/bricksync:latest
 
 
-#Renew Certificate
+# Renew Certificate
 openssl x509 -enddate -noout -in /etc/letsencrypt/live/vastbricks.com/cert.pem
 cd /etc/letsencrypt/live/vastbricks.com
 sudo certbot renew --apache

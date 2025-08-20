@@ -12,6 +12,7 @@
             --main-color: #535353;
             --accent-bg: #f0f0f0;
             --highlight-bg: #e8e8e8;
+            --highlight-error-bg: #944B51
         }
 
         body {
@@ -56,6 +57,14 @@
             color: var(--main-color);
         }
 
+        .highlight-red {
+            background-color: var(--highlight-error-bg);
+            padding: 1rem;
+            border-left: 4px solid var(--main-color);
+            margin: 1.5rem 0;
+            color: white;
+        }
+
         footer {
             text-align: center;
             margin-top: 2rem;
@@ -70,6 +79,11 @@
 </head>
 <body>
 <div class="container">
+    <div class="highlight-red">
+        <strong style="color: white">Dear friends in the United States</strong><br/><br/>
+        Unfortunately, I have had to suspend shipping to the USA. The US government has announced that starting 29 August, all imports without prepaid import duty will be blocked. As a result, my local shipping providers have stopped offering service to the USA.
+    </div>
+
     <!-- Logo -->
     <img src="logo.png" alt="Vast Bricks Logo" class="logo" />
 
