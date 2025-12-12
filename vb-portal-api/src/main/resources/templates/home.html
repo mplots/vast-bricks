@@ -85,6 +85,33 @@
             gap: 0.3rem;
         }
 
+        .store-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .store-name {
+            flex: 1;
+        }
+
+        .store-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            border: 1px solid #c5c5c5;
+        }
+
+        .store-indicator.has-offers {
+            background: #2e7d32;
+            border-color: #2e7d32;
+        }
+
+        .store-indicator.no-offers {
+            background: #d0d0d0;
+        }
+
         .filter-section label {
             font-size: 0.95rem;
         }
@@ -154,7 +181,14 @@
             </div>
             <div class="filter-section">
                 <strong>Stores</strong>
-                <label th:each="store : ${stores}"><input type="checkbox" name="stores" th:value="${store}" th:text="${store}" ></label>
+                <label th:each="store : ${stores}" class="store-option">
+                    <input type="checkbox" name="stores" th:value="${store}">
+                    <span class="store-name" th:text="${store}"></span>
+                    <span class="store-indicator"
+                          th:classappend="${#lists.contains(storesWithOffers, store)} ? ' has-offers' : ' no-offers'"
+                          th:title="${#lists.contains(storesWithOffers, store)} ? 'Offers present in last report' : 'No offers in last report'">
+                    </span>
+                </label>
             </div>
             <div class="filter-section">
                 <strong>Flags</strong>

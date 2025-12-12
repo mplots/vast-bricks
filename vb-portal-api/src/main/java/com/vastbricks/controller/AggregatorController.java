@@ -8,6 +8,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+
 
 @Controller
 @AllArgsConstructor
@@ -28,7 +31,13 @@ public class AggregatorController {
         var offers = brickSetRepository.findBestOffers(limit, set, ean, atl, stores, themes);
         model.addAttribute("bestPrices", offers);
 
-        model.addAttribute("stores", productRepository.findWebStores());
+        var storesList = new ArrayList<>(productRepository.findWebStores());
+        var storesWithOffers = brickSetRepository.findStoresWithOffersInLastReport();
+        storesList.sort(Comparator
+                .comparing((String store) -> !storesWithOffers.contains(store))
+                .thenComparing(String::compareToIgnoreCase));
+        model.addAttribute("stores", storesList);
+        model.addAttribute("storesWithOffers", storesWithOffers);
         model.addAttribute("themes", brickSetRepository.getAllThemes());
         return "home";
     }

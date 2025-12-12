@@ -27,6 +27,11 @@ public interface BrickSetRepository extends JpaRepository<BrickSet, Long> {
     List<String> getAllThemes();
 
     @Query(value = """
+        SELECT DISTINCT web_store FROM cheapest_offer_per_set;
+    """, nativeQuery = true)
+    List<String> findStoresWithOffersInLastReport();
+
+    @Query(value = """
         SELECT 
             lowest_offer_id,
             set_name,
