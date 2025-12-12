@@ -33,7 +33,6 @@ public class WebStoreScraperJob {
     private ProductRepository productRepository;
     private DiscordClient discordClient;
     private MaterializedViewRefresh materializedViewRefresh;
-//    private SalidziniScraper salidziniScraper;
 
     @Scheduled(fixedRate=60*60*1000, initialDelay =60*60*1000)
     public void runJob() {
@@ -49,7 +48,6 @@ public class WebStoreScraperJob {
     @Async
     public void runJobAsync(List<String> webStore) {
         var webSets = scrapers.stream().filter(e->webStore.contains(e.getWebStore())).map(Scraper::scrape).flatMap(List::stream).toList();
-//        webSets.addAll(salidziniScraper.scrape(webSets.stream().map(e->e.getNumber()).collect(Collectors.toSet()).stream().toList()));
         storeWebSets(webSets, true);
 
     }

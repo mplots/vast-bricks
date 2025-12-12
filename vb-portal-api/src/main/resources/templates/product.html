@@ -11,214 +11,28 @@
     <meta property="og:url" th:content="'/product?set=' + ${offer.setNumber}">
     <meta property="og:type" content="website">
 
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <th:block th:insert="fragments/product-common :: productStyles"/>
     <style>
-        /* General Page Styles */
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f8f9fa;
             margin: 0;
-            padding: 10px; /* Reduced padding */
+            padding: 10px;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
 
-        h1 {
-            font-size: 18px; /* Slightly smaller */
-            font-weight: 600;
-            margin-bottom: 15px; /* Reduced margin */
-            color: #333;
-        }
-
-        /* Product Grid */
         .product-container {
             max-width: 800px;
             margin: auto;
+            display: block;
+            gap: 0;
         }
 
-        /* Modern Product Card */
         .product-card {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             padding: 16px;
             margin-top: 20px;
-            position: relative;
-            overflow: visible;
-        }
-
-        .product-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-        }
-
-        .product-image {
-            display: flex;
-            justify-content: center;
-            padding: 10px; /* Reduced padding */
-            position: relative;
-        }
-
-        .product-image img {
-            max-height: 150px; /* Reduced max height */
-            width: auto;
-            max-width: 100%;
-            border-radius: 8px; /* Slightly rounded corners */
-            object-fit: contain;
-            display: block;
-        }
-
-
-        .badge {
-            position: absolute;
-            right: 8px;
-            padding: 4px 8px;
-            color: white;
-            font-size: 11px;
-            font-weight: bold;
-            border-radius: 12px;
-            min-width: 28px;
-            text-align: center;
-            white-space: nowrap;
-        }
-
-        .badge-top {
-            top: 8px;
-            background-color: #728875;
-        }
-
-        .badge-bottom {
-            background-color: #AAA081;
-            top: 35px;
-        }
-
-        .product-details {
-            padding: 15px; /* Reduced padding */
-            text-align: center;
-        }
-
-        /* Typography */
-        .product-title {
-            font-size: 16px; /* Smaller title */
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 5px; /* Reduced margin */
-        }
-
-        .profit, .price, .ratio, .store {
-            font-size: 14px; /* Smaller font size for compactness */
-            margin: 3px 0; /* Reduced vertical margin for all paragraphs */
-        }
-
-        .profit {
-            font-weight: bold;
-            color: #28a745; /* Green for profit */
-        }
-
-        .price {
-            font-weight: bold;
-            color: #007BFF;
-        }
-
-        .store {
-            font-size: 12px; /* Smaller */
-        }
-
-        /* Modern Links */
-        .modern-link {
-            color: #007BFF;
-            font-weight: 500;
-            text-decoration: none;
-            transition: color 0.3s ease-in-out;
-        }
-
-        .modern-link:hover {
-            color: #0056b3;
-        }
-
-        .product-links {
-            display: flex;
-            justify-content: center;
-            gap: 6px;
-            margin-top: 6px;
-        }
-        .product-links a {
-            text-decoration: none;
-            font-size: 14px;
-            color: #1976d2;
-            padding: 4px 6px;
-            border-radius: 4px;
-            background-color: #e3f2fd;
-        }
-        .product-links a:hover {
-            background-color: #bbdefb;
-        }
-        .product-metas {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 10px; /* Reduced gap */
-            padding-top: 10px;
-        }
-        .product-meta {
-            display: flex;
-            gap: 10px;
-            margin: 6px 0;
-        }
-        .product-meta .material-icons {
-            font-size: 24px;
-            color: #1976d2;
-        }
-        .meta-info {
-            display: flex;
-            flex-direction: column;
-        }
-        .meta-title {
-            font-size: 12px;
-            color: #888;
-        }
-        .meta-value {
-            font-size: 14px;
-            font-weight: bold;
-            position: relative;
-        }
-
-        .meta-value[data-tooltip] {
-            cursor: help;
-        }
-
-        .meta-value[data-tooltip]:hover::after {
-            content: attr(data-tooltip);
-            position: absolute;
-            bottom: 125%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.8);
-            color: #fff;
-            padding: 6px 8px;
-            border-radius: 4px;
-            white-space: nowrap;
-            font-size: 12px;
-            z-index: 2;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-        }
-
-        .meta-value[data-tooltip]:hover::before {
-            content: '';
-            position: absolute;
-            bottom: 115%;
-            left: 50%;
-            transform: translateX(-50%);
-            border-width: 6px;
-            border-style: solid;
-            border-color: rgba(0, 0, 0, 0.8) transparent transparent transparent;
-        }
-
-        .meta-subtext {
-            font-size: 11px;
-            color: #777;
-            margin-top: 2px;
         }
 
         /* Custom calculator */
@@ -264,7 +78,7 @@
             padding: 10px;
             border: 1px solid #d0d7de;
             border-radius: 6px;
-            font-size: 17px; /* avoid mobile zoom on focus */
+            font-size: 17px;
             min-height: 44px;
             box-sizing: border-box;
         }
@@ -294,131 +108,6 @@
             color: #222;
         }
 
-        .product-date {
-            font-size: 12px;
-            color: #666;
-            margin-top: 6px;
-        }
-
-        .product-actions {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 8px;
-            margin-top: 10px;
-            flex-wrap: wrap;
-        }
-
-        .action-menu {
-            position: relative;
-        }
-
-        .action-toggle {
-            border: none;
-            background: #f2f2f2;
-            color: #333;
-            border-radius: 6px;
-            padding: 6px 10px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: background 0.2s ease;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .action-toggle:hover {
-            background: #dcdcdc;
-        }
-
-        .action-dropdown {
-            position: absolute;
-            left: 0;
-            top: calc(100% + 4px);
-            background: #fff;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            display: none;
-            min-width: 180px;
-            z-index: 10;
-        }
-
-        .action-menu.open .action-dropdown {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            padding: 8px;
-        }
-
-        .action-dropdown button {
-            border: none;
-            background: #f5f5f5;
-            border-radius: 4px;
-            padding: 6px;
-            cursor: pointer;
-            text-align: left;
-            font-size: 14px;
-        }
-
-        .action-dropdown button:hover {
-            background: #e3f2fd;
-        }
-
-        .action-menu-floating {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            z-index: 5;
-        }
-
-        .action-toggle.icon-button {
-            border-radius: 50%;
-            padding: 4px;
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .action-toggle .material-icons {
-            font-size: 14px;
-        }
-
-        .action-toggle .spinner {
-            position: absolute;
-            inset: 0;
-            display: none;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .action-toggle .spinner::after {
-            content: '';
-            width: 14px;
-            height: 14px;
-            border: 2px solid rgba(0, 0, 0, 0.25);
-            border-top-color: transparent;
-            border-radius: 50%;
-            animation: spin 0.75s linear infinite;
-        }
-
-        .action-toggle.loading .material-icons {
-            opacity: 0;
-        }
-
-        .action-toggle.loading .spinner {
-            display: flex;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
         .store-list {
             background: white;
             border-radius: 8px;
@@ -426,6 +115,7 @@
             padding: 16px;
             margin-top: 20px;
         }
+
         .store-item {
             display: flex;
             align-items: center;
@@ -433,35 +123,28 @@
             padding: 10px 0;
             border-bottom: 1px solid #ddd;
         }
+
         .store-item:last-child {
             border-bottom: none;
-        }
-        .store-logo {
-            height: 24px;
-            margin-right: 10px;
         }
         .store-info {
             display: flex;
             align-items: center;
         }
+
         .store-name {
             font-weight: bold;
         }
+
         .store-price {
             font-size: 16px;
             font-weight: bold;
             color: #1976d2;
         }
+
         .store-date {
             font-size: 12px;
             color: #666;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .product-card {
-                width: 90%; /* Keep responsiveness */
-            }
         }
     </style>
     <title>Product List</title>
@@ -471,106 +154,7 @@
 <h1>Product Details</h1>
 
 <div class="product-container">
-    <div class="product-card">
-        <div class="action-menu action-menu-floating">
-            <button class="action-toggle icon-button" type="button" onclick="toggleActionMenu(event)">
-                <span class="material-icons">more_vert</span>
-                <span class="spinner" aria-hidden="true"></span>
-            </button>
-            <div class="action-dropdown">
-                <button type="button" th:onclick="'invalidateProduct(event,' + ${offer.productId} + ')'">Invalidate Product</button>
-                <button type="button" th:onclick="|invalidateAtl(event, ${offer.setNumber}, ${offer.lowestPrice})|">Invalidate ATL</button>
-            </div>
-        </div>
-        <div class="product-image">
-            <div>
-                <img th:src="${offer.image}" alt="Product Image"/>
-                <span class="badge badge-top" th:if="${offer.pieces != null}" th:text="${offer.pieces + ' pcs'}"></span>
-                <span class="badge badge-bottom" th:if="${offer.lots != null}" th:text="${offer.lots + ' lots'}"></span>
-            </div>
-        </div>
-        <div class="product-details">
-            <h2 class="product-title" th:text="${offer.setName.replace('LEGO', '')}"></h2>
-
-            <div class="product-metas">
-
-                <div class="product-meta">
-                    <i class="material-icons">shopping_cart</i>
-                    <div class="meta-info">
-                        <span class="meta-title">Price</span>
-                        <span class="meta-value" th:text="'€'+ ${offer.price}"/>
-                    </div>
-                </div>
-
-                <div class="product-meta">
-                    <i class="material-icons">trending_down</i>
-                    <div class="meta-info">
-                        <span class="meta-title">ATL Price</span>
-                        <span class="meta-value" th:attr="data-tooltip=${'Store: ' + offer.lowestPriceWebStore + offer.lowestPriceDate + ' | Age: ' + offer.lowestPriceAgeDays + ' days ago'}" th:text="'€'+ ${offer.getLowestPrice()}"></span>
-                    </div>
-                </div>
-
-                <div class="product-meta">
-                    <i class="material-icons">trending_up</i>
-                    <div class="meta-info">
-                        <span class="meta-title">Ratio</span>
-                        <span class="meta-value" style="color: #28a745" th:text="${offer.partOutRatio}"/>
-                    </div>
-                </div>
-
-                <div class="product-meta">
-                    <i class="material-icons">add_business</i>
-                    <div class="meta-info">
-                        <span class="meta-title">Part out</span>
-                        <span class="meta-value" style="color: #28a745" th:text="'€'+ ${offer.partOutPrice}"/>
-                    </div>
-                </div>
-
-                <div class="product-meta">
-                    <i class="material-icons">scatter_plot</i>
-                    <div class="meta-info">
-                        <span class="meta-title">Pear piece</span>
-                        <span class="meta-value" th:text="'€'+ ${offer.pricePeerPeace}"/>
-                    </div>
-                </div>
-
-                <div class="product-meta">
-                    <i class="material-icons">monetization_on</i>
-                    <div class="meta-info">
-                        <span class="meta-title">Profit</span>
-                        <span class="meta-value" style="color: #28a745" th:text="'€'+ ${offer.price.multiply(offer.partOutRatio).subtract(offer.price).setScale(2,2)}"/>
-                    </div>
-                </div>
-
-                <div class="product-meta">
-                    <i class="material-icons">merge_type</i>
-                    <div class="meta-info">
-                        <span class="meta-title">Theme</span>
-                        <span class="meta-value" th:text="  ${offer.theme}"/>
-                    </div>
-                </div>
-
-                <div class="product-meta">
-                    <i class="material-icons">link</i>
-                    <div class="meta-info">
-                        <span class="meta-title">Shop</span>
-                        <span class="meta-value">
-                            <a th:href="${offer.purchaseLink}" target="_blank" th:text="${offer.webStore}" class="modern-link"/>
-                        </span>
-                    </div>
-                </div>
-
-            </div>
-
-            <p class="product-date"><span th:text="${offer.priceTimestamp}"></span></p>
-            <div class="product-actions">
-                <div class="product-links">
-                    <a th:href="|https://www.salidzini.lv/cena?q=lego+${offer.getSetNumber()}!|" target="_blank">Salidzini</a>
-                    <a th:href="${offer.partOutLink}" target="_blank">Part Out Value</a>
-                </div>
-            </div>
-        </div>
-    </div>
+    <th:block th:insert="fragments/product-common :: productCard(${offer}, false)"/>
 
     <div class="custom-calc" id="custom-calc"
          th:data-partout="${offer.partOutPrice}"
@@ -618,56 +202,8 @@
 
 </div>
 
+<th:block th:insert="fragments/product-common :: productScripts"/>
 <script>
-    function toggleActionMenu(event) {
-        event.stopPropagation();
-        const menu = event.target.closest('.action-menu');
-        document.querySelectorAll('.action-menu').forEach(m => {
-            if (m !== menu) {
-                m.classList.remove('open');
-            }
-        });
-        menu.classList.toggle('open');
-    }
-
-    document.addEventListener('click', () => {
-        document.querySelectorAll('.action-menu').forEach(menu => menu.classList.remove('open'));
-    });
-
-    async function sendInvalidateRequest(url, toggleButton) {
-        if (toggleButton) {
-            toggleButton.classList.add('loading');
-        }
-        try {
-            const response = await fetch(url, { method: 'POST' });
-            if (!response.ok) {
-                throw new Error(await response.text());
-            }
-            window.location.reload();
-        } catch (error) {
-            if (toggleButton) {
-                toggleButton.classList.remove('loading');
-            }
-            alert('Failed to process request: ' + (error.message || 'Unknown error'));
-        }
-    }
-
-
-    function invalidateProduct(event, productId) {
-        if (productId) {
-            const toggle = event.target.closest('.action-menu').querySelector('.action-toggle');
-            sendInvalidateRequest(`/api/products/${productId}/invalidate`, toggle);
-        }
-    }
-
-    function invalidateAtl(event, setNumber, atlPrice) {
-        if (setNumber && atlPrice !== undefined) {
-            const toggle = event.target.closest('.action-menu').querySelector('.action-toggle');
-            const params = new URLSearchParams({ price: atlPrice });
-            sendInvalidateRequest(`/api/brick-sets/${setNumber}/invalidate-atl?${params.toString()}`, toggle);
-        }
-    }
-
     function updateCustomCalculator() {
         const container = document.getElementById('custom-calc');
         if (!container) return;
