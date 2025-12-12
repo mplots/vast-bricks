@@ -37,8 +37,9 @@
             background: #fff;
             border-radius: 8px; /* Slightly reduced rounding */
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
+            overflow: visible; /* allow floating menu to show */
             transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
         }
 
         .product-card:hover {
@@ -174,12 +175,169 @@
         .meta-value {
             font-size: 14px;
             font-weight: bold;
+            position: relative;
+        }
+
+        .meta-value[data-tooltip] {
+            cursor: help;
+        }
+
+        .meta-value[data-tooltip]:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            padding: 6px 8px;
+            border-radius: 4px;
+            white-space: nowrap;
+            font-size: 12px;
+            z-index: 2;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        }
+
+        .meta-value[data-tooltip]:hover::before {
+            content: '';
+            position: absolute;
+            bottom: 115%;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 6px;
+            border-style: solid;
+            border-color: rgba(0, 0, 0, 0.8) transparent transparent transparent;
+        }
+
+        .meta-subtext {
+            font-size: 11px;
+            color: #777;
+            margin-top: 2px;
         }
 
         .product-date {
             font-size: 12px;
             color: #666;
             margin-top: 6px;
+        }
+
+        .product-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .action-menu {
+            position: relative;
+        }
+
+        .action-toggle {
+            border: none;
+            background: #f2f2f2;
+            color: #333;
+            border-radius: 6px;
+            padding: 6px 10px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.2s ease;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-toggle:hover {
+            background: #dcdcdc;
+        }
+
+        .action-dropdown {
+            position: absolute;
+            left: 0;
+            top: calc(100% + 4px);
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            display: none;
+            min-width: 180px;
+            z-index: 10;
+        }
+
+        .action-menu.open .action-dropdown {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding: 8px;
+        }
+
+        .action-dropdown button {
+            border: none;
+            background: #f5f5f5;
+            border-radius: 4px;
+            padding: 6px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        .action-dropdown button:hover {
+            background: #e3f2fd;
+        }
+
+        .action-menu-floating {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 5;
+        }
+
+        .action-toggle.icon-button {
+            border-radius: 50%;
+            padding: 4px;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-toggle .material-icons {
+            font-size: 14px;
+        }
+
+        .action-toggle .spinner {
+            position: absolute;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-toggle .spinner::after {
+            content: '';
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(0, 0, 0, 0.25);
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.75s linear infinite;
+        }
+
+        .action-toggle.loading .material-icons {
+            opacity: 0;
+        }
+
+        .action-toggle.loading .spinner {
+            display: flex;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         /* Responsive Design */
@@ -253,6 +411,34 @@
             font-size: 0.95rem;
         }
 
+        .set-search-row {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        #set-search-input {
+            flex: 1;
+            padding: 0.5rem;
+            border: 1px solid #d0d0d0;
+            border-radius: 6px;
+            font-size: 0.95rem;
+        }
+
+        #set-search-button {
+            padding: 0.5rem 0.8rem;
+            background: #1976d2;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+
+        #set-search-button:hover {
+            background: #125da8;
+        }
+
         #filter-backdrop {
             display: none;
             position: fixed;
@@ -282,6 +468,13 @@
     <div id="filter-drawer">
         <form id="filter-form" method="GET" action="/">
             <div class="filter-section">
+                <strong>Go to Set</strong>
+                <div class="set-search-row">
+                    <input id="set-search-input" type="number" placeholder="Enter set number" inputmode="numeric" pattern="[0-9]*">
+                    <button id="set-search-button" type="button">Open</button>
+                </div>
+            </div>
+            <div class="filter-section">
                 <strong>Stores</strong>
                 <label th:each="store : ${stores}"><input type="checkbox" name="stores" th:value="${store}" th:text="${store}" ></label>
             </div>
@@ -300,6 +493,8 @@
         const drawer = document.getElementById('filter-drawer');
         const toggle = document.getElementById('filter-toggle');
         const backdrop = document.getElementById('filter-backdrop');
+        const setSearchInput = document.getElementById('set-search-input');
+        const setSearchButton = document.getElementById('set-search-button');
 
         toggle.addEventListener('click', () => {
             drawer.classList.add('open');
@@ -311,10 +506,25 @@
             backdrop.classList.remove('show');
         });
 
-        document.querySelectorAll('#filter-form input').forEach(input => {
+        document.querySelectorAll('#filter-form input[type="checkbox"]').forEach(input => {
             input.addEventListener('change', () => {
                 document.getElementById('filter-form').submit();
             });
+        });
+
+        function openSetPage() {
+            const setNumber = setSearchInput.value.trim();
+            if (setNumber) {
+                window.location.href = `/product?set=${encodeURIComponent(setNumber)}`;
+            }
+        }
+
+        setSearchButton.addEventListener('click', openSetPage);
+        setSearchInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                openSetPage();
+            }
         });
 
         function getQueryParams() {
@@ -348,6 +558,16 @@
 <div class="content">
 <div class="product-container">
     <div th:each="offer : ${bestPrices}" class="product-card">
+        <div class="action-menu action-menu-floating">
+            <button class="action-toggle icon-button" type="button" onclick="toggleActionMenu(event)">
+                <span class="material-icons">more_vert</span>
+                <span class="spinner" aria-hidden="true"></span>
+            </button>
+            <div class="action-dropdown">
+                <button type="button" th:onclick="'invalidateProduct(event,' + ${offer.productId} + ')'">Invalidate Product</button>
+                <button type="button" th:onclick="|invalidateAtl(event, ${offer.setNumber}, ${offer.lowestPrice})|">Invalidate ATL</button>
+            </div>
+        </div>
         <div class="product-image">
             <div>
                 <img th:src="${offer.image}" alt="Product Image"/>
@@ -372,7 +592,7 @@
                     <i class="material-icons">trending_down</i>
                     <div class="meta-info">
                         <span class="meta-title">ATL Price</span>
-                        <span class="meta-value" th:text="'€'+ ${offer.getLowestPrice()}"/>
+                        <span class="meta-value" th:attr="data-tooltip=${'Store: ' + offer.lowestPriceWebStore +  ' \n Age: ' + offer.lowestPriceAgeDays + ' days ago'}" th:text="'€'+ ${offer.getLowestPrice()}"></span>
                     </div>
                 </div>
 
@@ -429,14 +649,65 @@
             </div>
 
             <p class="product-date"><span th:text="${offer.priceTimestamp}"></span></p>
-            <div class="product-links">
-                <a th:href="|https://www.salidzini.lv/cena?q=lego+${offer.setNumber}!|" target="_blank">Salidzini</a>
-                <a th:href="${offer.partOutLink}" target="_blank">Part Out Value</a>
-                <a th:href="'/product?set=' + ${offer.setNumber}">Details</a>
+            <div class="product-actions">
+                <div class="product-links">
+                    <a th:href="|https://www.salidzini.lv/cena?q=lego+${offer.setNumber}!|" target="_blank">Salidzini</a>
+                    <a th:href="${offer.partOutLink}" target="_blank">Part Out Value</a>
+                    <a th:href="'/product?set=' + ${offer.setNumber}">Details</a>
+                </div>
             </div>
         </div>
     </div>
 </div>
 </div>
+<script>
+    function toggleActionMenu(event) {
+        event.stopPropagation();
+        const menu = event.target.closest('.action-menu');
+        document.querySelectorAll('.action-menu').forEach(m => {
+            if (m !== menu) {
+                m.classList.remove('open');
+            }
+        });
+        menu.classList.toggle('open');
+    }
+
+    document.addEventListener('click', () => {
+        document.querySelectorAll('.action-menu').forEach(menu => menu.classList.remove('open'));
+    });
+
+    async function sendInvalidateRequest(url, toggleButton) {
+        if (toggleButton) {
+            toggleButton.classList.add('loading');
+        }
+        try {
+            const response = await fetch(url, { method: 'POST' });
+            if (!response.ok) {
+                throw new Error(await response.text());
+            }
+            window.location.reload();
+        } catch (error) {
+            if (toggleButton) {
+                toggleButton.classList.remove('loading');
+            }
+            alert('Failed to process request: ' + (error.message || 'Unknown error'));
+        }
+    }
+
+    function invalidateProduct(event, productId) {
+        if (productId) {
+            const toggle = event.target.closest('.action-menu').querySelector('.action-toggle');
+            sendInvalidateRequest(`/api/products/${productId}/invalidate`, toggle);
+        }
+    }
+
+    function invalidateAtl(event, setNumber, atlPrice) {
+        if (setNumber && atlPrice !== undefined) {
+            const toggle = event.target.closest('.action-menu').querySelector('.action-toggle');
+            const params = new URLSearchParams({ price: atlPrice });
+            sendInvalidateRequest(`/api/brick-sets/${setNumber}/invalidate-atl?${params.toString()}`, toggle);
+        }
+    }
+</script>
 </body>
 </html>

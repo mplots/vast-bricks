@@ -4,6 +4,7 @@ import com.vastbricks.config.Env;
 import com.vastbricks.job.PartOutValueJob;
 import com.vastbricks.job.WebStoreScraperJob;
 import com.vastbricks.jpa.projection.BestOffer;
+import com.vastbricks.jpa.projection.Price;
 import com.vastbricks.jpa.repository.BrickSetRepository;
 import com.vastbricks.jpa.repository.MaterializedViewRefresh;
 import com.vastbricks.market.link.PartOutValue;
@@ -71,6 +72,28 @@ public class ApiController {
             @RequestParam(value = "themes", required = false) String[] themes) {
 
         return brickSetRepository.findBestOffers(limit, set, ean, atl, stores, themes);
+    }
+
+    @Data
+    @AllArgsConstructor
+    public static class ProductDetailsResponse {
+        private BestOffer offer;
+        private List<Price> prices;
+    }
+
+    @GetMapping(value = "/api/product-details")
+    public List<ProductDetailsResponse> productDetails(
+            @RequestParam(value = "limit", required = false, defaultValue = "200") Integer limit,
+            @RequestParam(value = "set", required = false) Long set,
+            @RequestParam(value = "ean", required = false) Long ean,
+            @RequestParam(value = "atl", required = false, defaultValue = "false") Boolean atl,
+            @RequestParam(value = "stores", required = false) String[] stores,
+            @RequestParam(value = "themes", required = false) String[] themes) {
+
+        var offers = brickSetRepository.findBestOffers(limit, set, ean, atl, stores, themes);
+        return offers.stream()
+                .map(offer -> new ProductDetailsResponse(offer, brickSetRepository.findSingleBestPrices(offer.getSetNumber())))
+                .toList();
     }
 
     @CrossOrigin(origins = "https://www.salidzini.lv")

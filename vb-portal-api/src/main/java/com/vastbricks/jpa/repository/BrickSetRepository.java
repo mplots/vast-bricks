@@ -18,13 +18,39 @@ public interface BrickSetRepository extends JpaRepository<BrickSet, Long> {
     @Query(value = "SELECT e.number FROM brick_set e", nativeQuery = true)
     List<String> findAllSetNumbers();
 
+    @Query(value = "SELECT e.number FROM brick_set e WHERE theme != 'Uncategorized'", nativeQuery = true)
+    List<String> findAllCategorizedSetNumbers();
+
     @Query(value = """
       SELECT DISTINCT ON (theme) theme FROM brick_set; 
     """, nativeQuery = true)
     List<String> getAllThemes();
 
     @Query(value = """
-        SELECT * FROM cheapest_offer_per_set 
+        SELECT 
+            lowest_offer_id,
+            set_name,
+            set_number,
+            theme,
+            pieces,
+            lots,
+            product_id,
+            web_store,
+            price,
+            lowest_price,
+            lowest_price_web_store AS lowestPriceWebStore,
+            lowest_price_date AS lowestPriceDate,
+            lowest_price_timestamp AS lowestPriceTimestamp,
+            lowest_price_age_days AS lowestPriceAgeDays,
+            part_out_price,
+            part_out_ratio,
+            price_peer_peace,
+            image,
+            purchase_link,
+            part_out_link,
+            ean_ids,
+            price_timestamp
+        FROM cheapest_offer_per_set 
         WHERE 
             theme != 'Collectable Minifigures' AND (
                 (:set IS NULL AND :ean IS NULL) OR 

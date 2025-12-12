@@ -1,7 +1,5 @@
 package com.vastbricks.jpa.repository;
 
-import com.vastbricks.jpa.entity.BrickSetOffer;
-import com.vastbricks.jpa.entity.OwlWebSetInventory;
 import com.vastbricks.jpa.entity.Product;
 import com.vastbricks.jpa.projection.Upsert;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface ProductRepository extends JpaRepository<OwlWebSetInventory, Integer> {
+public interface ProductRepository extends JpaRepository<Product, Long> {
 
     @Query(value = """
         WITH u AS (

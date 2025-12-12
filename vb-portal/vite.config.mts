@@ -5,6 +5,7 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   const API_URL = `${env.VITE_APP_BASE_NAME}`;
+  const API_PROXY = env.VITE_APP_API_PROXY || 'http://localhost:6161';
   const PORT = 3000;
 
   return {
@@ -13,7 +14,14 @@ export default defineConfig(({ mode }) => {
       open: true,
       // this sets a default port to 3000
       port: PORT,
-      host: true
+      host: true,
+      proxy: {
+        '/api': {
+          target: API_PROXY,
+          changeOrigin: true,
+          secure: false
+        }
+      }
     },
     preview: {
       open: true,

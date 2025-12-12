@@ -1,0 +1,2 @@
+ALTER TABLE brick_set_offer
+    ADD COLUMN active BOOLEAN NOT NULL DEFAULT TRUE;

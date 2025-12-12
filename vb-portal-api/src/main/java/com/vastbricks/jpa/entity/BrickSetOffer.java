@@ -28,4 +28,7 @@ public class BrickSetOffer {
 
     @ManyToOne
     private Product product;
+
+    @Column(nullable = false)
+    private boolean active = true;
 }

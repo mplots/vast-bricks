@@ -81,7 +81,7 @@ class OwlShipping {
 
     @Test
     public void testCreateShippingMethod() {
-        var mode = Tariff.Mode.TRACEABLE;
+        var mode = Tariff.Mode.SIMPLE;
         var cookie = System.getenv("TEST_OWL_COOKIE");
         var owl = new OwlClient("", cookie);
         var pasts = new LatvijasPastsClient();
@@ -113,7 +113,7 @@ class OwlShipping {
                     pricing.add(
                             ShipmentPricing.builder()
                                     .weightTo(tariff.getResult().getWeightTo().setScale(2, RoundingMode.HALF_UP))
-                                    .price(price.add(new BigDecimal("0.35")/* PayPal Static Fee */))
+                                    .price(price.add(new BigDecimal("1.00")/* Handling Fee */))
                                     .build()
                     );
                 }
@@ -124,15 +124,13 @@ class OwlShipping {
 
                 var details = ShippingMethodDetails.builder()
                         .share(false)
-                        .enabled(true)
+                        .enabled(!country.equals(Tariff.Country.UNITED_STATES) && !country.equals(Tariff.Country.RUSSIA) && !country.equals(Tariff.Country.BELARUS)) /* Disable */
                         .requirePhone(false)
                         .expedited(false)
                         .dontDefault(false)
                         .name(name)
                         .countries(List.of(owlCountry))
-                        .enabled(true)
                         .carrierId(195l)
-                        .enabled(true)
                         .carrierName("Latvijas Pasts")
                         .note(country.isEez() || country.equals(Tariff.Country.UNITED_KINGDOM) ? "" : "Please note: Buyers are responsible for any customs duties, import taxes, tariffs, or related fees incurred upon receiving their package.")
                         .restrictions(ShipmentDimensions.builder().build())

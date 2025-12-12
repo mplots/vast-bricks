@@ -4,10 +4,10 @@
   "version": "1.0",
   "description": "Auto-submits LEGO set numbers and sends data to API",
   "permissions": ["scripting"],
-  "host_permissions": ["https://aio.lv/lv/category--kubi-bloki-lego--331*"],
+  "host_permissions": ["https://aio.lv/lv/category--klucisi-un-bloki--331*"],
   "content_scripts": [
     {
-      "matches": ["https://aio.lv/lv/category--kubi-bloki-lego--331*"],
+      "matches": ["https://aio.lv/lv/category--klucisi-un-bloki--331*"],
       "js": ["content.js"],
       "run_at": "document_idle"
     }

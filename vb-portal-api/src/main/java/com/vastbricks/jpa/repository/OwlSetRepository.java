@@ -25,6 +25,9 @@ public interface OwlSetRepository extends JpaRepository<OwlSet, Integer> {
     @Query(value = "SELECT e.boid FROM owl_set e", nativeQuery = true)
     List<String> findAllBoids();
 
+    @Query(value = "SELECT e.boid FROM owl_set e WHERE (string_to_array(contents->>'cat_name_path', ' / '))[2] != 'Uncategorized'", nativeQuery = true)
+    List<String> findAllCategorizedBoids();
+
     @Query(value = """
         SELECT DISTINCT split_part(elem->>'id', '-', 1) AS set_number
         FROM owl_set, jsonb_array_elements(contents->'ids') AS elem

@@ -5,6 +5,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Column;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,6 +24,9 @@ public class Product {
     private String image;
 
     private String webStore;
+
+    @Column(columnDefinition = "boolean default true")
+    private Boolean active = true;
 
     @ManyToOne
     private BrickSet brickSet;

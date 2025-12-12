@@ -1,4 +1,4 @@
-DROP MATERIALIZED VIEW cheapest_offer_per_set;
+DROP MATERIALIZED VIEW IF EXISTS cheapest_offer_per_set;
 
 CREATE MATERIALIZED VIEW cheapest_offer_per_set  AS
 WITH lowest_offer AS (
@@ -10,7 +10,7 @@ WITH lowest_offer AS (
         bso.product_id
     FROM brick_set_offer bso
              JOIN product p ON bso.product_id = p.id
-    WHERE timestamp >= NOW() - INTERVAL '3 hours' AND p.active
+    WHERE timestamp >= NOW() - INTERVAL '3 hours' AND p.active AND bso.active
     ORDER BY brick_set_number, price ASC
 ),
      all_time_lowest_offer AS (
@@ -19,9 +19,11 @@ WITH lowest_offer AS (
              bso.id,
              bso.timestamp,
              p.brick_set_number,
-             bso.product_id
+             bso.product_id,
+             p.web_store
          FROM brick_set_offer bso
                   JOIN product p ON bso.product_id = p.id
+         WHERE bso.active
          ORDER BY brick_set_number, price ASC
      ),
      latest_part_out AS (
@@ -40,9 +42,13 @@ WITH lowest_offer AS (
         p.web_store as web_store,
         lo.price as price,
         atlo.price as lowest_price,
+        atlo.web_store as lowest_price_web_store,
+        atlo.timestamp as lowest_price_timestamp,
+        TO_CHAR(atlo.timestamp, 'YYYY-MM-DD') as lowest_price_date,
+        FLOOR(EXTRACT(EPOCH FROM (NOW() - atlo.timestamp)) / 86400) :: INT AS lowest_price_age_days,
         ROUND(hpo.price, 2) as part_out_price,
-        ROUND(hpo.price / lo.price, 2) as part_out_ratio,
-        ROUND(lo.price / COALESCE(bs.pieces, 1), 3) as price_peer_peace,
+        CASE WHEN lo.price = 0 THEN 0 ELSE ROUND(hpo.price / lo.price, 2) END AS part_out_ratio,
+        CASE WHEN bs.pieces = 0 THEN 0 ELSE ROUND(lo.price / COALESCE(bs.pieces, 1), 3) END AS price_peer_peace,
         p.image as image,
         p.link as purchase_link,
         hpo.link as part_out_link,

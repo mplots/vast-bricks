@@ -12,6 +12,10 @@ public interface BestOffer {
     String getWebStore();
     BigDecimal getPrice();
     BigDecimal getLowestPrice();
+    String getLowestPriceWebStore();
+    String getLowestPriceDate();
+    String getLowestPriceTimestamp();
+    Integer getLowestPriceAgeDays();
     BigDecimal getPartOutPrice();
     BigDecimal getPartOutRatio();
     BigDecimal getPricePeerPeace();

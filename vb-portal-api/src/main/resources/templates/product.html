@@ -44,6 +44,8 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             padding: 16px;
             margin-top: 20px;
+            position: relative;
+            overflow: visible;
         }
 
         .product-card:hover {
@@ -179,12 +181,242 @@
         .meta-value {
             font-size: 14px;
             font-weight: bold;
+            position: relative;
+        }
+
+        .meta-value[data-tooltip] {
+            cursor: help;
+        }
+
+        .meta-value[data-tooltip]:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            padding: 6px 8px;
+            border-radius: 4px;
+            white-space: nowrap;
+            font-size: 12px;
+            z-index: 2;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        }
+
+        .meta-value[data-tooltip]:hover::before {
+            content: '';
+            position: absolute;
+            bottom: 115%;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 6px;
+            border-style: solid;
+            border-color: rgba(0, 0, 0, 0.8) transparent transparent transparent;
+        }
+
+        .meta-subtext {
+            font-size: 11px;
+            color: #777;
+            margin-top: 2px;
+        }
+
+        /* Custom calculator */
+        .custom-calc {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+            padding: 12px;
+            margin: 16px auto;
+            max-width: 800px;
+        }
+
+        .custom-calc-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+
+        .custom-calc-header .material-icons {
+            font-size: 20px;
+        }
+
+        .custom-calc .calc-body {
+            margin-top: 10px;
+            display: grid;
+            gap: 10px;
+        }
+
+        .custom-calc .calc-input {
+            width: 100%;
+        }
+
+        .custom-calc label {
+            font-size: 13px;
+            color: #555;
+        }
+
+        .custom-calc input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d0d7de;
+            border-radius: 6px;
+            font-size: 17px; /* avoid mobile zoom on focus */
+            min-height: 44px;
+            box-sizing: border-box;
+        }
+
+        .calc-results {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+        }
+
+        .calc-card {
+            background: #f5f7fb;
+            border-radius: 6px;
+            padding: 10px;
+        }
+
+        .calc-card .label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .calc-card .value {
+            font-size: 16px;
+            font-weight: 700;
+            color: #222;
         }
 
         .product-date {
             font-size: 12px;
             color: #666;
             margin-top: 6px;
+        }
+
+        .product-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .action-menu {
+            position: relative;
+        }
+
+        .action-toggle {
+            border: none;
+            background: #f2f2f2;
+            color: #333;
+            border-radius: 6px;
+            padding: 6px 10px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.2s ease;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-toggle:hover {
+            background: #dcdcdc;
+        }
+
+        .action-dropdown {
+            position: absolute;
+            left: 0;
+            top: calc(100% + 4px);
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            display: none;
+            min-width: 180px;
+            z-index: 10;
+        }
+
+        .action-menu.open .action-dropdown {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding: 8px;
+        }
+
+        .action-dropdown button {
+            border: none;
+            background: #f5f5f5;
+            border-radius: 4px;
+            padding: 6px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        .action-dropdown button:hover {
+            background: #e3f2fd;
+        }
+
+        .action-menu-floating {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 5;
+        }
+
+        .action-toggle.icon-button {
+            border-radius: 50%;
+            padding: 4px;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-toggle .material-icons {
+            font-size: 14px;
+        }
+
+        .action-toggle .spinner {
+            position: absolute;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-toggle .spinner::after {
+            content: '';
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(0, 0, 0, 0.25);
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.75s linear infinite;
+        }
+
+        .action-toggle.loading .material-icons {
+            opacity: 0;
+        }
+
+        .action-toggle.loading .spinner {
+            display: flex;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         .store-list {
@@ -240,6 +472,16 @@
 
 <div class="product-container">
     <div class="product-card">
+        <div class="action-menu action-menu-floating">
+            <button class="action-toggle icon-button" type="button" onclick="toggleActionMenu(event)">
+                <span class="material-icons">more_vert</span>
+                <span class="spinner" aria-hidden="true"></span>
+            </button>
+            <div class="action-dropdown">
+                <button type="button" th:onclick="'invalidateProduct(event,' + ${offer.productId} + ')'">Invalidate Product</button>
+                <button type="button" th:onclick="|invalidateAtl(event, ${offer.setNumber}, ${offer.lowestPrice})|">Invalidate ATL</button>
+            </div>
+        </div>
         <div class="product-image">
             <div>
                 <img th:src="${offer.image}" alt="Product Image"/>
@@ -264,7 +506,7 @@
                     <i class="material-icons">trending_down</i>
                     <div class="meta-info">
                         <span class="meta-title">ATL Price</span>
-                        <span class="meta-value" th:text="'€'+ ${offer.getLowestPrice()}"/>
+                        <span class="meta-value" th:attr="data-tooltip=${'Store: ' + offer.lowestPriceWebStore + offer.lowestPriceDate + ' | Age: ' + offer.lowestPriceAgeDays + ' days ago'}" th:text="'€'+ ${offer.getLowestPrice()}"></span>
                     </div>
                 </div>
 
@@ -321,9 +563,41 @@
             </div>
 
             <p class="product-date"><span th:text="${offer.priceTimestamp}"></span></p>
-            <div class="product-links">
-                <a th:href="|https://www.salidzini.lv/cena?q=lego+${offer.getSetNumber()}!|" target="_blank">Salidzini</a>
-                <a th:href="${offer.partOutLink}" target="_blank">Part Out Value</a>
+            <div class="product-actions">
+                <div class="product-links">
+                    <a th:href="|https://www.salidzini.lv/cena?q=lego+${offer.getSetNumber()}!|" target="_blank">Salidzini</a>
+                    <a th:href="${offer.partOutLink}" target="_blank">Part Out Value</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="custom-calc" id="custom-calc"
+         th:data-partout="${offer.partOutPrice}"
+         th:data-pieces="${offer.pieces}">
+        <div class="custom-calc-header">
+            <span class="material-icons">calculate</span>
+            Custom Price Calculator
+        </div>
+        <div class="calc-body">
+            <div class="calc-input">
+                <label for="custom-price">Enter custom price (€)</label>
+                <input id="custom-price" name="custom-price" type="number" inputmode="decimal" min="0" step="0.01"
+                       th:value="${offer.price}">
+            </div>
+            <div class="calc-results">
+                <div class="calc-card">
+                    <div class="label">Ratio</div>
+                    <div class="value" id="calc-ratio">-</div>
+                </div>
+                <div class="calc-card">
+                    <div class="label">Price / Piece</div>
+                    <div class="value" id="calc-ppp">-</div>
+                </div>
+                <div class="calc-card">
+                    <div class="label">Profit (€)</div>
+                    <div class="value" id="calc-profit">-</div>
+                </div>
             </div>
         </div>
     </div>
@@ -344,5 +618,85 @@
 
 </div>
 
+<script>
+    function toggleActionMenu(event) {
+        event.stopPropagation();
+        const menu = event.target.closest('.action-menu');
+        document.querySelectorAll('.action-menu').forEach(m => {
+            if (m !== menu) {
+                m.classList.remove('open');
+            }
+        });
+        menu.classList.toggle('open');
+    }
+
+    document.addEventListener('click', () => {
+        document.querySelectorAll('.action-menu').forEach(menu => menu.classList.remove('open'));
+    });
+
+    async function sendInvalidateRequest(url, toggleButton) {
+        if (toggleButton) {
+            toggleButton.classList.add('loading');
+        }
+        try {
+            const response = await fetch(url, { method: 'POST' });
+            if (!response.ok) {
+                throw new Error(await response.text());
+            }
+            window.location.reload();
+        } catch (error) {
+            if (toggleButton) {
+                toggleButton.classList.remove('loading');
+            }
+            alert('Failed to process request: ' + (error.message || 'Unknown error'));
+        }
+    }
+
+
+    function invalidateProduct(event, productId) {
+        if (productId) {
+            const toggle = event.target.closest('.action-menu').querySelector('.action-toggle');
+            sendInvalidateRequest(`/api/products/${productId}/invalidate`, toggle);
+        }
+    }
+
+    function invalidateAtl(event, setNumber, atlPrice) {
+        if (setNumber && atlPrice !== undefined) {
+            const toggle = event.target.closest('.action-menu').querySelector('.action-toggle');
+            const params = new URLSearchParams({ price: atlPrice });
+            sendInvalidateRequest(`/api/brick-sets/${setNumber}/invalidate-atl?${params.toString()}`, toggle);
+        }
+    }
+
+    function updateCustomCalculator() {
+        const container = document.getElementById('custom-calc');
+        if (!container) return;
+
+        const input = document.getElementById('custom-price');
+        const partOut = parseFloat(container.dataset.partout);
+        const pieces = parseInt(container.dataset.pieces, 10);
+        const price = parseFloat(input.value);
+
+        const ratioEl = document.getElementById('calc-ratio');
+        const pppEl = document.getElementById('calc-ppp');
+        const profitEl = document.getElementById('calc-profit');
+
+        const hasPrice = !Number.isNaN(price) && price > 0;
+        const hasPartOut = !Number.isNaN(partOut) && partOut > 0;
+        const hasPieces = !Number.isNaN(pieces) && pieces > 0;
+
+        ratioEl.textContent = hasPrice && hasPartOut ? (partOut / price).toFixed(2) : 'N/A';
+        pppEl.textContent = hasPrice && hasPieces ? (price / pieces).toFixed(3) : 'N/A';
+        profitEl.textContent = hasPrice && hasPartOut ? (partOut - price).toFixed(2) : 'N/A';
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const input = document.getElementById('custom-price');
+        if (input) {
+            input.addEventListener('input', updateCustomCalculator);
+            updateCustomCalculator();
+        }
+    });
+</script>
 </body>
 </html>

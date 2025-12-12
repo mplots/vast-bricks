@@ -4,6 +4,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 // project-imports
 import NavUser from './NavUser';
 import NavCard from './NavCard';
+import NavSetSearch from './NavSetSearch';
 import Navigation from './Navigation';
 import { useGetMenuMaster } from 'api/menu';
 import SimpleBar from 'components/third-party/SimpleBar';
@@ -19,6 +20,7 @@ export default function DrawerContent() {
   return (
     <>
       <SimpleBar sx={{ '& .simplebar-content': { display: 'flex', flexDirection: 'column' } }}>
+        {drawerOpen && <NavSetSearch />}
         <Navigation />
         {drawerOpen && !downLG && <NavCard />}
       </SimpleBar>

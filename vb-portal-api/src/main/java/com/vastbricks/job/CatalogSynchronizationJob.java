@@ -1,11 +1,13 @@
 package com.vastbricks.job;
 
 import com.vastbricks.config.Env;
+import com.vastbricks.jpa.entity.BaseBrickSet;
 import com.vastbricks.jpa.entity.BrickSet;
 import com.vastbricks.jpa.entity.BrickSetPartOutPrice;
 import com.vastbricks.jpa.entity.Marketplace;
 import com.vastbricks.jpa.entity.OwlSet;
 import com.vastbricks.jpa.entity.OwlWebSetInventory;
+import com.vastbricks.jpa.repository.BaseBrickSetRepository;
 import com.vastbricks.jpa.repository.BrickSetPartOutPriceRepository;
 import com.vastbricks.jpa.repository.BrickSetRepository;
 import com.vastbricks.jpa.repository.MaterializedViewRefresh;
@@ -47,12 +49,13 @@ public class CatalogSynchronizationJob {
     private EntityManager entityManager;
     private PartOutValueJob partOutValueJob;
     private MaterializedViewRefresh materializedViewRefresh;
+    private BaseBrickSetRepository baseBrickSetRepository;
 
     @Scheduled(cron = "0 5 * * * *")
     public void runJob() {
         log.info("Starting Catalog Synchronization Job");
         var owlClient = new OwlClient(env.getBrickOwlApiKey(), env.getBrickOwlCookie());
-        var existingBoids = owlSetRepository.findAllBoids();
+        var existingBoids = owlSetRepository.findAllCategorizedBoids();
         var newBoids = owlClient.catalog().list(ItemType.SET).stream()
                 .filter(e->!existingBoids.contains(e.getBoid()))
                 .map(ListItem::getBoid).toList();
@@ -76,17 +79,6 @@ public class CatalogSynchronizationJob {
 
             owlSetRepository.saveAll(newOwlSets);
             log.info("New owl sets stored %s".formatted(chunk));
-
-            var webInventories = newOwlSets.stream().map(e-> {
-                var url = e.getContents().getUrl() + "/inventory";
-                var owlWebSetInventory = new OwlWebSetInventory();
-                owlWebSetInventory.setBoid(e.getBoid());
-                log.info("Fetching web inventory: %s".formatted(url));
-                owlWebSetInventory.setContents(owlClient.internal().webSetInventory(url));
-                return owlWebSetInventory;
-            }).toList();
-
-            owlWebSetInventoryRepository.saveAll(webInventories);
         });
 
         synchronizeBrickSets();
@@ -104,7 +96,7 @@ public class CatalogSynchronizationJob {
 
     private void synchronizeBrickSets() {
         var existingOwlSetNumbers = owlSetRepository.findAllSetNumbers();
-        var existingBrickSetNumbers = brickSetRepository.findAllSetNumbers();
+        var existingBrickSetNumbers = brickSetRepository.findAllCategorizedSetNumbers();
 
         var newOwlSetNumbers = existingOwlSetNumbers.stream().filter(e->!existingBrickSetNumbers.contains(e)).toList();
         var newOwlSets = owlSetRepository.findBySetNumberIn(newOwlSetNumbers);
@@ -113,7 +105,7 @@ public class CatalogSynchronizationJob {
             var setNumber = owlSet.getSetNumber();
             var catNamePath = owlSet.getContents().getCatNamePath();
             if (setNumber != null && catNamePath != null) {
-                var brickSet = new BrickSet();
+                var brickSet = new BaseBrickSet();
                 brickSet.setNumber(setNumber);
                 brickSet.setName(owlSet.getContents().getName());
                 brickSet.setTheme(catNamePath.split(" / ")[1]);
@@ -125,7 +117,7 @@ public class CatalogSynchronizationJob {
             return null;
         }).filter(Objects::nonNull).toList();
 
-        brickSetRepository.saveAll(newBrickSets);
+        baseBrickSetRepository.saveAll(newBrickSets);
     }
 
     private void synchronizeBrickSetPartOutPrices() {
