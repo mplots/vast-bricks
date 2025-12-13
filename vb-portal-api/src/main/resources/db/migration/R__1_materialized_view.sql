@@ -30,6 +30,12 @@ WITH lowest_offer AS (
          SELECT DISTINCT ON (brick_set_number) *
          FROM brick_set_part_out_price
          ORDER BY brick_set_number, marketplace, timestamp DESC
+     ), lowest_purchase AS (
+         SELECT
+             set_number,
+             MIN(price) AS lowest_purchase_price
+         FROM product_purchase
+         GROUP BY set_number
      ), best_prices AS (
     SELECT
         lo.id as lowest_offer_id,
@@ -56,12 +62,14 @@ WITH lowest_offer AS (
         TO_CHAR(
                 lo.timestamp,
                 'YYYY-MM-DD HH24:MI:SS'
-        ) AS price_timestamp
+        ) AS price_timestamp,
+        lp.lowest_purchase_price as lowest_purchase_price
     FROM brick_set bs
              JOIN lowest_offer lo ON lo.brick_set_number = bs.number
              JOIN all_time_lowest_offer atlo ON atlo.brick_set_number = bs.number
              JOIN latest_part_out hpo ON hpo.brick_set_number = bs.number
              JOIN product p ON lo.product_id = p.id
+             LEFT JOIN lowest_purchase lp ON lp.set_number = bs.number
 ) SELECT * FROM best_prices
 ORDER BY part_out_ratio DESC
 ;

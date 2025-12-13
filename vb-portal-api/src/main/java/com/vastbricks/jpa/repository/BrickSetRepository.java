@@ -47,6 +47,7 @@ public interface BrickSetRepository extends JpaRepository<BrickSet, Long> {
             lowest_price_date AS lowestPriceDate,
             lowest_price_timestamp AS lowestPriceTimestamp,
             lowest_price_age_days AS lowestPriceAgeDays,
+            lowest_purchase_price AS lowestPurchasePrice,
             part_out_price,
             part_out_ratio,
             price_peer_peace,
@@ -82,6 +83,7 @@ public interface BrickSetRepository extends JpaRepository<BrickSet, Long> {
     @Query(value = """
         SELECT 
             a.id AS offer_id,
+            a.product_id,
             a.web_store,
             TO_CHAR(
                     a.timestamp,
@@ -91,6 +93,7 @@ public interface BrickSetRepository extends JpaRepository<BrickSet, Long> {
         FROM (
             SELECT DISTINCT ON (web_store) 
                  bso.id,
+                 p.id as product_id,
                  p.web_store,
                  bso.timestamp,
                  bso.price    
@@ -106,6 +109,7 @@ public interface BrickSetRepository extends JpaRepository<BrickSet, Long> {
     @Query(value = """
         SELECT 
             bso.id AS offer_id,
+            p.id AS product_id,
             web_store,
             price,
             TO_CHAR(

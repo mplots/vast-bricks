@@ -16,6 +16,7 @@ public interface BestOffer {
     String getLowestPriceDate();
     String getLowestPriceTimestamp();
     Integer getLowestPriceAgeDays();
+    BigDecimal getLowestPurchasePrice();
     BigDecimal getPartOutPrice();
     BigDecimal getPartOutRatio();
     BigDecimal getPricePeerPeace();

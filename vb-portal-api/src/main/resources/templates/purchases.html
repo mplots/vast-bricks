@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <th:block th:insert="fragments/product-common :: productStyles"/>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 16px;
+        }
+
+        .purchase-card {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+            padding: 12px;
+            margin: 0 auto 16px;
+            max-width: 900px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .purchase-card h3 {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0 0 10px;
+            font-size: 18px;
+            font-weight: 600;
+            color: #1976d2;
+        }
+
+        .purchase-form {
+            display: grid;
+            gap: 10px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        }
+
+        .purchase-form label {
+            font-size: 13px;
+            color: #555;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .purchase-form input,
+        .purchase-form select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d0d7de;
+            border-radius: 6px;
+            font-size: 15px;
+            box-sizing: border-box;
+            min-height: 44px;
+        }
+
+        .purchase-actions {
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+        }
+
+        #purchase-submit {
+            background: #1976d2;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            min-height: 44px;
+        }
+
+        #purchase-submit:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        #purchase-feedback {
+            font-size: 13px;
+            color: #2e7d32;
+        }
+
+        /* Edit modal */
+        #edit-modal.hidden { display: none; }
+        #edit-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 150;
+        }
+        .edit-modal-content {
+            background: #fff;
+            border-radius: 10px;
+            padding: 16px;
+            width: min(500px, 90%);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .edit-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .edit-modal-header h3 {
+            margin: 0;
+            font-size: 18px;
+        }
+        .edit-close {
+            border: none;
+            background: transparent;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 0 0 12px;
+            padding: 12px 16px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 110;
+            background: #f8f9fa;
+        }
+
+        .purchase-list {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        .purchase-row {
+            display: grid;
+            grid-template-columns: 140px 1.2fr 1fr 0.7fr 1fr 1fr 1fr 0.8fr;
+            padding: 12px 16px;
+            border-bottom: 1px solid #e5e7eb;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .purchase-row.header {
+            font-weight: 700;
+            background: #f4f6fb;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .purchase-row:last-child {
+            border-bottom: none;
+        }
+
+        .set-name {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .set-name .meta {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .price, .qty, .date {
+            font-weight: 500;
+            color: #1f2937;
+        }
+
+        .store {
+            color: #2563eb;
+            font-weight: 500;
+        }
+
+        .summary-row {
+            font-weight: 700;
+            background: #f4f6fb;
+        }
+
+        .summary-label {
+            grid-column: 1 / span 7;
+        }
+
+        .summary-value {
+            grid-column: 8 / span 1;
+            text-align: left;
+            font-weight: 700;
+        }
+
+        .edit-btn {
+            padding: 6px 10px;
+            border: 1px solid #d0d7de;
+            border-radius: 6px;
+            background: #f5f5f5;
+            cursor: pointer;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            grid-column: 1 / -1;
+        }
+
+        @media (max-width: 768px) {
+            .purchase-row.header {
+                display: none;
+            }
+
+            .purchase-row {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto;
+                gap: 6px;
+            }
+
+            .purchase-row .cell {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 6px 0;
+                border-bottom: 1px solid #e5e7eb;
+                gap: 10px;
+            }
+
+            .purchase-row .cell:last-child {
+                border-bottom: none;
+            }
+
+            .purchase-row .cell::before {
+                content: attr(data-label);
+                font-weight: 600;
+                color: #6b7280;
+                text-transform: uppercase;
+                font-size: 12px;
+            }
+
+            .image-cell {
+                justify-content: center;
+                border-bottom: none;
+            }
+
+            .set-cell {
+                justify-content: center;
+                border-bottom: none;
+                text-align: center;
+                padding-top: 0;
+            }
+
+            .set-cell::before {
+                display: none;
+            }
+
+            .summary-row .cell {
+                border-bottom: none;
+            }
+        }
+    </style>
+    <title>My Purchases</title>
+</head>
+<body>
+
+<div class="page-header">
+    <span class="material-icons">shopping_bag</span>
+    <h2 style="margin: 0;">My Purchases</h2>
+</div>
+
+<div class="purchase-card">
+    <h3><span class="material-icons">add_shopping_cart</span>Add Purchase</h3>
+    <button id="open-add-modal" type="button" style="padding: 10px 14px; border: 1px solid #d0d7de; background: #f5f5f5; border-radius: 6px; cursor: pointer;">Add Purchase</button>
+</div>
+
+<div class="purchase-list">
+    <div class="purchase-row header">
+        <div>Image</div>
+        <div>Set</div>
+        <div>Store</div>
+        <div>Qty</div>
+        <div>Date</div>
+        <div>Price</div>
+        <div>Total</div>
+        <div>Actions</div>
+    </div>
+    <div th:if="${#lists.isEmpty(purchases)}" style="padding: 16px; text-align: center; color: #6b7280;">No purchases yet.</div>
+    <div th:each="row : ${purchases}" class="purchase-row"
+         th:data-id="${row.id}"
+         th:data-set-number="${row.setNumber}"
+         th:data-store="${row.webStore}"
+         th:data-price="${row.price}"
+         th:data-qty="${row.quantity}"
+         th:data-date="${row.purchasedAt}">
+        <div class="cell image-cell" data-label="" style="display:flex; justify-content:center; align-items:center;">
+            <img th:if="${row.image != null}" th:src="${row.image}" alt="" style="width:140px; height:140px; object-fit:contain; border-radius:8px;">
+        </div>
+        <div class="cell set-cell" data-label="" style="display:flex; align-items:center; gap:8px;">
+            <div class="set-name" style="gap:4px;">
+                <span th:text="${row.setName}"></span>
+            </div>
+        </div>
+        <div class="cell store" data-label="Store" th:text="${row.webStore}"></div>
+        <div class="cell qty" data-label="Qty" th:text="${row.quantity}"></div>
+        <div class="cell date" data-label="Date" th:text="${row.purchasedAt}"></div>
+        <div class="cell price" data-label="Price" th:text="'€' + ${row.price}"></div>
+        <div class="cell price" data-label="Total" th:text="'€' + ${row.totalAmount}"></div>
+        <div class="cell" data-label="">
+            <button type="button" class="edit-btn">Edit</button>
+        </div>
+    </div>
+    <div class="purchase-row summary-row" th:if="${totalSpent != null}">
+        <div class="cell summary-label"></div>
+        <div class="cell summary-value price" data-label="Total" th:text="'€' + ${totalSpent}"></div>
+    </div>
+</div>
+
+<!-- Edit modal -->
+<div id="edit-modal" class="hidden">
+    <div class="edit-modal-content">
+        <div class="edit-modal-header">
+            <h3 id="edit-title" style="display:flex; align-items:center; gap:6px;"><span class="material-icons">edit</span> Edit Purchase</h3>
+            <button id="edit-close" class="edit-close" type="button">&times;</button>
+        </div>
+        <form id="edit-form" class="purchase-form">
+            <input type="hidden" name="purchaseId">
+            <div>
+                <label for="edit-set">Set Number</label>
+                <input id="edit-set" name="setNumber" type="number" min="1" step="1" required>
+            </div>
+            <div>
+                <label for="edit-store">Store</label>
+                <select id="edit-store" name="webStore" required>
+                    <option value="" disabled selected>Select store</option>
+                    <option th:each="store : ${stores}" th:value="${store}" th:text="${store}"></option>
+                </select>
+            </div>
+            <div>
+                <label for="edit-price">Price (€)</label>
+                <input id="edit-price" name="price" type="number" min="0" step="0.01" required>
+            </div>
+            <div>
+                <label for="edit-qty">Quantity</label>
+                <input id="edit-qty" name="quantity" type="number" min="1" step="1" value="1">
+            </div>
+            <div>
+                <label for="edit-date">Date</label>
+                <input id="edit-date" name="purchasedAt" type="date">
+            </div>
+            <div class="modal-actions">
+                <button id="modal-submit" type="submit" class="edit-btn">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const modal = document.getElementById('edit-modal');
+        const form = document.getElementById('edit-form');
+        const modalTitle = document.getElementById('edit-title');
+        const modalSubmit = document.getElementById('modal-submit');
+        const closeBtn = document.getElementById('edit-close');
+        const addBtn = document.getElementById('open-add-modal');
+
+        function ensureStoreOption(select, value) {
+            if (!value) return;
+            const exists = Array.from(select.options).some(opt => opt.value === value);
+            if (!exists) {
+                const opt = document.createElement('option');
+                opt.value = value;
+                opt.textContent = value;
+                select.appendChild(opt);
+            }
+            select.value = value;
+        }
+
+        const today = () => new Date().toISOString().slice(0, 10);
+
+        function openModal(mode, data = {}) {
+            if (!modal || !form) return;
+            form.dataset.mode = mode;
+            modalTitle.innerHTML = `<span class="material-icons">${mode === 'edit' ? 'edit' : 'add'}</span> ${mode === 'edit' ? 'Edit Purchase' : 'Add Purchase'}`;
+            modalSubmit.textContent = mode === 'edit' ? 'Save' : 'Add';
+
+            form.purchaseId.value = data.id || '';
+            form.setNumber.value = data.setNumber || '';
+            form.webStore.value = '';
+            ensureStoreOption(form.webStore, data.webStore || '');
+            form.price.value = data.price || '';
+            form.quantity.value = data.quantity || '1';
+            form.purchasedAt.value = data.date || today();
+
+            modal.classList.remove('hidden');
+            modal.classList.add('show');
+        }
+
+        function closeEditModal() {
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('show');
+            }
+        }
+
+        if (closeBtn) {
+            closeBtn.addEventListener('click', closeEditModal);
+        }
+
+        if (addBtn) {
+            addBtn.addEventListener('click', () => openModal('add'));
+        }
+
+        document.querySelectorAll('.edit-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const row = e.target.closest('.purchase-row');
+                openModal('edit', {
+                    id: row.dataset.id,
+                    setNumber: row.dataset.setNumber,
+                    webStore: row.dataset.store,
+                    price: row.dataset.price,
+                    quantity: row.dataset.qty,
+                    date: row.dataset.date
+                });
+            });
+        });
+
+        if (form) {
+            form.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const mode = form.dataset.mode || 'add';
+                const purchaseId = form.purchaseId.value;
+                const setNumber = form.setNumber.value;
+                const webStore = form.webStore.value;
+                const priceValue = parseFloat(form.price.value);
+                const quantityValue = parseInt(form.quantity.value || '1', 10);
+                const purchasedAtValue = form.purchasedAt.value;
+
+                if (mode === 'edit' && !purchaseId) {
+                    alert('Missing purchase ID');
+                    return;
+                }
+                if (!setNumber) {
+                    alert('Enter set number');
+                    return;
+                }
+                if (!webStore) {
+                    alert('Select a store');
+                    return;
+                }
+                if (Number.isNaN(priceValue) || priceValue <= 0) {
+                    alert('Enter a valid price');
+                    return;
+                }
+                if (Number.isNaN(quantityValue) || quantityValue <= 0) {
+                    alert('Enter a valid quantity');
+                    return;
+                }
+
+                const payload = {
+                    price: priceValue,
+                    quantity: quantityValue,
+                    webStore: webStore,
+                    setNumber: Number(setNumber)
+                };
+                if (purchasedAtValue) {
+                    payload.purchasedAt = purchasedAtValue;
+                }
+
+                modalSubmit.disabled = true;
+                try {
+                    const url = mode === 'edit'
+                        ? `/api/purchases/${purchaseId}`
+                        : `/api/brick-sets/${setNumber}/purchases`;
+                    const method = mode === 'edit' ? 'PUT' : 'POST';
+                    const response = await fetch(url, {
+                        method,
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (!response.ok) {
+                        throw new Error(await response.text());
+                    }
+                    closeEditModal();
+                    setTimeout(() => window.location.reload(), 300);
+                } catch (err) {
+                    alert('Failed to save purchase: ' + (err.message || 'Unknown error'));
+                } finally {
+                    modalSubmit.disabled = false;
+                }
+            });
+        }
+    });
+</script>
+
+</body>
+</html>

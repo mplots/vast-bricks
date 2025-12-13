@@ -1,7 +1,9 @@
 package com.vastbricks.controller;
 
 import com.vastbricks.jpa.repository.BrickSetRepository;
+import com.vastbricks.jpa.repository.ProductPurchaseRepository;
 import com.vastbricks.jpa.repository.ProductRepository;
+import com.vastbricks.jpa.repository.ProductPurchaseRepository.PurchaseRow;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,6 +20,7 @@ public class AggregatorController {
 
     private BrickSetRepository brickSetRepository;
     private ProductRepository productRepository;
+    private ProductPurchaseRepository productPurchaseRepository;
 
     @GetMapping("/")
     public String home(
@@ -68,6 +71,18 @@ public class AggregatorController {
     @GetMapping("/splash")
     public String splash() {
         return "splash";
+    }
+
+    @GetMapping("/purchases")
+    public String purchases(Model model) {
+        var purchases = productPurchaseRepository.findAllWithSetOrdered();
+        model.addAttribute("purchases", purchases);
+        var totalSpent = purchases.stream()
+                .map(p -> p.getTotalAmount() == null ? java.math.BigDecimal.ZERO : p.getTotalAmount())
+                .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
+        model.addAttribute("totalSpent", totalSpent);
+        model.addAttribute("stores", productRepository.findWebStores());
+        return "purchases";
     }
 
 }

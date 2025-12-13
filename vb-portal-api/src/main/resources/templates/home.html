@@ -15,6 +15,17 @@
             align-items: center;
         }
 
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 0;
+            width: 100%;
+            text-align: center;
+            padding: 12px 16px;
+        }
+
         .product-card {
             width: 280px;
         }
@@ -25,16 +36,18 @@
             }
         }
     </style>
-    <title>Product List</title>
+    <title>Lego Sets</title>
 </head>
 <body>
 
-<div id="filter-container" style="font-family: 'Inter', sans-serif; background-color: #f8f9fa;">
+<div id="filter-container" style="font-family: 'Inter', sans-serif; background-color: #f8f9fa; position: sticky; top: 0; z-index: 110;">
     <style>
         #filter-header {
             display: flex;
-            justify-content: flex-end;
-            padding: 1rem;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: #f8f9fa;
         }
 
         #filter-toggle {
@@ -162,9 +175,13 @@
 
     <!-- Filter Button -->
     <div id="filter-header">
-        <button id="filter-toggle">
-            <i class="material-icons">tune</i>
-            Filters
+        <div class="header-spacer" style="width:48px; flex-shrink: 0;"></div>
+        <div class="page-header" style="margin: 0; justify-content: center;">
+            <span class="material-icons">store</span>
+            <h2 style="margin: 0;">Lego Sets</h2>
+        </div>
+        <button id="filter-toggle" aria-label="Menu">
+            <i class="material-icons">menu</i>
         </button>
     </div>
 
@@ -172,6 +189,12 @@
     <div id="filter-backdrop"></div>
     <div id="filter-drawer">
         <form id="filter-form" method="GET" action="/">
+            <div class="filter-section" style="margin-bottom: 0.5rem;">
+                <a href="/purchases" class="modern-link" style="font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
+                    <i class="material-icons" style="font-size: 18px;">shopping_bag</i>
+                    My Purchases
+                </a>
+            </div>
             <div class="filter-section">
                 <strong>Go to Set</strong>
                 <div class="set-search-row">

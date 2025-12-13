@@ -408,6 +408,15 @@
                 </div>
 
                 <div class="product-meta">
+                    <i class="material-icons">price_check</i>
+                    <div class="meta-info">
+                        <span class="meta-title">My Lowest Price</span>
+                        <span class="meta-value"
+                              th:text="${offer.lowestPurchasePrice != null ? '€' + offer.lowestPurchasePrice : 'N/A'}"/>
+                    </div>
+                </div>
+
+                <div class="product-meta">
                     <i class="material-icons">trending_up</i>
                     <div class="meta-info">
                         <span class="meta-title">Ratio</span>

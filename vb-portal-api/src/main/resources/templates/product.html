@@ -23,6 +23,21 @@
             align-items: center;
         }
 
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 0;
+            width: 100%;
+            text-align: center;
+            padding: 12px 16px;
+            position: sticky;
+            top: 0;
+            z-index: 110;
+            background: #f8f9fa;
+        }
+
         .product-container {
             max-width: 800px;
             margin: auto;
@@ -108,6 +123,76 @@
             color: #222;
         }
 
+        .purchase-card {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+            padding: 12px;
+            margin: 16px auto;
+            max-width: 800px;
+        }
+
+        .purchase-card h3 {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0 0 10px;
+            font-size: 18px;
+            font-weight: 600;
+            color: #1976d2;
+        }
+
+        .purchase-form {
+            display: grid;
+            gap: 10px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        }
+
+        .purchase-form label {
+            font-size: 13px;
+            color: #555;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .purchase-form input,
+        .purchase-form select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d0d7de;
+            border-radius: 6px;
+            font-size: 15px;
+            box-sizing: border-box;
+            min-height: 44px;
+        }
+
+        .purchase-actions {
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+        }
+
+        #purchase-submit {
+            background: #1976d2;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            min-height: 44px;
+        }
+
+        #purchase-submit:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        #purchase-feedback {
+            font-size: 13px;
+            color: #2e7d32;
+        }
+
         .store-list {
             background: white;
             border-radius: 8px;
@@ -151,7 +236,10 @@
 </head>
 <body>
 
-<h1>Product Details</h1>
+<div class="page-header">
+    <span class="material-icons">local_mall</span>
+    <h2 style="margin: 0;">Lego Set Details</h2>
+</div>
 
 <div class="product-container">
     <th:block th:insert="fragments/product-common :: productCard(${offer}, false)"/>
@@ -184,6 +272,40 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <div class="purchase-card">
+        <h3><span class="material-icons">add_shopping_cart</span>Record Purchase</h3>
+        <form id="purchase-form" class="purchase-form" th:data-set-number="${offer.setNumber}">
+            <div>
+                <label for="purchase-store">Store</label>
+                <select id="purchase-store" name="webStore" required>
+                    <option th:each="price, priceStat : ${prices}"
+                            th:value="${price.webStore}"
+                            th:text="${price.webStore}"
+                            th:data-price="${price.price}"
+                            th:selected="${price.webStore == offer.webStore}"></option>
+                </select>
+            </div>
+            <div>
+                <label for="purchase-price">Price (€)</label>
+                <input id="purchase-price" name="price" type="number" min="0" step="0.01" required
+                       th:value="${offer.price}">
+            </div>
+            <div>
+                <label for="purchase-qty">Quantity</label>
+                <input id="purchase-qty" name="quantity" type="number" min="1" step="1" value="1">
+            </div>
+            <div>
+                <label for="purchase-date">Date</label>
+                <input id="purchase-date" name="purchasedAt" type="date"
+                       th:value="${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}">
+            </div>
+            <div class="purchase-actions">
+                <button id="purchase-submit" type="submit">Add Purchase</button>
+                <span id="purchase-feedback"></span>
+            </div>
+        </form>
     </div>
 
     <div class="store-list">
@@ -231,6 +353,77 @@
         if (input) {
             input.addEventListener('input', updateCustomCalculator);
             updateCustomCalculator();
+        }
+
+        const purchaseForm = document.getElementById('purchase-form');
+        const purchaseFeedback = document.getElementById('purchase-feedback');
+        const purchaseSubmit = document.getElementById('purchase-submit');
+        const storeSelect = document.getElementById('purchase-store');
+        const priceInput = document.getElementById('purchase-price');
+
+        if (storeSelect && priceInput) {
+            const setPriceFromStore = () => {
+                const selected = storeSelect.options[storeSelect.selectedIndex];
+                const price = selected?.dataset?.price;
+                if (price && !Number.isNaN(parseFloat(price))) {
+                    priceInput.value = price;
+                }
+            };
+            storeSelect.addEventListener('change', setPriceFromStore);
+            setPriceFromStore();
+        }
+
+        if (purchaseForm) {
+            purchaseForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                purchaseFeedback.textContent = '';
+
+                const webStore = purchaseForm.webStore.value;
+                const priceValue = parseFloat(purchaseForm.price.value);
+                const quantityValue = parseInt(purchaseForm.quantity.value || '1', 10);
+                const purchasedAtValue = purchaseForm.purchasedAt.value;
+                const setNumber = purchaseForm.dataset.setNumber;
+
+                if (!webStore) {
+                    alert('Please select a store');
+                    return;
+                }
+                if (Number.isNaN(priceValue) || priceValue <= 0) {
+                    alert('Enter a valid price');
+                    return;
+                }
+                if (Number.isNaN(quantityValue) || quantityValue <= 0) {
+                    alert('Enter a valid quantity');
+                    return;
+                }
+
+                const payload = {
+                    price: priceValue,
+                    quantity: quantityValue,
+                    webStore: webStore
+                };
+                if (purchasedAtValue) {
+                    payload.purchasedAt = purchasedAtValue;
+                }
+
+                purchaseSubmit.disabled = true;
+                try {
+                    const response = await fetch(`/api/brick-sets/${setNumber}/purchases`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (!response.ok) {
+                        throw new Error(await response.text());
+                    }
+                    purchaseFeedback.textContent = 'Purchase saved! Updating...';
+                    setTimeout(() => window.location.reload(), 400);
+                } catch (err) {
+                    alert('Failed to save purchase: ' + (err.message || 'Unknown error'));
+                } finally {
+                    purchaseSubmit.disabled = false;
+                }
+            });
         }
     });
 </script>
