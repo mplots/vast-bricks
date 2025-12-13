@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <th:block th:insert="fragments/product-common :: productStyles"/>
+    <th:block th:insert="~{fragments/product-common :: productStyles}"/>
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -144,7 +144,7 @@
 
         .purchase-row {
             display: grid;
-            grid-template-columns: 140px 1.2fr 1fr 0.7fr 1fr 1fr 1fr 0.8fr;
+            grid-template-columns: 140px 1.2fr 1fr 0.7fr 1fr 1fr 1fr 1fr;
             padding: 12px 16px;
             border-bottom: 1px solid #e5e7eb;
             align-items: center;
@@ -200,11 +200,35 @@
         }
 
         .edit-btn {
-            padding: 6px 10px;
+            padding: 6px;
+            width: 32px;
+            height: 32px;
             border: 1px solid #d0d7de;
-            border-radius: 6px;
+            border-radius: 50%;
             background: #f5f5f5;
             cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .modal-actions .edit-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            width: auto;
+            height: auto;
+            padding: 10px 14px;
+            border-radius: 6px;
+            background: #f0f0f0;
+            color: #333;
+            border-color: #d0d7de;
+        }
+
+        .modal-actions .edit-btn .material-icons {
+            color: #333;
+            font-size: 18px;
         }
 
         .modal-actions {
@@ -232,6 +256,7 @@
                 padding: 6px 0;
                 border-bottom: 1px solid #e5e7eb;
                 gap: 10px;
+                position: relative;
             }
 
             .purchase-row .cell:last-child {
@@ -264,6 +289,15 @@
 
             .summary-row .cell {
                 border-bottom: none;
+            }
+
+            .action-cell {
+                position: absolute;
+                top: 8px;
+                right: 0;
+                border: none !important;
+                padding: 0;
+                background: transparent;
             }
         }
     </style>
@@ -299,7 +333,7 @@
          th:data-store="${row.webStore}"
          th:data-price="${row.price}"
          th:data-qty="${row.quantity}"
-         th:data-date="${row.purchasedAt}">
+         th:data-date-iso="${#temporals.format(row.purchasedAt, 'yyyy-MM-dd')}">
         <div class="cell image-cell" data-label="" style="display:flex; justify-content:center; align-items:center;">
             <img th:if="${row.image != null}" th:src="${row.image}" alt="" style="width:140px; height:140px; object-fit:contain; border-radius:8px;">
         </div>
@@ -310,11 +344,18 @@
         </div>
         <div class="cell store" data-label="Store" th:text="${row.webStore}"></div>
         <div class="cell qty" data-label="Qty" th:text="${row.quantity}"></div>
-        <div class="cell date" data-label="Date" th:text="${row.purchasedAt}"></div>
+        <div class="cell date" data-label="Date" th:text="${row.purchasedAtDisplay}"></div>
         <div class="cell price" data-label="Price" th:text="'€' + ${row.price}"></div>
         <div class="cell price" data-label="Total" th:text="'€' + ${row.totalAmount}"></div>
-        <div class="cell" data-label="">
-            <button type="button" class="edit-btn">Edit</button>
+        <div class="cell action-cell" data-label="">
+            <div style="display:flex; gap:6px;">
+                <button type="button" class="edit-btn" aria-label="Edit">
+                    <span class="material-icons" style="font-size:16px;">edit</span>
+                </button>
+                <button type="button" class="edit-btn delete-btn" aria-label="Delete">
+                    <span class="material-icons" style="font-size:16px;">delete</span>
+                </button>
+            </div>
         </div>
     </div>
     <div class="purchase-row summary-row" th:if="${totalSpent != null}">
@@ -356,7 +397,14 @@
                 <input id="edit-date" name="purchasedAt" type="date">
             </div>
             <div class="modal-actions">
-                <button id="modal-submit" type="submit" class="edit-btn">Save</button>
+                <button id="modal-submit" type="submit" class="edit-btn">
+                    <svg aria-hidden="true" focusable="false" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l3 3v13a2 2 0 0 1-2 2z"></path>
+                        <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                        <polyline points="7 3 7 8 15 8"></polyline>
+                    </svg>
+                    Save
+                </button>
             </div>
         </form>
     </div>
@@ -389,7 +437,12 @@
             if (!modal || !form) return;
             form.dataset.mode = mode;
             modalTitle.innerHTML = `<span class="material-icons">${mode === 'edit' ? 'edit' : 'add'}</span> ${mode === 'edit' ? 'Edit Purchase' : 'Add Purchase'}`;
-            modalSubmit.textContent = mode === 'edit' ? 'Save' : 'Add';
+            const label = mode === 'edit' ? 'Save' : 'Add';
+            modalSubmit.innerHTML = `<svg aria-hidden="true" focusable="false" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;">
+                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l3 3v13a2 2 0 0 1-2 2z"></path>
+                        <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                        <polyline points="7 3 7 8 15 8"></polyline>
+                    </svg> <span>${label}</span>`;
 
             form.purchaseId.value = data.id || '';
             form.setNumber.value = data.setNumber || '';
@@ -421,13 +474,25 @@
         document.querySelectorAll('.edit-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const row = e.target.closest('.purchase-row');
+                if (btn.classList.contains('delete-btn')) {
+                    if (!confirm('Delete this purchase?')) return;
+                    fetch(`/api/purchases/${row.dataset.id}`, { method: 'DELETE' })
+                        .then(resp => {
+                            if (!resp.ok) {
+                                return resp.text().then(t => { throw new Error(t); });
+                            }
+                            window.location.reload();
+                        })
+                        .catch(err => alert('Failed to delete: ' + (err.message || 'Unknown error')));
+                    return;
+                }
                 openModal('edit', {
                     id: row.dataset.id,
                     setNumber: row.dataset.setNumber,
                     webStore: row.dataset.store,
                     price: row.dataset.price,
                     quantity: row.dataset.qty,
-                    date: row.dataset.date
+                    date: row.dataset.dateIso
                 });
             });
         });

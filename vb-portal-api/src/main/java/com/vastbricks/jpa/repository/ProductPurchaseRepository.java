@@ -19,6 +19,7 @@ public interface ProductPurchaseRepository extends JpaRepository<ProductPurchase
             pp.price AS price,
             pp.quantity AS quantity,
             pp.purchased_at AS purchasedAt,
+            TO_CHAR(pp.purchased_at, 'DD-MM-YYYY') AS purchasedAtDisplay,
             t.total_amount AS totalAmount,
             (
                 SELECT p.image 
@@ -43,6 +44,7 @@ public interface ProductPurchaseRepository extends JpaRepository<ProductPurchase
         BigDecimal getPrice();
         Integer getQuantity();
         LocalDate getPurchasedAt();
+        String getPurchasedAtDisplay();
         String getImage();
         BigDecimal getTotalAmount();
     }

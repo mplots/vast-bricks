@@ -36,6 +36,6 @@ public class ProductPurchase {
     @Column(nullable = false)
     private Integer quantity = 1;
 
-    @Column(nullable = false, updatable = false)
+    @Column(nullable = false)
     private LocalDate purchasedAt;
 }

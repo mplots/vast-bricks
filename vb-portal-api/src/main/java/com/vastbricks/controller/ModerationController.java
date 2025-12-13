@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.transaction.annotation.Transactional;
@@ -115,6 +116,15 @@ public class ModerationController {
         productPurchaseRepository.save(purchase);
         materializedViewRefresh.refreshCheapestOfferView();
         log.info("Updated purchase {} for set {} (store {})", purchaseId, setNumber, request.getWebStore());
+    }
+
+    @DeleteMapping("/purchases/{purchaseId}")
+    public void deletePurchase(@PathVariable("purchaseId") Long purchaseId) {
+        var purchase = productPurchaseRepository.findById(purchaseId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Purchase not found"));
+        productPurchaseRepository.delete(purchase);
+        materializedViewRefresh.refreshCheapestOfferView();
+        log.info("Deleted purchase {}", purchaseId);
     }
 
 }

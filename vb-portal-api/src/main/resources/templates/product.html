@@ -11,7 +11,7 @@
     <meta property="og:url" th:content="'/product?set=' + ${offer.setNumber}">
     <meta property="og:type" content="website">
 
-    <th:block th:insert="fragments/product-common :: productStyles"/>
+    <th:block th:insert="~{fragments/product-common :: productStyles}"/>
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -242,7 +242,7 @@
 </div>
 
 <div class="product-container">
-    <th:block th:insert="fragments/product-common :: productCard(${offer}, false)"/>
+    <th:block th:insert="~{fragments/product-common :: productCard(${offer}, false)}"/>
 
     <div class="custom-calc" id="custom-calc"
          th:data-partout="${offer.partOutPrice}"
@@ -324,7 +324,7 @@
 
 </div>
 
-<th:block th:insert="fragments/product-common :: productScripts"/>
+<th:block th:insert="~{fragments/product-common :: productScripts}"/>
 <script>
     function updateCustomCalculator() {
         const container = document.getElementById('custom-calc');
