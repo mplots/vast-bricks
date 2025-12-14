@@ -88,3 +88,15 @@ CREATE TABLE rebrickable.inventory_minifigs (
     quantity INTEGER NOT NULL,
     PRIMARY KEY (inventory_id, fig_num)
 );
+
+-- Speed up color-part aggregation per set
+CREATE INDEX IF NOT EXISTS idx_rebrickable_inventories_set_num
+    ON rebrickable.inventories (set_num);
+
+-- Join from inventories to inventory_parts and group by color quickly
+CREATE INDEX IF NOT EXISTS idx_rebrickable_inventory_parts_inventory_color
+    ON rebrickable.inventory_parts (inventory_id, color_id);
+
+-- Case-insensitive color lookups/sorting support
+CREATE INDEX IF NOT EXISTS idx_rebrickable_colors_name_lower
+    ON rebrickable.colors (lower(name));

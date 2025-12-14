@@ -18,21 +18,228 @@
         .page-header {
             display: flex;
             align-items: center;
-            justify-content: center;
+            justify-content: space-between;
             gap: 10px;
             margin: 0;
             width: 100%;
             text-align: center;
             padding: 12px 16px;
+            box-sizing: border-box;
+        }
+
+        .page-title {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .view-toggle {
+            display: inline-flex;
+            background: #fff;
+            border: 1px solid #d0d0d0;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .view-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 12px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+
+        .view-button .material-icons {
+            font-size: 18px;
+        }
+
+        .view-button.active {
+            background: #1976d2;
+            color: #fff;
+        }
+
+        .view-button:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
         }
 
         .product-card {
             width: 280px;
         }
 
+        .grid-view.hidden {
+            display: none;
+        }
+
+        .table-view {
+            display: none;
+            width: 100%;
+            max-width: 1280px;
+        }
+
+        .table-view.active {
+            display: block;
+        }
+
+        .products-table-wrapper {
+            width: 100%;
+            max-width: 1280px;
+            margin: 12px auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .products-table {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .product-row {
+            display: grid;
+            grid-template-columns: 140px 1.4fr 1fr 0.8fr 1fr 0.9fr 0.7fr 0.9fr 0.9fr 1fr 1.1fr;
+            gap: 12px;
+            padding: 14px 16px;
+            align-items: center;
+            border-bottom: 1px solid #e5e7eb;
+            box-sizing: border-box;
+        }
+
+        .product-row.header {
+            background: #f4f6fb;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.4px;
+        }
+
+        .product-row:last-child {
+            border-bottom: none;
+        }
+
+        .product-row .cell {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .image-cell img {
+            width: 120px;
+            height: 120px;
+            object-fit: contain;
+            border-radius: 8px;
+            background: #f9fafb;
+        }
+
+        .set-title {
+            font-weight: 700;
+            color: #1f2937;
+            font-size: 15px;
+            text-align: left;
+        }
+
+        .set-meta {
+            font-size: 12px;
+            color: #6b7280;
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .price {
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .sub-text {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .ratio {
+            font-weight: 700;
+            color: #2563eb;
+        }
+
+        .profit {
+            font-weight: 700;
+            color: #16a34a;
+        }
+
+        .link-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .link-group a {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 10px;
+            border-radius: 6px;
+            background: #e3f2fd;
+            color: #0f437d;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .link-group a:hover {
+            background: #d4e7fb;
+        }
+
+        .meta-chips {
+            display: inline-flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .chip {
+            background: #eef2ff;
+            color: #3730a3;
+            border-radius: 999px;
+            padding: 4px 8px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
         @media (max-width: 768px) {
             .product-card {
                 width: 90%;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .view-toggle .view-button[data-view="table"] {
+                display: none;
+            }
+            .table-view {
+                display: none !important;
+            }
+            .page-header {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 8px;
+            }
+            .header-actions {
+                width: 100%;
+                justify-content: space-between;
             }
         }
     </style>
@@ -44,10 +251,12 @@
     <style>
         #filter-header {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            justify-content: center;
+            align-items: flex-start;
             padding: 12px 16px;
             background: #f8f9fa;
+            gap: 8px;
+            flex-wrap: wrap;
         }
 
         #filter-toggle {
@@ -175,14 +384,27 @@
 
     <!-- Filter Button -->
     <div id="filter-header">
-        <div class="header-spacer" style="width:48px; flex-shrink: 0;"></div>
-        <div class="page-header" style="margin: 0; justify-content: center;">
-            <span class="material-icons">store</span>
-            <h2 style="margin: 0;">Lego Sets</h2>
+        <div class="page-header">
+            <div class="page-title">
+                <span class="material-icons">store</span>
+                <h2 style="margin: 0;">Lego Sets</h2>
+            </div>
+            <div class="header-actions">
+                <div class="view-toggle" role="group" aria-label="Choose view">
+                    <button class="view-button active" type="button" data-view="grid">
+                        <span class="material-icons">grid_view</span>
+                        Grid
+                    </button>
+                    <button class="view-button" type="button" data-view="table">
+                        <span class="material-icons">table_chart</span>
+                        Table
+                    </button>
+                </div>
+                <button id="filter-toggle" aria-label="Menu">
+                    <i class="material-icons">menu</i>
+                </button>
+            </div>
         </div>
-        <button id="filter-toggle" aria-label="Menu">
-            <i class="material-icons">menu</i>
-        </button>
     </div>
 
 
@@ -287,13 +509,135 @@
                 });
             });
         })();
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const gridView = document.getElementById('grid-view');
+            const tableView = document.getElementById('table-view');
+            const viewButtons = document.querySelectorAll('.view-button');
+            const mobileQuery = window.matchMedia('(max-width: 900px)');
+            const storageKey = 'homeView';
+
+            function setView(view) {
+                const enforcedView = mobileQuery.matches ? 'grid' : view;
+                if (gridView) {
+                    gridView.classList.toggle('hidden', enforcedView === 'table');
+                    gridView.setAttribute('aria-hidden', enforcedView !== 'grid');
+                }
+                if (tableView) {
+                    tableView.classList.toggle('active', enforcedView === 'table');
+                    tableView.setAttribute('aria-hidden', enforcedView !== 'table');
+                }
+                viewButtons.forEach(btn => {
+                    const isActive = btn.dataset.view === enforcedView;
+                    btn.classList.toggle('active', isActive);
+                    const isTable = btn.dataset.view === 'table';
+                    btn.disabled = mobileQuery.matches && isTable;
+                    if (mobileQuery.matches && isTable) {
+                        btn.title = 'Table view is only available on desktop';
+                    } else {
+                        btn.removeAttribute('title');
+                    }
+                });
+                if (!mobileQuery.matches) {
+                    localStorage.setItem(storageKey, enforcedView);
+                }
+            }
+
+            const savedView = localStorage.getItem(storageKey) || 'grid';
+            setView(savedView);
+
+            viewButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    if (btn.disabled) return;
+                    setView(btn.dataset.view);
+                });
+            });
+
+            mobileQuery.addEventListener('change', () => {
+                setView(localStorage.getItem(storageKey) || 'grid');
+            });
+        });
     </script>
 </div>
 
 
 <div class="content">
-    <div class="product-container">
-        <th:block th:each="offer : ${bestPrices}" th:insert="~{fragments/product-common :: productCard(${offer}, true)}"/>
+    <div id="grid-view" class="grid-view" aria-label="Grid view of products">
+        <div class="product-container">
+            <th:block th:each="offer : ${bestPrices}" th:insert="~{fragments/product-common :: productCard(${offer}, true)}"/>
+        </div>
+    </div>
+    <div id="table-view" class="table-view" aria-label="Table view of products" aria-hidden="true">
+        <div class="products-table-wrapper">
+            <div class="products-table">
+                <div class="product-row header">
+                    <div>Image</div>
+                    <div>Set</div>
+                    <div>Store</div>
+                    <div>Price</div>
+                    <div>ATL</div>
+                    <div>My Low</div>
+                    <div>Ratio</div>
+                    <div>Part Out</div>
+                    <div>Profit</div>
+                    <div>Pieces</div>
+                    <div>Links</div>
+                </div>
+                <div th:each="offer : ${bestPrices}" class="product-row">
+                    <div class="cell image-cell">
+                        <img th:if="${offer.image != null}" th:src="${offer.image}" alt="" loading="lazy">
+                    </div>
+                    <div class="cell">
+                        <div class="set-title" th:text="${offer.setName.replace('LEGO', '')}"></div>
+                        <div class="set-meta">
+                            <span th:text="'#' + ${offer.setNumber}"></span>
+                            <span th:text="${offer.theme}"></span>
+                            <span th:text="${offer.priceTimestamp}"></span>
+                        </div>
+                    </div>
+                    <div class="cell">
+                        <a th:href="${offer.purchaseLink}" target="_blank" class="modern-link" th:text="${offer.webStore}"></a>
+                    </div>
+                    <div class="cell price">
+                        <span th:text="'€' + ${offer.price}"></span>
+                    </div>
+                    <div class="cell">
+                        <span class="price" th:text="'€' + ${offer.getLowestPrice()}"></span>
+                        <span class="sub-text"
+                              th:text="${offer.lowestPriceWebStore != null ? offer.lowestPriceWebStore + (offer.lowestPriceAgeDays != null ? ' • ' + offer.lowestPriceAgeDays + 'd ago' : '') : '—'}"></span>
+                    </div>
+                    <div class="cell">
+                        <span class="price" th:text="${offer.lowestPurchasePrice != null ? '€' + offer.lowestPurchasePrice : 'N/A'}"></span>
+                        <span class="sub-text">My best</span>
+                    </div>
+                    <div class="cell ratio">
+                        <span th:text="${offer.partOutRatio}"></span>
+                    </div>
+                    <div class="cell price">
+                        <span th:text="'€' + ${offer.partOutPrice}"></span>
+                        <span class="sub-text" th:if="${offer.lowestPriceWebStore != null}" th:text="'vs ' + ${offer.webStore}"></span>
+                    </div>
+                    <div class="cell profit">
+                        <span th:text="'€'+ ${offer.price.multiply(offer.partOutRatio).subtract(offer.price).setScale(2,2)}"></span>
+                    </div>
+                    <div class="cell">
+                        <div class="meta-chips">
+                            <span class="chip" th:if="${offer.pieces != null}" th:text="${offer.pieces + ' pcs'}"></span>
+                            <span class="chip" th:if="${offer.lots != null}" th:text="${offer.lots + ' lots'}"></span>
+                            <span class="chip" th:if="${offer.pricePeerPeace != null}" th:text="'€' + ${offer.pricePeerPeace} + ' / pc'"></span>
+                        </div>
+                    </div>
+                    <div class="cell">
+                        <div class="link-group">
+                            <a th:href="${offer.purchaseLink}" target="_blank"><span class="material-icons" style="font-size:16px;">shopping_cart</span>Buy</a>
+                            <a th:href="${offer.partOutLink}" target="_blank"><span class="material-icons" style="font-size:16px;">apps</span>Part Out</a>
+                            <a th:href="|https://www.salidzini.lv/cena?q=lego+${offer.setNumber}!|" target="_blank"><span class="material-icons" style="font-size:16px;">travel_explore</span>Salidzini</a>
+                            <a th:href="'/product?set=' + ${offer.setNumber}"><span class="material-icons" style="font-size:16px;">open_in_new</span>Details</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 <th:block th:insert="~{fragments/product-common :: productScripts}"/>
