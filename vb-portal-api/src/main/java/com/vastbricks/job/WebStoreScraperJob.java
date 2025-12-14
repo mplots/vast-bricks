@@ -81,7 +81,7 @@ public class WebStoreScraperJob {
                 brickSetOffers.add(brickSetOffer);
                 brickSetOfferRepository.upsert(brickSetOffer);
                 if (!result.getUpdated()) {
-                    var offers = brickSetRepository.findBestOffers(null, brickSet.get().getNumber(), null, false, null, null);
+                    var offers = brickSetRepository.findBestOffers(null, brickSet.get().getNumber(), null, false, null, null, false);
                     var prices = brickSetRepository.findSingleBestPrices(brickSet.get().getNumber());
                     if (offers.size() == 1 &&
                             offers.get(0).getPartOutRatio().compareTo(new BigDecimal("4.00")) >= 0 &&

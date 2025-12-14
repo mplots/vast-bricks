@@ -10,7 +10,7 @@ WITH lowest_offer AS (
         bso.product_id
     FROM brick_set_offer bso
              JOIN product p ON bso.product_id = p.id
-    WHERE timestamp >= NOW() - INTERVAL '3 hours' AND p.active AND bso.active
+    WHERE timestamp >= NOW() - ('${lowest_offer_interval}'::interval) AND p.active AND bso.active
     ORDER BY brick_set_number, price ASC
 ),
      all_time_lowest_offer AS (

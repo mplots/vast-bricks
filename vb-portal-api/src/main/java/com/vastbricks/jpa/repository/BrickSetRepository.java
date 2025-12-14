@@ -68,6 +68,10 @@ public interface BrickSetRepository extends JpaRepository<BrickSet, Long> {
                 CAST(:stores AS TEXT) IS NULL OR web_store IN (:stores)
             ) AND (
                 CAST(:themes AS TEXT) IS NULL OR theme IN (:themes)
+            ) AND (
+                NOT :purchased OR EXISTS (
+                    SELECT 1 FROM product_purchase pp WHERE pp.set_number = set_number
+                )
             )
         ORDER BY part_out_ratio DESC
         LIMIT :limit
@@ -78,7 +82,8 @@ public interface BrickSetRepository extends JpaRepository<BrickSet, Long> {
                                    @Param("ean") Long ean,
                                    @Param("atl") Boolean atl,
                                    @Param("stores") String[] stores,
-                                   @Param("themes") String[] themes);
+                                   @Param("themes") String[] themes,
+                                   @Param("purchased") Boolean purchased);
 
     @Query(value = """
         SELECT 
@@ -121,5 +126,29 @@ public interface BrickSetRepository extends JpaRepository<BrickSet, Long> {
         WHERE p.brick_set_number = :set AND p.web_store = :store ORDER BY timestamp DESC
     """, nativeQuery = true)
     List<Price> findPricesForStore(@Param("set") Long setNumber, @Param("store") String webStore);
+
+    @Query(value = """
+        SELECT 
+            t.id AS offer_id,
+            t.product_id AS product_id,
+            t.web_store AS web_store,
+            t.price,
+            TO_CHAR(t.timestamp, 'YYYY-MM-DD') AS timestamp
+        FROM (
+            SELECT DISTINCT ON (p.web_store, DATE(bso.timestamp))
+                bso.id,
+                bso.price,
+                bso.timestamp,
+                p.id as product_id,
+                p.web_store,
+                p.brick_set_number
+            FROM brick_set_offer bso
+            JOIN product p ON bso.product_id = p.id
+            WHERE p.active AND bso.active AND p.brick_set_number = :set
+            ORDER BY p.web_store, DATE(bso.timestamp), bso.price ASC, bso.timestamp DESC
+        ) t
+        ORDER BY t.web_store, t.timestamp ASC
+    """, nativeQuery = true)
+    List<Price> findAllPricesForSet(@Param("set") Long setNumber);
 
 }

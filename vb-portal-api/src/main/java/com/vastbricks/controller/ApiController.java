@@ -17,6 +17,7 @@ import com.vastbricks.webstore.SalidziniScraper;
 import com.vastbricks.webstore.WebSet;
 import com.vastbricks.webstore._1aScraper;
 import com.vastbricks.webstore._220Scraper;
+import com.vastbricks.jpa.repository.ProductPurchaseRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
@@ -40,6 +41,7 @@ public class ApiController {
     private PartOutValueJob partOutValueJob;
     private MaterializedViewRefresh materializedViewRefresh;
     private Env env;
+    private ProductPurchaseRepository productPurchaseRepository;
 
     @PostMapping("/api/web-sets")
     public void storeWebSets(@RequestBody List<WebSet> webSets) {
@@ -68,10 +70,18 @@ public class ApiController {
             @RequestParam(value = "set", required = false) Long set,
             @RequestParam(value = "ean", required = false) Long ean,
             @RequestParam(value = "atl", required = false, defaultValue = "false") Boolean atl,
+            @RequestParam(value = "purchased", required = false, defaultValue = "false") Boolean purchased,
             @RequestParam(value = "stores", required = false) String[] stores,
             @RequestParam(value = "themes", required = false) String[] themes) {
 
-        return brickSetRepository.findBestOffers(limit, set, ean, atl, stores, themes);
+        var offers = brickSetRepository.findBestOffers(limit, set, ean, atl, stores, themes, purchased);
+        if (purchased) {
+            var purchasedSets = productPurchaseRepository.findDistinctSetNumbers();
+            offers = offers.stream()
+                    .filter(o -> purchasedSets.contains(o.getSetNumber()))
+                    .toList();
+        }
+        return offers;
     }
 
     @Data
@@ -87,10 +97,17 @@ public class ApiController {
             @RequestParam(value = "set", required = false) Long set,
             @RequestParam(value = "ean", required = false) Long ean,
             @RequestParam(value = "atl", required = false, defaultValue = "false") Boolean atl,
+            @RequestParam(value = "purchased", required = false, defaultValue = "false") Boolean purchased,
             @RequestParam(value = "stores", required = false) String[] stores,
             @RequestParam(value = "themes", required = false) String[] themes) {
 
-        var offers = brickSetRepository.findBestOffers(limit, set, ean, atl, stores, themes);
+        var offers = brickSetRepository.findBestOffers(limit, set, ean, atl, stores, themes, purchased);
+        if (purchased) {
+            var purchasedSets = productPurchaseRepository.findDistinctSetNumbers();
+            offers = offers.stream()
+                    .filter(o -> purchasedSets.contains(o.getSetNumber()))
+                    .toList();
+        }
         return offers.stream()
                 .map(offer -> new ProductDetailsResponse(offer, brickSetRepository.findSingleBestPrices(offer.getSetNumber())))
                 .toList();

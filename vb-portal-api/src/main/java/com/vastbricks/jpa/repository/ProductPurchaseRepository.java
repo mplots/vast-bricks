@@ -48,4 +48,7 @@ public interface ProductPurchaseRepository extends JpaRepository<ProductPurchase
         String getImage();
         BigDecimal getTotalAmount();
     }
+
+    @Query(value = "SELECT DISTINCT set_number FROM product_purchase", nativeQuery = true)
+    List<Long> findDistinctSetNumbers();
 }

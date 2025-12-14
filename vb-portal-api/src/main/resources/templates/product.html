@@ -23,11 +23,38 @@
             align-items: center;
         }
 
+        .price-history-card {
+            width: 100%;
+            max-width: 900px;
+            box-sizing: border-box;
+            padding: 8px;
+        }
+
+        .chart-wrapper {
+            height: 260px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        @media (max-width: 768px) {
+            .chart-wrapper {
+                height: 200px;
+            }
+            .price-history-card {
+                padding: 6px;
+            }
+            .page-header h2 {
+                font-size: 18px;
+            }
+            .product-container {
+                width: 100%;
+            }
+        }
+
         .page-header {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
             margin: 0;
             width: 100%;
             text-align: center;
@@ -36,6 +63,32 @@
             top: 0;
             z-index: 110;
             background: #f8f9fa;
+        }
+
+        .page-header-inner {
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            gap: 10px;
+        }
+
+        .page-header .home-link {
+            position: absolute;
+            left: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 10px;
+            border: 1px solid #d0d7de;
+            border-radius: 6px;
+            background: #f5f5f5;
+            color: #333;
+            text-decoration: none;
+            gap: 4px;
         }
 
         .product-container {
@@ -237,8 +290,15 @@
 <body>
 
 <div class="page-header">
-    <span class="material-icons">local_mall</span>
-    <h2 style="margin: 0;">Lego Set Details</h2>
+    <div class="page-header-inner">
+        <a href="/" class="modern-link home-link">
+            <span class="material-icons" style="font-size:18px;">home</span>
+        </a>
+        <div style="display:flex; align-items:center; gap:8px;">
+            <span class="material-icons">local_mall</span>
+            <h2 style="margin: 0;">Lego Set Details</h2>
+        </div>
+    </div>
 </div>
 
 <div class="product-container">
@@ -274,58 +334,32 @@
         </div>
     </div>
 
-    <div class="purchase-card">
-        <h3><span class="material-icons">add_shopping_cart</span>Record Purchase</h3>
-        <form id="purchase-form" class="purchase-form" th:data-set-number="${offer.setNumber}">
-            <div>
-                <label for="purchase-store">Store</label>
-                <select id="purchase-store" name="webStore" required>
-                    <option th:each="price, priceStat : ${prices}"
-                            th:value="${price.webStore}"
-                            th:text="${price.webStore}"
-                            th:data-price="${price.price}"
-                            th:selected="${price.webStore == offer.webStore}"></option>
-                </select>
+    <div class="store-list price-history-card" style="margin-top: 20px;" id="price-history-wrapper">
+        <div style="display:flex; align-items:center; justify-content: space-between; gap:10px; flex-wrap: wrap;">
+            <h3 style="margin:0;">Price History</h3>
+            <div style="display:flex; align-items:center; gap:12px; flex-wrap: wrap; width:100%; max-width: 360px;">
+                <label style="display:flex; align-items:center; gap:6px; font-size:14px; color:#555; flex:1 1 160px;">
+                    Range:
+                    <select id="price-range" style="padding:6px; border-radius:6px; border:1px solid #d0d7de;">
+                        <option value="1m" selected>Last month</option>
+                        <option value="3m">Last 3 months</option>
+                        <option value="6m">Last 6 months</option>
+                        <option value="all">All time</option>
+                    </select>
+                </label>
             </div>
-            <div>
-                <label for="purchase-price">Price (€)</label>
-                <input id="purchase-price" name="price" type="number" min="0" step="0.01" required
-                       th:value="${offer.price}">
-            </div>
-            <div>
-                <label for="purchase-qty">Quantity</label>
-                <input id="purchase-qty" name="quantity" type="number" min="1" step="1" value="1">
-            </div>
-            <div>
-                <label for="purchase-date">Date</label>
-                <input id="purchase-date" name="purchasedAt" type="date"
-                       th:value="${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}">
-            </div>
-            <div class="purchase-actions">
-                <button id="purchase-submit" type="submit">Add Purchase</button>
-                <span id="purchase-feedback"></span>
-            </div>
-        </form>
-    </div>
-
-    <div class="store-list">
-        <div th:each="price : ${prices}" class="store-item">
-            <div class="store-info">
-<!--                <img src="https://www.iizii.eu/image/catalog/1.png" alt="Store Logo" class="store-logo">-->
-                <a class="modern-link" th:href="'/product?store=' + ${price.getWebStore()} + '&set=' + ${offer.getSetNumber()}"><span class="store-name" th:text="${price.getWebStore()}"/></a>
-
-            </div>
-            <div>
-                <span class="store-price" th:text="'' + ${price.price}"/>
-                <div class="store-date" th:text="${price.timestamp}"/>
-            </div>
+        </div>
+        <div class="chart-wrapper">
+            <canvas id="price-history-chart"></canvas>
         </div>
     </div>
 
 </div>
 
 <th:block th:insert="~{fragments/product-common :: productScripts}"/>
-<script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+<script th:inline="javascript">
     function updateCustomCalculator() {
         const container = document.getElementById('custom-calc');
         if (!container) return;
@@ -355,76 +389,152 @@
             updateCustomCalculator();
         }
 
-        const purchaseForm = document.getElementById('purchase-form');
-        const purchaseFeedback = document.getElementById('purchase-feedback');
-        const purchaseSubmit = document.getElementById('purchase-submit');
-        const storeSelect = document.getElementById('purchase-store');
-        const priceInput = document.getElementById('purchase-price');
+        const chartEl = document.getElementById('price-history-chart');
+        if (chartEl) {
+            /*<![CDATA[*/
+            const rawData = /*[[${priceHistory}]]*/ [];
+            /*]]>*/
+            const parsedData = rawData.map(item => ({
+                store: item.webStore || item.store,
+                price: parseFloat(item.price),
+                date: new Date(item.timestamp)
+            })).filter(i => i.store && !Number.isNaN(i.price) && !Number.isNaN(i.date.getTime()));
+            /*<![CDATA[*/
+            const rawPurchases = /*[[${purchaseHistory}]]*/ [];
+            /*]]>*/
+            const parsedPurchases = rawPurchases.map(item => ({
+                price: parseFloat(item.price),
+                date: new Date(item.purchasedAt)
+            })).filter(i => !Number.isNaN(i.price) && !Number.isNaN(i.date.getTime()));
 
-        if (storeSelect && priceInput) {
-            const setPriceFromStore = () => {
-                const selected = storeSelect.options[storeSelect.selectedIndex];
-                const price = selected?.dataset?.price;
-                if (price && !Number.isNaN(parseFloat(price))) {
-                    priceInput.value = price;
+            const rangeSelect = document.getElementById('price-range');
+            const togglePurchases = document.getElementById('toggle-purchases');
+            let chart;
+
+            function filterData(range) {
+                if (range === 'all') return parsedData;
+                const now = new Date();
+                const cutoff = new Date(now);
+                if (range === '6m') {
+                    cutoff.setMonth(now.getMonth() - 6);
+                } else if (range === '3m') {
+                    cutoff.setMonth(now.getMonth() - 3);
+                } else {
+                    cutoff.setMonth(now.getMonth() - 1);
                 }
-            };
-            storeSelect.addEventListener('change', setPriceFromStore);
-            setPriceFromStore();
-        }
+                return parsedData.filter(p => p.date >= cutoff);
+            }
 
-        if (purchaseForm) {
-            purchaseForm.addEventListener('submit', async (event) => {
-                event.preventDefault();
-                purchaseFeedback.textContent = '';
+            function buildChartData(range) {
+                const data = filterData(range);
+                const grouped = data.reduce((acc, item) => {
+                    if (!acc[item.store]) acc[item.store] = [];
+                    acc[item.store].push({ x: item.date, y: item.price });
+                    return acc;
+                }, {});
 
-                const webStore = purchaseForm.webStore.value;
-                const priceValue = parseFloat(purchaseForm.price.value);
-                const quantityValue = parseInt(purchaseForm.quantity.value || '1', 10);
-                const purchasedAtValue = purchaseForm.purchasedAt.value;
-                const setNumber = purchaseForm.dataset.setNumber;
+                const colors = ['#1976d2','#2e7d32','#c62828','#f9a825','#6a1b9a','#00897b','#e65100','#5d4037','#00838f','#9c27b0','#ff7043','#7cb342','#ab47bc','#6d4c41','#546e7a','#ffb300','#7e57c2','#009688','#ef6c00','#8d6e63'];
 
-                if (!webStore) {
-                    alert('Please select a store');
-                    return;
-                }
-                if (Number.isNaN(priceValue) || priceValue <= 0) {
-                    alert('Enter a valid price');
-                    return;
-                }
-                if (Number.isNaN(quantityValue) || quantityValue <= 0) {
-                    alert('Enter a valid quantity');
-                    return;
-                }
+                const datasets = Object.entries(grouped).map(([store, points], idx) => ({
+                    label: store,
+                    data: points.sort((a, b) => a.x - b.x),
+                    borderColor: colors[idx % colors.length],
+                    backgroundColor: colors[idx % colors.length],
+                    tension: 0.2,
+                    pointRadius: 2
+                })).filter(ds => ds.data.length > 0);
 
-                const payload = {
-                    price: priceValue,
-                    quantity: quantityValue,
-                    webStore: webStore
-                };
-                if (purchasedAtValue) {
-                    payload.purchasedAt = purchasedAtValue;
-                }
+                const purchasePoints = parsedPurchases;
 
-                purchaseSubmit.disabled = true;
-                try {
-                    const response = await fetch(`/api/brick-sets/${setNumber}/purchases`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-                    if (!response.ok) {
-                        throw new Error(await response.text());
+                const pricePoints = datasets.flatMap(ds => ds.data);
+                let minX = pricePoints.length ? pricePoints.reduce((min, p) => p.x < min ? p.x : min, pricePoints[0].x) : undefined;
+                let maxX = pricePoints.length ? pricePoints.reduce((max, p) => p.x > max ? p.x : max, pricePoints[0].x) : undefined;
+
+                if (purchasePoints.length > 0) {
+                    const purchasePrices = Array.from(new Set(purchasePoints.map(p => p.price)));
+                    if (!minX || !maxX) {
+                        minX = purchasePoints.reduce((min, p) => p.date < min ? p.date : min, purchasePoints[0].date);
+                        maxX = purchasePoints.reduce((max, p) => p.date > max ? p.date : max, purchasePoints[0].date);
+                        if (minX.getTime() === maxX.getTime()) {
+                            // avoid zero-length domain if purchases share same date
+                            maxX = new Date(maxX.getTime() + 24 * 60 * 60 * 1000);
+                        }
                     }
-                    purchaseFeedback.textContent = 'Purchase saved! Updating...';
-                    setTimeout(() => window.location.reload(), 400);
-                } catch (err) {
-                    alert('Failed to save purchase: ' + (err.message || 'Unknown error'));
-                } finally {
-                    purchaseSubmit.disabled = false;
+                    const domainMin = minX;
+                    const domainMax = maxX;
+                    purchasePrices.forEach((price, idx) => {
+                        datasets.push({
+                            label: purchasePrices.length > 1 ? `My purchase €${price}` : 'My purchase',
+                            data: [
+                                { x: domainMin, y: price },
+                                { x: domainMax, y: price }
+                            ],
+                            borderColor: '#444',
+                            borderDash: [6, 6],
+                            borderWidth: 1,
+                            pointRadius: 0,
+                            fill: false,
+                            tension: 0
+                        });
+                    });
                 }
-            });
+
+                const allPoints = datasets.flatMap(ds => ds.data);
+                if (allPoints.length && (!minX || !maxX)) {
+                    minX = allPoints.reduce((min, p) => p.x < min ? p.x : min, allPoints[0].x);
+                    maxX = allPoints.reduce((max, p) => p.x > max ? p.x : max, allPoints[0].x);
+                }
+
+                return { datasets, minX, maxX };
+            }
+
+            function renderChart(range) {
+                const { datasets, minX, maxX } = buildChartData(range);
+                if (datasets.length === 0) {
+                    chartEl.parentElement.innerHTML = '<p style="margin:0;color:#666;">No price history available.</p>';
+                    return;
+                }
+                const isMobile = window.innerWidth < 640;
+                if (chart) {
+                    chart.data.datasets = datasets;
+                    chart.options.scales.x.min = minX;
+                    chart.options.scales.x.max = maxX;
+                    chart.options.plugins.legend.display = !isMobile;
+                    chart.update();
+                    return;
+                }
+                chart = new Chart(chartEl, {
+                    type: 'line',
+                    data: { datasets },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        parsing: false,
+                        scales: {
+                            x: {
+                                type: 'time',
+                                time: { tooltipFormat: 'dd MMM yyyy', unit: 'day' },
+                                title: { display: true, text: 'Date' },
+                                min: minX,
+                                max: maxX
+                            },
+                            y: { title: { display: true, text: 'Price' } }
+                        },
+                        plugins: {
+                            legend: { position: 'bottom', display: !isMobile },
+                            tooltip: { mode: 'nearest', intersect: false }
+                        }
+                    }
+                });
+            }
+
+            if (rangeSelect) {
+                rangeSelect.addEventListener('change', () => renderChart(rangeSelect.value));
+            }
+            window.addEventListener('resize', () => renderChart(rangeSelect ? rangeSelect.value : '1m'));
+            renderChart(rangeSelect ? rangeSelect.value : '1m');
         }
+
     });
 </script>
 </body>

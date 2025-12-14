@@ -123,7 +123,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
             margin: 0 0 12px;
             padding: 12px 16px;
             text-align: center;
@@ -131,6 +130,32 @@
             top: 0;
             z-index: 110;
             background: #f8f9fa;
+        }
+
+        .page-header-inner {
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            gap: 10px;
+        }
+
+        .page-header .home-link {
+            position: absolute;
+            left: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 10px;
+            border: 1px solid #d0d7de;
+            border-radius: 6px;
+            background: #f5f5f5;
+            color: #333;
+            text-decoration: none;
+            gap: 4px;
         }
 
         .purchase-list {
@@ -167,6 +192,17 @@
             display: flex;
             flex-direction: column;
             gap: 2px;
+        }
+
+        .set-link {
+            color: #111827;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .set-link:hover,
+        .set-link:focus-visible {
+            text-decoration: underline;
         }
 
         .set-name .meta {
@@ -229,6 +265,24 @@
         .modal-actions .edit-btn .material-icons {
             color: #333;
             font-size: 18px;
+        }
+
+        .button-spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(0, 0, 0, 0.15);
+            border-top-color: #333;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .modal-actions .edit-btn.loading {
+            opacity: 0.8;
+            cursor: progress;
         }
 
         .modal-actions {
@@ -306,8 +360,15 @@
 <body>
 
 <div class="page-header">
-    <span class="material-icons">shopping_bag</span>
-    <h2 style="margin: 0;">My Purchases</h2>
+    <div class="page-header-inner">
+        <a href="/" class="modern-link home-link">
+            <span class="material-icons" style="font-size:18px;">home</span>
+        </a>
+        <div style="display:flex; align-items:center; gap:8px;">
+            <span class="material-icons">shopping_bag</span>
+            <h2 style="margin: 0;">My Purchases</h2>
+        </div>
+    </div>
 </div>
 
 <div class="purchase-card">
@@ -339,7 +400,7 @@
         </div>
         <div class="cell set-cell" data-label="" style="display:flex; align-items:center; gap:8px;">
             <div class="set-name" style="gap:4px;">
-                <span th:text="${row.setName}"></span>
+                <a class="set-link" th:href="@{|/product?set=${row.setNumber}|}" th:text="${row.setName}"></a>
             </div>
         </div>
         <div class="cell store" data-label="Store" th:text="${row.webStore}"></div>
@@ -498,6 +559,24 @@
         });
 
         if (form) {
+            function setSubmitLoading(isLoading, labelText) {
+                if (isLoading) {
+                    if (!modalSubmit.dataset.originalContent) {
+                        modalSubmit.dataset.originalContent = modalSubmit.innerHTML;
+                    }
+                    modalSubmit.classList.add('loading');
+                    modalSubmit.disabled = true;
+                    modalSubmit.innerHTML = `<span class="button-spinner" aria-hidden="true"></span><span style="margin-left: 8px;">${labelText}</span>`;
+                } else {
+                    modalSubmit.classList.remove('loading');
+                    modalSubmit.disabled = false;
+                    if (modalSubmit.dataset.originalContent) {
+                        modalSubmit.innerHTML = modalSubmit.dataset.originalContent;
+                        delete modalSubmit.dataset.originalContent;
+                    }
+                }
+            }
+
             form.addEventListener('submit', async (event) => {
                 event.preventDefault();
                 const mode = form.dataset.mode || 'add';
@@ -539,7 +618,7 @@
                     payload.purchasedAt = purchasedAtValue;
                 }
 
-                modalSubmit.disabled = true;
+                setSubmitLoading(true, mode === 'edit' ? 'Saving...' : 'Adding...');
                 try {
                     const url = mode === 'edit'
                         ? `/api/purchases/${purchaseId}`
@@ -558,7 +637,7 @@
                 } catch (err) {
                     alert('Failed to save purchase: ' + (err.message || 'Unknown error'));
                 } finally {
-                    modalSubmit.disabled = false;
+                    setSubmitLoading(false);
                 }
             });
         }

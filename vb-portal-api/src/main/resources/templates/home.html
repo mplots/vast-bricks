@@ -38,7 +38,7 @@
     </style>
     <title>Lego Sets</title>
 </head>
-<body>
+<body style="margin: 0; padding: 0;">
 
 <div id="filter-container" style="font-family: 'Inter', sans-serif; background-color: #f8f9fa; position: sticky; top: 0; z-index: 110;">
     <style>
@@ -216,6 +216,7 @@
             <div class="filter-section">
                 <strong>Flags</strong>
                 <label><input type="checkbox" name="atl" value="true">All-Time Lowest Price</label>
+                <label><input type="checkbox" name="purchased" value="true" th:checked="${purchasedFilter}">Purchased by me</label>
             </div>
             <div class="filter-section">
                 <strong>Themes</strong>
