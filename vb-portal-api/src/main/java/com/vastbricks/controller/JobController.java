@@ -2,6 +2,7 @@ package com.vastbricks.controller;
 
 import com.vastbricks.job.CatalogSynchronizationJob;
 import com.vastbricks.job.PartOutValueJob;
+import com.vastbricks.job.RebrickableSyncJob;
 import com.vastbricks.job.WebStoreScraperJob;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,7 @@ public class JobController {
     private WebStoreScraperJob webStoreScraperJob;
     private CatalogSynchronizationJob catalogSynchronizationJob;
     private PartOutValueJob partOutValueJob;
+    private RebrickableSyncJob rebrickableSyncJob;
 
     @GetMapping("trigger-web-store-scraper-job")
     public String triggerWebStoreScraperJob(@RequestParam(value = "stores", required = false) List<String> stores) {
@@ -41,6 +43,12 @@ public class JobController {
     @GetMapping("trigger-part-out-value-job")
     public String triggerPartOutValueJob() {
         partOutValueJob.runJobAsync();
+        return "ok";
+    }
+
+    @GetMapping("trigger-rebrickable-sync-job")
+    public String triggerRebrickableSyncJob() {
+        rebrickableSyncJob.runJobAsync();
         return "ok";
     }
 }
