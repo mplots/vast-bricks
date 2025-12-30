@@ -7,7 +7,7 @@
     <meta name="description" content="We sell only brand-new LEGO® parts, minifigures, and sets. Shop Vast Bricks on BrickLink® and BrickOwl, and follow our latest drops on Instagram." />
     <meta name="robots" content="index, follow" />
     <meta name="author" content="Vast Bricks" />
-    <meta name="theme-color" content="#1E88E5" />
+    <meta name="theme-color" content="#f3e6d8" />
     <meta name="color-scheme" content="light" />
     <link rel="canonical" href="https://vastbricks.com" />
 
@@ -54,8 +54,8 @@
 
     <style>
         :root {
-            --bg: #f7f7f9;
-            --bg-accent: #eaf3ff;
+            --bg: #f6f0ea;
+            --bg-accent: #f2e4d5;
             --ink: #171717;
             --muted: #525252;
             --card: #ffffff;
@@ -63,7 +63,7 @@
             --shadow: 0 18px 40px rgba(23, 23, 23, 0.12);
             --accent-yellow: #f2c94c;
             --accent-red: #e53935;
-            --accent-blue: #1e88e5;
+            --accent-clay: #c76a41;
         }
 
         * {
@@ -74,9 +74,9 @@
             margin: 0;
             font-family: "Space Grotesk", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
             color: var(--ink);
-            background: radial-gradient(circle at 12% 12%, rgba(229, 57, 53, 0.15), transparent 55%),
-                        radial-gradient(circle at 92% 0%, rgba(30, 136, 229, 0.18), transparent 45%),
-                        radial-gradient(circle at 50% 90%, rgba(242, 201, 76, 0.22), transparent 45%),
+            background: radial-gradient(circle at 12% 12%, rgba(229, 57, 53, 0.12), transparent 55%),
+                        radial-gradient(circle at 92% 0%, rgba(199, 106, 65, 0.16), transparent 45%),
+                        radial-gradient(circle at 50% 90%, rgba(242, 201, 76, 0.2), transparent 45%),
                         linear-gradient(135deg, var(--bg), #ffffff 55%, var(--bg-accent));
             min-height: 100vh;
             display: flex;
@@ -90,7 +90,7 @@
             position: fixed;
             width: 380px;
             height: 380px;
-            background: conic-gradient(from 200deg, var(--accent-red), var(--accent-yellow), var(--accent-blue), var(--accent-red));
+            background: conic-gradient(from 200deg, var(--accent-red), var(--accent-yellow), var(--accent-clay), var(--accent-red));
             opacity: 0.08;
             filter: blur(8px);
             border-radius: 50%;
@@ -199,7 +199,11 @@
         }
 
         .icon-instagram {
-            background: rgba(30, 136, 229, 0.14);
+            background: rgba(199, 106, 65, 0.18);
+        }
+
+        .icon-email {
+            background: rgba(229, 57, 53, 0.16);
         }
 
         .link-icon img {
@@ -271,6 +275,16 @@
             <span class="link-text">
                 <strong>Instagram</strong>
                 <span>@vastbricks</span>
+            </span>
+        </a>
+
+        <a class="link-card" href="mailto:maris.plots@vastbricks.com">
+            <span class="link-icon icon-email" aria-hidden="true">
+                <img src="/images/email.png" alt="" width="28" height="28" />
+            </span>
+            <span class="link-text">
+                <strong>Email</strong>
+                <span>info@vastbricks.com</span>
             </span>
         </a>
     </section>
