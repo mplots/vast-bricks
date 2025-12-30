@@ -3,7 +3,6 @@ package com.vastbricks.controller;
 import com.vastbricks.jpa.repository.BrickSetRepository;
 import com.vastbricks.jpa.repository.ProductPurchaseRepository;
 import com.vastbricks.jpa.repository.ProductRepository;
-import com.vastbricks.jpa.repository.ProductPurchaseRepository.PurchaseRow;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -97,6 +96,11 @@ public class AggregatorController {
         model.addAttribute("totalSpent", totalSpent);
         model.addAttribute("stores", productRepository.findWebStores());
         return "purchases";
+    }
+
+    @GetMapping("/links")
+    public String links() {
+        return "links";
     }
 
 }

@@ -3,3 +3,4 @@
 target
 node_modules
 vb-portal-api/src/main/resources/db/migration/data
+vb-portal-full-version

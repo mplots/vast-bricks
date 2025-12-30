@@ -15,6 +15,7 @@ spring:
     clean-disabled: false
     placeholders:
       lowest_offer_interval: '3 hours'
+    schemas: public,rebrickable
   datasource:
     url: jdbc:postgresql://localhost:2345/bricks
     username: bricks

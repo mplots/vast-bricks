@@ -37,7 +37,7 @@ async function post(url) {
             ?.click();
 
         console.log(`posting page ${i}`)
-        await post('https://vastbricks.com/api/220')
+        await post('https://tool.vastbricks.com/api/220')
     }
 
     console.log("sleeping for an hour")
