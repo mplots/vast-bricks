@@ -384,7 +384,7 @@
         </div>
         <div class="product-image">
             <div>
-                <img th:src="${offer.image}" alt="Product Image"/>
+                <img th:src="${'https://img.bricklink.com/ItemImage/OT/0/'+ offer.setNumber +'-1.t2.png'}" alt="Product Image"/>
                 <span class="badge badge-top" th:if="${offer.pieces != null}" th:text="${offer.pieces + ' pcs'}"></span>
                 <span class="badge badge-bottom" th:if="${offer.lots != null}" th:text="${offer.lots + ' lots'}"></span>
             </div>

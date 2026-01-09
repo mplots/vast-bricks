@@ -11,7 +11,7 @@ public class DigimartScraper extends HtmlScraper {
     @Override
     protected ScraperArgs scraperArgs() {
           return ScraperArgs.builder()
-            .urls(List.of("https://digimart.lv/lego-c/lego-c/lego-c?limit=100&page={page}"))
+            .urls(List.of("https://digimart.lv/lego/2107/1/c?limit=100&page={page}"))
             .page(1)
             .itemsCssQuery("div.product-link-2")
             .itemProcessor(element ->

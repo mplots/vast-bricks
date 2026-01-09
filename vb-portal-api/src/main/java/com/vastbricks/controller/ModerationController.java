@@ -6,6 +6,7 @@ import com.vastbricks.jpa.repository.MaterializedViewRefresh;
 import com.vastbricks.jpa.repository.ProductPurchaseRepository;
 import com.vastbricks.jpa.repository.ProductRepository;
 import com.vastbricks.jpa.entity.ProductPurchase;
+import com.vastbricks.service.PurchaseProgressService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,6 +42,7 @@ public class ModerationController {
     private BrickSetRepository brickSetRepository;
     private ProductPurchaseRepository productPurchaseRepository;
     private MaterializedViewRefresh materializedViewRefresh;
+    private PurchaseProgressService purchaseProgressService;
 
     @PostMapping("/products/{productId}/invalidate")
     public void invalidateProduct(@PathVariable("productId") Long productId) {
@@ -126,5 +129,25 @@ public class ModerationController {
         materializedViewRefresh.refreshCheapestOfferView();
         log.info("Deleted purchase {}", purchaseId);
     }
+
+    @GetMapping("/purchases/{purchaseId}/parts")
+    public PartsBreakdownResponse purchaseParts(@PathVariable("purchaseId") Long purchaseId,
+                                                @RequestParam(value = "offset", required = false, defaultValue = "0") Integer offset,
+                                                @RequestParam(value = "limit", required = false, defaultValue = "50") Integer limit) {
+        var breakdown = purchaseProgressService.buildPartBreakdown(purchaseId, offset, limit);
+        return new PartsBreakdownResponse(
+                purchaseId,
+                breakdown.total(),
+                breakdown.offset(),
+                breakdown.limit(),
+                breakdown.items()
+        );
+    }
+
+    public record PartsBreakdownResponse(Long purchaseId,
+                                         int total,
+                                         int offset,
+                                         int limit,
+                                         java.util.List<PurchaseProgressService.PartBreakdownItem> items) { }
 
 }

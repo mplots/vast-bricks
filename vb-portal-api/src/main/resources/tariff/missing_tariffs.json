@@ -1,0 +1,292 @@
+[
+  {
+    "traceable": false,
+    "countryCode": "AS",
+    "priceBands": [
+      {
+        "weightFrom": 0,
+        "weightTo": 20,
+        "price": 5.96
+      },
+      {
+        "weightFrom": 21,
+        "weightTo": 100,
+        "price": 6.13
+      },
+      {
+        "weightFrom": 101,
+        "weightTo": 500,
+        "price": 8.1
+      },
+      {
+        "weightFrom": 501,
+        "weightTo": 1000,
+        "price": 11.93
+      },
+      {
+        "weightFrom": 1001,
+        "weightTo": 2000,
+        "price": 15.76
+      }
+    ]
+  },
+  {
+    "traceable": false,
+    "countryCode": "VI",
+    "priceBands": [
+      {
+        "weightFrom": 0,
+        "weightTo": 20,
+        "price": 6.45
+      },
+      {
+        "weightFrom": 21,
+        "weightTo": 100,
+        "price": 6.65
+      },
+      {
+        "weightFrom": 101,
+        "weightTo": 500,
+        "price": 8.77
+      },
+      {
+        "weightFrom": 501,
+        "weightTo": 1000,
+        "price": 12.88
+      },
+      {
+        "weightFrom": 1001,
+        "weightTo": 2000,
+        "price": 17.11
+      }
+    ]
+  },
+  {
+    "traceable": true,
+    "countryCode": "EE",
+    "priceBands": [
+      {
+        "weightFrom": 0,
+        "weightTo": 20,
+        "price": 4.6
+      },
+      {
+        "weightFrom": 21,
+        "weightTo": 100,
+        "price": 4.72
+      },
+      {
+        "weightFrom": 101,
+        "weightTo": 500,
+        "price": 6.3
+      },
+      {
+        "weightFrom": 501,
+        "weightTo": 1000,
+        "price": 9.39
+      },
+      {
+        "weightFrom": 1001,
+        "weightTo": 2000,
+        "price": 12.2
+      }
+    ]
+  },
+  {
+    "traceable": true,
+    "countryCode": "LT",
+    "priceBands": [
+      {
+        "weightFrom": 0,
+        "weightTo": 20,
+        "price": 4.07
+      },
+      {
+        "weightFrom": 21,
+        "weightTo": 100,
+        "price": 4.17
+      },
+      {
+        "weightFrom": 101,
+        "weightTo": 500,
+        "price": 5.62
+      },
+      {
+        "weightFrom": 501,
+        "weightTo": 1000,
+        "price": 8.47
+      },
+      {
+        "weightFrom": 1001,
+        "weightTo": 2000,
+        "price": 10.96
+      }
+    ]
+  },
+  {
+    "countryCode": "MH",
+    "traceable": false,
+    "priceBands": [
+      {
+        "weightFrom": 0,
+        "weightTo": 20,
+        "price": 6.45
+      },
+      {
+        "weightFrom": 21,
+        "weightTo": 100,
+        "price": 6.65
+      },
+      {
+        "weightFrom": 101,
+        "weightTo": 500,
+        "price": 8.77
+      },
+      {
+        "weightFrom": 501,
+        "weightTo": 1000,
+        "price": 12.88
+      },
+      {
+        "weightFrom": 1001,
+        "weightTo": 2000,
+        "price": 17.11
+      }
+    ]
+  },
+  {
+    "countryCode": "FM",
+    "traceable": false,
+    "priceBands": [
+      {
+        "weightFrom": 0,
+        "weightTo": 20,
+        "price": 6.45
+      },
+      {
+        "weightFrom": 21,
+        "weightTo": 100,
+        "price": 6.65
+      },
+      {
+        "weightFrom": 101,
+        "weightTo": 500,
+        "price": 8.79
+      },
+      {
+        "weightFrom": 501,
+        "weightTo": 1000,
+        "price": 12.95
+      },
+      {
+        "weightFrom": 1001,
+        "weightTo": 2000,
+        "price": 17.24
+      }
+    ]
+  },
+  {
+    "traceable": false,
+    "countryCode": "PW",
+    "priceBands": [
+      {
+        "weightFrom": 0,
+        "weightTo": 20,
+        "price": 6.45
+      },
+      {
+        "weightFrom": 21,
+        "weightTo": 100,
+        "price": 6.65
+      },
+      {
+        "weightFrom": 101,
+        "weightTo": 500,
+        "price": 8.77
+      },
+      {
+        "weightFrom": 501,
+        "weightTo": 1000,
+        "price": 12.88
+      },
+      {
+        "weightFrom": 1001,
+        "weightTo": 2000,
+        "price": 17.11
+      }
+    ]
+  },
+  {
+    "traceable": false,
+    "countryCode": "MP",
+    "priceBands": [
+      {
+        "weightFrom": 0,
+        "weightTo": 20,
+        "price": 4.44
+      },
+      {
+        "weightFrom": 21,
+        "weightTo": 100,
+        "price": 4.6
+      },
+      {
+        "weightFrom": 101,
+        "weightTo": 500,
+        "price": 6.43
+      },
+      {
+        "weightFrom": 501,
+        "weightTo": 1000,
+        "price": 9.99
+      },
+      {
+        "weightFrom": 1001,
+        "weightTo": 2000,
+        "price": 13.46
+      }
+    ]
+  },
+  {
+    "traceable": true,
+    "countryCode": "LV",
+    "priceBands": [
+      {
+        "weightFrom": 0,
+        "weightTo": 20,
+        "price": 3.22
+      },
+      {
+        "weightFrom": 21,
+        "weightTo": 100,
+        "price": 3.56
+      },
+      {
+        "weightFrom": 101,
+        "weightTo": 500,
+        "price": 4.7
+      },
+      {
+        "weightFrom": 501,
+        "weightTo": 1000,
+        "price": 6.26
+      },
+      {
+        "weightFrom": 1001,
+        "weightTo": 2000,
+        "price": 7.84
+      }
+    ]
+  },
+  {
+    "countryCode": "GU",
+    "traceable": false,
+    "priceBands": [
+      { "weightFrom": 0,    "weightTo": 20,   "price": 5.96 },
+      { "weightFrom": 21,   "weightTo": 100,  "price": 6.13 },
+      { "weightFrom": 101,  "weightTo": 500,  "price": 8.10 },
+      { "weightFrom": 501,  "weightTo": 1000, "price": 11.93 },
+      { "weightFrom": 1001, "weightTo": 2000, "price": 15.76 }
+    ]
+  }
+]

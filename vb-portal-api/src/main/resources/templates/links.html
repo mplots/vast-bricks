@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Vast Bricks: Fresh LEGO® Parts, Stores, and Socials</title>
-    <meta name="description" content="We sell only brand-new LEGO® parts, minifigures, and sets. Shop Vast Bricks on BrickLink® and BrickOwl, and follow our latest drops on Instagram." />
+    <title>Vast Bricks: Fresh LEGO® Parts</title>
+    <meta name="description" content="We are Vast Bricks, a hobbyist LEGO reseller based in Riga, Latvia 🇱🇻. We offer only brand-new LEGO® parts, minifigures, and sets, and we pack every order with care and ship worldwide." />
     <meta name="robots" content="index, follow" />
     <meta name="author" content="Vast Bricks" />
     <meta name="theme-color" content="#eef1f3" />
@@ -12,16 +12,16 @@
     <link rel="canonical" href="https://vastbricks.com" />
 
     <meta name="image" content="https://vastbricks.com/images/logo.png" />
-    <meta property="og:title" content="Vast Bricks: Fresh LEGO® Parts, Stores, and Socials" />
-    <meta property="og:description" content="We sell only brand-new LEGO® parts, minifigures, and sets. Shop Vast Bricks on BrickLink® and BrickOwl, and follow our latest drops on Instagram." />
+    <meta property="og:title" content="Vast Bricks: Fresh LEGO® Parts" />
+    <meta property="og:description" content="We are Vast Bricks, a hobbyist LEGO reseller based in Riga, Latvia 🇱🇻. We offer only brand-new LEGO® parts, minifigures, and sets, and we pack every order with care and ship worldwide." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://vastbricks.com" />
     <meta property="og:image" content="https://vastbricks.com/images/logo.png" />
     <meta property="og:site_name" content="Vast Bricks" />
 
     <meta name="twitter:card" content="summary" />
-    <meta name="twitter:title" content="Vast Bricks: Fresh LEGO® Parts, Stores, and Socials" />
-    <meta name="twitter:description" content="We sell only brand-new LEGO® parts, minifigures, and sets. Shop Vast Bricks on BrickLink® and BrickOwl, and follow our latest drops on Instagram." />
+    <meta name="twitter:title" content="Vast Bricks: Fresh LEGO® Parts" />
+    <meta name="twitter:description" content="We are Vast Bricks, a hobbyist LEGO reseller based in Riga, Latvia 🇱🇻. We offer only brand-new LEGO® parts, minifigures, and sets, and we pack every order with care and ship worldwide." />
     <meta name="twitter:image" content="https://vastbricks.com/images/logo.png" />
 
     <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png" />
@@ -38,9 +38,9 @@
         {
           "@context": "https://schema.org",
           "@type": "WebPage",
-          "name": "Vast Bricks: Fresh LEGO® Parts, Stores, and Socials",
+          "name": "Vast Bricks: Fresh LEGO® Parts",
           "url": "https://vastbricks.com",
-          "description": "We sell only brand-new LEGO® parts, minifigures, and sets. Shop Vast Bricks on BrickLink® and BrickOwl, and follow our latest drops on Instagram.",
+          "description": "We are Vast Bricks, a hobbyist LEGO reseller based in Riga, Latvia 🇱🇻. We offer only brand-new LEGO® parts, minifigures, and sets, and we pack every order with care and ship worldwide.",
           "publisher": {
             "@type": "Organization",
             "name": "Vast Bricks",
@@ -51,234 +51,61 @@
           }
         }
     </script>
-
-    <style>
-        :root {
-            --bg: #eef1f3;
-            --bg-accent: #e1eaed;
-            --ink: #1b2226;
-            --muted: #5a676f;
-            --card: #ffffff;
-            --border: rgba(27, 34, 38, 0.08);
-            --shadow: 0 16px 36px rgba(20, 33, 43, 0.12);
-            --accent-slate: #3f4a52;
-            --accent-mint: #3f9a8a;
-        }
-
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            font-family: "Space Grotesk", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-            color: var(--ink);
-            background: radial-gradient(circle at 18% 8%, rgba(63, 74, 82, 0.12), transparent 55%),
-                        radial-gradient(circle at 80% 0%, rgba(63, 154, 138, 0.12), transparent 50%),
-                        linear-gradient(135deg, var(--bg), #ffffff 55%, var(--bg-accent));
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            padding: 4rem 1.5rem 3rem;
-        }
-
-        body::before {
-            content: "";
-            position: fixed;
-            inset: 0;
-            background: linear-gradient(120deg, rgba(63, 74, 82, 0.05), transparent 45%, rgba(63, 154, 138, 0.05));
-            z-index: 0;
-        }
-
-        .page {
-            width: 100%;
-            max-width: 560px;
-            background: var(--card);
-            border-radius: 28px;
-            padding: 2.5rem 2.25rem 2rem;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border);
-            position: relative;
-            z-index: 1;
-        }
-
-        .brand {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .brand img {
-            width: 120px;
-            height: auto;
-            margin-bottom: 1rem;
-        }
-
-        .brand h1 {
-            font-size: 2rem;
-            margin: 0 0 0.4rem;
-            letter-spacing: -0.02em;
-        }
-
-        .brand p {
-            margin: 0;
-            color: var(--muted);
-            font-size: 1rem;
-        }
-
-        .link-list {
-            display: grid;
-            gap: 1rem;
-            margin: 2rem 0 1.5rem;
-        }
-
-        .link-card {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 1rem 1.25rem;
-            border-radius: 16px;
-            text-decoration: none;
-            color: inherit;
-            border: 1px solid var(--border);
-            background: #ffffff;
-            transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
-        }
-
-        .link-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 30px rgba(31, 31, 31, 0.12);
-            border-color: rgba(63, 154, 138, 0.35);
-        }
-
-        .link-icon {
-            width: 52px;
-            height: 52px;
-            border-radius: 14px;
-            display: grid;
-            place-items: center;
-            flex-shrink: 0;
-        }
-
-        .link-text {
-            display: flex;
-            flex-direction: column;
-            gap: 0.15rem;
-        }
-
-        .link-text strong {
-            font-size: 1.05rem;
-        }
-
-        .link-text span {
-            color: var(--muted);
-            font-size: 0.95rem;
-        }
-
-        .icon-bricklink {
-            background: rgba(63, 74, 82, 0.14);
-        }
-
-        .icon-brickowl {
-            background: rgba(63, 154, 138, 0.18);
-        }
-
-        .icon-instagram {
-            background: rgba(63, 74, 82, 0.18);
-        }
-
-        .icon-email {
-            background: rgba(63, 154, 138, 0.16);
-        }
-
-        .link-icon img {
-            width: 28px;
-            height: 28px;
-            object-fit: contain;
-        }
-
-        footer {
-            text-align: center;
-            color: var(--muted);
-            font-size: 0.9rem;
-        }
-
-        @media (max-width: 640px) {
-            body {
-                padding: 3rem 1rem 2rem;
-            }
-
-            .page {
-                padding: 2rem 1.5rem 1.75rem;
-            }
-
-            .brand h1 {
-                font-size: 1.7rem;
-            }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            .link-card {
-                transition: none;
-            }
-        }
-    </style>
+    <th:block th:replace="~{fragments/links-common :: linksStyles}"></th:block>
 </head>
-<body>
+<body th:classappend="${orderThanks} ? 'qr-mode' : null">
 <main class="page">
-    <header class="brand">
-        <img src="/images/logo.png" alt="Vast Bricks logo" />
-        <h1>Vast Bricks</h1>
-        <p>We sell only brand-new LEGO® parts, minifigures, and sets. Shop Vast Bricks on BrickLink® and BrickOwl, and follow our latest drops on Instagram.</p>
-    </header>
+    <th:block th:replace="~{fragments/links-common :: linksHeader}"></th:block>
 
-    <section class="link-list" aria-label="Vast Bricks links">
-        <a class="link-card" href="https://store.bricklink.com/vastbricks" target="_blank" rel="noopener">
-            <span class="link-icon icon-bricklink" aria-hidden="true">
-                <img src="/images/bricklink.png" alt="" width="28" height="28" />
-            </span>
-            <span class="link-text">
-                <strong>BrickLink Store</strong>
-                <span>store.bricklink.com/vastbricks</span>
-            </span>
-        </a>
-
-        <a class="link-card" href="https://vastbricks.brickowl.com" target="_blank" rel="noopener">
-            <span class="link-icon icon-brickowl" aria-hidden="true">
-                <img src="/images/brickowl.png" alt="" width="30" height="30" />
-            </span>
-            <span class="link-text">
-                <strong>BrickOwl Shop</strong>
-                <span>vastbricks.brickowl.com</span>
-            </span>
-        </a>
-
-        <a class="link-card" href="https://www.instagram.com/vastbricks" target="_blank" rel="noopener">
-            <span class="link-icon icon-instagram" aria-hidden="true">
-                <img src="/images/instagram.png" alt="" width="30" height="30" />
-            </span>
-            <span class="link-text">
-                <strong>Instagram</strong>
-                <span>@vastbricks</span>
-            </span>
-        </a>
-
-        <a class="link-card" href="mailto:maris.plots@vastbricks.com">
-            <span class="link-icon icon-email" aria-hidden="true">
-                <img src="/images/email.png" alt="" width="28" height="28" />
-            </span>
-            <span class="link-text">
-                <strong>Email</strong>
-                <span>info@vastbricks.com</span>
-            </span>
-        </a>
+    <section class="qr-card" th:if="${orderThanks}">
+        <h2 th:text="${'Hello ' + customerName + '.'}">Hello.</h2>
+        <p class="qr-note">
+            Thank you for your
+            <span th:text="${orderSource}">BrickLink</span>
+            order
+            <a class="qr-link qr-link-order" th:href="${orderUrl}" th:text="${'#' + orderId}" target="_blank" rel="noopener"></a>.
+        </p>
+        <p class="qr-note">
+            You can review your ordered items below or by clicking the order link directly in
+            <span th:text="${orderSource}">BrickLink</span>.
+            If everything looks good, we would love your
+            <a class="qr-link qr-link-feedback" th:href="${feedbackUrl}" target="_blank" rel="noopener">feedback</a>.
+        </p>
+        <details class="qr-items" th:if="${orderItems}">
+            <summary>
+                Order items (<span th:text="${#lists.size(orderItems)}"></span>)
+            </summary>
+            <table class="qr-items-table">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Image</th>
+                        <th>Qty</th>
+                        <th>Item</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="item : ${orderItems}">
+                        <td>
+                            <label class="qr-check">
+                                <input type="checkbox" />
+                                <span class="qr-check-box"></span>
+                            </label>
+                        </td>
+                        <td>
+                            <img class="qr-item-img" th:if="${item.imageUrl}" th:src="${item.imageUrl}" alt="" />
+                        </td>
+                        <td th:text="${item.qty}"></td>
+                        <td th:text="${item.name}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </details>
     </section>
 
-    <footer>
-        © Vast Bricks <span id="year">2025</span>
-    </footer>
+    <th:block th:if="${orderThanks != true}" th:replace="~{fragments/links-common :: linksList}"></th:block>
+
+    <th:block th:replace="~{fragments/links-common :: linksFooter}"></th:block>
 </main>
-<script>
-    document.getElementById("year").textContent = new Date().getFullYear();
-</script>
 </body>
 </html>

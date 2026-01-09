@@ -6,6 +6,7 @@ import com.vastbricks.market.link.Countries;
 import com.vastbricks.market.link.LinkClient;
 import com.vastbricks.market.link.ShippingMethod;
 import com.vastbricks.shipping.LatvijasPastsClient;
+import com.vastbricks.shipping.LatvijasPastsClientV2;
 import com.vastbricks.shipping.Tariff;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +30,7 @@ class LinkShipping {
     void updateLatvianPostShipping() {
         var cookie = System.getenv("TEST_LINK_COOKIE");
         var client = new LinkClient(cookie);
-        var shippingMethodId = 341503;
+        var shippingMethodId = 336128;
         var countries = client.internal().getCountries().getCountries();
 //        var countries = new ArrayList<Countries.Country>();
 //        countries.add(Countries.Country.builder().
@@ -82,18 +83,22 @@ class LinkShipping {
                 method.getMethod().getZones().add(zone);
             }
 
-            var pasts = new LatvijasPastsClient();
+            var pasts = new LatvijasPastsClientV2();
             var weights = List.of(new BigDecimal("100").setScale(2, RoundingMode.HALF_UP), new BigDecimal("500").setScale(2, RoundingMode.HALF_UP), new BigDecimal("1000").setScale(2, RoundingMode.HALF_UP), new BigDecimal("2000").setScale(2, RoundingMode.HALF_UP));
                 var request = Tariff.builder()
                         .type(Tariff.Type.SMALL_PACKAGE)
                         .group(oLpCountry.get() == Tariff.Country.LATVIA ? Tariff.Group.LATVIA : Tariff.Group.FOREIGN_COUNTRIES)
                         .country(oLpCountry.get())
                         .build();
+                request.setWeight(new BigDecimal("100"));
+                request.setMode(Tariff.Mode.TRACEABLE);
+
                 var mode = pasts.calculate(request).getData().getModes().stream().anyMatch(e->e.getId().equals(Tariff.Mode.TRACEABLE.getId())) ? Tariff.Mode.TRACEABLE : Tariff.Mode.SIMPLE;
                 request.setMode(mode);
 
             for (var weight : weights) {
                 request.setWeight(weight);
+                request.setMode(Tariff.Mode.SIMPLE);
                 var tariff = pasts.calculate(
                     request
                 );
@@ -116,13 +121,11 @@ class LinkShipping {
                     refTable.getCosts().add(aCost);
                     return aCost;
                 });
-                cost.setCost(price);
+                cost.setCost(price.toString());
 
                 // Move level down ?
                 if (mode == Tariff.Mode.TRACEABLE) {
-                    var trackingVAT = tariff.getResult().getTrackableVat().divide(new BigDecimal("100")).add(new BigDecimal("1"));
-                    var tracking = tariff.getResult().getTrackable();
-                    var trackingWithVAT = tracking.multiply(trackingVAT).setScale(2, RoundingMode.HALF_UP);
+                    var trackingWithVAT = tariff.getResult().getTrackable();
 
                     trackingRule = method.getMethod().getTrackingRules().stream().filter(e -> e.getArg1().equals(trackingWithVAT.toString())).findFirst().orElseGet(() -> {
                         var aTrackingRule = new ShippingMethod.TrackingRule();
@@ -141,7 +144,7 @@ class LinkShipping {
                 trackingRule.getZones().add(zone.getId());
             }
         }
-
+        method.getMethod().setTrackingRules(null);
         client.internal().updateShippingMethod(shippingMethodId, method);
     }
 }

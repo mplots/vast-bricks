@@ -164,12 +164,13 @@
             background: #fff;
             border-radius: 10px;
             box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-            overflow: hidden;
+            overflow: visible;
+            position: relative;
         }
 
         .purchase-row {
             display: grid;
-            grid-template-columns: 140px 1.2fr 1fr 0.7fr 1fr 1fr 1fr 1fr;
+            grid-template-columns: 140px 1.2fr 0.9fr 0.6fr 0.9fr 0.8fr 0.8fr 1.2fr 0.6fr;
             padding: 12px 16px;
             border-bottom: 1px solid #e5e7eb;
             align-items: center;
@@ -182,6 +183,15 @@
             text-transform: uppercase;
             font-size: 12px;
             letter-spacing: 0.5px;
+        }
+
+        .purchase-row.footer-row {
+            font-weight: 600;
+            background: #f9fafb;
+            position: sticky;
+            bottom: 0;
+            z-index: 5;
+            border-top: 2px solid #e5e7eb;
         }
 
         .purchase-row:last-child {
@@ -198,6 +208,167 @@
             color: #2563eb;
             text-decoration: underline;
             font-weight: 600;
+        }
+
+        .progress-cell {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .progress-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #334155;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #22c55e 0%, #16a34a 100%);
+        }
+
+        .progress-meta {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .purchase-row.details-row {
+            grid-template-columns: 1fr;
+            background: #f8fafc;
+        }
+
+        .purchase-row.details-row .details-cell {
+            grid-column: 1 / -1;
+        }
+
+        .details-panel {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            background: #ffffff;
+            padding: 12px;
+        }
+
+        .details-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .details-title {
+            font-weight: 600;
+            color: #1f2937;
+            font-size: 14px;
+        }
+
+        .parts-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            table-layout: fixed;
+        }
+
+        .parts-table th,
+        .parts-table td {
+            padding: 8px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: left;
+            vertical-align: top;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .parts-table th {
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            font-size: 11px;
+            color: #6b7280;
+            white-space: nowrap;
+        }
+
+        .parts-table .col-image {
+            width: 62px;
+        }
+
+        .parts-table .col-part {
+            width: 40%;
+        }
+
+        .parts-table .col-color {
+            width: 20%;
+        }
+
+        .parts-table .col-sold {
+            width: 12%;
+        }
+
+        .parts-table .col-progress {
+            width: 28%;
+        }
+
+        .parts-progress {
+            height: 6px;
+            background: #e5e7eb;
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .parts-progress > span {
+            display: block;
+            height: 100%;
+            background: linear-gradient(90deg, #38bdf8 0%, #0ea5e9 100%);
+        }
+
+        .parts-progress-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 4px;
+        }
+
+        .parts-image {
+            width: 36px;
+            height: 36px;
+            object-fit: contain;
+            border-radius: 4px;
+            background: #f8fafc;
+        }
+
+        .parts-pagination {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 10px;
+            font-size: 12px;
+            color: #475569;
+        }
+
+        .parts-pagination button {
+            border: 1px solid #d0d7de;
+            background: #fff;
+            border-radius: 6px;
+            padding: 4px 8px;
+            cursor: pointer;
+        }
+
+        .parts-pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .parts-pagination .loading {
+            opacity: 0.6;
+            pointer-events: none;
         }
 
         .set-link:hover,
@@ -386,6 +557,7 @@
         <div>Date</div>
         <div>Price</div>
         <div>Total</div>
+        <div>Progress</div>
         <div>Actions</div>
     </div>
     <div th:if="${#lists.isEmpty(purchases)}" style="padding: 16px; text-align: center; color: #6b7280;">No purchases yet.</div>
@@ -397,7 +569,7 @@
          th:data-qty="${row.quantity}"
          th:data-date-iso="${#temporals.format(row.purchasedAt, 'yyyy-MM-dd')}">
         <div class="cell image-cell" data-label="" style="display:flex; justify-content:center; align-items:center;">
-            <img th:if="${row.image != null}" th:src="${row.image}" alt="" style="width:140px; height:140px; object-fit:contain; border-radius:8px;">
+            <img th:src="${'https://img.bricklink.com/ItemImage/OT/0/'+ row.setNumber +'-1.t2.png'}" alt="" style="width:140px; height:140px; object-fit:contain; border-radius:8px;"/>
         </div>
         <div class="cell set-cell" data-label="" style="display:flex; align-items:center; gap:8px;">
             <div class="set-name" style="gap:4px;">
@@ -409,8 +581,18 @@
         <div class="cell date" data-label="Date" th:text="${row.purchasedAtDisplay}"></div>
         <div class="cell price" data-label="Price" th:text="'€' + ${row.price}"></div>
         <div class="cell price" data-label="Total" th:text="'€' + ${row.totalAmount}"></div>
+        <div class="cell progress-cell" data-label="Progress">
+            <div class="progress-label" th:text="${row.progressPercent} + '%'"></div>
+            <div class="progress-bar">
+                <div class="progress-fill" th:style="'width:' + ${row.progressPercent} + '%'"></div>
+            </div>
+            <div class="progress-meta" th:text="${row.soldParts} + '/' + ${row.totalParts} + ' parts'"></div>
+        </div>
         <div class="cell action-cell" data-label="">
             <div style="display:flex; gap:6px;">
+                <button type="button" class="edit-btn parts-toggle" aria-label="Expand parts">
+                    <span class="material-icons" style="font-size:16px;">unfold_more</span>
+                </button>
                 <button type="button" class="edit-btn" aria-label="Edit">
                     <span class="material-icons" style="font-size:16px;">edit</span>
                 </button>
@@ -420,9 +602,22 @@
             </div>
         </div>
     </div>
-    <div class="purchase-row summary-row" th:if="${totalSpent != null}">
-        <div class="cell summary-label"></div>
-        <div class="cell summary-value price" data-label="Total" th:text="'€' + ${totalSpent}"></div>
+    <div class="purchase-row footer-row" th:if="${totalSpent != null}">
+        <div class="cell image-cell"></div>
+        <div class="cell set-cell" data-label="Set">Totals</div>
+        <div class="cell store"></div>
+        <div class="cell qty" data-label="Qty" th:text="${totalPurchased}"></div>
+        <div class="cell date"></div>
+        <div class="cell price"></div>
+        <div class="cell price" data-label="Total" th:text="'€' + ${totalSpent}"></div>
+        <div class="cell progress-cell" data-label="Progress">
+            <div class="progress-label" th:text="${totalItemsPercent} + '%'"></div>
+            <div class="progress-bar">
+                <div class="progress-fill" th:style="'width:' + ${totalItemsPercent} + '%'"></div>
+            </div>
+            <div class="progress-meta" th:text="${totalItemsSold} + '/' + ${totalItems} + ' parts'"></div>
+        </div>
+        <div class="cell action-cell"></div>
     </div>
 </div>
 
@@ -535,6 +730,9 @@
 
         document.querySelectorAll('.edit-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
+                if (btn.classList.contains('parts-toggle')) {
+                    return;
+                }
                 const row = e.target.closest('.purchase-row');
                 if (btn.classList.contains('delete-btn')) {
                     if (!confirm('Delete this purchase?')) return;
@@ -556,6 +754,156 @@
                     quantity: row.dataset.qty,
                     date: row.dataset.dateIso
                 });
+            });
+        });
+
+        const pageSize = 10;
+
+        async function fetchParts(purchaseId, offset) {
+            const response = await fetch(`/api/purchases/${purchaseId}/parts?offset=${offset}&limit=${pageSize}`);
+            if (!response.ok) {
+                throw new Error(await response.text());
+            }
+            return await response.json();
+        }
+
+        function renderParts(detailsCell, data) {
+            const rows = data.items || [];
+            const total = data.total || 0;
+            const offset = data.offset || 0;
+            const limit = data.limit || pageSize;
+            const end = Math.min(offset + limit, total);
+            const startDisplay = total === 0 ? 0 : offset + 1;
+
+            const bodyRows = rows.map(item => `
+                <tr>
+                    <td>${item.imageUrl ? `<img class=\"parts-image\" src=\"${item.imageUrl}\" alt=\"\">` : ''}</td>
+                    <td>
+                        <div style="font-weight:600;">${item.partNum}</div>
+                        <div style="font-size:12px; color:#6b7280;">${item.partName || ''}</div>
+                    </td>
+                    <td>${item.colorName || ''}</td>
+                    <td>${item.sold}/${item.total}</td>
+                    <td>
+                        <div class=\"parts-progress-label\">${item.percent}%</div>
+                        <div class=\"parts-progress\"><span style=\"width:${item.percent}%\"></span></div>
+                    </td>
+                </tr>
+            `).join('');
+
+            detailsCell.innerHTML = `
+                <div class="details-panel">
+                    <div class="details-header">
+                        <div class="details-title">Part breakdown</div>
+                        <div style="font-size:12px; color:#64748b;">${startDisplay}-${end} of ${total}</div>
+                    </div>
+                    <table class="parts-table">
+                        <colgroup>
+                            <col class="col-image">
+                            <col class="col-part">
+                            <col class="col-color">
+                            <col class="col-sold">
+                            <col class="col-progress">
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Part</th>
+                                <th>Color</th>
+                                <th>Sold</th>
+                                <th>Progress</th>
+                            </tr>
+                        </thead>
+                        <tbody>${bodyRows || '<tr><td colspan=\"5\">No parts found.</td></tr>'}</tbody>
+                    </table>
+                    <div class="parts-pagination">
+                        <button type="button" data-page="prev" ${offset <= 0 ? 'disabled' : ''}>Prev</button>
+                        <button type="button" data-page="next" ${end >= total ? 'disabled' : ''}>Next</button>
+                    </div>
+                </div>
+            `;
+
+            const prevBtn = detailsCell.querySelector('button[data-page="prev"]');
+            const nextBtn = detailsCell.querySelector('button[data-page="next"]');
+            if (prevBtn) {
+                prevBtn.addEventListener('click', async () => {
+                    if (prevBtn.disabled) return;
+                    const nextOffset = Math.max(0, offset - limit);
+                    detailsCell.dataset.offset = nextOffset.toString();
+                    setPaginationLoading(detailsCell, true);
+                    try {
+                        const page = await fetchParts(data.purchaseId, nextOffset);
+                        renderParts(detailsCell, page);
+                    } finally {
+                        setPaginationLoading(detailsCell, false);
+                    }
+                });
+            }
+            if (nextBtn) {
+                nextBtn.addEventListener('click', async () => {
+                    if (nextBtn.disabled) return;
+                    const nextOffset = offset + limit;
+                    detailsCell.dataset.offset = nextOffset.toString();
+                    setPaginationLoading(detailsCell, true);
+                    try {
+                        const page = await fetchParts(data.purchaseId, nextOffset);
+                        renderParts(detailsCell, page);
+                    } finally {
+                        setPaginationLoading(detailsCell, false);
+                    }
+                });
+            }
+        }
+
+        function renderLoading(detailsCell) {
+            detailsCell.innerHTML = `
+                <div class="details-panel">
+                    <div class="details-title">Loading parts…</div>
+                </div>
+            `;
+        }
+
+        function setPaginationLoading(detailsCell, isLoading) {
+            const prevBtn = detailsCell.querySelector('button[data-page="prev"]');
+            const nextBtn = detailsCell.querySelector('button[data-page="next"]');
+            [prevBtn, nextBtn].forEach(btn => {
+                if (!btn) return;
+                if (isLoading) {
+                    btn.classList.add('loading');
+                } else {
+                    btn.classList.remove('loading');
+                }
+            });
+        }
+
+        document.querySelectorAll('.parts-toggle').forEach(button => {
+            button.addEventListener('click', async (event) => {
+                event.stopPropagation();
+                const row = event.target.closest('.purchase-row');
+                if (!row) return;
+                const purchaseId = row.dataset.id;
+                if (!purchaseId) return;
+                const existing = document.querySelector(`.purchase-row.details-row[data-details-for=\"${purchaseId}\"]`);
+                if (existing) {
+                    existing.remove();
+                    return;
+                }
+
+                const detailsRow = document.createElement('div');
+                detailsRow.className = 'purchase-row details-row';
+                detailsRow.dataset.detailsFor = purchaseId;
+                const detailsCell = document.createElement('div');
+                detailsCell.className = 'cell details-cell';
+                detailsRow.appendChild(detailsCell);
+                row.insertAdjacentElement('afterend', detailsRow);
+
+                try {
+                    renderLoading(detailsCell);
+                    const data = await fetchParts(purchaseId, 0);
+                    renderParts(detailsCell, data);
+                } catch (err) {
+                    detailsCell.innerHTML = `<div class=\"details-panel\">Failed to load parts.</div>`;
+                }
             });
         });
 

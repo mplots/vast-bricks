@@ -158,9 +158,9 @@ public class InternalAPI {
             var td = row.select("td");
             var method = td.get(0);
             var carrier = td.get(1);
-            var updated = td.get(2);
-            var enabled = td.get(3);
-            var delete = td.get(4);
+            var updated = td.get(3);
+            var enabled = td.get(4);
+            var delete = td.get(5);
             var carrierIdMatcher = carrierIdPattern.matcher(carrier.select("img").attr("src"));
             var deleteTokenMatcher = deleteTokenPattern.matcher(delete.select("a").attr("href"));
 

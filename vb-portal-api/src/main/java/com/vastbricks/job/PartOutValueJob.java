@@ -37,6 +37,14 @@ public class PartOutValueJob {
         synchronizeBrickSetPartOutPrices(sets);
     }
 
+    public void runJob(List<String> sets) {
+        var filteredSets = sets.stream()
+                .filter(NumberUtils::isParsable)
+                .distinct()
+                .toList();
+        synchronizeBrickSetPartOutPrices(filteredSets);
+    }
+
     public void synchronizeBrickSetPartOutPrices(List<String> sets) {
         for (var set : sets) {
             try {
@@ -72,5 +80,10 @@ public class PartOutValueJob {
     @Async
     public void runJobAsync() {
         runJob();
+    }
+
+    @Async
+    public void runJobAsync(List<String> sets) {
+        runJob(sets);
     }
 }

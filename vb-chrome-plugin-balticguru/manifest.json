@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "BalticGuru Auto Crawler",
+  "version": "1.0",
+  "description": "Auto-submits LEGO pages and sends data to API",
+  "permissions": ["scripting"],
+  "host_permissions": ["https://balticguru.eu/lego/1799/1/c*"],
+  "content_scripts": [
+    {
+      "matches": ["https://balticguru.eu/lego/1799/1/c*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

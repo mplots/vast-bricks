@@ -13,6 +13,7 @@ import com.vastbricks.shipping.LatvijasPastsClient;
 import com.vastbricks.shipping.Order;
 import com.vastbricks.shipping.Tariff;
 import com.vastbricks.webstore.AioScraper;
+import com.vastbricks.webstore.BalticGuruScraper;
 import com.vastbricks.webstore.SalidziniScraper;
 import com.vastbricks.webstore.WebSet;
 import com.vastbricks.webstore._1aScraper;
@@ -160,6 +161,18 @@ public class ApiController {
     @PostMapping("/api/aio")
     public void aio(@RequestBody Request request) {
         var scraper = new AioScraper(){
+            @Override
+            protected String getHtml() {
+                return request.getHtml();
+            }
+        };
+        storeScraperJob.storeWebSets(scraper.scrape(), false);
+    }
+
+    @CrossOrigin(origins = "https://balticguru.eu/")
+    @PostMapping("/api/balticguru")
+    public void balticguru(@RequestBody Request request) {
+        var scraper = new BalticGuruScraper(){
             @Override
             protected String getHtml() {
                 return request.getHtml();

@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+</head>
+<body>
+<th:block th:fragment="linksStyles">
+    <style>
+        :root {
+            --bg: #eef1f3;
+            --bg-accent: #e1eaed;
+            --ink: #1b2226;
+            --muted: #5a676f;
+            --card: #ffffff;
+            --border: rgba(27, 34, 38, 0.08);
+            --shadow: 0 16px 36px rgba(20, 33, 43, 0.12);
+            --accent-slate: #3f4a52;
+            --accent-mint: #3f9a8a;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Space Grotesk", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--ink);
+            background: radial-gradient(circle at 18% 8%, rgba(63, 74, 82, 0.12), transparent 55%),
+                        radial-gradient(circle at 80% 0%, rgba(63, 154, 138, 0.12), transparent 50%),
+                        linear-gradient(135deg, var(--bg), #ffffff 55%, var(--bg-accent));
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 4rem 1.5rem 3rem;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(120deg, rgba(63, 74, 82, 0.05), transparent 45%, rgba(63, 154, 138, 0.05));
+            z-index: 0;
+        }
+
+        .page {
+            width: 100%;
+            max-width: 560px;
+            background: var(--card);
+            border-radius: 28px;
+            padding: 2.5rem 2.25rem 2rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            position: relative;
+            z-index: 1;
+        }
+
+        .brand {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .brand img {
+            width: 120px;
+            height: auto;
+            margin-bottom: 1rem;
+        }
+
+        .brand h1 {
+            font-size: 2rem;
+            margin: 0 0 0.4rem;
+            letter-spacing: -0.02em;
+        }
+
+        .brand p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 1rem;
+        }
+
+        .qr-card {
+            margin: 1.75rem 0 1.5rem;
+            padding: 1.4rem 1.6rem;
+            border-radius: 20px;
+            border: 1px solid rgba(63, 154, 138, 0.25);
+            background: linear-gradient(135deg, rgba(63, 154, 138, 0.12), rgba(63, 74, 82, 0.06));
+        }
+
+        .qr-card h2 {
+            margin: 0 0 0.5rem;
+            font-size: 1.4rem;
+        }
+
+        .qr-card p {
+            margin: 0 0 0.75rem;
+            color: var(--muted);
+        }
+
+        .qr-note {
+            margin-top: 0.75rem;
+            font-size: 0.95rem;
+        }
+
+        .qr-items {
+            margin-top: 0.9rem;
+            border-top: 1px solid rgba(27, 34, 38, 0.08);
+            padding-top: 0.6rem;
+        }
+
+        .qr-items summary {
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--accent-slate);
+        }
+
+        .qr-items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 0.6rem;
+            overflow: hidden;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .qr-items-table th,
+        .qr-items-table td {
+            padding: 0.55rem 0.6rem;
+            border-bottom: 1px solid rgba(27, 34, 38, 0.06);
+            text-align: left;
+            vertical-align: middle;
+        }
+
+        .qr-items-table th {
+            font-size: 0.75rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--muted);
+            background: rgba(27, 34, 38, 0.03);
+        }
+
+        .qr-items-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .qr-items-table td:first-child {
+            width: 44px;
+            text-align: center;
+        }
+
+        .qr-item-img {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            background: #fff;
+            border: 1px solid rgba(27, 34, 38, 0.08);
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+
+        .qr-check {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            cursor: pointer;
+        }
+
+        .qr-check input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .qr-check-box {
+            width: 20px;
+            height: 20px;
+            border-radius: 6px;
+            border: 2px solid rgba(63, 74, 82, 0.3);
+            background: #fff;
+            display: grid;
+            place-items: center;
+            position: relative;
+            transition: border-color 160ms ease, background 160ms ease, box-shadow 160ms ease;
+        }
+
+        .qr-check-box::after {
+            content: "";
+            width: 8px;
+            height: 4px;
+            border-left: 2px solid #ffffff;
+            border-bottom: 2px solid #ffffff;
+            position: absolute;
+            inset: 0;
+            margin: auto;
+            transform: rotate(-45deg);
+            opacity: 0;
+            transition: opacity 160ms ease;
+        }
+
+        .qr-check input:checked + .qr-check-box {
+            background: var(--accent-mint);
+            border-color: var(--accent-mint);
+            box-shadow: 0 6px 14px rgba(63, 154, 138, 0.25);
+        }
+
+        .qr-check input:checked + .qr-check-box::after {
+            opacity: 1;
+        }
+
+        .qr-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem 1rem;
+            font-size: 0.95rem;
+        }
+
+        .qr-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.1rem 0.4rem;
+            border-radius: 999px;
+            background: rgba(63, 154, 138, 0.16);
+            color: #1f5c53;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .qr-link:hover {
+            background: rgba(63, 154, 138, 0.24);
+        }
+
+        .qr-link-order {
+            background: rgba(63, 74, 82, 0.12);
+            color: #2e353a;
+        }
+
+        .qr-link-order:hover {
+            background: rgba(63, 74, 82, 0.2);
+        }
+
+        .link-list {
+            display: grid;
+            gap: 1rem;
+            margin: 2rem 0 1.5rem;
+        }
+
+        .link-card {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.25rem;
+            border-radius: 16px;
+            text-decoration: none;
+            color: inherit;
+            border: 1px solid var(--border);
+            background: #ffffff;
+            transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+        }
+
+        .link-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(31, 31, 31, 0.12);
+            border-color: rgba(63, 154, 138, 0.35);
+        }
+
+        .link-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+        }
+
+        .link-text {
+            display: flex;
+            flex-direction: column;
+            gap: 0.15rem;
+        }
+
+        .link-text strong {
+            font-size: 1.05rem;
+        }
+
+        .link-text span {
+            color: var(--muted);
+            font-size: 0.95rem;
+        }
+
+        .icon-bricklink {
+            background: rgba(63, 74, 82, 0.14);
+        }
+
+        .icon-brickowl {
+            background: rgba(63, 154, 138, 0.18);
+        }
+
+        .icon-instagram {
+            background: rgba(63, 74, 82, 0.18);
+        }
+
+        .icon-email {
+            background: rgba(63, 154, 138, 0.16);
+        }
+
+        .link-icon img {
+            width: 28px;
+            height: 28px;
+            object-fit: contain;
+        }
+
+        footer {
+            text-align: center;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        body.qr-mode .link-list {
+            margin-top: 1.25rem;
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 0.5rem;
+        }
+
+        body.qr-mode .link-list:not(.footer-links) {
+            display: none;
+        }
+
+        body.qr-mode .link-card {
+            flex-direction: column;
+            justify-content: center;
+            text-align: center;
+            padding: 0.6rem 0.4rem;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.7);
+            border-color: rgba(27, 34, 38, 0.06);
+            transition: none;
+            box-shadow: none;
+        }
+
+        body.qr-mode .link-card:hover {
+            transform: none;
+            box-shadow: none;
+            border-color: rgba(27, 34, 38, 0.08);
+        }
+
+        body.qr-mode .link-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+        }
+
+        body.qr-mode .link-icon img {
+            width: 16px;
+            height: 16px;
+        }
+
+        body.qr-mode .link-text strong {
+            font-size: 0.82rem;
+        }
+
+        body.qr-mode .link-text span {
+            display: none;
+        }
+
+        body.qr-mode .footer-links {
+            margin: 0.75rem auto 0.35rem;
+            display: flex;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+
+        body.qr-mode .footer-links .link-card {
+            width: 46px;
+            height: 46px;
+            padding: 0;
+            border-radius: 50%;
+            background: transparent;
+            border: none;
+            display: grid;
+            place-items: center;
+        }
+
+        body.qr-mode .footer-links .link-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(27, 34, 38, 0.06);
+        }
+
+        body.qr-mode .footer-links .link-icon img {
+            width: 20px;
+            height: 20px;
+        }
+
+        body.qr-mode .footer-links .link-text {
+            display: none;
+        }
+
+        @media (max-width: 640px) {
+            body.qr-mode .link-list {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 3rem 1rem 2rem;
+            }
+
+            .page {
+                padding: 2rem 1.5rem 1.75rem;
+            }
+
+            .brand h1 {
+                font-size: 1.7rem;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .link-card {
+                transition: none;
+            }
+        }
+    </style>
+</th:block>
+
+<th:block th:fragment="linksHeader">
+    <header class="brand">
+        <img src="/images/logo.png" alt="Vast Bricks logo" />
+        <h1>Vast Bricks</h1>
+        <p>We are Vast Bricks, a hobbyist LEGO reseller based in Riga, Latvia 🇱🇻. We offer only brand-new LEGO® parts, minifigures, and sets, and we pack every order with care and ship worldwide.</p>
+    </header>
+</th:block>
+
+<th:block th:fragment="linksList">
+    <section class="link-list" aria-label="Vast Bricks links">
+        <a class="link-card" href="https://store.bricklink.com/vastbricks" target="_blank" rel="noopener">
+            <span class="link-icon icon-bricklink" aria-hidden="true">
+                <img src="/images/bricklink.png" alt="" width="28" height="28" />
+            </span>
+            <span class="link-text">
+                <strong>BrickLink</strong>
+                <span>store.bricklink.com/vastbricks</span>
+            </span>
+        </a>
+
+        <a class="link-card" href="https://vastbricks.brickowl.com" target="_blank" rel="noopener">
+            <span class="link-icon icon-brickowl" aria-hidden="true">
+                <img src="/images/brickowl.png" alt="" width="30" height="30" />
+            </span>
+            <span class="link-text">
+                <strong>Brick Owl</strong>
+                <span>vastbricks.brickowl.com</span>
+            </span>
+        </a>
+
+        <a class="link-card" href="https://www.instagram.com/vastbricks" target="_blank" rel="noopener">
+            <span class="link-icon icon-instagram" aria-hidden="true">
+                <img src="/images/instagram.png" alt="" width="30" height="30" />
+            </span>
+            <span class="link-text">
+                <strong>Instagram</strong>
+                <span>@vastbricks</span>
+            </span>
+        </a>
+
+        <a class="link-card" href="mailto:info@vastbricks.com">
+            <span class="link-icon icon-email" aria-hidden="true">
+                <img src="/images/email.png" alt="" width="28" height="28" />
+            </span>
+            <span class="link-text">
+                <strong>Email</strong>
+                <span>info@vastbricks.com</span>
+            </span>
+        </a>
+    </section>
+</th:block>
+
+<th:block th:fragment="linksFooter">
+    <footer>
+        <section class="link-list footer-links" th:if="${orderThanks}" aria-label="Vast Bricks links">
+            <a class="link-card" href="https://store.bricklink.com/vastbricks" target="_blank" rel="noopener">
+                <span class="link-icon icon-bricklink" aria-hidden="true">
+                    <img src="/images/bricklink.png" alt="" width="28" height="28" />
+                </span>
+                <span class="link-text">
+                    <strong>BrickLink</strong>
+                </span>
+            </a>
+
+            <a class="link-card" href="https://vastbricks.brickowl.com" target="_blank" rel="noopener">
+                <span class="link-icon icon-brickowl" aria-hidden="true">
+                    <img src="/images/brickowl.png" alt="" width="30" height="30" />
+                </span>
+                <span class="link-text">
+                    <strong>Brick Owl</strong>
+                </span>
+            </a>
+
+            <a class="link-card" href="https://www.instagram.com/vastbricks" target="_blank" rel="noopener">
+                <span class="link-icon icon-instagram" aria-hidden="true">
+                    <img src="/images/instagram.png" alt="" width="30" height="30" />
+                </span>
+                <span class="link-text">
+                    <strong>Instagram</strong>
+                </span>
+            </a>
+
+            <a class="link-card" href="mailto:info@vastbricks.com">
+                <span class="link-icon icon-email" aria-hidden="true">
+                    <img src="/images/email.png" alt="" width="28" height="28" />
+                </span>
+                <span class="link-text">
+                    <strong>Email</strong>
+                </span>
+            </a>
+        </section>
+        © Vast Bricks 2026
+    </footer>
+</th:block>
+</body>
+</html>

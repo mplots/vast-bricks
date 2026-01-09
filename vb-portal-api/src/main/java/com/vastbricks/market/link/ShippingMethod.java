@@ -81,6 +81,6 @@ public class ShippingMethod {
     @NoArgsConstructor
     public static final class Cost {
         private Integer zoneId;
-        private BigDecimal cost;
+        private String cost;
     }
 }

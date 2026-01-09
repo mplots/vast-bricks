@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "BrickOwl QR Registration",
+  "version": "1.0",
+  "description": "Register BrickOwl order QR IDs",
+  "permissions": ["scripting"],
+  "host_permissions": ["https://www.brickowl.com/mystore/orders/outstanding/*"],
+  "content_scripts": [
+    {
+      "matches": ["https://www.brickowl.com/mystore/orders/outstanding/*"],
+      "js": ["content.js"]
+    }
+  ]
+}

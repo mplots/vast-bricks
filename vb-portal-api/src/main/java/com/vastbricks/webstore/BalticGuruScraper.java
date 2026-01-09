@@ -1,16 +1,15 @@
 package com.vastbricks.webstore;
 
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@Component
+//@Component
 public class BalticGuruScraper extends HtmlScraper {
 
     @Override
     protected ScraperArgs scraperArgs() {
         return ScraperArgs.builder()
-            .urls(List.of("https://balticguru.eu/lego/lego/lego/lego/lego?limit=100&page={page}"))
+            .urls(List.of("https://balticguru.eu/lego/1799/1/c?limit=100&page={page}"))
             .page(1)
             .itemsCssQuery("div.product-link-2")
             .itemProcessor(element ->

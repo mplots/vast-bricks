@@ -51,4 +51,12 @@ public interface ProductPurchaseRepository extends JpaRepository<ProductPurchase
 
     @Query(value = "SELECT DISTINCT set_number FROM product_purchase", nativeQuery = true)
     List<Long> findDistinctSetNumbers();
+
+    @Query("""
+        SELECT pp
+        FROM ProductPurchase pp
+        WHERE pp.brickSet.number = :setNumber
+        ORDER BY pp.purchasedAt ASC, pp.id ASC
+        """)
+    List<ProductPurchase> findBySetNumberOrdered(@org.springframework.data.repository.query.Param("setNumber") Long setNumber);
 }

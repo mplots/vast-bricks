@@ -1,6 +1,7 @@
 package com.vastbricks.market.owl;
 
 import com.vastbricks.shipping.LatvijasPastsClient;
+import com.vastbricks.shipping.LatvijasPastsClientV2;
 import com.vastbricks.shipping.Tariff;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -81,10 +82,10 @@ class OwlShipping {
 
     @Test
     public void testCreateShippingMethod() {
-        var mode = Tariff.Mode.SIMPLE;
+        var mode = Tariff.Mode.TRACEABLE;
         var cookie = System.getenv("TEST_OWL_COOKIE");
         var owl = new OwlClient("", cookie);
-        var pasts = new LatvijasPastsClient();
+        var pasts = new LatvijasPastsClientV2();
         var weights = List.of(new BigDecimal("100").setScale(2, RoundingMode.HALF_UP), new BigDecimal("500").setScale(2, RoundingMode.HALF_UP), new BigDecimal("1000").setScale(2, RoundingMode.HALF_UP), new BigDecimal("2000").setScale(2, RoundingMode.HALF_UP));
 
         var existingMethods = owl.internal().listShippingMethods();
@@ -105,10 +106,11 @@ class OwlShipping {
                                     .build()
                     );
 
-                    var vat = tariff.getResult().getTrackableVat().divide(new BigDecimal("100")).add(new BigDecimal("1"));
-                    var shipping = tariff.getResult().getTrackable();
-                    var shippingAndVat = shipping.multiply(vat);
-                    var price = tariff.getResult().getAmount().add(shippingAndVat).setScale(2, RoundingMode.HALF_UP);
+                    if (mode == Tariff.Mode.TRACEABLE && !tariff.getData().getModes().stream().anyMatch(e->e.getId().equals(Tariff.Mode.TRACEABLE.getId()))) {
+                        throw new Exception("Not traceable");
+                    }
+
+                    var price = tariff.getResult().getAmount().setScale(2, RoundingMode.HALF_UP);
 
                     pricing.add(
                             ShipmentPricing.builder()
@@ -146,6 +148,9 @@ class OwlShipping {
                     owl.internal().createShippingMethod(details);
                 }
             } catch (Exception e) {
+                if(!e.getMessage().equals("Not traceable")){
+                    e.printStackTrace();
+                }
                 //Do nothing
             }
         }

@@ -3,9 +3,11 @@ package com.vastbricks.webstore;
 
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
-//@Component
+@Component
 public class IiziiScraper extends HtmlScraper {
 
     @Override
@@ -17,13 +19,15 @@ public class IiziiScraper extends HtmlScraper {
             .itemProcessor(element ->
                 WebSet.builder()
                     .name(element.selectFirst("span.product-link-2-title").text() )
-                    .price(parsePrice(element.selectFirst("span.price-new-1").text()))
+                    .price(parsePrice(element.selectFirst("span.price-new-1").text()).add(new BigDecimal("4.00")))
                     .link(element.selectFirst("a").attr("href"))
                     .image(element.selectFirst("img").attr("src"))
                 .build()
             )
         .build();
     }
+
+
 
     @Override
     public String getWebStore() {

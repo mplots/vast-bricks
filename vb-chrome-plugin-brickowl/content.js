@@ -1,19 +1,3 @@
-function getBuyerInfoTable() {
-    const contactLink = Array.from(document.querySelectorAll('a'))
-        .find(a => a.href.includes('/contact.asp?orderID='));
-
-    if (!contactLink) return;
-
-    const baseTable = contactLink.closest('table');
-    if (!baseTable) return;
-
-    let buyerInfoTable = baseTable.nextElementSibling;
-    while (buyerInfoTable && buyerInfoTable.tagName !== 'TABLE') {
-        buyerInfoTable = buyerInfoTable.nextElementSibling;
-    }
-    return buyerInfoTable;
-}
-
 function extractQrids(rawText) {
     const lines = rawText.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
     const qrids = [];
@@ -40,19 +24,45 @@ function extractQrids(rawText) {
     return qrids;
 }
 
+function getOrderDetailsTableBody() {
+    const blocks = Array.from(document.querySelectorAll('.order-block'));
+    const block = blocks.find(el => {
+        const title = el.querySelector('.order-block-title');
+        return title && title.textContent.trim() === 'Order Details';
+    });
+
+    if (!block) return;
+
+    const table = block.querySelector('table.form-list');
+    if (!table) return;
+
+    return table.querySelector('tbody');
+}
+
 function buildQridLinks(qrids) {
     return qrids.map(qrid => `https://vastbricks.com?qrid=${qrid}`).join('\n');
 }
 
 (function () {
-    const buyerInfoTable = getBuyerInfoTable();
-    if (!buyerInfoTable) return;
+    const tbody = getOrderDetailsTableBody();
+    if (!tbody) return;
+
+    const rows = tbody.querySelectorAll('tr');
+    const lastRow = rows[rows.length - 1];
+    let rowClass = 'odd';
+    if (lastRow) {
+        if (lastRow.classList.contains('odd')) {
+            rowClass = 'even';
+        } else if (lastRow.classList.contains('even')) {
+            rowClass = 'odd';
+        }
+    }
 
     const newRow = document.createElement('tr');
-    newRow.bgColor = '#EEEEEE';
+    newRow.className = rowClass;
     newRow.innerHTML = `
-      <td style="vertical-align: top;"><label for="qrTextArea">&nbsp;QR IDs:</label></td>
-      <td>
+      <td class="flabel">QR IDs</td>
+      <td class="value">
         <textarea id="qrTextArea" rows="4" style="width: 350px;"></textarea>
         <div style="margin-top: 6px;">
           <button id="submitQrBtn">Submit</button>
@@ -60,15 +70,16 @@ function buildQridLinks(qrids) {
         </div>
       </td>
     `;
-    buyerInfoTable.querySelector('tbody').appendChild(newRow);
+    tbody.appendChild(newRow);
 
     const btn = document.getElementById('submitQrBtn');
     const statusMsg = document.getElementById('statusMsg');
     const textArea = document.getElementById('qrTextArea');
-    const orderId = new URL(window.location.href).searchParams.get('ID');
+    const pathParts = window.location.pathname.split('/').filter(Boolean);
+    const orderId = pathParts[pathParts.length - 1];
 
     if (orderId) {
-        fetch(`https://tool.vastbricks.com/api/qr/list?orderId=${encodeURIComponent(orderId)}&source=BRICKLINK`)
+        fetch(`https://tool.vastbricks.com/api/qr/list?orderId=${encodeURIComponent(orderId)}&source=BRICK_OWL`)
             .then(res => res.ok ? res.json() : Promise.reject(res))
             .then(data => {
                 if (Array.isArray(data?.qrids) && data.qrids.length) {
@@ -79,7 +90,8 @@ function buildQridLinks(qrids) {
     }
 
     btn.addEventListener('click', () => {
-        const orderId = new URL(window.location.href).searchParams.get('ID');
+        const pathParts = window.location.pathname.split('/').filter(Boolean);
+        const orderId = pathParts[pathParts.length - 1];
         const qrids = extractQrids(textArea.value);
 
         if (!orderId) {
@@ -94,7 +106,7 @@ function buildQridLinks(qrids) {
             return;
         }
 
-        const payload = { orderId: orderId, source: 'BRICKLINK', qrids: qrids };
+        const payload = { orderId: orderId, source: 'BRICK_OWL', qrids: qrids };
 
         statusMsg.style.color = 'blue';
         statusMsg.textContent = 'Submitting...';

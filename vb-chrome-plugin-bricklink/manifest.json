@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "BrickLink Latvijas Pasts Shipping",
+  "name": "BrickLink Vast Bricks Extension",
   "version": "1.0",
-  "description": "Send out shipping information to Latvijas Pasts",
+  "description": "Adds additional functionality to BrickLink site",
   "permissions": ["scripting"],
   "host_permissions": ["https://www.bricklink.com/orderDetail.asp*"],
   "content_scripts": [
