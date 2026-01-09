@@ -1,16 +1,11 @@
 package com.vastbricks.service;
 
-import com.vastbricks.bsx.BrickStoreXml;
-import com.vastbricks.bsx.BsxParser;
-import com.vastbricks.config.Env;
-import com.vastbricks.jpa.entity.ProductPurchase;
+import com.vastbricks.jpa.repository.BsxItemRepository;
 import com.vastbricks.jpa.repository.ProductPurchaseRepository;
 import com.vastbricks.jpa.repository.RebrickableInventoryRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -29,10 +24,9 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class PurchaseProgressService {
 
-    private final Env env;
-    private final BsxParser bsxParser;
     private final RebrickableInventoryRepository rebrickableInventoryRepository;
     private final ProductPurchaseRepository productPurchaseRepository;
+    private final BsxItemRepository bsxItemRepository;
 
     public Map<Long, PurchaseProgress> buildProgress(List<ProductPurchaseRepository.PurchaseRow> purchases) {
         if (purchases == null || purchases.isEmpty()) {
@@ -228,56 +222,20 @@ public class PurchaseProgressService {
     }
 
     private List<OrderItemSale> loadOrderSales() {
-        var bsxDir = env.getBsxOrderDir();
-        if (bsxDir == null || bsxDir.isBlank()) {
-            return List.of();
-        }
-        var dirPath = Path.of(bsxDir);
-        if (!Files.exists(dirPath) || !Files.isDirectory(dirPath)) {
-            return List.of();
-        }
-
         var results = new ArrayList<OrderItemSale>();
-        try (var stream = Files.list(dirPath)) {
-            var files = stream
-                    .filter(path -> path.getFileName().toString().toLowerCase().endsWith(".bsx"))
-                    .toList();
-            for (var path : files) {
-                var bsx = bsxParser.parse(path).orElse(null);
-                if (bsx == null) {
-                    continue;
-                }
-                results.addAll(extractSales(bsx));
-            }
-        } catch (Exception ignored) {
-            return List.of();
-        }
-
-        return results;
-    }
-
-    private List<OrderItemSale> extractSales(BrickStoreXml bsx) {
-        if (bsx.getOrder() == null || bsx.getInventory() == null || bsx.getInventory().getItems() == null) {
-            return List.of();
-        }
-        var orderDate = toOrderDate(bsx.getOrder().getOrderDate());
-        if (orderDate == null) {
-            return List.of();
-        }
-        var results = new ArrayList<OrderItemSale>();
-        for (var item : bsx.getInventory().getItems()) {
-            if (item == null || item.getItemId() == null || item.getQty() == null) {
+        var rows = bsxItemRepository.findOrderItems();
+        for (var row : rows) {
+            if (row.getItemTypeId() == null || !"P".equalsIgnoreCase(row.getItemTypeId().trim())) {
                 continue;
             }
-            if (item.getItemTypeId() == null || !"P".equalsIgnoreCase(item.getItemTypeId().trim())) {
+            if (row.getItemId() == null || row.getColorId() == null || row.getQty() == null || row.getQty() <= 0) {
                 continue;
             }
-            var partId = item.getItemId().trim();
-            var colorId = item.getColorId();
-            if (partId.isEmpty() || item.getQty() <= 0 || colorId == null) {
+            var orderDate = toOrderDate(row.getOrderDate());
+            if (orderDate == null) {
                 continue;
             }
-            results.add(new OrderItemSale(orderDate, new PartKey(partId, colorId), item.getQty()));
+            results.add(new OrderItemSale(orderDate, new PartKey(row.getItemId().trim(), row.getColorId()), row.getQty()));
         }
         return results;
     }

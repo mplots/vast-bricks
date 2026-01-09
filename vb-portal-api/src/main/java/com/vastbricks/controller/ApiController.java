@@ -7,6 +7,9 @@ import com.vastbricks.jpa.projection.BestOffer;
 import com.vastbricks.jpa.projection.Price;
 import com.vastbricks.jpa.repository.BrickSetRepository;
 import com.vastbricks.jpa.repository.MaterializedViewRefresh;
+import com.vastbricks.jpa.repository.PartUsageRepository;
+import com.vastbricks.jpa.repository.InventoryRepository;
+import com.vastbricks.service.PartUsageService;
 import com.vastbricks.market.link.PartOutValue;
 import com.vastbricks.market.link.PrivateAPI;
 import com.vastbricks.shipping.LatvijasPastsClient;
@@ -30,6 +33,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
@@ -43,6 +47,9 @@ public class ApiController {
     private MaterializedViewRefresh materializedViewRefresh;
     private Env env;
     private ProductPurchaseRepository productPurchaseRepository;
+    private PartUsageRepository partUsageRepository;
+    private InventoryRepository inventoryRepository;
+    private PartUsageService partUsageService;
 
     @PostMapping("/api/web-sets")
     public void storeWebSets(@RequestBody List<WebSet> webSets) {
@@ -55,6 +62,30 @@ public class ApiController {
         var result =  partOutValueJob.fetchAndSyncPartOutValue(set);
         materializedViewRefresh.refreshCheapestOfferView();
         return result;
+    }
+
+    @GetMapping("/api/parts/usage")
+    public PartUsageRowPage partUsage(@RequestParam("partNum") String partNum,
+                                      @RequestParam("colorId") Integer colorId,
+                                      @RequestParam(value = "limit", required = false, defaultValue = "20") Integer limit,
+                                      @RequestParam(value = "offset", required = false, defaultValue = "0") Integer offset,
+                                      @RequestParam(value = "sort", required = false, defaultValue = "ratio") String sort,
+                                      @RequestParam(value = "dir", required = false, defaultValue = "desc") String dir) {
+        var safeLimit = limit == null || limit <= 0 ? 20 : Math.min(limit, 100);
+        var safeOffset = offset == null || offset < 0 ? 0 : offset;
+        var safeSort = sort == null ? "ratio" : sort.toLowerCase();
+        if (!safeSort.equals("ratio") && !safeSort.equals("qty") && !safeSort.equals("price") && !safeSort.equals("partout")) {
+            safeSort = "ratio";
+        }
+        var safeDir = dir == null ? "desc" : dir.toLowerCase();
+        if (!safeDir.equals("asc") && !safeDir.equals("desc")) {
+            safeDir = "desc";
+        }
+        var total = partUsageRepository.countTopUsage(partNum, colorId);
+        var rows = partUsageRepository.findTopUsage(partNum, colorId, safeLimit, safeOffset, safeSort, safeDir).stream()
+                .map(PartUsageRow::from)
+                .toList();
+        return new PartUsageRowPage(total, safeOffset, safeLimit, rows, safeSort, safeDir);
     }
 
     //External Scrappers
@@ -90,6 +121,160 @@ public class ApiController {
     public static class ProductDetailsResponse {
         private BestOffer offer;
         private List<Price> prices;
+    }
+
+    public record PartUsageRow(Long setNumber,
+                               String setName,
+                               Integer partQty,
+                               BigDecimal partOutPrice,
+                               BigDecimal partOutRatio,
+                               String partOutLink,
+                               BigDecimal setPrice,
+                               String webStore,
+                               String image) {
+        private static PartUsageRow from(PartUsageRepository.PartUsageRow row) {
+            return new PartUsageRow(
+                    row.getSetNumber(),
+                    row.getSetName(),
+                    row.getPartQty(),
+                    row.getPartOutPrice(),
+                    row.getPartOutRatio(),
+                    row.getPartOutLink(),
+                    row.getSetPrice(),
+                    row.getWebStore(),
+                    row.getImage()
+            );
+        }
+    }
+
+    public record PartUsageRowPage(long total,
+                                   int offset,
+                                   int limit,
+                                   List<PartUsageRow> items,
+                                   String sort,
+                                   String dir) { }
+
+    @PostMapping("/api/parts/usage-multi")
+    public PartUsageMultiPage partUsageMulti(@RequestBody PartUsageMultiRequest request) {
+        var parts = request.parts() == null ? List.<PartUsageService.PartKey>of() : request.parts().stream()
+                .filter(p -> p.partNum() != null && !p.partNum().isBlank() && p.colorId() != null)
+                .map(p -> new PartUsageService.PartKey(p.partNum().trim(), p.colorId()))
+                .toList();
+        var limit = request.limit() == null || request.limit() <= 0 ? 20 : Math.min(request.limit(), 100);
+        var offset = request.offset() == null || request.offset() < 0 ? 0 : request.offset();
+        var sort = request.sort() == null ? "ratio" : request.sort().toLowerCase();
+        if (!sort.equals("ratio") && !sort.equals("qty") && !sort.equals("price") && !sort.equals("partout")) {
+            sort = "ratio";
+        }
+        var dir = request.dir() == null ? "desc" : request.dir().toLowerCase();
+        if (!dir.equals("asc") && !dir.equals("desc")) {
+            dir = "desc";
+        }
+        var page = partUsageService.fetchUsage(parts, limit, offset, sort, dir);
+        return new PartUsageMultiPage(page.total(), page.offset(), page.limit(),
+                page.items().stream().map(PartUsageMultiRow::from).toList(),
+                page.sort(), page.dir());
+    }
+
+    @GetMapping("/api/inventory")
+    public InventoryPage inventory(@RequestParam(value = "offset", required = false, defaultValue = "0") Integer offset,
+                                   @RequestParam(value = "limit", required = false, defaultValue = "10") Integer limit) {
+        var safeLimit = limit == null || limit <= 0 ? 10 : Math.min(limit, 200);
+        var safeOffset = offset == null || offset < 0 ? 0 : offset;
+        var inventoryFile = env.getBsxInventoryFile();
+        if (inventoryFile == null || inventoryFile.isBlank()) {
+            return new InventoryPage(0, safeOffset, safeLimit, List.of());
+        }
+        var filename = Path.of(inventoryFile).getFileName().toString();
+        var total = inventoryRepository.countInventory(filename);
+        var rows = inventoryRepository.findInventoryPage(filename, safeLimit, safeOffset).stream()
+                .map(InventoryRow::from)
+                .toList();
+        return new InventoryPage(total, safeOffset, safeLimit, rows);
+    }
+
+    public record InventoryPage(long total,
+                                int offset,
+                                int limit,
+                                List<InventoryRow> items) { }
+
+    public record PartUsageMultiRequest(List<PartKeyRequest> parts,
+                                        Integer limit,
+                                        Integer offset,
+                                        String sort,
+                                        String dir) { }
+
+    public record PartKeyRequest(String partNum, Integer colorId) { }
+
+    public record PartUsageMultiPage(long total,
+                                     int offset,
+                                     int limit,
+                                     List<PartUsageMultiRow> items,
+                                     String sort,
+                                     String dir) { }
+
+    public record PartUsageMultiRow(Long setNumber,
+                                    String setName,
+                                    Integer totalQty,
+                                    BigDecimal partOutPrice,
+                                    BigDecimal partOutRatio,
+                                    String partOutLink,
+                                    BigDecimal setPrice,
+                                    String webStore,
+                                    String image) {
+        private static PartUsageMultiRow from(PartUsageService.PartUsageRow row) {
+            return new PartUsageMultiRow(
+                    row.setNumber(),
+                    row.setName(),
+                    row.totalQty(),
+                    row.partOutPrice(),
+                    row.partOutRatio(),
+                    row.partOutLink(),
+                    row.setPrice(),
+                    row.webStore(),
+                    row.image()
+            );
+        }
+    }
+
+    public record InventoryRow(String partNum,
+                               String partName,
+                               String colorName,
+                               Integer colorId,
+                               Integer totalQty,
+                               Integer soldQty,
+                               Integer remainingQty,
+                               Integer orderCount,
+                               Integer percent,
+                               String imageUrl) {
+        private static InventoryRow from(InventoryRepository.InventoryRow row) {
+            var remaining = row.getRemainingQty() == null ? 0 : row.getRemainingQty();
+            var sold = row.getSoldQty() == null ? 0 : row.getSoldQty();
+            var orders = row.getOrderCount() == null ? 0 : row.getOrderCount();
+            var total = remaining + sold;
+            var percent = total <= 0 ? 0 : (int) Math.min(100, Math.round((sold * 100.0) / total));
+            var imageUrl = buildPartImageUrl(row.getPartNum(), row.getColorId());
+            return new InventoryRow(
+                    row.getPartNum(),
+                    row.getPartName(),
+                    row.getColorName(),
+                    row.getColorId(),
+                    total,
+                    sold,
+                    remaining,
+                    orders,
+                    percent,
+                    imageUrl
+            );
+        }
+    }
+
+    private static String buildPartImageUrl(String partNum, Integer colorId) {
+        if (partNum == null || partNum.isBlank()) {
+            return null;
+        }
+        var color = colorId == null ? "0" : colorId.toString();
+        return "https://img.bricklink.com/ItemImage/PN/%s/%s.png".formatted(color, partNum.trim());
     }
 
     @GetMapping(value = "/api/product-details")

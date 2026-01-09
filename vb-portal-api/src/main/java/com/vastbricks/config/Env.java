@@ -42,4 +42,7 @@ public class Env {
 
     @Value("#{environment.BSX_ORDER_DIR}")
     private String bsxOrderDir;
+
+    @Value("#{environment.BSX_INVENTORY_FILE}")
+    private String bsxInventoryFile;
 }

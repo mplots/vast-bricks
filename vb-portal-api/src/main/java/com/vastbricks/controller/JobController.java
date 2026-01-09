@@ -1,6 +1,7 @@
 package com.vastbricks.controller;
 
 import com.vastbricks.job.BsxImportJob;
+import com.vastbricks.job.BsxInventorySyncJob;
 import com.vastbricks.job.CatalogSynchronizationJob;
 import com.vastbricks.job.PartOutValueJob;
 import com.vastbricks.job.RebrickableSyncJob;
@@ -26,6 +27,7 @@ public class JobController {
     private PartOutValueJob partOutValueJob;
     private RebrickableSyncJob rebrickableSyncJob;
     private BsxImportJob bsxImportJob;
+    private BsxInventorySyncJob bsxInventorySyncJob;
     private MaterializedViewRefresh materializedViewRefresh;
 
     @GetMapping("trigger-web-store-scraper-job")
@@ -63,6 +65,12 @@ public class JobController {
     @GetMapping("trigger-bsx-import-job")
     public String triggerBsxImportJob() {
         bsxImportJob.runJobAsync();
+        return "ok";
+    }
+
+    @GetMapping("trigger-bsx-inventory-sync-job")
+    public String triggerBsxInventorySyncJob() {
+        bsxInventorySyncJob.runJobAsync();
         return "ok";
     }
 

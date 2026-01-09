@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <th:block th:insert="~{fragments/product-common :: productStyles}"/>
+    <title>Inventory</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 16px;
+        }
+
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            padding: 0 16px;
+            height: 64px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 110;
+            background: #f8f9fa;
+        }
+
+        .page-header-inner {
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            gap: 10px;
+        }
+
+        .page-header .home-link {
+            position: absolute;
+            left: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 10px;
+            border: 1px solid #d0d7de;
+            border-radius: 6px;
+            background: #f5f5f5;
+            color: #333;
+            text-decoration: none;
+            gap: 4px;
+        }
+
+        .inventory-list {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+            overflow: visible;
+        }
+
+        .inventory-row {
+            display: grid;
+            grid-template-columns: 40px 80px 1.6fr 0.8fr 0.6fr 1.5fr;
+            padding: 10px 12px;
+            border-bottom: 1px solid #e5e7eb;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .inventory-row.header {
+            font-weight: 700;
+            background: #f4f6fb;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+            position: sticky;
+            top: 64px;
+            z-index: 120;
+            box-shadow: 0 2px 4px rgba(15, 23, 42, 0.08);
+        }
+
+        .inventory-row:last-child {
+            border-bottom: none;
+        }
+
+        .part-image {
+            width: 64px;
+            height: 64px;
+            object-fit: contain;
+            border-radius: 6px;
+            background: #f8fafc;
+        }
+
+        .part-name {
+            font-weight: 600;
+            color: #1f2937;
+            font-size: 13px;
+            line-height: 1.2;
+        }
+
+        .part-number {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .progress-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #334155;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #22c55e 0%, #16a34a 100%);
+        }
+
+        .progress-meta {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .progress-meta-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .progress-remaining {
+            font-size: 12px;
+            color: #0f766e;
+            font-weight: 600;
+        }
+
+        .pagination {
+            max-width: 900px;
+            margin: 12px auto 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            font-size: 12px;
+            color: #475569;
+        }
+
+        .pagination a {
+            border: 1px solid #d0d7de;
+            background: #fff;
+            border-radius: 6px;
+            padding: 6px 10px;
+            text-decoration: none;
+            color: #1f2937;
+        }
+
+        .pagination .disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .part-select {
+            width: 16px;
+            height: 16px;
+        }
+
+        .select-cell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .usage-drawer.hidden { transform: translateX(100%); pointer-events: none; }
+        .usage-drawer {
+            position: fixed;
+            top: 0;
+            right: 0;
+            height: 100vh;
+            width: min(520px, 92vw);
+            background: #fff;
+            box-shadow: 8px 0 24px rgba(15, 23, 42, 0.18);
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+            transform: translateX(0);
+            transition: transform 0.2s ease;
+        }
+        .usage-drawer-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 14px;
+            border-bottom: 1px solid #e5e7eb;
+            background: #f8fafc;
+        }
+        .usage-drawer-header h4 {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+        .usage-drawer-close {
+            border: none;
+            background: transparent;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        .usage-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            table-layout: fixed;
+        }
+        .usage-table th,
+        .usage-table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: left;
+            vertical-align: top;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .usage-table th {
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            font-size: 11px;
+            color: #6b7280;
+        }
+
+        .usage-table th.sortable {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .usage-table th.sortable.active {
+            color: #1f2937;
+        }
+
+        .usage-table th.sortable .sort-indicator {
+            margin-left: 4px;
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .usage-table .col-image { width: 64px; }
+        .usage-table .col-set { width: 58%; }
+        .usage-table .col-qty { width: 10%; text-align: right; }
+        .usage-table .col-price { width: 14%; text-align: right; }
+        .usage-table .col-ratio { width: 12%; text-align: right; }
+
+        .usage-image {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+            border-radius: 6px;
+            background: #f8fafc;
+        }
+        .usage-body {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            flex-direction: column;
+        }
+
+        .usage-cart {
+            width: 100%;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 12px;
+            overflow: auto;
+            background: #fbfbfd;
+            max-height: 35%;
+            scrollbar-gutter: stable;
+        }
+
+        .usage-cart h5 {
+            margin: 0 0 10px;
+            font-size: 13px;
+            color: #334155;
+        }
+
+        .cart-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 6px 0;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 12px;
+        }
+
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+
+        .cart-item-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+        }
+
+        .cart-item-label {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .cart-image {
+            width: 28px;
+            height: 28px;
+            object-fit: contain;
+            border-radius: 4px;
+            background: #f8fafc;
+            flex-shrink: 0;
+        }
+
+        .cart-remove {
+            border: 1px solid #d0d7de;
+            background: #fff;
+            border-radius: 6px;
+            padding: 2px 6px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+
+        .usage-results {
+            flex: 1;
+            overflow: auto;
+            overflow-x: hidden;
+        }
+
+        .cart-toggle {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            background: #111827;
+            color: #fff;
+            border: none;
+            border-radius: 999px;
+            padding: 10px 16px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 10px 20px rgba(15, 23, 42, 0.2);
+            cursor: pointer;
+            z-index: 180;
+        }
+
+        .cart-toggle.hidden {
+            display: none;
+        }
+
+        .cart-count {
+            background: #facc15;
+            color: #1f2937;
+            border-radius: 999px;
+            padding: 2px 8px;
+            font-weight: 700;
+            font-size: 11px;
+        }
+
+        .usage-table tbody tr {
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+
+        .usage-table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        .usage-loading {
+            padding: 10px 12px;
+            border-top: 1px solid #e5e7eb;
+            font-size: 12px;
+            color: #475569;
+            background: #fafafa;
+            text-align: center;
+            display: none;
+        }
+
+        .set-dialog.hidden { display: none; }
+        .set-dialog {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.45);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 210;
+        }
+        .set-dialog-content {
+            width: min(1040px, 96vw);
+            height: min(860px, 96vh);
+            background: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+            display: flex;
+            flex-direction: column;
+        }
+        .set-dialog-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 14px;
+            border-bottom: 1px solid #e5e7eb;
+            background: #f8fafc;
+        }
+        .set-dialog-header h4 {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+        .set-dialog-close {
+            border: none;
+            background: transparent;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        .set-dialog-frame {
+            flex: 1;
+            border: none;
+            width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            .inventory-row.header {
+                display: none;
+            }
+
+            .inventory-row {
+                grid-template-columns: 1fr;
+                gap: 6px;
+            }
+
+            .inventory-row .cell {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 6px 0;
+                border-bottom: 1px solid #e5e7eb;
+                gap: 10px;
+                position: relative;
+            }
+
+            .inventory-row .cell:last-child {
+                border-bottom: none;
+            }
+
+            .inventory-row .cell::before {
+                content: attr(data-label);
+                font-weight: 600;
+                color: #6b7280;
+                text-transform: uppercase;
+                font-size: 12px;
+            }
+
+            .cell.image-cell::before {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="page-header">
+    <div class="page-header-inner">
+        <a href="/" class="modern-link home-link">
+            <span class="material-icons" style="font-size:18px;">home</span>
+        </a>
+        <div style="display:flex; align-items:center; gap:8px;">
+            <span class="material-icons">inventory_2</span>
+            <h2 style="margin: 0;">Inventory</h2>
+        </div>
+    </div>
+</div>
+
+<div class="inventory-list" id="inventory-list"
+     th:data-total="${inventoryTotal}"
+     th:data-page-size="${inventoryPageSize}"
+     th:data-offset="${#lists.size(inventoryRows)}"
+     th:data-missing="${inventoryMissingFile}">
+    <div class="inventory-row header">
+        <div>Select</div>
+        <div>Image</div>
+        <div>Part</div>
+        <div>Color</div>
+        <div>Orders</div>
+        <div>Progress</div>
+    </div>
+        <div th:if="${inventoryMissingFile}" style="padding: 16px; text-align: center; color: #6b7280;">Set BSX_INVENTORY_FILE to load inventory.</div>
+        <div th:if="${!inventoryMissingFile and #lists.isEmpty(inventoryRows)}" style="padding: 16px; text-align: center; color: #6b7280;">No inventory yet.</div>
+    <div th:each="row : ${inventoryRows}" class="inventory-row">
+        <div class="cell select-cell" data-label="Select">
+            <input class="part-select" type="checkbox"
+                   th:attr="data-part-key=${row.partNum} + '::' + ${row.colorId}"
+                   th:data-part-num="${row.partNum}"
+                   th:data-color-id="${row.colorId}"
+                   th:data-part-name="${row.partName}"
+                   th:data-color-name="${row.colorName}"
+                   th:data-image-url="${row.imageUrl}">
+        </div>
+        <div class="cell image-cell" data-label="">
+            <img class="part-image" th:if="${row.imageUrl != null}" th:src="${row.imageUrl}" alt="">
+        </div>
+        <div class="cell" data-label="Part">
+            <div>
+                <div class="part-name" th:text="${row.partName}">Part name</div>
+                <div class="part-number" th:text="${row.partNum}">part</div>
+            </div>
+        </div>
+        <div class="cell" data-label="Color" th:text="${row.colorName}"></div>
+        <div class="cell" data-label="Orders" th:text="${row.orderCount}"></div>
+        <div class="cell" data-label="Progress">
+            <div class="progress-label" th:text="${row.percent} + '%'"></div>
+            <div class="progress-bar">
+                <div class="progress-fill" th:style="'width:' + ${row.percent} + '%'"></div>
+            </div>
+            <div class="progress-meta-row">
+                <div class="progress-meta" th:text="${row.soldQty} + ' sold of ' + ${row.totalQty}"></div>
+                <div class="progress-remaining" th:text="${row.remainingQty} + ' remaining'"></div>
+            </div>
+        </div>
+    </div>
+    <div id="inventory-loading" style="padding: 12px; text-align:center; color:#6b7280; display:none;">
+        Loading more parts...
+    </div>
+    <div id="inventory-sentinel"></div>
+</div>
+
+<div id="usage-drawer" class="usage-drawer hidden" role="dialog" aria-modal="true" aria-labelledby="usage-drawer-title">
+    <div class="usage-drawer-header">
+        <h4 id="usage-drawer-title">Sets containing selected parts</h4>
+        <button id="usage-drawer-close" class="usage-drawer-close" type="button" aria-label="Close">&times;</button>
+    </div>
+    <div class="usage-body">
+        <div class="usage-cart">
+            <h5>Selected parts</h5>
+            <div id="usage-cart-list"></div>
+        </div>
+        <div class="usage-results">
+            <table class="usage-table">
+                <colgroup>
+                    <col class="col-image">
+                    <col class="col-set">
+                    <col class="col-qty">
+                    <col class="col-price">
+                    <col class="col-ratio">
+                </colgroup>
+                <thead>
+                <tr>
+                    <th>Image</th>
+                    <th>Set</th>
+                    <th class="sortable" data-sort="qty">Qty <span class="sort-indicator"></span></th>
+                    <th class="sortable" data-sort="price">Price <span class="sort-indicator"></span></th>
+                    <th class="sortable" data-sort="ratio">Ratio <span class="sort-indicator"></span></th>
+                </tr>
+                </thead>
+                <tbody id="usage-table-body">
+                <tr><td colspan="5" style="padding: 16px;">Select parts to view sets.</td></tr>
+                </tbody>
+            </table>
+            <div id="usage-loading" class="usage-loading">Loading more sets...</div>
+            <div id="usage-sentinel"></div>
+        </div>
+    </div>
+</div>
+
+<button id="cart-toggle" class="cart-toggle hidden" type="button">
+    Selected parts <span id="cart-count" class="cart-count">0</span>
+</button>
+
+<div id="set-dialog" class="set-dialog hidden">
+    <div class="set-dialog-content" role="dialog" aria-modal="true" aria-labelledby="set-dialog-title">
+        <div class="set-dialog-header">
+            <h4 id="set-dialog-title">Set details</h4>
+            <button id="set-dialog-close" class="set-dialog-close" type="button" aria-label="Close">&times;</button>
+        </div>
+        <iframe id="set-dialog-frame" class="set-dialog-frame" title="Set details"></iframe>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const drawer = document.getElementById('usage-drawer');
+        const drawerClose = document.getElementById('usage-drawer-close');
+        const cartList = document.getElementById('usage-cart-list');
+        const tableBody = document.getElementById('usage-table-body');
+        const title = document.getElementById('usage-drawer-title');
+        const usageLoading = document.getElementById('usage-loading');
+        const usageSentinel = document.getElementById('usage-sentinel');
+        const setDialog = document.getElementById('set-dialog');
+        const setDialogFrame = document.getElementById('set-dialog-frame');
+        const setDialogClose = document.getElementById('set-dialog-close');
+        const cartToggle = document.getElementById('cart-toggle');
+        const cartCount = document.getElementById('cart-count');
+        const usagePageSize = 20;
+        let currentOffset = 0;
+        let currentTotal = 0;
+        let currentSort = 'ratio';
+        let currentDir = 'desc';
+        let usageLoadingActive = false;
+        let requestId = 0;
+        const selectedParts = new Map();
+
+        function partKey(partNum, colorId) {
+            return `${partNum}::${colorId}`;
+        }
+
+        function setDrawerVisible(visible) {
+            if (!drawer) return;
+            drawer.classList.toggle('hidden', !visible);
+        }
+
+        function updateCartButton() {
+            if (!cartToggle || !cartCount) return;
+            const count = selectedParts.size;
+            cartCount.textContent = `${count}`;
+            cartToggle.classList.toggle('hidden', count === 0);
+            if (count === 0) {
+                setDrawerVisible(false);
+            }
+        }
+
+        function updateTitle() {
+            if (!title) return;
+            title.textContent = 'Sets containing selected parts';
+        }
+
+        function renderCart() {
+            if (!cartList) return;
+            cartList.innerHTML = '';
+            if (selectedParts.size === 0) {
+                const empty = document.createElement('div');
+                empty.style.fontSize = '12px';
+                empty.style.color = '#6b7280';
+                empty.textContent = 'No parts selected.';
+                cartList.appendChild(empty);
+                return;
+            }
+            selectedParts.forEach((part, key) => {
+                const item = document.createElement('div');
+                item.className = 'cart-item';
+                const info = document.createElement('div');
+                info.className = 'cart-item-info';
+                if (part.imageUrl) {
+                    const img = document.createElement('img');
+                    img.className = 'cart-image';
+                    img.src = part.imageUrl;
+                    img.alt = '';
+                    info.appendChild(img);
+                }
+                const label = document.createElement('span');
+                label.className = 'cart-item-label';
+                const colorLabel = part.colorName ? ` • ${part.colorName}` : '';
+                label.textContent = `${part.partNum}${colorLabel}`;
+                info.appendChild(label);
+                const remove = document.createElement('button');
+                remove.type = 'button';
+                remove.className = 'cart-remove';
+                remove.dataset.key = key;
+                remove.textContent = 'Remove';
+                item.appendChild(info);
+                item.appendChild(remove);
+                cartList.appendChild(item);
+            });
+        }
+
+        function setTableMessage(message) {
+            if (!tableBody) return;
+            tableBody.innerHTML = `<tr><td colspan="5" style="padding: 16px;">${message}</td></tr>`;
+        }
+
+        function openSetDialog(setNumber) {
+            if (!setDialog || !setDialogFrame || !setNumber) return;
+            setDialogFrame.src = `/product?set=${setNumber}`;
+            setDialog.classList.remove('hidden');
+        }
+
+        function closeSetDialog() {
+            if (!setDialog || !setDialogFrame) return;
+            setDialog.classList.add('hidden');
+            setDialogFrame.src = '';
+        }
+
+        function updateUsageSort() {
+            document.querySelectorAll('.usage-table th.sortable').forEach(th => {
+                if (th.dataset.sort === currentSort) {
+                    th.classList.add('active');
+                    const indicator = th.querySelector('.sort-indicator');
+                    if (indicator) {
+                        indicator.textContent = currentDir === 'asc' ? '▲' : '▼';
+                    }
+                } else {
+                    th.classList.remove('active');
+                    const indicator = th.querySelector('.sort-indicator');
+                    if (indicator) {
+                        indicator.textContent = '';
+                    }
+                }
+            });
+        }
+
+        function buildUsageBody() {
+            const parts = Array.from(selectedParts.values()).map(part => ({
+                partNum: part.partNum,
+                colorId: part.colorId
+            }));
+            return {
+                parts,
+                limit: usagePageSize,
+                offset: currentOffset,
+                sort: currentSort,
+                dir: currentDir
+            };
+        }
+
+        async function loadUsagePage(offset, reset = false) {
+            if (!tableBody || usageLoadingActive) return;
+            if (selectedParts.size === 0) {
+                currentTotal = 0;
+                currentOffset = 0;
+                updateTitle();
+                updateUsageSort();
+                setTableMessage('Select parts to view sets.');
+                return;
+            }
+            if (reset) {
+                currentOffset = 0;
+                currentTotal = 0;
+                tableBody.innerHTML = '';
+            } else if (currentTotal !== 0 && currentOffset >= currentTotal) {
+                return;
+            }
+            currentOffset = Math.max(0, offset);
+            updateTitle();
+            if (usageLoading) usageLoading.style.display = 'block';
+            if (currentOffset === 0) {
+                setTableMessage('Loading...');
+            }
+            usageLoadingActive = true;
+            const currentRequest = ++requestId;
+            try {
+                const res = await fetch('/api/parts/usage-multi', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(buildUsageBody())
+                });
+                if (!res.ok) {
+                    throw new Error(`HTTP ${res.status}`);
+                }
+                const page = await res.json();
+                if (currentRequest !== requestId) {
+                    return;
+                }
+                currentTotal = page.total || 0;
+                currentSort = page.sort || currentSort;
+                currentDir = page.dir || currentDir;
+                const items = page.items || [];
+                if (items.length === 0 && currentOffset === 0) {
+                    setTableMessage('No sets found.');
+                    updateUsageSort();
+                    return;
+                }
+                const rowsHtml = items.map(item => {
+                    const ratio = item.partOutRatio != null ? item.partOutRatio : '-';
+                    const price = item.setPrice != null ? `€${item.setPrice}` : '-';
+                    const setName = item.setName ?? '';
+                    const setNumber = item.setNumber ?? '';
+                    const imageUrl = setNumber ? `https://img.bricklink.com/ItemImage/OT/0/${setNumber}-1.t2.png` : '';
+                    const image = imageUrl ? `<img class="usage-image" src="${imageUrl}" alt="">` : '-';
+                    return `
+                        <tr data-set-number="${setNumber}">
+                            <td>${image}</td>
+                            <td>${setName}</td>
+                            <td>${item.totalQty ?? '-'}</td>
+                            <td>${price}</td>
+                            <td>${ratio}</td>
+                        </tr>
+                    `;
+                }).join('');
+                if (currentOffset === 0) {
+                    tableBody.innerHTML = rowsHtml;
+                } else {
+                    tableBody.insertAdjacentHTML('beforeend', rowsHtml);
+                }
+                currentOffset += items.length;
+                updateUsageSort();
+            } catch (err) {
+                if (currentRequest !== requestId) {
+                    return;
+                }
+                if (currentOffset === 0) {
+                    setTableMessage('Failed to load.');
+                }
+                updateUsageSort();
+            } finally {
+                usageLoadingActive = false;
+                if (usageLoading) usageLoading.style.display = 'none';
+            }
+        }
+
+        function clearSelection() {
+            selectedParts.clear();
+            document.querySelectorAll('.part-select:checked').forEach(input => {
+                input.checked = false;
+            });
+            renderCart();
+            updateCartButton();
+            updateTitle();
+            setTableMessage('Select parts to view sets.');
+            updateUsageSort();
+        }
+
+        if (drawerClose) {
+            drawerClose.addEventListener('click', () => setDrawerVisible(false));
+        }
+
+        if (cartToggle) {
+            cartToggle.addEventListener('click', () => {
+                setDrawerVisible(true);
+                loadUsagePage(0, true);
+            });
+        }
+
+        if (setDialogClose) {
+            setDialogClose.addEventListener('click', closeSetDialog);
+        }
+        if (setDialog) {
+            setDialog.addEventListener('click', (event) => {
+                if (event.target === setDialog) {
+                    closeSetDialog();
+                }
+            });
+        }
+
+        if (cartList) {
+            cartList.addEventListener('click', event => {
+                const removeButton = event.target.closest('.cart-remove');
+                if (!removeButton) return;
+                const key = removeButton.dataset.key;
+                if (!key) return;
+                selectedParts.delete(key);
+                const checkbox = document.querySelector(`.part-select[data-part-key="${key}"]`);
+                if (checkbox) {
+                    checkbox.checked = false;
+                }
+                renderCart();
+                updateCartButton();
+                if (!drawer.classList.contains('hidden')) {
+                    loadUsagePage(0, true);
+                }
+            });
+        }
+
+        document.querySelectorAll('.usage-table th.sortable').forEach(th => {
+            th.addEventListener('click', () => {
+                if (selectedParts.size === 0) return;
+                const nextSort = th.dataset.sort || 'ratio';
+                if (nextSort === currentSort) {
+                    currentDir = currentDir === 'asc' ? 'desc' : 'asc';
+                } else {
+                    currentSort = nextSort;
+                    currentDir = 'desc';
+                }
+                currentOffset = 0;
+                loadUsagePage(0, true);
+            });
+        });
+
+        if (tableBody) {
+            tableBody.addEventListener('click', event => {
+                const row = event.target.closest('tr[data-set-number]');
+                if (!row) return;
+                openSetDialog(row.dataset.setNumber);
+            });
+        }
+
+        if (usageSentinel) {
+            const usageObserver = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        loadUsagePage(currentOffset, false);
+                    }
+                });
+            }, { root: document.querySelector('.usage-results'), rootMargin: '200px' });
+            usageObserver.observe(usageSentinel);
+        }
+
+        const inventoryList = document.getElementById('inventory-list');
+        const loadingEl = document.getElementById('inventory-loading');
+        const sentinel = document.getElementById('inventory-sentinel');
+        if (inventoryList && sentinel) {
+            const total = parseInt(inventoryList.dataset.total || '0', 10);
+            const pageSize = parseInt(inventoryList.dataset.pageSize || '10', 10);
+            let offset = parseInt(inventoryList.dataset.offset || '0', 10);
+            const missing = inventoryList.dataset.missing === 'true';
+            let loading = false;
+
+            inventoryList.addEventListener('change', event => {
+                const checkbox = event.target.closest('.part-select');
+                if (!checkbox) return;
+                const partNum = checkbox.dataset.partNum;
+                const colorIdRaw = checkbox.dataset.colorId;
+                const colorId = Number.parseInt(colorIdRaw, 10);
+                if (!partNum || Number.isNaN(colorId)) {
+                    checkbox.checked = false;
+                    return;
+                }
+                        const key = checkbox.dataset.partKey || partKey(partNum, colorId);
+                        if (checkbox.checked) {
+                            selectedParts.set(key, {
+                                partNum,
+                                colorId,
+                                partName: checkbox.dataset.partName || '',
+                                colorName: checkbox.dataset.colorName || '',
+                                imageUrl: checkbox.dataset.imageUrl || ''
+                            });
+                        } else {
+                            selectedParts.delete(key);
+                        }
+                renderCart();
+                updateCartButton();
+                if (!drawer.classList.contains('hidden')) {
+                    loadUsagePage(0, true);
+                }
+            });
+
+            async function loadMore() {
+                if (loading || missing) return;
+                if (offset >= total) return;
+                loading = true;
+                if (loadingEl) loadingEl.style.display = 'block';
+                try {
+                    const res = await fetch(`/api/inventory?offset=${offset}&limit=${pageSize}`);
+                    if (!res.ok) {
+                        throw new Error(`HTTP ${res.status}`);
+                    }
+                    const page = await res.json();
+                    const items = page.items || [];
+                    items.forEach(item => {
+                        const row = document.createElement('div');
+                        row.className = 'inventory-row';
+                        const key = partKey(item.partNum ?? '', item.colorId ?? '');
+                        row.innerHTML = `
+                            <div class="cell select-cell" data-label="Select">
+                                <input class="part-select" type="checkbox"
+                                       data-part-key="${key}"
+                                       data-part-num="${item.partNum ?? ''}"
+                                       data-color-id="${item.colorId ?? ''}"
+                                       data-part-name="${item.partName ?? ''}"
+                                       data-color-name="${item.colorName ?? ''}"
+                                       data-image-url="${item.imageUrl ?? ''}">
+                            </div>
+                            <div class="cell image-cell" data-label="">
+                                ${item.imageUrl ? `<img class="part-image" src="${item.imageUrl}" alt="">` : ''}
+                            </div>
+                            <div class="cell" data-label="Part">
+                                <div>
+                                    <div class="part-name">${item.partName ?? ''}</div>
+                                    <div class="part-number">${item.partNum ?? ''}</div>
+                                </div>
+                            </div>
+                            <div class="cell" data-label="Color">${item.colorName ?? ''}</div>
+                            <div class="cell" data-label="Orders">${item.orderCount ?? 0}</div>
+                            <div class="cell" data-label="Progress">
+                                <div class="progress-label">${item.percent ?? 0}%</div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width:${item.percent ?? 0}%"></div>
+                                </div>
+                                <div class="progress-meta-row">
+                                    <div class="progress-meta">${item.soldQty ?? 0} sold of ${item.totalQty ?? 0}</div>
+                                    <div class="progress-remaining">${item.remainingQty ?? 0} remaining</div>
+                                </div>
+                            </div>
+                        `;
+                        inventoryList.insertBefore(row, loadingEl);
+                    });
+                    offset += items.length;
+                    inventoryList.dataset.offset = offset.toString();
+                } catch (err) {
+                    console.error(err);
+                } finally {
+                    if (loadingEl) loadingEl.style.display = 'none';
+                    loading = false;
+                }
+            }
+
+            const observer = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        loadMore();
+                    }
+                });
+            }, { rootMargin: '200px' });
+
+            observer.observe(sentinel);
+        }
+    });
+</script>
+</body>
+</html>

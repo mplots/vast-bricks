@@ -170,11 +170,11 @@
 
         .purchase-row {
             display: grid;
-            grid-template-columns: 140px 1.2fr 0.9fr 0.6fr 0.9fr 0.8fr 0.8fr 1.2fr 0.6fr;
-            padding: 12px 16px;
+            grid-template-columns: 96px 1.1fr 0.9fr 0.5fr 0.8fr 0.7fr 0.7fr 1fr 0.5fr;
+            padding: 8px 12px;
             border-bottom: 1px solid #e5e7eb;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
 
         .purchase-row.header {
@@ -205,9 +205,79 @@
         }
 
         .set-link {
+            color: #1f2937;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 13px;
+            line-height: 1.2;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .set-number-link {
+            font-size: 12px;
+            font-weight: 600;
             color: #2563eb;
             text-decoration: underline;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 0;
+        }
+
+        .set-image {
+            width: 96px;
+            height: 96px;
+            object-fit: contain;
+            border-radius: 6px;
+        }
+
+        .set-dialog.hidden { display: none; }
+        .set-dialog {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.45);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+        }
+        .set-dialog-content {
+            width: min(1040px, 96vw);
+            height: min(860px, 96vh);
+            background: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+            display: flex;
+            flex-direction: column;
+        }
+        .set-dialog-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 14px;
+            border-bottom: 1px solid #e5e7eb;
+            background: #f8fafc;
+        }
+        .set-dialog-header h4 {
+            margin: 0;
+            font-size: 14px;
             font-weight: 600;
+            color: #1f2937;
+        }
+        .set-dialog-close {
+            border: none;
+            background: transparent;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        .set-dialog-frame {
+            flex: 1;
+            border: none;
+            width: 100%;
         }
 
         .progress-cell {
@@ -502,6 +572,11 @@
                 border-bottom: none;
             }
 
+            .set-image {
+                width: 140px;
+                height: 140px;
+            }
+
             .set-cell {
                 justify-content: center;
                 border-bottom: none;
@@ -568,12 +643,13 @@
          th:data-price="${row.price}"
          th:data-qty="${row.quantity}"
          th:data-date-iso="${#temporals.format(row.purchasedAt, 'yyyy-MM-dd')}">
-        <div class="cell image-cell" data-label="" style="display:flex; justify-content:center; align-items:center;">
-            <img th:src="${'https://img.bricklink.com/ItemImage/OT/0/'+ row.setNumber +'-1.t2.png'}" alt="" style="width:140px; height:140px; object-fit:contain; border-radius:8px;"/>
+        <div class="cell image-cell" data-label="" style="display:flex; flex-direction:column; gap:2px; justify-content:center; align-items:center;">
+            <img class="set-image" th:src="${'https://img.bricklink.com/ItemImage/OT/0/'+ row.setNumber +'-1.t2.png'}" alt=""/>
+            <a class="set-number-link" href="#" th:data-set-number="${row.setNumber}" th:text="${row.setNumber}"></a>
         </div>
         <div class="cell set-cell" data-label="" style="display:flex; align-items:center; gap:8px;">
             <div class="set-name" style="gap:4px;">
-                <a class="set-link" th:href="@{|/product?set=${row.setNumber}|}" th:text="${row.setName}"></a>
+                <div class="set-link" th:text="${row.setName}"></div>
             </div>
         </div>
         <div class="cell store" data-label="Store" th:text="${row.webStore}"></div>
@@ -667,8 +743,44 @@
     </div>
 </div>
 
+<div id="set-dialog" class="set-dialog hidden">
+    <div class="set-dialog-content" role="dialog" aria-modal="true" aria-labelledby="set-dialog-title">
+        <div class="set-dialog-header">
+            <h4 id="set-dialog-title">Set details</h4>
+            <button id="set-dialog-close" class="set-dialog-close" type="button" aria-label="Close">&times;</button>
+        </div>
+        <iframe id="set-dialog-frame" class="set-dialog-frame" title="Set details"></iframe>
+    </div>
+</div>
+
 <script>
     document.addEventListener('DOMContentLoaded', () => {
+        const setDialog = document.getElementById('set-dialog');
+        const setDialogFrame = document.getElementById('set-dialog-frame');
+        const setDialogClose = document.getElementById('set-dialog-close');
+
+        function openSetDialog(setNumber) {
+            if (!setDialog || !setDialogFrame || !setNumber) return;
+            setDialogFrame.src = `/product?set=${setNumber}`;
+            setDialog.classList.remove('hidden');
+        }
+
+        function closeSetDialog() {
+            if (!setDialog || !setDialogFrame) return;
+            setDialog.classList.add('hidden');
+            setDialogFrame.src = '';
+        }
+
+        if (setDialogClose) {
+            setDialogClose.addEventListener('click', closeSetDialog);
+        }
+        if (setDialog) {
+            setDialog.addEventListener('click', (event) => {
+                if (event.target === setDialog) {
+                    closeSetDialog();
+                }
+            });
+        }
         const modal = document.getElementById('edit-modal');
         const form = document.getElementById('edit-form');
         const modalTitle = document.getElementById('edit-title');
@@ -754,6 +866,14 @@
                     quantity: row.dataset.qty,
                     date: row.dataset.dateIso
                 });
+            });
+        });
+
+        document.querySelectorAll('.set-number-link').forEach(link => {
+            link.addEventListener('click', (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                openSetDialog(link.dataset.setNumber);
             });
         });
 

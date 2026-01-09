@@ -226,6 +226,15 @@
 </div>
 
 <div class="job-card">
+    <h3><span class="material-icons">inventory_2</span>BSX inventory sync</h3>
+    <p>Syncs inventory from the configured BSX file (overwrites previous data).</p>
+    <div class="job-actions">
+        <button id="trigger-bsx-inventory">Trigger job</button>
+        <span class="job-status" id="status-bsx-inventory"></span>
+    </div>
+</div>
+
+<div class="job-card">
     <h3><span class="material-icons">refresh</span>Materialized view</h3>
     <p>Refreshes the cheapest offer materialized view.</p>
     <div class="job-actions">
@@ -289,6 +298,10 @@
 
     document.getElementById('trigger-bsx-import').addEventListener('click', () => {
         callJob('/jobs/trigger-bsx-import-job', document.getElementById('status-bsx-import'), 'Job triggered.');
+    });
+
+    document.getElementById('trigger-bsx-inventory').addEventListener('click', () => {
+        callJob('/jobs/trigger-bsx-inventory-sync-job', document.getElementById('status-bsx-inventory'), 'Job triggered.');
     });
 
     document.getElementById('refresh-view').addEventListener('click', () => {

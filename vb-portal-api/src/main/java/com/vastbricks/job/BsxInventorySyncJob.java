@@ -13,7 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -22,55 +22,48 @@ import java.util.ArrayList;
 @Component
 @AllArgsConstructor
 @Slf4j
-public class BsxImportJob {
+public class BsxInventorySyncJob {
 
     private Env env;
     private BsxParser bsxParser;
     private BsxDocumentRepository bsxDocumentRepository;
     private BsxOrderRepository bsxOrderRepository;
     private BsxItemRepository bsxItemRepository;
+    private TransactionTemplate transactionTemplate;
 
-    @Scheduled(fixedRate = 60 * 60 * 1000, initialDelay = 60 * 60 * 1000)
+    @Scheduled(cron = "0 0 2 * * *")
     public void runJob() {
         runJobAsync();
     }
 
     @Async
     public void runJobAsync() {
-        var bsxDir = env.getBsxOrderDir();
-        if (bsxDir == null || bsxDir.isBlank()) {
-            log.info("BSX import skipped: BSX_ORDER_DIR not configured");
+        var filePath = env.getBsxInventoryFile();
+        if (filePath == null || filePath.isBlank()) {
+            log.info("BSX inventory sync skipped: BSX_INVENTORY_FILE not configured");
             return;
         }
-        var dirPath = Path.of(bsxDir);
-        if (!Files.exists(dirPath) || !Files.isDirectory(dirPath)) {
-            log.warn("BSX import skipped: directory not found {}", dirPath);
+        var path = Path.of(filePath);
+        if (!Files.exists(path) || !Files.isRegularFile(path)) {
+            log.warn("BSX inventory sync skipped: file not found {}", path);
             return;
         }
-        try (var stream = Files.list(dirPath)) {
-            var imported = stream.filter(path -> path.getFileName().toString().toLowerCase().endsWith(".bsx"))
-                    .map(this::importFile)
-                    .filter(Boolean::booleanValue)
-                    .count();
-            log.info("BSX import finished: processed {} file(s)", imported);
-        } catch (Exception e) {
-            log.error("Failed to read BSX directory", e);
-        }
+        transactionTemplate.executeWithoutResult(status -> importInventoryFile(path));
     }
 
-    @Transactional
-    public boolean importFile(Path path) {
+    private void importInventoryFile(Path path) {
         var filename = path.getFileName().toString();
         bsxDocumentRepository.deleteByFilename(filename);
         bsxDocumentRepository.flush();
+
         var bsx = bsxParser.parse(path).orElse(null);
         if (bsx == null) {
-            log.warn("BSX import failed: unable to parse {}", filename);
-            return false;
+            log.warn("BSX inventory sync failed: unable to parse {}", filename);
+            return;
         }
 
         var document = new BsxDocument();
-        document.setDocumentType("ORDER");
+        document.setDocumentType("INVENTORY");
         document.setFilename(filename);
         document = bsxDocumentRepository.save(document);
 
@@ -88,10 +81,15 @@ public class BsxImportJob {
             bsxOrderRepository.save(order);
         }
 
+        if (bsx.getInventory() == null || bsx.getInventory().getItems() == null) {
+            log.info("BSX inventory sync stored document {} with no items", filename);
+            return;
+        }
+
         var items = bsx.getInventory().getItems();
-        if (items == null || items.isEmpty()) {
-            log.info("BSX import stored document {} with empty inventory", filename);
-            return true;
+        if (items.isEmpty()) {
+            log.info("BSX inventory sync stored document {} with empty inventory", filename);
+            return;
         }
 
         var entities = new ArrayList<BsxItem>(items.size());
@@ -118,7 +116,6 @@ public class BsxImportJob {
             entities.add(entity);
         }
         bsxItemRepository.saveAll(entities);
-        log.info("BSX import stored document {} with {} item(s)", filename, entities.size());
-        return true;
+        log.info("BSX inventory sync stored document {} with {} item(s)", filename, entities.size());
     }
 }

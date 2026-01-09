@@ -22,6 +22,9 @@ public class BsxDocument {
     private Long id;
 
     @Column(nullable = false)
+    private String documentType;
+
+    @Column(nullable = false)
     private String filename;
 
     @Column(nullable = false)

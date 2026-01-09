@@ -1,10 +1,12 @@
 package com.vastbricks.controller;
 
-import com.vastbricks.bsx.BsxParser;
 import org.apache.commons.text.StringEscapeUtils;
 import com.vastbricks.config.Env;
 import com.vastbricks.jpa.entity.Marketplace;
+import com.vastbricks.jpa.repository.BsxItemRepository;
+import com.vastbricks.jpa.repository.BsxOrderRepository;
 import com.vastbricks.jpa.repository.BrickSetRepository;
+import com.vastbricks.jpa.repository.InventoryRepository;
 import com.vastbricks.jpa.repository.OrderQrRegistrationRepository;
 import com.vastbricks.jpa.repository.ProductPurchaseRepository;
 import com.vastbricks.jpa.repository.ProductRepository;
@@ -19,9 +21,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.nio.file.Files;
-import java.nio.file.Path;
-
 
 @Controller
 @AllArgsConstructor
@@ -31,9 +30,11 @@ public class AggregatorController {
     private ProductRepository productRepository;
     private ProductPurchaseRepository productPurchaseRepository;
     private OrderQrRegistrationRepository orderQrRegistrationRepository;
-    private Env env;
-    private BsxParser bsxParser;
     private PurchaseProgressService purchaseProgressService;
+    private BsxOrderRepository bsxOrderRepository;
+    private BsxItemRepository bsxItemRepository;
+    private InventoryRepository inventoryRepository;
+    private Env env;
 
     @GetMapping("/")
     public String home(
@@ -130,6 +131,37 @@ public class AggregatorController {
         return "purchases";
     }
 
+    @GetMapping("/inventory")
+    public String inventory(@RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
+                            Model model) {
+        var pageSize = 10;
+        var safePage = page == null || page < 1 ? 1 : page;
+        var offset = (safePage - 1) * pageSize;
+        var inventoryFile = env.getBsxInventoryFile();
+        if (inventoryFile == null || inventoryFile.isBlank()) {
+            model.addAttribute("inventoryRows", java.util.List.of());
+            model.addAttribute("inventoryTotal", 0);
+            model.addAttribute("inventoryPage", safePage);
+            model.addAttribute("inventoryPages", 1);
+            model.addAttribute("inventoryPageSize", pageSize);
+            model.addAttribute("inventoryMissingFile", true);
+            return "inventory";
+        }
+        var filename = java.nio.file.Path.of(inventoryFile).getFileName().toString();
+        var rows = inventoryRepository.findInventoryPage(filename, pageSize, offset).stream()
+                .map(row -> InventoryRow.from(row))
+                .toList();
+        var total = inventoryRepository.countInventory(filename);
+        var totalPages = (int) Math.ceil(total / (double) pageSize);
+        model.addAttribute("inventoryRows", rows);
+        model.addAttribute("inventoryTotal", total);
+        model.addAttribute("inventoryPage", safePage);
+        model.addAttribute("inventoryPages", totalPages);
+        model.addAttribute("inventoryPageSize", pageSize);
+        model.addAttribute("inventoryMissingFile", false);
+        return "inventory";
+    }
+
     @GetMapping("/links")
     public String links(@RequestParam(value = "qrid", required = false) String qrid, Model model) {
         if (qrid == null || qrid.isBlank()) {
@@ -145,25 +177,12 @@ public class AggregatorController {
         var entry = registration.get();
         var source = entry.getSource();
         var sourceLabel = source == Marketplace.BRICK_LINK ? "BrickLink" : "Brick Owl";
-        var filePrefix = source == Marketplace.BRICK_LINK ? "bricklink" : "brickowl";
-        var fileName = "%s-%s.bsx".formatted(filePrefix, entry.getOrderId());
-
-        var bsxDir = env.getBsxOrderDir();
-        if (bsxDir == null || bsxDir.isBlank()) {
+        var order = bsxOrderRepository.findByOrderId(entry.getOrderId().toString()).orElse(null);
+        if (order == null || order.getDocument() == null) {
             return "links";
         }
 
-        var path = Path.of(bsxDir).resolve(fileName);
-        if (!Files.exists(path)) {
-            return "links";
-        }
-
-        var bsx = bsxParser.parse(path).orElse(null);
-        if (bsx == null || bsx.getOrder() == null) {
-            return "links";
-        }
-
-        var customerName = formatCustomerName(bsx.getOrder().getCustomer());
+        var customerName = formatCustomerName(order.getCustomer());
         if (customerName == null || customerName.isBlank()) {
             return "links";
         }
@@ -180,7 +199,7 @@ public class AggregatorController {
             ? "https://www.bricklink.com/orderPlaced.asp"
             : "https://www.brickowl.com";
         model.addAttribute("feedbackUrl", feedbackUrl);
-        var items = bsx.getInventory() == null ? null : bsx.getInventory().getItems();
+        var items = bsxItemRepository.findByDocumentId(order.getDocument().getId());
         if (items != null && !items.isEmpty()) {
             var itemSummaries = items.stream()
                 .filter(item -> item.getItemName() != null && item.getQty() != null)
@@ -217,7 +236,7 @@ public class AggregatorController {
         return Character.toUpperCase(lower.charAt(0)) + lower.substring(1);
     }
 
-    private String buildItemImageUrl(com.vastbricks.bsx.Item item) {
+    private String buildItemImageUrl(com.vastbricks.jpa.entity.bsx.BsxItem item) {
         if (item == null || item.getItemId() == null || item.getItemTypeId() == null) {
             return null;
         }
@@ -240,6 +259,14 @@ public class AggregatorController {
         }
         var color = item.getColorId() == null ? "0" : item.getColorId().toString();
         return "https://img.bricklink.com/ItemImage/%s/%s/%s.png".formatted(folder, color, item.getItemId());
+    }
+
+    private static String buildPartImageUrl(String partNum, Integer colorId) {
+        if (partNum == null || partNum.isBlank()) {
+            return null;
+        }
+        var color = colorId == null ? "0" : colorId.toString();
+        return "https://img.bricklink.com/ItemImage/PN/%s/%s.png".formatted(color, partNum.trim());
     }
 
     private record ItemSummary(String name, Integer qty, String imageUrl) { }
@@ -278,6 +305,40 @@ public class AggregatorController {
                     percent,
                     sold,
                     total
+            );
+        }
+    }
+
+    private record InventoryRow(
+            String partNum,
+            String partName,
+            String colorName,
+            Integer colorId,
+            Integer totalQty,
+            Integer soldQty,
+            Integer remainingQty,
+            Integer orderCount,
+            Integer percent,
+            String imageUrl
+    ) {
+        private static InventoryRow from(InventoryRepository.InventoryRow row) {
+            var remaining = row.getRemainingQty() == null ? 0 : row.getRemainingQty();
+            var sold = row.getSoldQty() == null ? 0 : row.getSoldQty();
+            var orders = row.getOrderCount() == null ? 0 : row.getOrderCount();
+            var total = remaining + sold;
+            var percent = total <= 0 ? 0 : (int) Math.min(100, Math.round((sold * 100.0) / total));
+            var imageUrl = buildPartImageUrl(row.getPartNum(), row.getColorId());
+            return new InventoryRow(
+                    row.getPartNum(),
+                    row.getPartName(),
+                    row.getColorName(),
+                    row.getColorId(),
+                    total,
+                    sold,
+                    remaining,
+                    orders,
+                    percent,
+                    imageUrl
             );
         }
     }
