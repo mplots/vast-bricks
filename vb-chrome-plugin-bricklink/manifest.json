@@ -4,11 +4,18 @@
   "version": "1.0",
   "description": "Adds additional functionality to BrickLink site",
   "permissions": ["scripting"],
-  "host_permissions": ["https://www.bricklink.com/orderDetail.asp*"],
+  "host_permissions": [
+    "https://www.bricklink.com/orderDetail.asp*",
+    "https://www.bricklink.com/orderReceived.asp*"
+  ],
   "content_scripts": [
     {
       "matches": ["https://www.bricklink.com/orderDetail.asp*"],
       "js": ["content.js"]
+    },
+    {
+      "matches": ["https://www.bricklink.com/orderReceived.asp*"],
+      "js": ["content_order_received.js"]
     }
   ]
 }

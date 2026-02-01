@@ -30,7 +30,7 @@ class LinkShipping {
     void updateLatvianPostShipping() {
         var cookie = System.getenv("TEST_LINK_COOKIE");
         var client = new LinkClient(cookie);
-        var shippingMethodId = 336128;
+        var shippingMethodId = 341503;
         var countries = client.internal().getCountries().getCountries();
 //        var countries = new ArrayList<Countries.Country>();
 //        countries.add(Countries.Country.builder().
@@ -50,6 +50,11 @@ class LinkShipping {
         var newIdCounter = -method.getMethod().getZones().size();
 
         for (var country : countries) {
+
+            if (country.getStrCountryID().equals("TC")) {
+                continue;
+            }
+
             var oLpCountry = Arrays.stream(Tariff.Country.values()).filter(e-> e.getCode().equals(country.getStrCountryID())).findFirst();
             if (country.getStrCountryID().equals("UK")) {
                 oLpCountry = Optional.of(Tariff.Country.UNITED_KINGDOM);
@@ -102,7 +107,7 @@ class LinkShipping {
                 var tariff = pasts.calculate(
                     request
                 );
-                var price = tariff.getResult().getAmount().setScale(2, RoundingMode.HALF_UP);
+                var price = tariff.getResult().getAmount().add(BigDecimal.valueOf(0.5)).setScale(2, RoundingMode.HALF_UP);
 
                 var refTable = method.getMethod().getRateTable().stream().filter(e-> new BigDecimal(e.getUpto()).compareTo(weight) == 0).findFirst().orElseGet(()->{
                     var rate =  ShippingMethod.Rate.builder()

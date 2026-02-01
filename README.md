@@ -28,7 +28,7 @@ sudo docker run -d \
     --add-host=host.docker.internal:host-gateway \
     -v /opt/nginx/nginx.conf:/etc/nginx/nginx.conf:ro \
     -v /opt/nginx/sites-enabled:/etc/nginx/sites-enabled:ro \
-    -v /etc/letsencrypt:/etc/letsencrypt:ro \
+    -v /etc/letsencrypt:/etc/letsencrypt:ro \   
     -v /opt/nginx/logs:/var/log/nginx \
     -v /opt/nginx/acme:/var/www/acme \
     nginx:stable-alpine

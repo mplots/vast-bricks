@@ -2,6 +2,18 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+const RUN_INTERVAL_MS = 4 * 60 * 60 * 1000;
+const LAST_RUN_KEY = 'vb_last_run_balticguru';
+
+function getLastRun() {
+    const value = Number(localStorage.getItem(LAST_RUN_KEY));
+    return Number.isFinite(value) ? value : 0;
+}
+
+function setLastRun() {
+    localStorage.setItem(LAST_RUN_KEY, String(Date.now()));
+}
+
 function getPageFromUrl(url) {
     try {
         const parsed = new URL(url, window.location.origin);
@@ -62,6 +74,16 @@ async function post(url) {
 }
 
 (async () => {
+    const lastRun = getLastRun();
+    const now = Date.now();
+    const nextRunIn = RUN_INTERVAL_MS - (now - lastRun);
+    if (lastRun && nextRunIn > 0 && getCurrentPage() === 1) {
+        console.log(`skipping run, next in ${Math.ceil(nextRunIn / 60000)} minutes`);
+        await sleep(nextRunIn);
+        window.location.href = buildPageUrl(1);
+        return;
+    }
+
     const currentPage = getCurrentPage();
     const maxPage = getMaxPage();
 
@@ -73,7 +95,8 @@ async function post(url) {
         return;
     }
 
-    console.log('sleeping for an hour');
-    await sleep(60 * 60 * 1000);
+    setLastRun();
+    console.log('sleeping for 4 hours');
+    await sleep(4 * 60 * 60 * 1000);
     window.location.href = buildPageUrl(1);
 })();

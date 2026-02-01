@@ -1,6 +1,9 @@
 package com.vastbricks.controller;
 
 import com.vastbricks.config.Env;
+import com.vastbricks.agent.AgentJobRequest;
+import com.vastbricks.agent.AgentJobService;
+import com.vastbricks.agent.AgentProperties;
 import com.vastbricks.job.PartOutValueJob;
 import com.vastbricks.job.WebStoreScraperJob;
 import com.vastbricks.jpa.projection.BestOffer;
@@ -9,11 +12,10 @@ import com.vastbricks.jpa.repository.BrickSetRepository;
 import com.vastbricks.jpa.repository.MaterializedViewRefresh;
 import com.vastbricks.jpa.repository.PartUsageRepository;
 import com.vastbricks.jpa.repository.InventoryRepository;
+import com.vastbricks.market.link.Order;
 import com.vastbricks.service.PartUsageService;
 import com.vastbricks.market.link.PartOutValue;
 import com.vastbricks.market.link.PrivateAPI;
-import com.vastbricks.shipping.LatvijasPastsClient;
-import com.vastbricks.shipping.Order;
 import com.vastbricks.shipping.Tariff;
 import com.vastbricks.webstore.AioScraper;
 import com.vastbricks.webstore.BalticGuruScraper;
@@ -25,17 +27,23 @@ import com.vastbricks.jpa.repository.ProductPurchaseRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @AllArgsConstructor
@@ -50,6 +58,8 @@ public class ApiController {
     private PartUsageRepository partUsageRepository;
     private InventoryRepository inventoryRepository;
     private PartUsageService partUsageService;
+    private AgentJobService agentJobService;
+    private AgentProperties agentProperties;
 
     @PostMapping("/api/web-sets")
     public void storeWebSets(@RequestBody List<WebSet> webSets) {
@@ -378,44 +388,162 @@ public class ApiController {
         private String orderNumber;
     }
 
+    @Data
+    public static class BricklinkOrderInfoRequest {
+        private Long orderId;
+        private BigDecimal weight;
+    }
+
+    @Data
+    @AllArgsConstructor
+    public static class BricklinkOrderInfoResponse {
+        private Long orderId;
+        private BigDecimal weight;
+        private String fullName;
+        private String email;
+        private String phone;
+        private String address1;
+        private String address2;
+        private String city;
+        private String state;
+        private String postalCode;
+        private String countryCode;
+        private BigDecimal packValue;
+        private Integer quantity;
+        private String shippingMethod;
+        private String mode;
+    }
+
+    @CrossOrigin(origins = {"https://www.bricklink.com", "https://manspasts.lv", "https://www.manspasts.lv"})
+    @PostMapping("/api/bricklink/order-info")
+    public BricklinkOrderInfoResponse bricklinkOrderInfo(@RequestBody BricklinkOrderInfoRequest request) {
+        if (request == null || request.getOrderId() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "orderId is required");
+        }
+        if (request.getWeight() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "weight is required");
+        }
+
+        var order = new PrivateAPI(
+                env.getBrickLinkConsumerKey(),
+                env.getBrickLinkConsumerSecret(),
+                env.getBrickLinkToken(),
+                env.getBrickLinkTokenSecret()
+        ).getOrder(request.getOrderId());
+
+        if (order == null || order.getData() == null || order.getData().getShipping() == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found");
+        }
+
+        var shipping = order.getData().getShipping();
+        var address = shipping.getAddress();
+
+        var mode = Tariff.Mode.SIMPLE;
+        var etc2 = order.getData().getCost() != null ? order.getData().getCost().getEtc2() : null;
+        if (etc2 != null && etc2.compareTo(BigDecimal.ZERO) > 0) {
+            mode = Tariff.Mode.TRACEABLE;
+        }
+
+        return new BricklinkOrderInfoResponse(
+                order.getData().getOrderId(),
+                request.getWeight(),
+                address != null && address.getName() != null ? address.getName().getFull() : address != null ? address.getFull() : null,
+                order.getData().getBuyerEmail(),
+                address != null ? address.getPhoneNumber() : null,
+                address != null ? join(address.getAddress1(), address.getAddress2()) : null,
+                address != null ? join(address.getState(), address.getCity()) : null,
+                address != null ? address.getCity() : null,
+                address != null ? address.getState() : null,
+                address != null ? address.getPostalCode() : null,
+                address != null ? address.getCountryCode() : null,
+                order.getData().getCost() != null ? order.getData().getCost().getSubtotal() : null,
+                order.getData().getTotalCount(),
+                shipping.getMethod(),
+                mode.name()
+        );
+    }
+
     @CrossOrigin(origins = "https://www.bricklink.com")
     @PostMapping("/api/bricklink/shipping-request")
-    public byte[] prepareBricklinkShipping(@RequestBody ShippingRequest shippingRequest) {
+    public ResponseEntity<byte[]> prepareBricklinkShipping(@RequestBody ShippingRequest shippingRequest) {
         var order = new PrivateAPI(env.getBrickLinkConsumerKey(), env.getBrickLinkConsumerSecret(), env.getBrickLinkToken(), env.getBrickLinkTokenSecret())
                 .getOrder(shippingRequest.getOrderId());
 
         var address = order.getData().getShipping().getAddress();
-
-        var client = new LatvijasPastsClient();
 
         var mode = Tariff.Mode.SIMPLE;
         if (order.getData().getCost().getEtc2().compareTo(BigDecimal.ZERO) > 0) {
             mode = Tariff.Mode.TRACEABLE;
         }
 
-        var cookie = client.login(env.getMansPastsUsername(), env.getMansPastsPassword());
-        return client.createOrder(
-            Order.builder()
-                .cookie(cookie)
-                .type(Tariff.Type.SMALL_PACKAGE)
-                .mode(mode)
-                .fullName(address.getName().getFull())
-                .telephone(address.getPhoneNumber())
-                .email(order.getData().getBuyerEmail())
-                .address1(join(address.getAddress1(), address.getAddress2()))
-                .address2(join(address.getState(), address.getCity()))
-                .state(address.getState())
-                .country(order.getData().getShipping().getAddress().getCountryCode())
-                .postcode(order.getData().getShipping().getAddress().getPostalCode())
-                .weight(shippingRequest.getWeight())
-                .packValue(order.getData().getCost().getSubtotal())
-                .quantity(order.getData().getTotalCount())
-            .build()
-        );
+        var cypressBrowser = env.getCypressBrowser();
+        Map<String, String> jobEnv = new HashMap<>();
+        jobEnv.put("MANS_PASTS_EMAIL", safeEnv(env.getMansPastsUsername()));
+        jobEnv.put("MANS_PASTS_PASSWORD", safeEnv(env.getMansPastsPassword()));
+        jobEnv.put("MODE", mode.name());
+        jobEnv.put("FULL_NAME", safeEnv(address != null && address.getName() != null ? address.getName().getFull() : null));
+        jobEnv.put("TELEPHONE", safeEnv(address != null ? address.getPhoneNumber() : null));
+        jobEnv.put("EMAIL", safeEnv(order.getData().getBuyerEmail()));
+        jobEnv.put("ADDRESS1", safeEnv(address != null ? join(address.getAddress1(), address.getAddress2()) : null));
+        jobEnv.put("ADDRESS2", safeEnv(address != null ? join(address.getState(), address.getCity()) : null));
+        jobEnv.put("STATE", safeEnv(address != null ? address.getState() : null));
+        jobEnv.put("COUNTRY_CODE", safeEnv(address != null ? address.getCountryCode() : null));
+        jobEnv.put("POSTCODE", safeEnv(address != null ? address.getPostalCode() : null));
+        jobEnv.put("WEIGHT", safeEnv(shippingRequest.getWeight()));
+        jobEnv.put("PACK_VALUE", safeMoneyEnv(order.getData().getCost() != null ? order.getData().getCost().getSubtotal() : null));
+        jobEnv.put("QUANTITY", safeEnv(order.getData().getTotalCount()));
+        jobEnv.put("ETC1", safeMoneyEnv(order.getData().getCost() != null ? order.getData().getCost().getEtc1() : null));
+        jobEnv.put("ETC2", safeMoneyEnv(order.getData().getCost() != null ? order.getData().getCost().getEtc2() : null));
+        jobEnv.put("SHIPPING", safeMoneyEnv(order.getData().getCost() != null ? order.getData().getCost().getShipping() : null));
+        jobEnv.put("CYPRESS_BROWSER", safeEnv(cypressBrowser));
+
+        AgentJobRequest request = new AgentJobRequest();
+        request.setEnv(jobEnv);
+        request.setCommand(null);
+        request.setPdfPath("cypress/downloads");
+
+        com.vastbricks.agent.v1.JobResult result;
+        try {
+            result = agentJobService.submitJobAndWait(request, agentProperties.getJobTimeoutSeconds());
+        } catch (RuntimeException ex) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Cypress agent run failed", ex);
+        }
+
+        if (!result.getSuccess()) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Cypress run failed: " + result.getMessage());
+        }
+
+        var headers = new HttpHeaders();
+        headers.add("Access-Control-Expose-Headers", "X-Shipping-Price,X-Delivery-Days");
+        if (result.getMetaMap().containsKey("price")) {
+            headers.add("X-Shipping-Price", result.getMetaMap().get("price"));
+        }
+        if (result.getMetaMap().containsKey("deliveryDays")) {
+            headers.add("X-Delivery-Days", result.getMetaMap().get("deliveryDays"));
+        }
+
+        return ResponseEntity.ok().headers(headers).body(result.getPdf().toByteArray());
     }
 
     private String join(String ... strings) {
         return StringUtils.join(Arrays.stream(strings).filter(StringUtils::isNotBlank).distinct().toArray(), ", ");
+    }
+
+    private String safeEnv(Object value) {
+        if (value == null) {
+            return "";
+        }
+        if (value instanceof BigDecimal) {
+            return ((BigDecimal) value).toPlainString();
+        }
+        return value.toString();
+    }
+
+    private String safeMoneyEnv(BigDecimal value) {
+        if (value == null) {
+            return "";
+        }
+        return value.setScale(2, java.math.RoundingMode.HALF_UP).toPlainString();
     }
 
 }

@@ -82,7 +82,7 @@ class OwlShipping {
 
     @Test
     public void testCreateShippingMethod() {
-        var mode = Tariff.Mode.TRACEABLE;
+        var mode = Tariff.Mode.SIMPLE;
         var cookie = System.getenv("TEST_OWL_COOKIE");
         var owl = new OwlClient("", cookie);
         var pasts = new LatvijasPastsClientV2();
@@ -91,6 +91,9 @@ class OwlShipping {
         var existingMethods = owl.internal().listShippingMethods();
 
         for (var country : Tariff.Country.values()) {
+            if (!country.isEu()) {
+                continue;
+            }
             try {
                 var pricing = new ArrayList<ShipmentPricing>();
                 for (var weight : weights) {
@@ -126,7 +129,7 @@ class OwlShipping {
 
                 var details = ShippingMethodDetails.builder()
                         .share(false)
-                        .enabled(!country.equals(Tariff.Country.UNITED_STATES) && !country.equals(Tariff.Country.RUSSIA) && !country.equals(Tariff.Country.BELARUS)) /* Disable */
+                        .enabled(true) /* Disable */
                         .requirePhone(false)
                         .expedited(false)
                         .dontDefault(false)

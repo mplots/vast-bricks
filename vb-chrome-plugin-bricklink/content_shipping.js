@@ -27,53 +27,33 @@ function getBuyerInfoTable() {
       <td><label for="weightInput">&nbsp;Weight (g):</label></td>
       <td>
         <input id="weightInput" type="number" style="width: 100px;" />
-        <button id="submitWeightBtn">Submit</button>
+        <button id="openManspastsBtn">Open Manspasts</button>
         <span id="statusMsg" style="margin-left: 10px; font-weight: bold;"></span>
       </td>
     `;
     buyerInfoTable.querySelector('tbody').appendChild(newRow);
 
-    const btn = document.getElementById('submitWeightBtn');
+    const btn = document.getElementById('openManspastsBtn');
     const statusMsg = document.getElementById('statusMsg');
 
     btn.addEventListener('click', () => {
         const weight = document.getElementById('weightInput').value;
         const id = new URL(window.location.href).searchParams.get("ID");
-        const payload = { orderId: id, weight: weight };
-
-        // Show loading indicator
-        statusMsg.style.color = "blue";
-        statusMsg.textContent = "Submitting...";
-
-        fetch('https://vastbricks.com/api/bricklink/shipping-request', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        })
-        .then(res => {
-            if (!res.ok) {
-                throw new Error(`HTTP error! status: ${res.status}`);
-            }
-            return res.blob();
-        })
-        .then(blob => {
-            // Create a download link for PDF
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = `shipping-label-${id}.pdf`; // file name
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-            window.URL.revokeObjectURL(url);
-
-            statusMsg.style.color = "green";
-            statusMsg.textContent = `PDF downloaded successfully!`;
-        })
-        .catch(err => {
-            console.error(err);
+        if (!id) {
             statusMsg.style.color = "red";
-            statusMsg.textContent = "Submission failed!";
-        });
+            statusMsg.textContent = "Order ID not found!";
+            return;
+        }
+        if (!weight) {
+            statusMsg.style.color = "red";
+            statusMsg.textContent = "Enter weight!";
+            return;
+        }
+        statusMsg.style.color = "green";
+        statusMsg.textContent = "Opening Manspasts...";
+        const url = new URL('https://www.manspasts.lv/lv/login');
+        url.searchParams.set('orderId', id);
+        url.searchParams.set('weight', weight);
+        window.open(url.toString(), '_blank', 'noopener');
     });
 })();

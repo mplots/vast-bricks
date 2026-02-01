@@ -33,6 +33,7 @@ public class AggregatorController {
     private PurchaseProgressService purchaseProgressService;
     private BsxOrderRepository bsxOrderRepository;
     private BsxItemRepository bsxItemRepository;
+
     private InventoryRepository inventoryRepository;
     private Env env;
 

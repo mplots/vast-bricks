@@ -1,6 +1,18 @@
 server:
   port : 6161
 
+grpc:
+  server:
+    port: 9095
+    max-inbound-message-bytes: 20971520
+
+agent:
+  api-key: change-me
+  heartbeat-timeout-seconds: 90
+  job-timeout-seconds: 300
+  results:
+    forward-url: ""
+
 #logging:
 #  level:
 #    root: debug

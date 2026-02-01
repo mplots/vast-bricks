@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "Manspasts Auto Login",
+  "version": "1.0.0",
+  "description": "Auto-login to manspasts.lv when opening a page with orderId.",
+  "permissions": ["storage"],
+  "host_permissions": [
+    "https://manspasts.lv/*",
+    "https://www.manspasts.lv/*",
+    "http://localhost:6161/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://manspasts.lv/*",
+        "https://www.manspasts.lv/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

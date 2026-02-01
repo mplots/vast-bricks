@@ -10,6 +10,17 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.vastbricks</groupId>
+            <artifactId>vb-portal-grpc</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-netty-shaded</artifactId>
+            <version>1.61.1</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
             <version>3.4.3</version>

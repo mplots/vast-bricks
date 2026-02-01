@@ -2,6 +2,18 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+const RUN_INTERVAL_MS = 4 * 60 * 60 * 1000;
+const LAST_RUN_KEY = 'vb_last_run_aio';
+
+function getLastRun() {
+    const value = Number(localStorage.getItem(LAST_RUN_KEY));
+    return Number.isFinite(value) ? value : 0;
+}
+
+function setLastRun() {
+    localStorage.setItem(LAST_RUN_KEY, String(Date.now()));
+}
+
 async function post(url) {
     //Sleep for two seconds for page to load.
     await sleep(2000)
@@ -30,6 +42,16 @@ async function post(url) {
 }
 
 (async () => {
+    const lastRun = getLastRun();
+    const now = Date.now();
+    const nextRunIn = RUN_INTERVAL_MS - (now - lastRun);
+    if (lastRun && nextRunIn > 0) {
+        console.log(`skipping run, next in ${Math.ceil(nextRunIn / 60000)} minutes`);
+        await sleep(nextRunIn);
+        window.location.href = window.location.origin + window.location.pathname + "?manufacturer-id=1022&category-id=331";
+        return;
+    }
+
     const numberOfPages = document.querySelector('a.last')?.textContent.trim();
     for(let i=1; i<=numberOfPages; i++ ) {
         [...document.querySelectorAll('div.pages a')]
@@ -40,7 +62,8 @@ async function post(url) {
         await post('https://tool.vastbricks.com/api/aio')
     }
 
-    console.log("sleeping for an hour")
-    await sleep(60 * 60 * 1000)
+    setLastRun();
+    console.log("sleeping for 4 hours")
+    await sleep(4 * 60 * 60 * 1000)
     window.location.href = window.location.origin + window.location.pathname + "?manufacturer-id=1022&category-id=331";
 })();
