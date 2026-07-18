@@ -1,14 +1,18 @@
 {
   "manifest_version": 3,
-  "name": "BrickOwl QR Registration",
+  "name": "BrickOwl Tools",
   "version": "1.0",
-  "description": "Register BrickOwl order QR IDs",
-  "permissions": ["scripting"],
-  "host_permissions": ["https://www.brickowl.com/mystore/orders/outstanding/*"],
+  "description": "Adds BrickOwl order shipping-label tools.",
+  "permissions": [],
+  "host_permissions": [
+    "https://www.brickowl.com/*",
+    "https://tool.vastbricks.com/*"
+  ],
   "content_scripts": [
     {
-      "matches": ["https://www.brickowl.com/mystore/orders/outstanding/*"],
-      "js": ["content.js"]
+      "matches": ["https://www.brickowl.com/mystore/orders/history/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
     }
   ]
 }

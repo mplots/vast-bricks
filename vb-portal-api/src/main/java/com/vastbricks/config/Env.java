@@ -28,6 +28,15 @@ public class Env {
     @Value("#{environment.MANS_PASTS_PASSWORD}")
     private String mansPastsPassword;
 
+    @Value("#{environment.MANS_PASTS_API_USER}")
+    private String mansPastsApiUser;
+
+    @Value("#{environment.MANS_PASTS_API_KEY}")
+    private String mansPastsApiKey;
+
+    @Value("#{environment.MANS_PASTS_API_BASE_URL ?: 'https://www.manspasts.lv'}")
+    private String mansPastsApiBaseUrl;
+
     @Value("#{environment.BRICKLINK_CONSUMER_KEY}")
     private String brickLinkConsumerKey;
 

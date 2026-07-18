@@ -1,33 +1,42 @@
-const VB_BRICKOWL_SHIPPING_LABEL_API_URL = 'https://tool.vastbricks.com/api/shipping-label/brickowl';
+const VB_SHIPPING_REQUEST_API_URL = 'https://tool.vastbricks.com/api/bricklink/shipping-request';
 
-function getBrickOwlOrderIdFromUrl() {
-    const match = window.location.pathname.match(/^\/mystore\/orders\/history\/(\d+)\/?$/);
-    return match ? match[1] : null;
+function getOrderIdFromUrl() {
+    const orderId = new URL(window.location.href).searchParams.get('ID');
+    return /^\d+$/.test(orderId || '') ? orderId : null;
+}
+
+function findBuyerInformationElement() {
+    const candidates = Array.from(document.querySelectorAll('b, strong, td, th, font, div, span'))
+        .filter(element => element.textContent.trim().replace(/\s+/g, ' ') === 'Buyer Information');
+
+    return candidates[0] || null;
+}
+
+function findBuyerInformationTable() {
+    const label = findBuyerInformationElement();
+    if (!label) return null;
+
+    const sellerLabel = Array.from(document.querySelectorAll('b, strong, td, th, font, div, span'))
+        .find(element => element.textContent.trim().replace(/\s+/g, ' ') === 'Seller Information');
+
+    return Array.from(document.querySelectorAll('table'))
+        .find(table => {
+            const afterBuyerHeading = label.compareDocumentPosition(table) & Node.DOCUMENT_POSITION_FOLLOWING;
+            const beforeSellerHeading = !sellerLabel || table.compareDocumentPosition(sellerLabel) & Node.DOCUMENT_POSITION_FOLLOWING;
+            const hasBuyerRows = table.textContent.includes('Username:') && table.textContent.includes('Name & Address:');
+            return afterBuyerHeading && beforeSellerHeading && hasBuyerRows;
+        }) || null;
 }
 
 function normalizeText(value) {
-    return (value || '').trim().replace(/\s+/g, ' ');
-}
-
-function findOrderDetailsBlock() {
-    return Array.from(document.querySelectorAll('.order-block'))
-        .find(block => normalizeText(block.querySelector('.order-block-title')?.textContent) === 'Order Details') || null;
-}
-
-function findOrderDetailsTable() {
-    return findOrderDetailsBlock()?.querySelector('table.form-list') || null;
-}
-
-function findOrderDetailsRow(label) {
-    const table = findOrderDetailsTable();
-    if (!table) return null;
-
-    return Array.from(table.querySelectorAll('tr'))
-        .find(row => normalizeText(row.querySelector('.flabel')?.textContent).replace(/\s+Edit$/, '') === label) || null;
+    return value.trim().replace(/\s+/g, ' ');
 }
 
 function getShippingMethod() {
-    return normalizeText(findOrderDetailsRow('Shipping Method')?.querySelector('.value')?.textContent || '');
+    const labelCell = Array.from(document.querySelectorAll('td, th'))
+        .find(element => normalizeText(element.textContent).replace(/:$/, '') === 'Shipping Method');
+
+    return normalizeText(labelCell?.nextElementSibling?.textContent || '');
 }
 
 function isLatvianPostShippingMethod() {
@@ -51,25 +60,22 @@ function downloadPdf(blob, orderId) {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `brickowl-order-${orderId}-shipping.pdf`;
+    link.download = `bricklink-order-${orderId}-shipping.pdf`;
     document.body.appendChild(link);
     link.click();
     link.remove();
     window.setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-async function requestShippingLabel(orderId, weightKg, status, button) {
+async function requestShippingLabel(orderId, weight, status, button) {
     button.disabled = true;
     setStatus(status, 'Creating label...');
 
     try {
-        const response = await fetch(VB_BRICKOWL_SHIPPING_LABEL_API_URL, {
+        const response = await fetch(VB_SHIPPING_REQUEST_API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                orderId,
-                weight: Number((Number(weightKg) * 1000).toFixed(3))
-            })
+            body: JSON.stringify({ orderId: Number(orderId), weight: Number(weight) })
         });
 
         if (!response.ok) {
@@ -90,9 +96,9 @@ async function requestShippingLabel(orderId, weightKg, status, button) {
     }
 }
 
-function createShippingControls(orderId) {
+function createShippingControls(orderId, compact = false) {
     const wrapper = document.createElement('div');
-    wrapper.id = 'vb-brickowl-shipping-label';
+    wrapper.id = 'vb-order-detail-shipping-request';
     wrapper.style.display = 'flex';
     wrapper.style.alignItems = 'center';
     wrapper.style.flexWrap = 'wrap';
@@ -105,12 +111,12 @@ function createShippingControls(orderId) {
 
     const label = document.createElement('label');
     label.textContent = 'Weight kg';
-    label.htmlFor = 'vb-brickowl-shipping-weight';
+    label.htmlFor = 'vb-order-detail-shipping-weight';
     label.style.fontWeight = '700';
     label.style.color = '#1e3a8a';
 
     const input = document.createElement('input');
-    input.id = 'vb-brickowl-shipping-weight';
+    input.id = 'vb-order-detail-shipping-weight';
     input.type = 'number';
     input.min = '0.001';
     input.step = '0.001';
@@ -147,32 +153,42 @@ function createShippingControls(orderId) {
     });
 
     wrapper.append(label, input, button, status);
+    if (compact) {
+        wrapper.style.margin = '4px 0';
+    }
     return wrapper;
 }
 
 function insertControls(orderId) {
-    if (document.getElementById('vb-brickowl-shipping-label')) return;
+    if (document.getElementById('vb-order-detail-shipping-request')) return;
 
-    const shippingMethodRow = findOrderDetailsRow('Shipping Method');
-    if (!shippingMethodRow) return;
+    const buyerTable = findBuyerInformationTable();
 
-    const row = document.createElement('tr');
-    row.className = shippingMethodRow.classList.contains('odd') ? 'even' : 'odd';
+    if (buyerTable?.tBodies?.[0]) {
+        const row = buyerTable.tBodies[0].insertRow(-1);
+        row.setAttribute('bgcolor', '#EEEEEE');
 
-    const labelCell = document.createElement('td');
-    labelCell.className = 'flabel';
-    labelCell.textContent = 'Shipping Label';
+        const labelCell = row.insertCell(0);
+        labelCell.innerHTML = '&nbsp;Shipping Label:';
+        labelCell.style.width = '25%';
+        labelCell.style.fontWeight = '700';
 
-    const valueCell = document.createElement('td');
-    valueCell.className = 'value';
-    valueCell.appendChild(createShippingControls(orderId));
+        const cell = row.insertCell(1);
+        cell.style.width = '75%';
+        const controls = createShippingControls(orderId, true);
+        cell.appendChild(controls);
+        return;
+    }
 
-    row.append(labelCell, valueCell);
-    shippingMethodRow.insertAdjacentElement('afterend', row);
+    const label = findBuyerInformationElement();
+    if (label) {
+        const controls = createShippingControls(orderId);
+        label.insertAdjacentElement('afterend', controls);
+    }
 }
 
-function initBrickOwlOrderShipping() {
-    const orderId = getBrickOwlOrderIdFromUrl();
+function initOrderDetailShipping() {
+    const orderId = getOrderIdFromUrl();
     if (!orderId) return;
     if (!isLatvianPostShippingMethod()) return;
 
@@ -180,7 +196,7 @@ function initBrickOwlOrderShipping() {
 }
 
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initBrickOwlOrderShipping);
+    document.addEventListener('DOMContentLoaded', initOrderDetailShipping);
 } else {
-    initBrickOwlOrderShipping();
+    initOrderDetailShipping();
 }

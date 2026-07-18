@@ -1,5 +1,6 @@
 .DS_Store
 .idea
+.bricksync-data
 target
 node_modules
 .env

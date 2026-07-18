@@ -17,4 +17,8 @@ public class OwlClient {
     public CatalogAPI catalog() {
         return new CatalogAPI(BASE_URL, key);
     }
+
+    public OrderAPI order() {
+        return new OrderAPI(BASE_URL, key);
+    }
 }

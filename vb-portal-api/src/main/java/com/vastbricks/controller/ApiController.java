@@ -1,9 +1,6 @@
 package com.vastbricks.controller;
 
 import com.vastbricks.config.Env;
-import com.vastbricks.agent.AgentJobRequest;
-import com.vastbricks.agent.AgentJobService;
-import com.vastbricks.agent.AgentProperties;
 import com.vastbricks.job.PartOutValueJob;
 import com.vastbricks.job.WebStoreScraperJob;
 import com.vastbricks.jpa.projection.BestOffer;
@@ -28,8 +25,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -42,8 +37,6 @@ import java.math.BigDecimal;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 @AllArgsConstructor
@@ -58,8 +51,6 @@ public class ApiController {
     private PartUsageRepository partUsageRepository;
     private InventoryRepository inventoryRepository;
     private PartUsageService partUsageService;
-    private AgentJobService agentJobService;
-    private AgentProperties agentProperties;
 
     @PostMapping("/api/web-sets")
     public void storeWebSets(@RequestBody List<WebSet> webSets) {
@@ -377,18 +368,6 @@ public class ApiController {
     }
 
     @Data
-    public static class ShippingRequest {
-        private Long orderId;
-        private BigDecimal weight;
-    }
-
-    @Data
-    @AllArgsConstructor
-    public static class ShippingResponse {
-        private String orderNumber;
-    }
-
-    @Data
     public static class BricklinkOrderInfoRequest {
         private Long orderId;
         private BigDecimal weight;
@@ -463,87 +442,8 @@ public class ApiController {
         );
     }
 
-    @CrossOrigin(origins = "https://www.bricklink.com")
-    @PostMapping("/api/bricklink/shipping-request")
-    public ResponseEntity<byte[]> prepareBricklinkShipping(@RequestBody ShippingRequest shippingRequest) {
-        var order = new PrivateAPI(env.getBrickLinkConsumerKey(), env.getBrickLinkConsumerSecret(), env.getBrickLinkToken(), env.getBrickLinkTokenSecret())
-                .getOrder(shippingRequest.getOrderId());
-
-        var address = order.getData().getShipping().getAddress();
-
-        var mode = Tariff.Mode.SIMPLE;
-        if (order.getData().getCost().getEtc2().compareTo(BigDecimal.ZERO) > 0) {
-            mode = Tariff.Mode.TRACEABLE;
-        }
-
-        var cypressBrowser = env.getCypressBrowser();
-        Map<String, String> jobEnv = new HashMap<>();
-        jobEnv.put("MANS_PASTS_EMAIL", safeEnv(env.getMansPastsUsername()));
-        jobEnv.put("MANS_PASTS_PASSWORD", safeEnv(env.getMansPastsPassword()));
-        jobEnv.put("MODE", mode.name());
-        jobEnv.put("FULL_NAME", safeEnv(address != null && address.getName() != null ? address.getName().getFull() : null));
-        jobEnv.put("TELEPHONE", safeEnv(address != null ? address.getPhoneNumber() : null));
-        jobEnv.put("EMAIL", safeEnv(order.getData().getBuyerEmail()));
-        jobEnv.put("ADDRESS1", safeEnv(address != null ? join(address.getAddress1(), address.getAddress2()) : null));
-        jobEnv.put("ADDRESS2", safeEnv(address != null ? join(address.getState(), address.getCity()) : null));
-        jobEnv.put("STATE", safeEnv(address != null ? address.getState() : null));
-        jobEnv.put("COUNTRY_CODE", safeEnv(address != null ? address.getCountryCode() : null));
-        jobEnv.put("POSTCODE", safeEnv(address != null ? address.getPostalCode() : null));
-        jobEnv.put("WEIGHT", safeEnv(shippingRequest.getWeight()));
-        jobEnv.put("PACK_VALUE", safeMoneyEnv(order.getData().getCost() != null ? order.getData().getCost().getSubtotal() : null));
-        jobEnv.put("QUANTITY", safeEnv(order.getData().getTotalCount()));
-        jobEnv.put("ETC1", safeMoneyEnv(order.getData().getCost() != null ? order.getData().getCost().getEtc1() : null));
-        jobEnv.put("ETC2", safeMoneyEnv(order.getData().getCost() != null ? order.getData().getCost().getEtc2() : null));
-        jobEnv.put("SHIPPING", safeMoneyEnv(order.getData().getCost() != null ? order.getData().getCost().getShipping() : null));
-        jobEnv.put("CYPRESS_BROWSER", safeEnv(cypressBrowser));
-
-        AgentJobRequest request = new AgentJobRequest();
-        request.setEnv(jobEnv);
-        request.setCommand(null);
-        request.setPdfPath("cypress/downloads");
-
-        com.vastbricks.agent.v1.JobResult result;
-        try {
-            result = agentJobService.submitJobAndWait(request, agentProperties.getJobTimeoutSeconds());
-        } catch (RuntimeException ex) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Cypress agent run failed", ex);
-        }
-
-        if (!result.getSuccess()) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Cypress run failed: " + result.getMessage());
-        }
-
-        var headers = new HttpHeaders();
-        headers.add("Access-Control-Expose-Headers", "X-Shipping-Price,X-Delivery-Days");
-        if (result.getMetaMap().containsKey("price")) {
-            headers.add("X-Shipping-Price", result.getMetaMap().get("price"));
-        }
-        if (result.getMetaMap().containsKey("deliveryDays")) {
-            headers.add("X-Delivery-Days", result.getMetaMap().get("deliveryDays"));
-        }
-
-        return ResponseEntity.ok().headers(headers).body(result.getPdf().toByteArray());
-    }
-
     private String join(String ... strings) {
         return StringUtils.join(Arrays.stream(strings).filter(StringUtils::isNotBlank).distinct().toArray(), ", ");
-    }
-
-    private String safeEnv(Object value) {
-        if (value == null) {
-            return "";
-        }
-        if (value instanceof BigDecimal) {
-            return ((BigDecimal) value).toPlainString();
-        }
-        return value.toString();
-    }
-
-    private String safeMoneyEnv(BigDecimal value) {
-        if (value == null) {
-            return "";
-        }
-        return value.setScale(2, java.math.RoundingMode.HALF_UP).toPlainString();
     }
 
 }

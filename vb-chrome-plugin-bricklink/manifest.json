@@ -1,21 +1,48 @@
 {
   "manifest_version": 3,
-  "name": "BrickLink Vast Bricks Extension",
-  "version": "1.0",
-  "description": "Adds additional functionality to BrickLink site",
-  "permissions": ["scripting"],
-  "host_permissions": [
-    "https://www.bricklink.com/orderDetail.asp*",
-    "https://www.bricklink.com/orderReceived.asp*"
+  "name": "BrickLink Tools",
+  "version": "1.0.0",
+  "description": "Adds BrickLink order and inventory shortcuts.",
+  "permissions": [
+    "storage"
   ],
+  "host_permissions": [
+    "https://www.bricklink.com/*",
+    "https://tool.vastbricks.com/*",
+    "http://localhost:6161/*",
+    "http://127.0.0.1:6161/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
   "content_scripts": [
     {
-      "matches": ["https://www.bricklink.com/orderDetail.asp*"],
-      "js": ["content.js"]
+      "matches": [
+        "https://www.bricklink.com/orderReceived.asp*",
+        "https://www.bricklink.com/ordersReceived.asp*"
+      ],
+      "js": ["mans-pasts.js"],
+      "run_at": "document_idle"
     },
     {
-      "matches": ["https://www.bricklink.com/orderReceived.asp*"],
-      "js": ["content_order_received.js"]
+      "matches": ["https://www.bricklink.com/v2/api/register_consumer.page*"],
+      "js": ["consumer-ip.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://www.bricklink.com/orderDetail.asp*"],
+      "js": ["order-detail-shipping.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://www.bricklink.com/*"],
+      "js": ["remarks-search.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://www.bricklink.com/*"],
+      "js": ["bricksync-console.js"],
+      "run_at": "document_idle"
     }
   ]
 }
