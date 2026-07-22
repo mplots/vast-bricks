@@ -12,6 +12,5 @@
     <modules>
         <module>vb-portal-grpc</module>
         <module>vb-portal-api</module>
-        <module>vb-portal-agent</module>
     </modules>
 </project>

@@ -23,6 +23,9 @@
 
     const expandedWidth = defaults.panelWidth;
     const hiddenWidth = '166px';
+    const floatingPanelRight = '66px';
+    const masterPanelBottom = '14px';
+    const expandedPanelBottom = '64px';
 
     function storageGet(keys) {
         return new Promise(resolve => chrome.storage.local.get(keys, resolve));
@@ -96,8 +99,8 @@
 
         const panel = createElement('div', {
             position: 'fixed',
-            right: '14px',
-            bottom: '174px',
+            right: floatingPanelRight,
+            bottom: expandedPanelBottom,
             zIndex: '2147483647',
             width: expandedWidth,
             height: defaults.panelHeight,
@@ -123,8 +126,8 @@
 
         const masterPanel = createElement('div', {
             position: 'fixed',
-            right: '14px',
-            bottom: '124px',
+            right: floatingPanelRight,
+            bottom: masterPanelBottom,
             zIndex: '2147483647',
             width: hiddenWidth,
             height: '47px',
@@ -364,8 +367,8 @@
                 compactMasterSwitch.style.top = '10px';
                 panel.style.left = '';
                 panel.style.top = '';
-                panel.style.right = '14px';
-                panel.style.bottom = '124px';
+                panel.style.right = floatingPanelRight;
+                panel.style.bottom = masterPanelBottom;
                 panel.style.width = hiddenWidth;
                 panel.style.height = '47px';
                 panel.style.minWidth = hiddenWidth;
@@ -400,8 +403,8 @@
             settings.panelHeight = defaults.panelHeight;
             panel.style.left = '';
             panel.style.top = '';
-            panel.style.right = '14px';
-            panel.style.bottom = '174px';
+            panel.style.right = floatingPanelRight;
+            panel.style.bottom = expandedPanelBottom;
             panel.style.width = defaults.panelWidth;
             panel.style.height = defaults.panelHeight;
             savePanelLayout(panel);
@@ -419,8 +422,8 @@
             } else {
                 panel.style.left = '';
                 panel.style.top = '';
-                panel.style.right = '14px';
-                panel.style.bottom = '174px';
+                panel.style.right = floatingPanelRight;
+                panel.style.bottom = expandedPanelBottom;
             }
         }
 

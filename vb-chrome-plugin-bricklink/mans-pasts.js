@@ -15,6 +15,7 @@ function updateOrderDetailLink(link) {
 
     url.searchParams.set('viewChk', 'Y');
     url.searchParams.set('viewWeight', 'Y');
+    url.searchParams.set('viewRemain', 'Y');
     link.href = url.pathname + url.search;
 }
 

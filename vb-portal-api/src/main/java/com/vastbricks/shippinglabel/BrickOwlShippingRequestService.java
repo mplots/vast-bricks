@@ -3,9 +3,6 @@ package com.vastbricks.shippinglabel;
 import com.vastbricks.config.Env;
 import com.vastbricks.market.owl.OrderView;
 import com.vastbricks.market.owl.OwlClient;
-import com.vastbricks.shipping.LatvijasPastsApiClient;
-import com.vastbricks.shipping.LatvijasPastsApiException;
-import com.vastbricks.shipping.Order;
 import com.vastbricks.shipping.Tariff;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -13,10 +10,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.Arrays;
+
 @Service
 @AllArgsConstructor
 class BrickOwlShippingRequestService {
     private Env env;
+    private MansPastsShippingApiClient mansPastsClient;
 
     ShippingLabelResult prepareShippingLabel(BrickOwlShippingRequest request) {
         validateRequest(request);
@@ -34,15 +36,15 @@ class BrickOwlShippingRequestService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Order shipping method is not Latvian Post");
         }
 
-        var shippingOrder = toShippingOrder(order, request);
+        var packageRequest = buildPackageRequest(order, request);
         try {
-            var label = new LatvijasPastsApiClient(env).createSmallPackageLabel(shippingOrder);
+            var label = mansPastsClient.createPackageAndDownloadDocument(packageRequest);
             return new ShippingLabelResult(
                     label.pdf(),
-                    label.packageId() == null ? null : label.packageId().toString(),
+                    label.packageId(),
                     label.barcode()
             );
-        } catch (LatvijasPastsApiException ex) {
+        } catch (MansPastsShippingApiException ex) {
             throw new ResponseStatusException(
                     ex.getStatusCode() != null ? ex.getStatusCode() : HttpStatus.BAD_GATEWAY,
                     ex.getMessage(),
@@ -55,28 +57,31 @@ class BrickOwlShippingRequestService {
         if (request == null || StringUtils.isBlank(request.getOrderId())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "orderId is required");
         }
-        if (request.getWeight() != null && request.getWeight().signum() <= 0) {
+        if (request.getWeight() != null && request.getWeight().compareTo(BigDecimal.ZERO) <= 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "weight must be positive");
         }
     }
 
-    private Order toShippingOrder(OrderView order, BrickOwlShippingRequest request) {
+    private MansPastsPackageRequest buildPackageRequest(OrderView order, BrickOwlShippingRequest request) {
         var weight = request.getWeight() != null ? request.getWeight() : order.getWeight();
-        return Order.builder()
-                .type(Tariff.Type.SMALL_PACKAGE)
-                .mode(shippingMode(order))
-                .fullName(fullName(order))
-                .email(StringUtils.trimToNull(order.getCustomerEmail()))
-                .telephone(StringUtils.trimToNull(order.getShipPhone()))
-                .country(StringUtils.upperCase(StringUtils.trimToNull(order.getShipCountryCode())))
-                .state(StringUtils.trimToNull(order.getShipRegion()))
-                .address1(join(order.getShipStreet1(), order.getShipStreet2()))
-                .address2(join(order.getShipRegion(), order.getShipCity()))
-                .postcode(StringUtils.trimToNull(order.getShipPostCode()))
-                .weight(weight)
-                .quantity(order.getTotalQuantity())
-                .packValue(order.getSubTotal())
-                .build();
+        if (weight == null || weight.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "weight is required");
+        }
+
+        var mode = shippingMode(order);
+        return new MansPastsPackageRequest(
+                "Goods",
+                mode == Tariff.Mode.TRACEABLE ? "Tracked" : "Ordinary",
+                "Letter",
+                StringUtils.upperCase(StringUtils.trimToNull(order.getShipCountryCode())),
+                join(order.getShipStreet1(), order.getShipStreet2()),
+                join(order.getShipRegion(), order.getShipCity()),
+                StringUtils.trimToNull(order.getShipPostCode()),
+                fullName(order),
+                StringUtils.trimToNull(order.getShipPhone()),
+                StringUtils.trimToNull(order.getCustomerEmail()),
+                weight.setScale(3, RoundingMode.HALF_UP)
+        );
     }
 
     private Tariff.Mode shippingMode(OrderView order) {
@@ -92,7 +97,7 @@ class BrickOwlShippingRequestService {
 
     private String join(String... values) {
         return StringUtils.trimToNull(StringUtils.join(
-                java.util.Arrays.stream(values)
+                Arrays.stream(values)
                         .filter(StringUtils::isNotBlank)
                         .map(StringUtils::trim)
                         .distinct()

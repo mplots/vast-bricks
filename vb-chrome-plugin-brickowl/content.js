@@ -1,4 +1,4 @@
-const VB_BRICKOWL_SHIPPING_LABEL_API_URL = 'https://tool.vastbricks.com/api/shipping-label/brickowl';
+const VB_BRICKOWL_SHIPPING_LABEL_API_URL = 'http://localhost:6161/api/shipping-label/brickowl';
 
 function getBrickOwlOrderIdFromUrl() {
     const match = window.location.pathname.match(/^\/mystore\/orders\/history\/(\d+)\/?$/);
@@ -68,7 +68,7 @@ async function requestShippingLabel(orderId, weightKg, status, button) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 orderId,
-                weight: Number((Number(weightKg) * 1000).toFixed(3))
+                weight: Number(weightKg)
             })
         });
 

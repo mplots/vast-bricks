@@ -11,12 +11,17 @@ async function fetchCurrentIpAddress() {
 }
 
 function populateIpAddress(ipAddress) {
-    const inputs = Array.from(document.querySelectorAll('input[type="text"], input:not([type])'))
-        .filter(input => /ip/i.test(input.name || input.id || input.placeholder || ''));
+    const parts = String(ipAddress || '').trim().split('.');
+    if (parts.length !== 4 || parts.some(part => !/^\d{1,3}$/.test(part) || Number(part) > 255)) {
+        return;
+    }
 
-    inputs.forEach(input => {
+    const inputs = Array.from(document.querySelectorAll('input[name="allowIpToken"]'));
+    if (inputs.length < 4) return;
+
+    inputs.slice(0, 4).forEach((input, index) => {
         if (!input.value.trim()) {
-            input.value = ipAddress;
+            input.value = parts[index];
             input.dispatchEvent(new Event('input', { bubbles: true }));
             input.dispatchEvent(new Event('change', { bubbles: true }));
         }
@@ -24,15 +29,22 @@ function populateIpAddress(ipAddress) {
 }
 
 function colorNoticeableIpAddress() {
-    Array.from(document.querySelectorAll('td, th, span, div, a'))
-        .filter(element => element.childElementCount === 0 && element.textContent.includes(VB_NOTICEABLE_IP))
-        .forEach(element => {
-            element.style.background = '#fff3bf';
-            element.style.color = '#7c2d12';
-            element.style.fontWeight = '700';
-            element.style.border = '3px solid #f59f00';
-            element.style.borderRadius = '3px';
-            element.style.padding = '2px 4px';
+    Array.from(document.querySelectorAll('.access_token_list_item'))
+        .filter(section => section.textContent.includes(VB_NOTICEABLE_IP))
+        .forEach(section => {
+            section.style.background = '#fff3bf';
+            section.style.color = '#7c2d12';
+            section.style.fontWeight = '700';
+            section.style.border = '3px solid #f59f00';
+            section.style.borderRadius = '4px';
+            section.style.padding = '6px';
+            section.style.margin = '4px 0';
+            section.style.boxShadow = '0 0 0 2px rgba(245, 159, 0, 0.22)';
+
+            const table = section.querySelector('table');
+            if (table) {
+                table.style.background = 'transparent';
+            }
         });
 }
 
