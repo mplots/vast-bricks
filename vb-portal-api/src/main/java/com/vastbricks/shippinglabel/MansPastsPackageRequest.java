@@ -13,6 +13,7 @@ record MansPastsPackageRequest(
         String name,
         String phone,
         String email,
-        BigDecimal userPackageWeight
+        BigDecimal userPackageWeight,
+        String comment
 ) {
 }

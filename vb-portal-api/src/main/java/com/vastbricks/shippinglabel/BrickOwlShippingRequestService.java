@@ -80,7 +80,8 @@ class BrickOwlShippingRequestService {
                 fullName(order),
                 StringUtils.trimToNull(order.getShipPhone()),
                 StringUtils.trimToNull(order.getCustomerEmail()),
-                weight.setScale(3, RoundingMode.HALF_UP)
+                weight.setScale(3, RoundingMode.HALF_UP),
+                "Order #" + StringUtils.trim(request.getOrderId())
         );
     }
 

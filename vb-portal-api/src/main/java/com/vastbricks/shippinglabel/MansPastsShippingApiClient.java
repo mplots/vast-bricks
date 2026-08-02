@@ -176,6 +176,7 @@ class MansPastsShippingApiClient {
         private String type;
         private String postageType;
         private String itemType;
+        private String comment;
         private List<PackageAddress> addresses;
 
         private static PackageCreateRequest from(String apiUser, String apiKey, MansPastsPackageRequest source) {
@@ -185,6 +186,7 @@ class MansPastsShippingApiClient {
             request.setType(source.type());
             request.setPostageType(source.postageType());
             request.setItemType(source.itemType());
+            request.setComment(source.comment());
             request.setAddresses(List.of(PackageAddress.from(source)));
             return request;
         }

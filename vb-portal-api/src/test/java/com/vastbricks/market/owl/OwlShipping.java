@@ -82,7 +82,7 @@ class OwlShipping {
 
     @Test
     public void testCreateShippingMethod() {
-        var mode = Tariff.Mode.SIMPLE;
+        var mode = Tariff.Mode.TRACEABLE;
         var cookie = System.getenv("TEST_OWL_COOKIE");
         var owl = new OwlClient("", cookie);
         var pasts = new LatvijasPastsClientV2();
@@ -91,7 +91,7 @@ class OwlShipping {
         var existingMethods = owl.internal().listShippingMethods();
 
         for (var country : Tariff.Country.values()) {
-            if (!country.isEu()) {
+            if (country.isEu()) {
                 continue;
             }
             try {

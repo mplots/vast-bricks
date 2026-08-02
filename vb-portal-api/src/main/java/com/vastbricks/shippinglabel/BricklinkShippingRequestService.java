@@ -81,7 +81,8 @@ class BricklinkShippingRequestService {
                 address.getName() != null ? address.getName().getFull() : address.getFull(),
                 StringUtils.trimToNull(address.getPhoneNumber()),
                 StringUtils.trimToNull(data.getBuyerEmail()),
-                weight.setScale(3, RoundingMode.HALF_UP)
+                weight.setScale(3, RoundingMode.HALF_UP),
+                "Order #" + data.getOrderId()
         );
     }
 
