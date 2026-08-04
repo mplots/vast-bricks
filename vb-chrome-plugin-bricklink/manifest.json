@@ -31,7 +31,7 @@
     },
     {
       "matches": ["https://www.bricklink.com/orderDetail.asp*"],
-      "js": ["order-detail-shipping.js"],
+      "js": ["order-detail-shipping.js", "order-detail-package-weight.js"],
       "run_at": "document_idle"
     },
     {
