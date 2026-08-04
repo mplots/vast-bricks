@@ -164,7 +164,23 @@ function createSearchPanel() {
         apiConsumerLink.style.textDecoration = 'none';
     });
 
-    wrapper.append(title, label, input, apiConsumerLink);
+    const brickStoreAccessLink = document.createElement('a');
+    brickStoreAccessLink.href = 'https://www.bricklink.com/v3/brickstore-access-management.page';
+    brickStoreAccessLink.textContent = 'BrickStore Access Management';
+    brickStoreAccessLink.style.display = 'block';
+    brickStoreAccessLink.style.marginTop = '4px';
+    brickStoreAccessLink.style.font = '11px Arial, sans-serif';
+    brickStoreAccessLink.style.color = '#6b21a8';
+    brickStoreAccessLink.style.textDecoration = 'none';
+
+    brickStoreAccessLink.addEventListener('mouseover', () => {
+        brickStoreAccessLink.style.textDecoration = 'underline';
+    });
+    brickStoreAccessLink.addEventListener('mouseout', () => {
+        brickStoreAccessLink.style.textDecoration = 'none';
+    });
+
+    wrapper.append(title, label, input, apiConsumerLink, brickStoreAccessLink);
     return wrapper;
 }
 

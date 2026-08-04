@@ -52,6 +52,9 @@ public class Env {
     @Value("#{environment.BRICKLINK_TOKEN_SECRET}")
     private String brickLinkTokenSecret;
 
+    @Value("#{environment.BRICKSTORE_CLIENT_TOKEN}")
+    private String brickStoreClientToken;
+
     @Value("#{environment.BSX_ORDER_DIR}")
     private String bsxOrderDir;
 
