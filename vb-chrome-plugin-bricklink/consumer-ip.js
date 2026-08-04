@@ -1,5 +1,8 @@
 const VB_CURRENT_IP_API_URL = 'https://api.ipify.org?format=json';
-const VB_NOTICEABLE_IP = '54.170.87.58';
+const VB_NOTICEABLE_IP_SECTIONS = [
+    { ipAddress: '54.170.87.58', title: 'AWS' },
+    { ipAddress: '80.232.255.100', title: 'Finserio' }
+];
 
 async function fetchCurrentIpAddress() {
     const response = await fetch(VB_CURRENT_IP_API_URL);
@@ -28,28 +31,48 @@ function populateIpAddress(ipAddress) {
     });
 }
 
-function colorNoticeableIpAddress() {
-    Array.from(document.querySelectorAll('.access_token_list_item'))
-        .filter(section => section.textContent.includes(VB_NOTICEABLE_IP))
-        .forEach(section => {
-            section.style.background = '#fff3bf';
-            section.style.color = '#7c2d12';
-            section.style.fontWeight = '700';
-            section.style.border = '3px solid #f59f00';
-            section.style.borderRadius = '4px';
-            section.style.padding = '6px';
-            section.style.margin = '4px 0';
-            section.style.boxShadow = '0 0 0 2px rgba(245, 159, 0, 0.22)';
+function colorNoticeableIpAddresses() {
+    const sections = Array.from(document.querySelectorAll('.access_token_list_item'));
 
-            const table = section.querySelector('table');
-            if (table) {
-                table.style.background = 'transparent';
-            }
-        });
+    VB_NOTICEABLE_IP_SECTIONS.forEach(noticeableIp => {
+        sections
+            .filter(section => section.textContent.includes(noticeableIp.ipAddress))
+            .forEach(section => {
+                section.style.background = '#fff3bf';
+                section.style.color = '#7c2d12';
+                section.style.fontWeight = '700';
+                section.style.border = '3px solid #f59f00';
+                section.style.borderRadius = '4px';
+                section.style.padding = '6px';
+                section.style.margin = '4px 0';
+                section.style.boxShadow = '0 0 0 2px rgba(245, 159, 0, 0.22)';
+
+                const table = section.querySelector('table');
+                if (table) {
+                    table.style.background = 'transparent';
+                }
+
+                if (!section.querySelector(`[data-vb-ip-section-title="${noticeableIp.title}"]`)) {
+                    const title = document.createElement('div');
+                    title.setAttribute('data-vb-ip-section-title', noticeableIp.title);
+                    title.textContent = noticeableIp.title;
+                    Object.assign(title.style, {
+                        display: 'inline-block',
+                        marginBottom: '6px',
+                        padding: '3px 8px',
+                        borderRadius: '3px',
+                        background: '#f59f00',
+                        color: '#ffffff',
+                        font: '700 13px Arial, sans-serif'
+                    });
+                    section.insertBefore(title, section.firstChild);
+                }
+            });
+    });
 }
 
 async function initConsumerIp() {
-    colorNoticeableIpAddress();
+    colorNoticeableIpAddresses();
     try {
         populateIpAddress(await fetchCurrentIpAddress());
     } catch (error) {

@@ -39,7 +39,7 @@ class BricklinkShippingRequestService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Order shipping address not found");
         }
 
-        var countryCode = StringUtils.upperCase(StringUtils.trimToEmpty(address.getCountryCode()));
+        var countryCode = MansPastsShippingApiClient.normalizeCountryCode(address.getCountryCode());
         var mode = shippingMode(order);
         var packageRequest = buildPackageRequest(order, request.getWeight(), countryCode, mode);
         try {
@@ -70,6 +70,10 @@ class BricklinkShippingRequestService {
     private MansPastsPackageRequest buildPackageRequest(Order order, BigDecimal weight, String countryCode, Tariff.Mode mode) {
         var data = order.getData();
         var address = data.getShipping().getAddress();
+        var cost = data.getCost();
+        var contentValue = cost == null ? null : amountWithAdditional(cost.getSubtotal(), cost.getEtc1());
+        var postagePaid = cost == null ? null : amountWithAdditional(cost.getShipping(), cost.getEtc2());
+        validateCustomsAmounts(countryCode, contentValue, postagePaid);
         return new MansPastsPackageRequest(
                 "Goods",
                 mode == Tariff.Mode.TRACEABLE ? "Tracked" : "Ordinary",
@@ -82,8 +86,24 @@ class BricklinkShippingRequestService {
                 StringUtils.trimToNull(address.getPhoneNumber()),
                 StringUtils.trimToNull(data.getBuyerEmail()),
                 weight.setScale(3, RoundingMode.HALF_UP),
+                scaleMoney(contentValue),
+                scaleMoney(postagePaid),
                 "Order #" + data.getOrderId()
         );
+    }
+
+    static BigDecimal amountWithAdditional(BigDecimal base, BigDecimal additional) {
+        return base == null ? null : base.add(additional == null ? BigDecimal.ZERO : additional);
+    }
+
+    private BigDecimal scaleMoney(BigDecimal amount) {
+        return amount == null ? null : amount.setScale(2, RoundingMode.HALF_UP);
+    }
+
+    private void validateCustomsAmounts(String countryCode, BigDecimal contentValue, BigDecimal postagePaid) {
+        if (!MansPastsShippingApiClient.isEuCountry(countryCode) && (contentValue == null || postagePaid == null)) {
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Order customs values are not available");
+        }
     }
 
     private Tariff.Mode shippingMode(Order order) {

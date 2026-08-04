@@ -1,4 +1,20 @@
-const VB_SHIPPING_REQUEST_API_URL = 'https://tool.vastbricks.com/api/bricklink/shipping-request';
+const VB_API_ENVIRONMENT_STORAGE_KEY = 'vbApiEnvironment';
+const VB_LEGACY_API_BASE_URL_STORAGE_KEY = 'vbBrickSyncApiBaseUrl';
+const VB_PROD_API_BASE_URL = 'https://tool.vastbricks.com';
+const VB_LOCAL_API_BASE_URL = 'http://127.0.0.1:6161';
+
+function getApiBaseUrl() {
+    return new Promise(resolve => {
+        chrome.storage.local.get([
+            VB_API_ENVIRONMENT_STORAGE_KEY,
+            VB_LEGACY_API_BASE_URL_STORAGE_KEY
+        ], stored => {
+            const environment = stored[VB_API_ENVIRONMENT_STORAGE_KEY]
+                || (stored[VB_LEGACY_API_BASE_URL_STORAGE_KEY] === VB_LOCAL_API_BASE_URL ? 'local' : 'prod');
+            resolve(environment === 'local' ? VB_LOCAL_API_BASE_URL : VB_PROD_API_BASE_URL);
+        });
+    });
+}
 
 function getOrderIdFromUrl() {
     const orderId = new URL(window.location.href).searchParams.get('ID');
@@ -72,7 +88,8 @@ async function requestShippingLabel(orderId, weight, status, button) {
     setStatus(status, 'Creating label...');
 
     try {
-        const response = await fetch(VB_SHIPPING_REQUEST_API_URL, {
+        const apiBaseUrl = await getApiBaseUrl();
+        const response = await fetch(`${apiBaseUrl}/api/bricklink/shipping-request`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ orderId: Number(orderId), weight: Number(weight) })

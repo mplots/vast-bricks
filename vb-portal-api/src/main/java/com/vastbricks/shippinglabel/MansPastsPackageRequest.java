@@ -13,7 +13,9 @@ record MansPastsPackageRequest(
         String name,
         String phone,
         String email,
-        BigDecimal userPackageWeight,
+        BigDecimal packageWeightKg,
+        BigDecimal contentValue,
+        BigDecimal postagePaid,
         String comment
 ) {
 }

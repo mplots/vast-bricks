@@ -23,6 +23,8 @@ public class OrderView {
     @JsonProperty("sub_total")
     private BigDecimal subTotal;
 
+    private BigDecimal shipping;
+
     @JsonProperty("customer_email")
     private String customerEmail;
 

@@ -37,6 +37,9 @@ public class Env {
     @Value("#{environment.MANS_PASTS_API_BASE_URL ?: 'https://www.manspasts.lv'}")
     private String mansPastsApiBaseUrl;
 
+    @Value("#{environment.EXPORTER_VAT_ID ?: ''}")
+    private String exporterVatId;
+
     @Value("#{environment.BRICKLINK_CONSUMER_KEY}")
     private String brickLinkConsumerKey;
 

@@ -69,11 +69,13 @@ class BrickOwlShippingRequestService {
         }
 
         var mode = shippingMode(order);
+        var countryCode = MansPastsShippingApiClient.normalizeCountryCode(order.getShipCountryCode());
+        validateCustomsAmounts(countryCode, order.getSubTotal(), order.getShipping());
         return new MansPastsPackageRequest(
                 "Goods",
                 mode == Tariff.Mode.TRACEABLE ? "Tracked" : "Ordinary",
                 "Letter",
-                StringUtils.upperCase(StringUtils.trimToNull(order.getShipCountryCode())),
+                countryCode,
                 join(order.getShipStreet1(), order.getShipStreet2()),
                 join(order.getShipRegion(), order.getShipCity()),
                 StringUtils.trimToNull(order.getShipPostCode()),
@@ -81,8 +83,20 @@ class BrickOwlShippingRequestService {
                 StringUtils.trimToNull(order.getShipPhone()),
                 StringUtils.trimToNull(order.getCustomerEmail()),
                 weight.setScale(3, RoundingMode.HALF_UP),
+                scaleMoney(order.getSubTotal()),
+                scaleMoney(order.getShipping()),
                 "Order #" + StringUtils.trim(request.getOrderId())
         );
+    }
+
+    private BigDecimal scaleMoney(BigDecimal amount) {
+        return amount == null ? null : amount.setScale(2, RoundingMode.HALF_UP);
+    }
+
+    private void validateCustomsAmounts(String countryCode, BigDecimal contentValue, BigDecimal postagePaid) {
+        if (!MansPastsShippingApiClient.isEuCountry(countryCode) && (contentValue == null || postagePaid == null)) {
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Order customs values are not available");
+        }
     }
 
     private Tariff.Mode shippingMode(OrderView order) {

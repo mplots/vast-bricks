@@ -10,7 +10,6 @@
     <version>1.0</version>
 
     <modules>
-        <module>vb-portal-grpc</module>
         <module>vb-portal-api</module>
     </modules>
 </project>

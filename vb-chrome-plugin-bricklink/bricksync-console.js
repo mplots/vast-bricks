@@ -1,7 +1,12 @@
 (function () {
+    const PROD_API_BASE_URL = 'https://tool.vastbricks.com';
+    const LOCAL_API_BASE_URL = 'http://127.0.0.1:6161';
     const STORAGE_KEYS = {
+        environment: 'vbApiEnvironment',
         apiBaseUrl: 'vbBrickSyncApiBaseUrl',
         apiKey: 'vbBrickSyncApiKey',
+        prodApiKey: 'vbBrickSyncProdApiKey',
+        localApiKey: 'vbBrickSyncLocalApiKey',
         tail: 'vbBrickSyncTail',
         hidden: 'vbBrickSyncHidden',
         panelLeft: 'vbBrickSyncPanelLeft',
@@ -12,8 +17,10 @@
     const TOOLS_VISIBILITY_EVENT = 'vb-bricklink-tools-visibility-change';
 
     const defaults = {
-        apiBaseUrl: 'https://tool.vastbricks.com',
+        environment: 'prod',
+        apiBaseUrl: PROD_API_BASE_URL,
         apiKey: 'jaidaisae5AiW1ain2',
+        localApiKey: 'change-me',
         tail: '200',
         hidden: true,
         pollMs: 2500,
@@ -23,9 +30,10 @@
 
     const expandedWidth = defaults.panelWidth;
     const hiddenWidth = '166px';
+    const compactHeight = '82px';
     const floatingPanelRight = '66px';
     const masterPanelBottom = '14px';
-    const expandedPanelBottom = '64px';
+    const expandedPanelBottom = '104px';
 
     function storageGet(keys) {
         return new Promise(resolve => chrome.storage.local.get(keys, resolve));
@@ -37,9 +45,16 @@
 
     async function loadSettings() {
         const stored = await storageGet(Object.values(STORAGE_KEYS));
+        const environment = stored[STORAGE_KEYS.environment]
+            || (stored[STORAGE_KEYS.apiBaseUrl] === LOCAL_API_BASE_URL ? 'local' : defaults.environment);
+        const prodApiKey = stored[STORAGE_KEYS.prodApiKey] || stored[STORAGE_KEYS.apiKey] || defaults.apiKey;
+        const localApiKey = stored[STORAGE_KEYS.localApiKey] || defaults.localApiKey;
         return {
-            apiBaseUrl: stored[STORAGE_KEYS.apiBaseUrl] || defaults.apiBaseUrl,
-            apiKey: stored[STORAGE_KEYS.apiKey] || defaults.apiKey,
+            environment,
+            apiBaseUrl: apiBaseUrlForEnvironment(environment),
+            apiKey: environment === 'local' ? localApiKey : prodApiKey,
+            prodApiKey,
+            localApiKey,
             tail: stored[STORAGE_KEYS.tail] || defaults.tail,
             hidden: stored[STORAGE_KEYS.hidden] === undefined ? defaults.hidden : Boolean(stored[STORAGE_KEYS.hidden]),
             panelLeft: stored[STORAGE_KEYS.panelLeft],
@@ -50,11 +65,20 @@
     }
 
     function saveSettings(settings) {
+        const environmentApiKeyStorageKey = settings.environment === 'local'
+            ? STORAGE_KEYS.localApiKey
+            : STORAGE_KEYS.prodApiKey;
         return storageSet({
+            [STORAGE_KEYS.environment]: settings.environment,
             [STORAGE_KEYS.apiBaseUrl]: settings.apiBaseUrl,
             [STORAGE_KEYS.apiKey]: settings.apiKey,
+            [environmentApiKeyStorageKey]: settings.apiKey,
             [STORAGE_KEYS.tail]: settings.tail
         });
+    }
+
+    function apiBaseUrlForEnvironment(environment) {
+        return environment === 'local' ? LOCAL_API_BASE_URL : PROD_API_BASE_URL;
     }
 
     function saveHidden(hidden) {
@@ -77,6 +101,60 @@
             element.textContent = text;
         }
         return element;
+    }
+
+    function createEnvironmentControl(environment) {
+        const element = createElement('div', {
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '8px',
+            width: '100%',
+            whiteSpace: 'nowrap'
+        });
+        const text = createElement('span', {
+            color: '#e5e7eb',
+            fontWeight: '700'
+        }, 'DEV Mode');
+        const switchElement = createElement('label', {
+            position: 'relative',
+            display: 'inline-flex',
+            width: '46px',
+            height: '26px',
+            flex: '0 0 auto',
+            cursor: 'pointer'
+        });
+        const input = document.createElement('input');
+        input.type = 'checkbox';
+        input.checked = environment === 'local';
+        input.setAttribute('aria-label', 'Enable Dev Mode');
+        Object.assign(input.style, {
+            position: 'absolute',
+            opacity: '0',
+            width: '1px',
+            height: '1px'
+        });
+        const track = createElement('span', {
+            position: 'absolute',
+            inset: '0',
+            borderRadius: '999px',
+            cursor: 'pointer',
+            transition: 'background 140ms ease'
+        });
+        const thumb = createElement('span', {
+            position: 'absolute',
+            width: '22px',
+            height: '22px',
+            left: '2px',
+            top: '2px',
+            borderRadius: '50%',
+            background: '#ffffff',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.36)',
+            transition: 'transform 140ms ease'
+        });
+        switchElement.append(input, track, thumb);
+        element.append(text, switchElement);
+        return { element, input, track, thumb };
     }
 
     async function requestJson(url, options) {
@@ -130,7 +208,7 @@
             bottom: masterPanelBottom,
             zIndex: '2147483647',
             width: hiddenWidth,
-            height: '47px',
+            height: compactHeight,
             maxWidth: 'calc(100vw - 28px)',
             background: '#111827',
             color: '#e5e7eb',
@@ -145,10 +223,10 @@
         masterPanel.id = 'vb-bricksync-master-mode';
         const masterContent = createElement('div', {
             display: 'flex',
+            flexDirection: 'column',
             alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: '8px',
-            height: '29px'
+            gap: '6px',
+            height: '64px'
         });
         const masterText = createElement('span', {
             color: '#e5e7eb',
@@ -190,7 +268,16 @@
             transition: 'transform 140ms ease'
         });
         masterSwitch.append(masterInput, masterTrack, masterThumb);
-        masterContent.append(masterText, masterSwitch);
+        const masterModeControl = createElement('div', {
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            width: '100%',
+            gap: '8px'
+        });
+        masterModeControl.append(masterText, masterSwitch);
+        const menuEnvironment = createEnvironmentControl(settings.environment);
+        masterContent.append(masterModeControl, menuEnvironment.element);
         masterPanel.append(masterContent);
         masterPanel.title = 'BrickLink Master Mode';
         ensureSpinnerStyle();
@@ -230,6 +317,8 @@
             transition: 'transform 140ms ease'
         });
         compactMasterSwitch.append(compactMasterInput, compactMasterTrack, compactMasterThumb);
+        const compactEnvironment = createEnvironmentControl(settings.environment);
+        compactEnvironment.element.style.display = 'none';
 
         const header = createElement('div', {
             display: 'flex',
@@ -257,7 +346,7 @@
         resetButton.title = 'Reset BrickSync window position and size';
         const settingsButton = createElement('button', buttonStyle(), 'Settings');
         headerActions.append(resetButton, settingsButton);
-        header.append(closeButton, title, compactMasterSwitch, headerActions);
+        header.append(closeButton, title, compactMasterSwitch, compactEnvironment.element, headerActions);
 
         const body = createElement('div', {
             padding: '10px',
@@ -274,14 +363,27 @@
             gap: '6px',
             gridTemplateColumns: '1fr 100px'
         });
+        const environmentRow = createElement('div', {
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '12px',
+            gridColumn: '1 / -1',
+            padding: '2px 0 4px'
+        });
+        const settingsEnvironment = createEnvironmentControl(settings.environment);
+        const environmentInput = settingsEnvironment.input;
+        environmentRow.append(settingsEnvironment.element);
         const apiBaseInput = input('API URL', settings.apiBaseUrl);
+        apiBaseInput.readOnly = true;
+        apiBaseInput.title = 'Selected by Dev Mode';
         const tailInput = input('Log lines', settings.tail);
         tailInput.type = 'number';
         tailInput.min = '1';
         tailInput.title = 'Number of recent BrickSync log lines to display';
         const keyInput = input('API key', settings.apiKey);
         keyInput.type = 'password';
-        settingsPanel.append(apiBaseInput, tailInput, keyInput);
+        settingsPanel.append(environmentRow, apiBaseInput, tailInput, keyInput);
 
         const status = createElement('div', { minHeight: '16px', color: '#9ca3af' }, '');
         const logOutput = createElement('pre', {
@@ -323,6 +425,7 @@
         let resizeSaveTimer = null;
         let dragState = null;
         let masterStatusCheckInFlight = false;
+        let masterStatusGeneration = 0;
         let awaitingMasterStatusOutput = false;
         let masterStatusLoading = false;
         let hiddenState = settings.hidden;
@@ -332,11 +435,57 @@
         applyToolsVisibility(toolsOpen);
 
         function currentSettings() {
+            const environment = environmentInput.checked ? 'local' : 'prod';
             return {
-                apiBaseUrl: apiBaseInput.value.trim().replace(/\/+$/, ''),
+                environment,
+                apiBaseUrl: apiBaseUrlForEnvironment(environment),
                 apiKey: keyInput.value,
                 tail: tailInput.value.trim() || defaults.tail
             };
+        }
+
+        function renderEnvironmentSwitch() {
+            const local = environmentInput.checked;
+            [settingsEnvironment, menuEnvironment, compactEnvironment].forEach(control => {
+                control.input.checked = local;
+                control.track.style.background = local ? '#f59e0b' : '#4b5563';
+                control.thumb.style.transform = local ? 'translateX(20px)' : 'translateX(0)';
+                control.element.title = local ? LOCAL_API_BASE_URL : PROD_API_BASE_URL;
+            });
+            apiBaseInput.value = apiBaseUrlForEnvironment(local ? 'local' : 'prod');
+        }
+
+        async function selectEnvironment(local) {
+            const previousEnvironment = settings.environment;
+            if (previousEnvironment === 'local') {
+                settings.localApiKey = keyInput.value;
+            } else {
+                settings.prodApiKey = keyInput.value;
+            }
+            await storageSet({
+                [previousEnvironment === 'local' ? STORAGE_KEYS.localApiKey : STORAGE_KEYS.prodApiKey]: keyInput.value
+            });
+
+            environmentInput.checked = local;
+            renderEnvironmentSwitch();
+            keyInput.value = local ? settings.localApiKey : settings.prodApiKey;
+            const current = currentSettings();
+            settings.environment = current.environment;
+            settings.apiBaseUrl = current.apiBaseUrl;
+
+            masterStatusGeneration += 1;
+            masterStatusCheckInFlight = false;
+            awaitingMasterStatusOutput = false;
+            masterStatusLoading = false;
+            masterPendingState = null;
+            masterState = 'unknown';
+            renderMasterState();
+
+            await saveSettings(current);
+            status.textContent = `Dev Mode: ${local ? 'On' : 'Off'}; checking BL Master...`;
+            if (toolsOpen) {
+                await requestMasterStatus();
+            }
         }
 
         function applyHidden(hidden) {
@@ -349,6 +498,7 @@
             closeButton.style.display = hidden ? 'none' : '';
             openConsoleButton.style.display = hidden ? '' : 'none';
             compactMasterSwitch.style.display = hidden ? 'inline-flex' : 'none';
+            compactEnvironment.element.style.display = hidden ? 'flex' : 'none';
             resetButton.style.display = hidden ? 'none' : '';
             settingsButton.style.display = hidden ? 'none' : '';
             headerActions.style.display = hidden ? 'none' : 'flex';
@@ -359,22 +509,27 @@
                 title.textContent = 'BL Master';
                 title.style.position = 'absolute';
                 title.style.left = '34px';
-                title.style.top = '16px';
+                title.style.top = '17px';
                 title.style.paddingLeft = '0';
                 title.style.flex = '0 0 auto';
                 compactMasterSwitch.style.position = 'absolute';
                 compactMasterSwitch.style.right = '10px';
                 compactMasterSwitch.style.top = '10px';
+                compactEnvironment.element.style.position = 'absolute';
+                compactEnvironment.element.style.width = 'auto';
+                compactEnvironment.element.style.left = '34px';
+                compactEnvironment.element.style.right = '10px';
+                compactEnvironment.element.style.top = '46px';
                 panel.style.left = '';
                 panel.style.top = '';
                 panel.style.right = floatingPanelRight;
                 panel.style.bottom = masterPanelBottom;
                 panel.style.width = hiddenWidth;
-                panel.style.height = '47px';
+                panel.style.height = compactHeight;
                 panel.style.minWidth = hiddenWidth;
-                panel.style.minHeight = '47px';
+                panel.style.minHeight = compactHeight;
                 panel.style.maxWidth = hiddenWidth;
-                panel.style.maxHeight = '47px';
+                panel.style.maxHeight = compactHeight;
                 panel.style.resize = 'none';
                 settingsPanel.style.display = 'none';
             } else {
@@ -387,6 +542,11 @@
                 compactMasterSwitch.style.position = 'relative';
                 compactMasterSwitch.style.right = '';
                 compactMasterSwitch.style.top = '';
+                compactEnvironment.element.style.position = '';
+                compactEnvironment.element.style.width = '100%';
+                compactEnvironment.element.style.left = '';
+                compactEnvironment.element.style.right = '';
+                compactEnvironment.element.style.top = '';
                 panel.style.minWidth = '320px';
                 panel.style.minHeight = '280px';
                 panel.style.maxWidth = 'calc(100vw - 28px)';
@@ -517,6 +677,7 @@
                 const body = await requestJson(`${current.apiBaseUrl}/api/bricksync/logs?tail=${encodeURIComponent(current.tail)}`, {
                     headers: { 'X-Bricksync-Key': current.apiKey }
                 });
+                if (currentSettings().apiBaseUrl !== current.apiBaseUrl) return;
                 const logs = body.logs || '';
                 updateMasterState(logs);
                 if (document.body.contains(logOutput)) {
@@ -527,6 +688,7 @@
                 }
                 status.textContent = `Logs: ${new Date().toLocaleTimeString()}`;
             } catch (error) {
+                if (currentSettings().apiBaseUrl !== current.apiBaseUrl) return;
                 markMasterStateUnavailable();
                 throw error;
             } finally {
@@ -575,25 +737,30 @@
         async function requestMasterStatus() {
             if (!toolsOpen || masterStatusCheckInFlight) return;
 
+            const generation = masterStatusGeneration;
             masterStatusCheckInFlight = true;
             awaitingMasterStatusOutput = true;
             masterStatusLoading = true;
             renderMasterState();
             try {
                 await sendBrickSyncCommand('status', { quiet: true });
+                if (generation !== masterStatusGeneration) return;
                 window.setTimeout(() => {
-                    if (toolsOpen) {
+                    if (toolsOpen && generation === masterStatusGeneration) {
                         refreshLogs().catch(error => status.textContent = error.message);
                     }
                 }, 500);
             } catch (error) {
+                if (generation !== masterStatusGeneration) return;
                 awaitingMasterStatusOutput = false;
                 masterStatusLoading = false;
                 masterState = 'unknown';
                 renderMasterState();
                 throw error;
             } finally {
-                masterStatusCheckInFlight = false;
+                if (generation === masterStatusGeneration) {
+                    masterStatusCheckInFlight = false;
+                }
             }
         }
 
@@ -719,6 +886,12 @@
         settingsButton.addEventListener('click', () => {
             settingsPanel.style.display = settingsPanel.style.display === 'none' ? 'grid' : 'none';
         });
+        environmentInput.addEventListener('change', () => selectEnvironment(environmentInput.checked)
+            .catch(error => status.textContent = error.message));
+        menuEnvironment.input.addEventListener('change', () => selectEnvironment(menuEnvironment.input.checked)
+            .catch(error => status.textContent = error.message));
+        compactEnvironment.input.addEventListener('change', () => selectEnvironment(compactEnvironment.input.checked)
+            .catch(error => status.textContent = error.message));
         closeButton.addEventListener('click', () => {
             applyHidden(true);
             masterPanel.style.display = 'none';
@@ -752,6 +925,7 @@
         window.addEventListener(TOOLS_VISIBILITY_EVENT, event => {
             applyToolsVisibility(Boolean(event.detail?.open));
         });
+        renderEnvironmentSwitch();
         renderMasterState();
     }
 
