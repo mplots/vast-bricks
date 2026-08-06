@@ -8,13 +8,11 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.URLEncoder;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -31,7 +29,6 @@ public class LinkInternalClient {
 
     private final LinkCredentialService credentialService;
     private final LinkTokenAuthenticator tokenAuthenticator;
-    private final HttpClient httpClient = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.NEVER).build();
     private final RestTemplate restTemplate = new RestTemplate();
     private final URI orderExportUri = ORDER_EXPORT_URI;
 
@@ -47,7 +44,7 @@ public class LinkInternalClient {
         for (var mode : authenticationModes()) {
             try {
                 var response = sendOrderExport(request, mode);
-                if (authenticationExpired(response)) {
+                if (shouldTryNextAuthenticationMode(mode, response)) {
                     failures.add(mode + " failed: " + responseSummary(response));
                     continue;
                 }
@@ -76,13 +73,7 @@ public class LinkInternalClient {
         var headers = new HttpHeaders();
         headers.add(HttpHeaders.COOKIE, cookie);
         headers.add(HttpHeaders.CONTENT_TYPE, "application/x-www-form-urlencoded");
-        var response = restTemplate.exchange(
-            orderExportUri,
-            HttpMethod.POST,
-            new HttpEntity<>(formBody(orderRequest), headers),
-            byte[].class
-        );
-        return new LinkResponse(response.getStatusCode().value(), response.getHeaders(), response.getBody());
+        return postOrderExport(orderRequest, headers);
     }
 
     private LinkResponse sendOrderExportWithToken(OrderExportRequest orderRequest) {
@@ -96,13 +87,26 @@ public class LinkInternalClient {
     }
 
     private LinkResponse sendOrderExportWithSessionToken(OrderExportRequest orderRequest, String token) {
-        var request = HttpRequest.newBuilder(orderExportUri)
-            .header("Content-Type", "application/x-www-form-urlencoded")
-            .header(LinkTokenAuthenticator.CLIENT_ID_HEADER, LinkTokenAuthenticator.CLIENT_ID)
-            .header(LinkTokenAuthenticator.SESSION_TOKEN_HEADER, token)
-            .POST(HttpRequest.BodyPublishers.ofString(formBody(orderRequest), StandardCharsets.UTF_8))
-            .build();
-        return send(request);
+        var headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_TYPE, "application/x-www-form-urlencoded");
+        headers.add(LinkTokenAuthenticator.CLIENT_ID_HEADER, LinkTokenAuthenticator.CLIENT_ID);
+        headers.add(LinkTokenAuthenticator.SESSION_TOKEN_HEADER, token);
+        return postOrderExport(orderRequest, headers);
+    }
+
+    private LinkResponse postOrderExport(OrderExportRequest orderRequest, HttpHeaders headers) {
+        try {
+            var response = restTemplate.exchange(
+                orderExportUri,
+                HttpMethod.POST,
+                new HttpEntity<>(formBody(orderRequest), headers),
+                byte[].class
+            );
+            return new LinkResponse(response.getStatusCode().value(), response.getHeaders(), response.getBody());
+        } catch (HttpStatusCodeException ex) {
+            var responseHeaders = ex.getResponseHeaders() == null ? new HttpHeaders() : ex.getResponseHeaders();
+            return new LinkResponse(ex.getStatusCode().value(), responseHeaders, ex.getResponseBodyAsByteArray());
+        }
     }
 
     private byte[] bodyOrThrow(LinkResponse response) {
@@ -115,20 +119,6 @@ public class LinkInternalClient {
             );
         }
         return response.body;
-    }
-
-    private LinkResponse send(HttpRequest request) {
-        try {
-            var response = httpClient.send(request, java.net.http.HttpResponse.BodyHandlers.ofByteArray());
-            var headers = new HttpHeaders();
-            response.headers().map().forEach(headers::addAll);
-            return new LinkResponse(response.statusCode(), headers, response.body());
-        } catch (InterruptedException ex) {
-            Thread.currentThread().interrupt();
-            throw new LinkInternalClientException("BrickLink request was interrupted", ex);
-        } catch (IOException ex) {
-            throw new LinkInternalClientException("BrickLink request failed", ex);
-        }
     }
 
     private String formBody(OrderExportRequest request) {
@@ -186,6 +176,11 @@ public class LinkInternalClient {
             && response.headers.getFirst(HttpHeaders.LOCATION) != null
             && response.headers.getFirst(HttpHeaders.LOCATION)
             .contains("auth/sign-in?");
+    }
+
+    private boolean shouldTryNextAuthenticationMode(LinkAuthenticationMode mode, LinkResponse response) {
+        return authenticationExpired(response)
+            || mode == LinkAuthenticationMode.TOKEN && response.statusCode == 405;
     }
 
     private boolean isEmptyOrderExport(LinkResponse response) {

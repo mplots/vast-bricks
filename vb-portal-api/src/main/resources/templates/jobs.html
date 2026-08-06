@@ -226,6 +226,15 @@
 </div>
 
 <div class="job-card">
+    <h3><span class="material-icons">archive</span>BrickLink order archive</h3>
+    <p>Downloads changed BrickLink orders as raw API JSON and detailed accounting XML files.</p>
+    <div class="job-actions">
+        <button id="trigger-bricklink-order-archive">Trigger job</button>
+        <span class="job-status" id="status-bricklink-order-archive"></span>
+    </div>
+</div>
+
+<div class="job-card">
     <h3><span class="material-icons">inventory_2</span>BSX inventory sync</h3>
     <p>Syncs inventory from the configured BSX file (overwrites previous data).</p>
     <div class="job-actions">
@@ -298,6 +307,14 @@
 
     document.getElementById('trigger-bsx-import').addEventListener('click', () => {
         callJob('/jobs/trigger-bsx-import-job', document.getElementById('status-bsx-import'), 'Job triggered.');
+    });
+
+    document.getElementById('trigger-bricklink-order-archive').addEventListener('click', () => {
+        callJob(
+            '/jobs/trigger-bricklink-order-archive-job',
+            document.getElementById('status-bricklink-order-archive'),
+            'Job triggered.'
+        );
     });
 
     document.getElementById('trigger-bsx-inventory').addEventListener('click', () => {

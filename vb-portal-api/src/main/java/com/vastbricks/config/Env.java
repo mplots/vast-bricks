@@ -55,6 +55,9 @@ public class Env {
     @Value("#{environment.BRICKLINK_TOKEN_SECRET}")
     private String brickLinkTokenSecret;
 
+    @Value("#{environment.BRICKLINK_ORDER_ARCHIVE_DIR ?: '/tmp/vast-bricks/order-archive'}")
+    private String brickLinkOrderArchiveDir;
+
     @Value("#{environment.BRICKSTORE_CLIENT_TOKEN}")
     private String brickStoreClientToken;
 
