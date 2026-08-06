@@ -1,5 +1,10 @@
 package com.vastbricks.client.brickstore;
 
+import com.vastbricks.config.Env;
+import com.vastbricks.integration.bricklink.LinkInternalClient;
+import com.vastbricks.integration.bricklink.LinkInternalClientException;
+import com.vastbricks.integration.bricklink.OrderExportRequest;
+import com.vastbricks.integration.bricklink.OrderType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
@@ -9,6 +14,7 @@ import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,10 +27,14 @@ import java.util.Locale;
 @RequestMapping("/api/brickstore")
 @RequiredArgsConstructor
 public class BrickStoreController {
-    private final BrickStoreClient brickStoreClient;
+    private static final String API_KEY_HEADER = "X-Api-Key";
+
+    private final Env env;
+    private final LinkInternalClient linkInternalClient;
 
     @GetMapping(value = "/orders", produces = MediaType.APPLICATION_XML_VALUE)
     public ResponseEntity<byte[]> exportOrders(
+            @RequestHeader(value = API_KEY_HEADER, required = false) String apiKey,
             @RequestParam(value = "action", defaultValue = "save") String action,
             @RequestParam(value = "orderType", defaultValue = "received") String orderType,
             @RequestParam(value = "viewType", defaultValue = "X") String viewType,
@@ -42,6 +52,7 @@ public class BrickStoreController {
             @RequestParam(value = "tYY", required = false) Integer toYear,
             @RequestParam(value = "orderID", required = false) String orderId
     ) {
+        requireApiKey(apiKey);
         var type = parseOrderType(orderType);
         final OrderExportRequest request;
         try {
@@ -66,7 +77,7 @@ public class BrickStoreController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage(), ex);
         }
 
-        var body = brickStoreClient.exportOrders(request);
+        var body = linkInternalClient.exportOrders(request);
         var headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_XML);
         headers.setContentDisposition(ContentDisposition.attachment()
@@ -75,8 +86,18 @@ public class BrickStoreController {
         return new ResponseEntity<>(body, headers, HttpStatus.OK);
     }
 
-    @ExceptionHandler(BrickStoreClientException.class)
-    public ProblemDetail handleBrickStoreClientException(BrickStoreClientException ex) {
+    private void requireApiKey(String providedKey) {
+        var expectedKey = env.getApiKey();
+        if (expectedKey == null || expectedKey.isBlank()) {
+            return;
+        }
+        if (!expectedKey.equals(providedKey)) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid API key");
+        }
+    }
+
+    @ExceptionHandler(LinkInternalClientException.class)
+    public ProblemDetail handleLinkInternalClientException(LinkInternalClientException ex) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_GATEWAY, ex.getMessage());
     }
 

@@ -1,0 +1,7 @@
+CREATE TABLE bricklink_credential (
+    id BIGSERIAL PRIMARY KEY,
+    credential_type VARCHAR NOT NULL UNIQUE,
+    credential_value TEXT NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);

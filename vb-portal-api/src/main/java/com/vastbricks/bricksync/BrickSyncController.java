@@ -1,5 +1,6 @@
 package com.vastbricks.bricksync;
 
+import com.vastbricks.config.Env;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -18,12 +19,14 @@ import java.util.Map;
 @RequestMapping("/api/bricksync")
 @CrossOrigin(origins = "*")
 public class BrickSyncController {
-    private static final String API_KEY_HEADER = "X-Bricksync-Key";
+    private static final String API_KEY_HEADER = "X-Api-Key";
 
+    private final Env env;
     private final BrickSyncProperties properties;
     private final BrickSyncService service;
 
-    public BrickSyncController(BrickSyncProperties properties, BrickSyncService service) {
+    public BrickSyncController(Env env, BrickSyncProperties properties, BrickSyncService service) {
+        this.env = env;
         this.properties = properties;
         this.service = service;
     }
@@ -51,12 +54,12 @@ public class BrickSyncController {
     }
 
     private void requireApiKey(String providedKey) {
-        String expectedKey = properties.getApiKey();
+        String expectedKey = env.getApiKey();
         if (expectedKey == null || expectedKey.isBlank()) {
             return;
         }
         if (!expectedKey.equals(providedKey)) {
-            throw new BrickSyncException(HttpStatus.UNAUTHORIZED, "Invalid BrickSync API key");
+            throw new BrickSyncException(HttpStatus.UNAUTHORIZED, "Invalid API key");
         }
     }
 }

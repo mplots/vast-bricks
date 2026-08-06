@@ -7,6 +7,9 @@ import org.springframework.stereotype.Component;
 @Getter
 @Component
 public class Env {
+    @Value("#{environment.VASTBRICKS_API_KEY ?: 'change-me'}")
+    private String apiKey;
+
     @Value("#{environment.FLYWAY_CLEN_ON_STARTUP ?: 'false'}")
     private Boolean flywayClenOnStartup;
 

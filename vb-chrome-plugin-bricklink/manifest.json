@@ -4,7 +4,9 @@
   "version": "1.0.0",
   "description": "Adds BrickLink order and inventory shortcuts.",
   "permissions": [
-    "storage"
+    "cookies",
+    "storage",
+    "webRequest"
   ],
   "host_permissions": [
     "https://www.bricklink.com/*",
@@ -30,8 +32,18 @@
       "run_at": "document_idle"
     },
     {
+      "matches": ["https://www.bricklink.com/v3/brickstore-access-management.page*"],
+      "js": ["brickstore-token-sync.js"],
+      "run_at": "document_idle"
+    },
+    {
       "matches": ["https://www.bricklink.com/orderDetail.asp*"],
       "js": ["order-detail-shipping.js", "order-detail-package-weight.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://www.bricklink.com/*"],
+      "js": ["session-cookie-sync.js"],
       "run_at": "document_idle"
     },
     {

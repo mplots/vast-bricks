@@ -4,9 +4,9 @@
     const STORAGE_KEYS = {
         environment: 'vbApiEnvironment',
         apiBaseUrl: 'vbBrickSyncApiBaseUrl',
-        apiKey: 'vbBrickSyncApiKey',
-        prodApiKey: 'vbBrickSyncProdApiKey',
-        localApiKey: 'vbBrickSyncLocalApiKey',
+        apiKey: 'vbApiKey',
+        prodApiKey: 'vbProdApiKey',
+        localApiKey: 'vbLocalApiKey',
         tail: 'vbBrickSyncTail',
         hidden: 'vbBrickSyncHidden',
         panelLeft: 'vbBrickSyncPanelLeft',
@@ -19,7 +19,7 @@
     const defaults = {
         environment: 'prod',
         apiBaseUrl: PROD_API_BASE_URL,
-        apiKey: 'jaidaisae5AiW1ain2',
+        apiKey: '',
         localApiKey: 'change-me',
         tail: '200',
         hidden: true,
@@ -675,7 +675,7 @@
             try {
                 await saveSettings(current);
                 const body = await requestJson(`${current.apiBaseUrl}/api/bricksync/logs?tail=${encodeURIComponent(current.tail)}`, {
-                    headers: { 'X-Bricksync-Key': current.apiKey }
+                    headers: { 'X-Api-Key': current.apiKey }
                 });
                 if (currentSettings().apiBaseUrl !== current.apiBaseUrl) return;
                 const logs = body.logs || '';
@@ -728,7 +728,7 @@
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-Bricksync-Key': current.apiKey
+                    'X-Api-Key': current.apiKey
                 },
                 body: JSON.stringify({ command })
             });

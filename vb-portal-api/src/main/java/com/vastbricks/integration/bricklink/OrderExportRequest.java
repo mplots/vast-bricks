@@ -1,4 +1,4 @@
-package com.vastbricks.client.brickstore;
+package com.vastbricks.integration.bricklink;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

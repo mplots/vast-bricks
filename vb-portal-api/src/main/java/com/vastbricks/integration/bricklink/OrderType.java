@@ -1,4 +1,4 @@
-package com.vastbricks.client.brickstore;
+package com.vastbricks.integration.bricklink;
 
 public enum OrderType {
     RECEIVED("received"),

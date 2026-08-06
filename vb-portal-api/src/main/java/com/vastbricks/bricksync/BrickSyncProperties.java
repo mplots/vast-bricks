@@ -7,9 +7,6 @@ import org.springframework.stereotype.Component;
 @Getter
 @Component
 public class BrickSyncProperties {
-    @Value("#{environment.BRICKSYNC_API_KEY ?: 'change-me'}")
-    private String apiKey;
-
     @Value("#{environment.BRICKSYNC_COMMAND_PIPE ?: '/tmp/vb-bricksync-test/control/commands.fifo'}")
     private String commandPipe;
 
