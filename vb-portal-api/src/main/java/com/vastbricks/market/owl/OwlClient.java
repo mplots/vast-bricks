@@ -21,4 +21,8 @@ public class OwlClient {
     public OrderAPI order() {
         return new OrderAPI(BASE_URL, key);
     }
+
+    public BatchAPI batch() {
+        return new BatchAPI(BASE_URL, key);
+    }
 }

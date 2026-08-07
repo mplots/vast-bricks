@@ -3,9 +3,13 @@ package com.vastbricks.market.owl;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
@@ -38,6 +42,15 @@ public class RestClient {
          return restTemplate.exchange(url, HttpMethod.GET, null, responseType,uriVariables);
     }
 
+    public <T> ResponseEntity<T> postForm(
+            String url,
+            ParameterizedTypeReference<T> responseType,
+            MultiValueMap<String, String> formData
+    ) {
+        var headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        return restTemplate.exchange(url, HttpMethod.POST, new HttpEntity<>(formData, headers), responseType);
+    }
 
 
 }

@@ -1,5 +1,7 @@
 package com.vastbricks.integration.bricklink;
 
+import com.fasterxml.jackson.dataformat.xml.XmlFactory;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +13,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
+import javax.xml.stream.XMLInputFactory;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -31,6 +35,7 @@ public class LinkInternalClient {
     private final LinkTokenAuthenticator tokenAuthenticator;
     private final RestTemplate restTemplate = new RestTemplate();
     private final URI orderExportUri = ORDER_EXPORT_URI;
+    private final XmlMapper xmlMapper = createXmlMapper();
 
     /**
      * Downloads BrickLink's XML order export. An empty array means BrickLink reported no matching orders.
@@ -57,6 +62,28 @@ public class LinkInternalClient {
         throw new LinkInternalClientException(
             "BrickLink order export authentication failed. " + String.join("; ", failures)
         );
+    }
+
+    /**
+     * Downloads and parses BrickLink's XML order-summary export.
+     */
+    public List<LinkOrderSummary> listOrders(OrderExportRequest request) {
+        if (request == null) {
+            throw new IllegalArgumentException("request is required");
+        }
+        if (!"X".equalsIgnoreCase(request.getViewType())) {
+            throw new IllegalArgumentException("viewType must be X for an XML order export");
+        }
+        var xml = exportOrders(request);
+        if (xml.length == 0) {
+            return List.of();
+        }
+        try {
+            var export = xmlMapper.readValue(xml, LinkOrderExport.class);
+            return export.getOrders() == null ? List.of() : List.copyOf(export.getOrders());
+        } catch (IOException ex) {
+            throw new LinkInternalClientException("Could not parse BrickLink order export XML", ex);
+        }
     }
 
     private LinkResponse sendOrderExport(OrderExportRequest request, LinkAuthenticationMode mode) {
@@ -197,6 +224,13 @@ public class LinkInternalClient {
 
     private String responseSummary(LinkResponse response) {
         return "HTTP " + response.statusCode + redirectSuffix(response);
+    }
+
+    private static XmlMapper createXmlMapper() {
+        var inputFactory = XMLInputFactory.newFactory();
+        inputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+        inputFactory.setProperty("javax.xml.stream.isSupportingExternalEntities", false);
+        return new XmlMapper(new XmlFactory(inputFactory));
     }
 
     @Getter
