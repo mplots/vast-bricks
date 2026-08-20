@@ -59,7 +59,7 @@ public class AccountingService {
         return orders;
     }
 
-    private List<AccountingOrder> findBrickLinkOrders(YearMonth month) {
+    public List<AccountingOrder> findBrickLinkOrders(YearMonth month) {
         var request = OrderExportRequest.forDateRange(
                 OrderType.RECEIVED,
                 month.atDay(1),

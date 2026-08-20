@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.lang.Nullable;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
@@ -21,7 +20,9 @@ import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.Socket;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeoutException;
 
 @Slf4j
@@ -29,12 +30,32 @@ public class TorRestTemplate {
 
     private static final Integer NEW_IP_MAX_WAIT_SECONDS = 100;
     private static final Integer MAX_REQUESTS_BEFORE_REQUESTING_NEW_IP = 50;
-    private static final Integer MAX_403_ATTEMPTS = 200;
+    private static final Integer MAX_RETRY_ATTEMPTS = 200;
+
+    private final Set<HttpStatusCode> retryStatuses;
+    private final boolean preserveCookies;
     private Integer performedRequests = 0;
 
+    public TorRestTemplate() {
+        this(HttpStatusCode.valueOf(403));
+    }
+
+    public TorRestTemplate(HttpStatusCode... retryStatuses) {
+        this(false, retryStatuses);
+    }
+
+    public TorRestTemplate(boolean preserveCookies, HttpStatusCode... retryStatuses) {
+        if (retryStatuses.length == 0) {
+            throw new IllegalArgumentException("At least one retry status is required");
+        }
+        this.retryStatuses = Set.copyOf(List.of(retryStatuses));
+        this.preserveCookies = preserveCookies;
+    }
+
     public <T> ResponseEntity<T> exchange(String url, HttpMethod method, @Nullable HttpEntity<?> requestEntity, Class<T> responseType, Object... uriVariables) throws RestClientException {
-        var attempt403 = 0;
-        while (attempt403 < MAX_403_ATTEMPTS) {
+        var retryAttempt = 0;
+        var lastRetryStatus = retryStatuses.iterator().next();
+        while (retryAttempt < MAX_RETRY_ATTEMPTS) {
             try {
                 if (performedRequests > MAX_REQUESTS_BEFORE_REQUESTING_NEW_IP)  {
                     performedRequests = 0;
@@ -42,19 +63,24 @@ public class TorRestTemplate {
                 }
                 performedRequests++;
                 return getRestTemplate().exchange(url, method, requestEntity, responseType);
-            } catch (HttpClientErrorException.Forbidden e) {
-                log.warn("Forbidden using current tor circuit retrying...");
+            } catch (HttpClientErrorException ex) {
+                if (!retryStatuses.contains(ex.getStatusCode())) {
+                    throw ex;
+                }
+                lastRetryStatus = ex.getStatusCode();
+                log.warn("HTTP {} using current tor circuit, retrying...", ex.getStatusCode().value());
                 requestNewTorCircuit(true);
-                attempt403 ++;
+                retryAttempt++;
             }
         }
-        throw new HttpStatusCodeException(HttpStatusCode.valueOf(403)){};
+        throw new HttpClientErrorException(lastRetryStatus);
     }
 
 
     public <T> ResponseEntity<T> getForEntity(String url, Class<T> responseType, Map<String, ?> uriVariables) throws RestClientException {
-        var attempt403 = 0;
-        while (attempt403 < MAX_403_ATTEMPTS) {
+        var retryAttempt = 0;
+        var lastRetryStatus = retryStatuses.iterator().next();
+        while (retryAttempt < MAX_RETRY_ATTEMPTS) {
             try {
                 if (performedRequests > MAX_REQUESTS_BEFORE_REQUESTING_NEW_IP)  {
                     performedRequests = 0;
@@ -62,13 +88,17 @@ public class TorRestTemplate {
                 }
                 performedRequests++;
                 return getRestTemplate().getForEntity(url, responseType, uriVariables);
-            } catch (HttpClientErrorException.Forbidden e) {
-                log.warn("Forbidden using current tor circuit retrying...");
+            } catch (HttpClientErrorException ex) {
+                if (!retryStatuses.contains(ex.getStatusCode())) {
+                    throw ex;
+                }
+                lastRetryStatus = ex.getStatusCode();
+                log.warn("HTTP {} using current tor circuit, retrying...", ex.getStatusCode().value());
                 requestNewTorCircuit(true);
-                attempt403 ++;
+                retryAttempt++;
             }
         }
-        throw new HttpStatusCodeException(HttpStatusCode.valueOf(403)){};
+        throw new HttpClientErrorException(lastRetryStatus);
     }
 
     private RestTemplate getRestTemplate() {
@@ -79,7 +109,9 @@ public class TorRestTemplate {
         var template =  new RestTemplate(factory);
 
         template.getInterceptors().add((request, body, execution) -> {
-            request.getHeaders().remove(HttpHeaders.COOKIE);
+            if (!preserveCookies) {
+                request.getHeaders().remove(HttpHeaders.COOKIE);
+            }
             request.getHeaders().add("Connection", "close");
             request.getHeaders().set("Cache-Control", "no-cache");
             return execution.execute(request, body);

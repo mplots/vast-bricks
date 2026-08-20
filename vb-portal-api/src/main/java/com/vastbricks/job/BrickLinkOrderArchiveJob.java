@@ -57,6 +57,21 @@ public class BrickLinkOrderArchiveJob {
         }
     }
 
+    public boolean archiveOrder(long orderId) throws IOException {
+        if (orderId <= 0) {
+            throw new IllegalArgumentException("orderId must be positive");
+        }
+        var archiveDirectory = archiveDirectory();
+        if (archiveDirectory == null) {
+            throw new IllegalStateException("BRICKLINK_ORDER_ARCHIVE_DIR is not configured");
+        }
+        Files.createDirectories(archiveDirectory);
+
+        var rawJson = apiClient.getOrderRaw(orderId);
+        var order = deserializeOrder(rawJson, orderId);
+        return archiveOrder(archiveDirectory, order, rawJson, order);
+    }
+
     private void archiveOrders() throws IOException {
         var archiveDirectory = archiveDirectory();
         if (archiveDirectory == null) {
@@ -80,7 +95,7 @@ public class BrickLinkOrderArchiveJob {
                 continue;
             }
             try {
-                if (alreadyArchived(archiveDirectory, order.getOrderId(), order.getDateStatusChanged())) {
+                if (alreadyArchived(archiveDirectory, order)) {
                     skipped++;
                     continue;
                 }
@@ -106,6 +121,16 @@ public class BrickLinkOrderArchiveJob {
         var orderId = summary.getOrderId();
         var rawJson = apiClient.getOrderRaw(orderId);
         var order = deserializeOrder(rawJson, orderId);
+        return archiveOrder(directory, summary, rawJson, order);
+    }
+
+    private boolean archiveOrder(
+        Path directory,
+        LinkOrder summary,
+        String rawJson,
+        LinkOrder order
+    ) throws IOException {
+        var orderId = summary.getOrderId();
         var dateStatusChanged = StringUtils.defaultIfBlank(
             order.getDateStatusChanged(),
             summary.getDateStatusChanged()
@@ -115,13 +140,19 @@ public class BrickLinkOrderArchiveJob {
         }
 
         var paths = archivePaths(directory, orderId, dateStatusChanged);
-        if (Files.exists(paths.getApi()) && Files.exists(paths.getAccounting())) {
+        var vatInvoiceRequired = Boolean.TRUE.equals(order.getVatCollectedByBrickLink());
+        if (Files.exists(paths.getApi())
+            && Files.exists(paths.getAccounting())
+            && (!vatInvoiceRequired || Files.exists(paths.getVatInvoice()))) {
             return false;
         }
 
-        var rawXml = internalClient.exportOrders(
-            OrderExportRequest.forOrderId(OrderType.RECEIVED, orderId.toString())
-        );
+        byte[] rawXml = null;
+        if (!Files.exists(paths.getAccounting())) {
+            rawXml = internalClient.exportOrders(
+                OrderExportRequest.forOrderId(OrderType.RECEIVED, orderId.toString())
+            );
+        }
         if (!Files.exists(paths.getApi())) {
             Files.writeString(
                 paths.getApi(),
@@ -132,6 +163,10 @@ public class BrickLinkOrderArchiveJob {
         }
         if (!Files.exists(paths.getAccounting())) {
             Files.write(paths.getAccounting(), rawXml, StandardOpenOption.CREATE_NEW);
+        }
+        if (vatInvoiceRequired && !Files.exists(paths.getVatInvoice())) {
+            var rawVatInvoice = internalClient.downloadVatInvoice(orderId);
+            Files.write(paths.getVatInvoice(), rawVatInvoice, StandardOpenOption.CREATE_NEW);
         }
         log.info("Archived BrickLink order {} changed at {}", orderId, dateStatusChanged);
         return true;
@@ -152,19 +187,24 @@ public class BrickLinkOrderArchiveJob {
         }
     }
 
-    private boolean alreadyArchived(Path directory, long orderId, String dateStatusChanged) {
+    private boolean alreadyArchived(Path directory, LinkOrder order) {
+        var orderId = order.getOrderId();
+        var dateStatusChanged = order.getDateStatusChanged();
         if (StringUtils.isBlank(dateStatusChanged)) {
             return false;
         }
         var paths = archivePaths(directory, orderId, dateStatusChanged);
-        return Files.exists(paths.getApi()) && Files.exists(paths.getAccounting());
+        return Files.exists(paths.getApi())
+            && Files.exists(paths.getAccounting())
+            && (!Boolean.TRUE.equals(order.getVatCollectedByBrickLink()) || Files.exists(paths.getVatInvoice()));
     }
 
     private ArchivePaths archivePaths(Path directory, long orderId, String dateStatusChanged) {
         var timestamp = safeFilenamePart(dateStatusChanged);
         return new ArchivePaths(
             directory.resolve("api-" + orderId + "-" + timestamp + ".json"),
-            directory.resolve("accounting-" + orderId + "-" + timestamp + ".xml")
+            directory.resolve("accounting-" + orderId + "-" + timestamp + ".xml"),
+            directory.resolve("vat-invoice-" + orderId + "-" + timestamp + ".pdf")
         );
     }
 
@@ -185,5 +225,6 @@ public class BrickLinkOrderArchiveJob {
     private static class ArchivePaths {
         private final Path api;
         private final Path accounting;
+        private final Path vatInvoice;
     }
 }
