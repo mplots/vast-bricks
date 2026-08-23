@@ -8,4 +8,6 @@ import java.math.BigDecimal;
 class BricklinkShippingRequest {
     private Long orderId;
     private BigDecimal weight;
+    private byte[] vatInvoicePdf;
+    private String vatInvoiceFilename;
 }

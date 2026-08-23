@@ -83,16 +83,80 @@ function downloadPdf(blob, orderId) {
     window.setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
+function getHeaderFilename(contentDisposition) {
+    if (!contentDisposition) return null;
+
+    const utf8Match = contentDisposition.match(/filename\*=UTF-8''([^;]+)/i);
+    if (utf8Match) {
+        try {
+            return decodeURIComponent(utf8Match[1].trim().replace(/^"|"$/g, ''));
+        } catch (error) {
+            return utf8Match[1].trim().replace(/^"|"$/g, '');
+        }
+    }
+
+    const match = contentDisposition.match(/filename="?([^";]+)"?/i);
+    return match ? match[1].trim() : null;
+}
+
+function findVatInvoiceUrl(orderId) {
+    const links = Array.from(document.querySelectorAll('a[href*="/_file/orders/vat_invoice.file"]'));
+    const link = links.find(anchor => {
+        const url = new URL(anchor.getAttribute('href'), window.location.origin);
+        return url.searchParams.get('oid') === String(orderId) && url.searchParams.get('type') === 'I';
+    });
+    if (link) {
+        return new URL(link.getAttribute('href'), window.location.origin).toString();
+    }
+
+    const source = document.documentElement.innerHTML;
+    const pattern = new RegExp(`/_file/orders/vat_invoice\\.file\\?[^"'<>\\s]*oid=${orderId}[^"'<>\\s]*type=I[^"'<>\\s]*`);
+    const match = source.match(pattern);
+    return match ? new URL(match[0].replaceAll('&amp;', '&'), window.location.origin).toString() : null;
+}
+
+async function downloadVatInvoice(orderId) {
+    const url = findVatInvoiceUrl(orderId);
+    if (!url) return null;
+
+    const response = await fetch(url, {
+        method: 'GET',
+        credentials: 'include',
+        headers: { 'Accept': 'application/pdf' }
+    });
+
+    if (!response.ok) {
+        return null;
+    }
+
+    const blob = await response.blob();
+
+    return {
+        blob,
+        filename: getHeaderFilename(response.headers.get('Content-Disposition')) || `vat-invoice-${orderId}.pdf`
+    };
+}
+
 async function requestShippingLabel(orderId, weight, status, button) {
     button.disabled = true;
-    setStatus(status, 'Creating label...');
+    setStatus(status, 'Downloading VAT invoice...');
 
     try {
+        const vatInvoice = await downloadVatInvoice(orderId);
+        setStatus(status, 'Creating label...');
+
         const apiBaseUrl = await getApiBaseUrl();
+        const formData = new FormData();
+        formData.append('orderId', String(Number(orderId)));
+        formData.append('weight', String(Number(weight)));
+        if (vatInvoice) {
+            formData.append('vatInvoiceFilename', vatInvoice.filename);
+            formData.append('vatInvoiceFile', vatInvoice.blob, vatInvoice.filename);
+        }
+
         const response = await fetch(`${apiBaseUrl}/api/bricklink/shipping-request`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ orderId: Number(orderId), weight: Number(weight) })
+            body: formData
         });
 
         if (!response.ok) {

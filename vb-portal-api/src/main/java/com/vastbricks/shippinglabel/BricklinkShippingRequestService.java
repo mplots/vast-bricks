@@ -1,24 +1,36 @@
 package com.vastbricks.shippinglabel;
 
 import com.vastbricks.config.Env;
+import com.vastbricks.jpa.entity.Marketplace;
 import com.vastbricks.market.link.Order;
 import com.vastbricks.market.link.PrivateAPI;
 import com.vastbricks.shipping.Tariff;
+import com.vastbricks.taxinvoice.TaxInvoiceParseResult;
+import com.vastbricks.taxinvoice.TaxInvoiceParseRequest;
+import com.vastbricks.taxinvoice.TaxInvoiceParserException;
+import com.vastbricks.taxinvoice.TaxInvoiceParserService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 class BricklinkShippingRequestService {
     private Env env;
     private MansPastsShippingApiClient mansPastsClient;
+    private TaxInvoiceParserService taxInvoiceParserService;
 
     ShippingLabelResult prepareShippingLabel(BricklinkShippingRequest request) {
         validateRequest(request);
@@ -42,13 +54,15 @@ class BricklinkShippingRequestService {
         var countryCode = MansPastsShippingApiClient.normalizeCountryCode(address.getCountryCode());
         var mode = shippingMode(order);
         var packageRequest = buildPackageRequest(order, request.getWeight(), countryCode, mode);
+        archiveVatInvoice(request, order, countryCode);
         try {
             var label = mansPastsClient.createPackageAndDownloadDocument(packageRequest);
-            return new ShippingLabelResult(
-                    label.pdf(),
-                    label.packageId(),
-                    label.barcode()
-            );
+            return null;
+//            return new ShippingLabelResult(
+//                    label.pdf(),
+//                    label.packageId(),
+//                    label.barcode()
+//            );
         } catch (MansPastsShippingApiException ex) {
             throw new ResponseStatusException(
                     ex.getStatusCode() != null ? ex.getStatusCode() : HttpStatus.BAD_GATEWAY,
@@ -65,6 +79,76 @@ class BricklinkShippingRequestService {
         if (request.getWeight() == null || request.getWeight().compareTo(BigDecimal.ZERO) <= 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "weight is required");
         }
+        if (request.getVatInvoicePdf() != null || StringUtils.isNotBlank(request.getVatInvoiceFilename())) {
+            if (request.getVatInvoicePdf() == null || request.getVatInvoicePdf().length == 0) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "VAT invoice PDF is required");
+            }
+            if (StringUtils.isBlank(request.getVatInvoiceFilename())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "VAT invoice filename is required");
+            }
+        }
+    }
+
+    private void archiveVatInvoice(BricklinkShippingRequest request, Order order, String countryCode) {
+        if (request.getVatInvoicePdf() == null || request.getVatInvoicePdf().length == 0) {
+            return;
+        }
+
+        var taxInvoice = parseVatInvoice(request, countryCode);
+        log.info(
+            "Parsed BrickLink tax invoice for order {}: invoice {}, tax ID {}",
+            order.getData().getOrderId(),
+            taxInvoice.invoiceNumber(),
+            taxInvoice.taxId()
+        );
+
+        var dateStatusChanged = order.getData().getDateStatusChanged();
+        if (dateStatusChanged == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Order status change date is not available");
+        }
+
+        try {
+            var archiveDirectory = archiveDirectory();
+            Files.createDirectories(archiveDirectory);
+            var path = archiveDirectory.resolve(
+                "vat-invoice-" + order.getData().getOrderId() + "-" + safeFilenamePart(dateStatusChanged.toString()) + ".pdf"
+            );
+            if (!Files.exists(path)) {
+                Files.write(path, request.getVatInvoicePdf(), StandardOpenOption.CREATE_NEW);
+            }
+        } catch (IOException ex) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Could not archive VAT invoice", ex);
+        }
+    }
+
+    private TaxInvoiceParseResult parseVatInvoice(BricklinkShippingRequest request, String countryCode) {
+        try {
+            return taxInvoiceParserService.parse(
+                Marketplace.BRICK_LINK,
+                countryCode,
+                new TaxInvoiceParseRequest(
+                    request.getVatInvoicePdf(),
+                    request.getVatInvoiceFilename(),
+                    request.getOrderId()
+                )
+            );
+        } catch (TaxInvoiceParserException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage(), ex);
+        }
+    }
+
+    private Path archiveDirectory() {
+        if (StringUtils.isBlank(env.getBrickLinkOrderArchiveDir())) {
+            throw new ResponseStatusException(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "BRICKLINK_ORDER_ARCHIVE_DIR is not configured"
+            );
+        }
+        return Path.of(env.getBrickLinkOrderArchiveDir().trim());
+    }
+
+    private String safeFilenamePart(String value) {
+        return value.trim().replaceAll("[^A-Za-z0-9._:+-]", "-");
     }
 
     private MansPastsPackageRequest buildPackageRequest(Order order, BigDecimal weight, String countryCode, Tariff.Mode mode) {
