@@ -19,13 +19,16 @@ class MansPastsCustomsDeclarationTest {
         var payload = MAPPER.valueToTree(MansPastsShippingApiClient.PackageCreateRequest.from(
                 "USER",
                 "KEY",
-                "VAT-ID",
                 request("GB")
         ));
 
         var address = payload.path("addresses").get(0);
         assertEquals("Other", address.path("contentType").asText());
-        assertEquals("VAT-ID", address.path("customIndication").asText());
+        assertEquals("LV40203724029", address.path("customsIndication").asText());
+        assertEquals("IMPORTER-TAX-ID", address.path("importerDetails").asText());
+        assertEquals("invoice", address.path("relatedDocuments").asText());
+        assertEquals("BrickLink Invoice", address.path("docDescription").asText());
+        assertEquals("INV-1", address.path("docNumber").asText());
         assertFalse(address.has("userPackageWeight"));
         assertEquals(0, new BigDecimal("7.50").compareTo(address.path("postage_paid").decimalValue()));
 
@@ -45,13 +48,16 @@ class MansPastsCustomsDeclarationTest {
         var payload = MAPPER.valueToTree(MansPastsShippingApiClient.PackageCreateRequest.from(
                 "USER",
                 "KEY",
-                "VAT-ID",
                 request("de")
         ));
 
         var address = payload.path("addresses").get(0);
         assertFalse(address.has("contentType"));
-        assertFalse(address.has("customIndication"));
+        assertFalse(address.has("customsIndication"));
+        assertFalse(address.has("importerDetails"));
+        assertFalse(address.has("relatedDocuments"));
+        assertFalse(address.has("docDescription"));
+        assertFalse(address.has("docNumber"));
         assertFalse(address.has("postage_paid"));
         assertFalse(address.has("contentItems"));
         assertEquals(0, new BigDecimal("0.5").compareTo(address.path("userPackageWeight").decimalValue()));
@@ -65,7 +71,6 @@ class MansPastsCustomsDeclarationTest {
         var payload = MAPPER.valueToTree(MansPastsShippingApiClient.PackageCreateRequest.from(
                 "USER",
                 "KEY",
-                "VAT-ID",
                 request("UK", new BigDecimal("0.1"))
         ));
 
@@ -135,6 +140,10 @@ class MansPastsCustomsDeclarationTest {
                 weight,
                 new BigDecimal("25.00"),
                 new BigDecimal("7.50"),
+                "IMPORTER-TAX-ID",
+                "invoice",
+                "BrickLink Invoice",
+                "INV-1",
                 null
         );
     }

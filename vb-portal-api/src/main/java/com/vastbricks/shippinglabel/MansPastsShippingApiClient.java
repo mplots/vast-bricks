@@ -37,6 +37,7 @@ class MansPastsShippingApiClient {
     private static final String CONTENT_NAME = "Lego Set";
     private static final String HS_CODE = "950300";
     private static final String CONTENT_ORIGIN_COUNTRY = "DK";
+    private static final String EXPORTER_TAX_ID = "LV40203724029";
     private static final Set<String> EU_COUNTRY_CODES = Set.of(
             "AT", "BE", "BG", "HR", "CY", "CZ", "DE", "DK", "EE",
             "ES", "FI", "FR", "GR", "HU", "IE", "IT", "LT", "LU",
@@ -62,7 +63,6 @@ class MansPastsShippingApiClient {
         var envelope = new PackageCreateEnvelope(PackageCreateRequest.from(
                 apiUser(),
                 apiKey(),
-                exporterVatId(),
                 request
         ));
         var headers = new HttpHeaders();
@@ -147,10 +147,6 @@ class MansPastsShippingApiClient {
         return StringUtils.trimToNull(env.getMansPastsApiKey());
     }
 
-    private String exporterVatId() {
-        return StringUtils.trimToNull(env.getExporterVatId());
-    }
-
     private String baseUrl() {
         return StringUtils.removeEnd(StringUtils.defaultIfBlank(env.getMansPastsApiBaseUrl(), "https://www.manspasts.lv"), "/");
     }
@@ -207,7 +203,6 @@ class MansPastsShippingApiClient {
         static PackageCreateRequest from(
                 String apiUser,
                 String apiKey,
-                String exporterVatId,
                 MansPastsPackageRequest source
         ) {
             var request = new PackageCreateRequest();
@@ -217,7 +212,7 @@ class MansPastsShippingApiClient {
             request.setPostageType(source.postageType());
             request.setItemType(source.itemType());
             request.setComment(source.comment());
-            request.setAddresses(List.of(PackageAddress.from(source, exporterVatId)));
+            request.setAddresses(List.of(PackageAddress.from(source)));
             return request;
         }
     }
@@ -234,14 +229,18 @@ class MansPastsShippingApiClient {
         private String email;
         private java.math.BigDecimal userPackageWeight;
         private String contentType;
-        private String customIndication;
+        private String customsIndication;
+        private String importerDetails;
+        private String relatedDocuments;
+        private String docDescription;
+        private String docNumber;
 
         @JsonProperty("postage_paid")
         private java.math.BigDecimal postagePaid;
 
         private List<ContentItem> contentItems;
 
-        private static PackageAddress from(MansPastsPackageRequest source, String exporterVatId) {
+        private static PackageAddress from(MansPastsPackageRequest source) {
             var address = new PackageAddress();
             address.setCountryCode(normalizeCountryCode(source.countryCode()));
             address.setFreeformAddressLine1(source.freeformAddressLine1());
@@ -254,7 +253,11 @@ class MansPastsShippingApiClient {
                 address.setUserPackageWeight(source.packageWeightKg());
             } else {
                 address.setContentType("Other");
-                address.setCustomIndication(StringUtils.trimToNull(exporterVatId));
+                address.setCustomsIndication(EXPORTER_TAX_ID);
+                address.setImporterDetails(StringUtils.trimToNull(source.importerDetails()));
+                address.setRelatedDocuments(StringUtils.trimToNull(source.relatedDocuments()));
+                address.setDocDescription(StringUtils.trimToNull(source.documentDescription()));
+                address.setDocNumber(StringUtils.trimToNull(source.documentNumber()));
                 address.setPostagePaid(source.postagePaid());
                 address.setContentItems(List.of(ContentItem.from(source)));
             }

@@ -53,16 +53,16 @@ class BricklinkShippingRequestService {
 
         var countryCode = MansPastsShippingApiClient.normalizeCountryCode(address.getCountryCode());
         var mode = shippingMode(order);
-        var packageRequest = buildPackageRequest(order, request.getWeight(), countryCode, mode);
-        archiveVatInvoice(request, order, countryCode);
+        var taxInvoice = parseVatInvoice(request, countryCode);
+        var packageRequest = buildPackageRequest(order, request.getWeight(), countryCode, mode, taxInvoice);
+        archiveVatInvoice(request, order, taxInvoice);
         try {
             var label = mansPastsClient.createPackageAndDownloadDocument(packageRequest);
-            return null;
-//            return new ShippingLabelResult(
-//                    label.pdf(),
-//                    label.packageId(),
-//                    label.barcode()
-//            );
+            return new ShippingLabelResult(
+                    label.pdf(),
+                    label.packageId(),
+                    label.barcode()
+            );
         } catch (MansPastsShippingApiException ex) {
             throw new ResponseStatusException(
                     ex.getStatusCode() != null ? ex.getStatusCode() : HttpStatus.BAD_GATEWAY,
@@ -89,12 +89,11 @@ class BricklinkShippingRequestService {
         }
     }
 
-    private void archiveVatInvoice(BricklinkShippingRequest request, Order order, String countryCode) {
+    private void archiveVatInvoice(BricklinkShippingRequest request, Order order, TaxInvoiceParseResult taxInvoice) {
         if (request.getVatInvoicePdf() == null || request.getVatInvoicePdf().length == 0) {
             return;
         }
 
-        var taxInvoice = parseVatInvoice(request, countryCode);
         log.info(
             "Parsed BrickLink tax invoice for order {}: invoice {}, tax ID {}",
             order.getData().getOrderId(),
@@ -122,6 +121,9 @@ class BricklinkShippingRequestService {
     }
 
     private TaxInvoiceParseResult parseVatInvoice(BricklinkShippingRequest request, String countryCode) {
+        if (request.getVatInvoicePdf() == null || request.getVatInvoicePdf().length == 0) {
+            return null;
+        }
         try {
             return taxInvoiceParserService.parse(
                 Marketplace.BRICK_LINK,
@@ -151,7 +153,13 @@ class BricklinkShippingRequestService {
         return value.trim().replaceAll("[^A-Za-z0-9._:+-]", "-");
     }
 
-    private MansPastsPackageRequest buildPackageRequest(Order order, BigDecimal weight, String countryCode, Tariff.Mode mode) {
+    private MansPastsPackageRequest buildPackageRequest(
+        Order order,
+        BigDecimal weight,
+        String countryCode,
+        Tariff.Mode mode,
+        TaxInvoiceParseResult taxInvoice
+    ) {
         var data = order.getData();
         var address = data.getShipping().getAddress();
         var cost = data.getCost();
@@ -172,6 +180,10 @@ class BricklinkShippingRequestService {
                 weight.setScale(3, RoundingMode.HALF_UP),
                 scaleMoney(contentValue),
                 scaleMoney(postagePaid),
+                taxInvoice == null ? null : taxInvoice.taxId(),
+                taxInvoice == null ? null : "invoice",
+                taxInvoice == null ? null : "BrickLink Invoice",
+                taxInvoice == null ? null : taxInvoice.invoiceNumber(),
                 "Order #" + data.getOrderId()
         );
     }

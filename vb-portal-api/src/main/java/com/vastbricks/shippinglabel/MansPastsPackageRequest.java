@@ -16,6 +16,10 @@ record MansPastsPackageRequest(
         BigDecimal packageWeightKg,
         BigDecimal contentValue,
         BigDecimal postagePaid,
+        String importerDetails,
+        String relatedDocuments,
+        String documentDescription,
+        String documentNumber,
         String comment
 ) {
 }

@@ -85,6 +85,10 @@ class BrickOwlShippingRequestService {
                 weight.setScale(3, RoundingMode.HALF_UP),
                 scaleMoney(order.getSubTotal()),
                 scaleMoney(order.getShipping()),
+                null,
+                "invoice",
+                "BrickOwl Invoice",
+                StringUtils.trim(request.getOrderId()),
                 "Order #" + StringUtils.trim(request.getOrderId())
         );
     }
