@@ -52,8 +52,32 @@ class ShippingLabelController {
     }
 
     @CrossOrigin(origins = "https://www.brickowl.com")
-    @PostMapping("/api/shipping-label/brickowl")
+    @PostMapping(
+        value = "/api/shipping-label/brickowl",
+        consumes = MediaType.APPLICATION_JSON_VALUE
+    )
     ResponseEntity<byte[]> prepareBrickOwlShipping(@RequestBody BrickOwlShippingRequest request) {
+        return shippingLabelResponse(brickOwlService.prepareShippingLabel(request));
+    }
+
+    @CrossOrigin(origins = "https://www.brickowl.com")
+    @PostMapping(
+        value = "/api/shipping-label/brickowl",
+        consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    ResponseEntity<byte[]> prepareBrickOwlShipping(
+        @RequestParam("orderId") String orderId,
+        @RequestParam("weight") BigDecimal weight,
+        @RequestParam(value = "vatInvoiceFilename", required = false) String vatInvoiceFilename,
+        @RequestParam(value = "vatInvoiceFile", required = false) MultipartFile vatInvoiceFile
+    ) throws IOException {
+        var request = new BrickOwlShippingRequest();
+        request.setOrderId(orderId);
+        request.setWeight(weight);
+        request.setVatInvoiceFilename(vatInvoiceFilename);
+        if (vatInvoiceFile != null) {
+            request.setVatInvoicePdf(vatInvoiceFile.getBytes());
+        }
         return shippingLabelResponse(brickOwlService.prepareShippingLabel(request));
     }
 

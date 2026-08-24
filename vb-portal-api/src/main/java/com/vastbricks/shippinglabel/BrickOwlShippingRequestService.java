@@ -1,9 +1,14 @@
 package com.vastbricks.shippinglabel;
 
 import com.vastbricks.config.Env;
+import com.vastbricks.jpa.entity.Marketplace;
 import com.vastbricks.market.owl.OrderView;
 import com.vastbricks.market.owl.OwlClient;
 import com.vastbricks.shipping.Tariff;
+import com.vastbricks.taxinvoice.TaxInvoiceParseRequest;
+import com.vastbricks.taxinvoice.TaxInvoiceParseResult;
+import com.vastbricks.taxinvoice.TaxInvoiceParserException;
+import com.vastbricks.taxinvoice.TaxInvoiceParserService;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
@@ -19,6 +24,7 @@ import java.util.Arrays;
 class BrickOwlShippingRequestService {
     private Env env;
     private MansPastsShippingApiClient mansPastsClient;
+    private TaxInvoiceParserService taxInvoiceParserService;
 
     ShippingLabelResult prepareShippingLabel(BrickOwlShippingRequest request) {
         validateRequest(request);
@@ -36,7 +42,9 @@ class BrickOwlShippingRequestService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Order shipping method is not Latvian Post");
         }
 
-        var packageRequest = buildPackageRequest(order, request);
+        var countryCode = MansPastsShippingApiClient.normalizeCountryCode(order.getShipCountryCode());
+        var taxInvoice = parseVatInvoice(request, countryCode);
+        var packageRequest = buildPackageRequest(order, request, countryCode, taxInvoice);
         try {
             var label = mansPastsClient.createPackageAndDownloadDocument(packageRequest);
             return new ShippingLabelResult(
@@ -60,16 +68,55 @@ class BrickOwlShippingRequestService {
         if (request.getWeight() != null && request.getWeight().compareTo(BigDecimal.ZERO) <= 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "weight must be positive");
         }
+        if (request.getVatInvoicePdf() != null || StringUtils.isNotBlank(request.getVatInvoiceFilename())) {
+            if (request.getVatInvoicePdf() == null || request.getVatInvoicePdf().length == 0) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "VAT invoice PDF is required");
+            }
+            if (StringUtils.isBlank(request.getVatInvoiceFilename())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "VAT invoice filename is required");
+            }
+        }
     }
 
-    private MansPastsPackageRequest buildPackageRequest(OrderView order, BrickOwlShippingRequest request) {
+    private TaxInvoiceParseResult parseVatInvoice(BrickOwlShippingRequest request, String countryCode) {
+        if (request.getVatInvoicePdf() == null || request.getVatInvoicePdf().length == 0) {
+            return null;
+        }
+        try {
+            return taxInvoiceParserService.parse(
+                Marketplace.BRICK_OWL,
+                countryCode,
+                new TaxInvoiceParseRequest(
+                    request.getVatInvoicePdf(),
+                    request.getVatInvoiceFilename(),
+                    parseOrderId(request.getOrderId())
+                )
+            );
+        } catch (TaxInvoiceParserException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage(), ex);
+        }
+    }
+
+    private Long parseOrderId(String orderId) {
+        var value = StringUtils.trimToNull(orderId);
+        if (value == null || !value.matches("\\d+")) {
+            return null;
+        }
+        return Long.valueOf(value);
+    }
+
+    private MansPastsPackageRequest buildPackageRequest(
+        OrderView order,
+        BrickOwlShippingRequest request,
+        String countryCode,
+        TaxInvoiceParseResult taxInvoice
+    ) {
         var weight = request.getWeight() != null ? request.getWeight() : order.getWeight();
         if (weight == null || weight.compareTo(BigDecimal.ZERO) <= 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "weight is required");
         }
 
         var mode = shippingMode(order);
-        var countryCode = MansPastsShippingApiClient.normalizeCountryCode(order.getShipCountryCode());
         validateCustomsAmounts(countryCode, order.getSubTotal(), order.getShipping());
         return new MansPastsPackageRequest(
                 "Goods",
@@ -85,10 +132,10 @@ class BrickOwlShippingRequestService {
                 weight.setScale(3, RoundingMode.HALF_UP),
                 scaleMoney(order.getSubTotal()),
                 scaleMoney(order.getShipping()),
-                null,
-                "invoice",
-                "BrickOwl Invoice",
-                StringUtils.trim(request.getOrderId()),
+                taxInvoice == null ? null : taxInvoice.taxId(),
+                taxInvoice == null ? null : "invoice",
+                taxInvoice == null ? null : "BrickOwl Invoice",
+                taxInvoice == null ? null : taxInvoice.invoiceNumber(),
                 "Order #" + StringUtils.trim(request.getOrderId())
         );
     }
