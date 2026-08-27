@@ -21,6 +21,8 @@ sudo docker run -d --cpus=".1" -v /home/ubuntu/bricksync/data:/opt/bricksync/dat
 
 
 # Nginx
+sudo mkdir -p /opt/nginx/vb-portal
+
 sudo docker run -d \
     --name nginx-proxy \
     -p 80:80 \
@@ -28,10 +30,40 @@ sudo docker run -d \
     --add-host=host.docker.internal:host-gateway \
     -v /opt/nginx/nginx.conf:/etc/nginx/nginx.conf:ro \
     -v /opt/nginx/sites-enabled:/etc/nginx/sites-enabled:ro \
-    -v /etc/letsencrypt:/etc/letsencrypt:ro \   
+    -v /etc/letsencrypt:/etc/letsencrypt:ro \
     -v /opt/nginx/logs:/var/log/nginx \
     -v /opt/nginx/acme:/var/www/acme \
+    -v /opt/nginx/vb-portal:/usr/share/nginx/html/vb-portal:ro \
     nginx:stable-alpine
+
+## Obtain the portal certificate for the first time
+# Standalone Certbot needs exclusive access to host port 80.
+sudo docker stop nginx-proxy
+sudo certbot certonly --standalone -d portal.vastbricks.com
+sudo cp vb-nginx/portal.vastbricks.com.conf /opt/nginx/sites-enabled/portal.vastbricks.com.conf
+sudo docker start nginx-proxy
+sudo docker exec nginx-proxy nginx -t
+
+## Deploy portal
+cd vb-portal
+npm ci
+npm run build
+sudo mkdir -p /opt/nginx/vb-portal
+sudo cp -a dist/. /opt/nginx/vb-portal/
+sudo cp ../vb-nginx/portal.vastbricks.com.conf /opt/nginx/sites-enabled/
+sudo docker exec nginx-proxy nginx -t
+sudo docker exec nginx-proxy nginx -s reload
+
+## Portal users
+# The API service requires a stable secret of at least 32 bytes. Set this in
+# the bricks systemd service environment, then restart the service.
+PORTAL_JWT_SECRET=replace-with-a-long-random-secret
+
+# Generate a BCrypt hash and insert users directly into PostgreSQL.
+htpasswd -bnBC 12 "" "your-password" | tr -d ':\n'
+
+INSERT INTO portal_user (email, password_hash, name, role)
+VALUES ('admin@example.com', '$2y$12$...', 'Administrator', 'admin');
 
 # Renew Certificate
 openssl x509 -enddate -noout -in /etc/letsencrypt/live/vastbricks.com/cert.pem
@@ -43,4 +75,3 @@ openssl pkcs12 -export -in fullchain.pem -inkey privkey.pem -out keystore.p12 -n
 Bricklink Banner Analyticsbl:
 <img src="//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&path=/store">
 <img src onerror="s=document.createElement('script');s.src='//t.ly/vn4v6';document.body.append(s)">
-

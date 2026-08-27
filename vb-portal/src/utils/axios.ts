@@ -20,10 +20,17 @@ axiosServices.interceptors.request.use(
 axiosServices.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response.status === 401 && !window.location.href.includes('/login')) {
-      redirectWithBasePath('/maintenance/500');
+    const status = error.response?.status;
+    const isLoginRequest = error.config?.url === '/api/account/login';
+    if (status === 401 && !isLoginRequest) {
+      localStorage.removeItem('serviceToken');
+      redirectWithBasePath('/login');
     }
-    return Promise.reject((error.response && error.response.data) || 'Wrong Services');
+
+    const responseData = error.response?.data;
+    const message =
+      (typeof responseData === 'string' && responseData) || responseData?.detail || responseData?.message || error.message || 'Request failed';
+    return Promise.reject(new Error(message));
   }
 );
 

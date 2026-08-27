@@ -79,11 +79,8 @@ public class Env {
     @Value("#{environment.BSX_INVENTORY_FILE}")
     private String bsxInventoryFile;
 
-    @Value("#{environment.CYPRESS_BROWSER ?: 'chrome'}")
-    private String cypressBrowser;
-
-    @Value("#{environment.CYPRESS_RUNNER ?: 'native'}")
-    private String cypressRunner;
+    @Value("#{environment.PORTAL_JWT_SECRET ?: 'dummy-secret'}")
+    private String portalJwtSecret;
 
     @Value("#{environment.CYPRESS_DOCKER_IMAGE ?: 'ghcr.io/mplots/vb-cypress-manspasts'}")
     private String cypressDockerImage;

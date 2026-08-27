@@ -1,19 +1,14 @@
 import { useState, SyntheticEvent } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
 import { preload } from 'swr';
 
 // material-ui
 import Button from '@mui/material/Button';
-import Checkbox from '@mui/material/Checkbox';
-import FormControlLabel from '@mui/material/FormControlLabel';
 import FormHelperText from '@mui/material/FormHelperText';
 import Grid from '@mui/material/Grid';
 import InputAdornment from '@mui/material/InputAdornment';
 import InputLabel from '@mui/material/InputLabel';
-import Link from '@mui/material/Link';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import Stack from '@mui/material/Stack';
-import Typography from '@mui/material/Typography';
 
 // third-party
 import * as Yup from 'yup';
@@ -31,10 +26,8 @@ import { Eye, EyeSlash } from 'iconsax-reactjs';
 
 // ============================|| JWT - LOGIN ||============================ //
 
-export default function AuthLogin({ forgot }: { forgot?: string }) {
-  const [checked, setChecked] = useState(false);
-
-  const { isLoggedIn, login } = useAuth();
+export default function AuthLogin() {
+  const { login } = useAuth();
   const scriptedRef = useScriptRef();
 
   const [showPassword, setShowPassword] = useState(false);
@@ -50,8 +43,8 @@ export default function AuthLogin({ forgot }: { forgot?: string }) {
     <>
       <Formik
         initialValues={{
-          email: 'info@phoenixcoded.co',
-          password: '123456',
+          email: '',
+          password: '',
           submit: null
         }}
         validationSchema={Yup.object().shape({
@@ -59,7 +52,7 @@ export default function AuthLogin({ forgot }: { forgot?: string }) {
           password: Yup.string()
             .required('Password is required')
             .test('no-leading-trailing-whitespace', 'Password can not start or end with spaces', (value) => value === value.trim())
-            .max(10, 'Password must be less than 10 characters')
+            .max(128, 'Password must be at most 128 characters')
         })}
         onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
           try {
@@ -139,26 +132,6 @@ export default function AuthLogin({ forgot }: { forgot?: string }) {
                 )}
               </Grid>
 
-              <Grid sx={{ mt: -1 }} size={12}>
-                <Stack direction="row" sx={{ gap: 2, justifyContent: 'space-between', alignItems: 'center' }}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={checked}
-                        onChange={(event) => setChecked(event.target.checked)}
-                        name="checked"
-                        color="primary"
-                        size="small"
-                      />
-                    }
-                    label={<Typography variant="h6">Keep me sign in</Typography>}
-                  />
-
-                  <Link variant="h6" component={RouterLink} to={isLoggedIn && forgot ? forgot : '/forgot-password'} color="text.primary">
-                    Forgot Password?
-                  </Link>
-                </Stack>
-              </Grid>
               {errors.submit && (
                 <Grid size={12}>
                   <FormHelperText error>{errors.submit}</FormHelperText>

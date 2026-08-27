@@ -153,7 +153,7 @@ const ProductCard = ({ product, prices }: { product: ProductOffer; prices: Produ
           </Box>
           <Grid container spacing={2}>
             {metrics.map((metric) => (
-              <Grid key={metric.label} item xs={12} sm={6} lg={4}>
+              <Grid key={metric.label} size={{ xs: 12, sm: 6, lg: 4 }}>
                 <Stack
                   spacing={0.5}
                   sx={{
