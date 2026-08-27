@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 
 import javax.xml.stream.XMLInputFactory;
 import java.io.IOException;
@@ -37,6 +38,7 @@ public class LinkInternalClient {
         LinkAuthenticationMode.TOKEN,
         LinkAuthenticationMode.SESSION_COOKIE
     };
+    private static final LinkRestTemplateMode REST_TEMPLATE_MODE = LinkRestTemplateMode.SIMPLE;
     private static final URI ORDER_EXPORT_URI = URI.create("https://www.bricklink.com/orderExcelFinal.asp");
     private static final URI VAT_INVOICE_URI = URI.create("https://www.bricklink.com/_file/orders/vat_invoice.file");
 
@@ -44,6 +46,7 @@ public class LinkInternalClient {
     private final LinkTokenAuthenticator tokenAuthenticator;
     private final TorRestTemplate sessionRestTemplate = new TorRestTemplate(true, HttpStatus.FORBIDDEN);
     private final TorRestTemplate tokenRestTemplate = new TorRestTemplate(HttpStatus.METHOD_NOT_ALLOWED, HttpStatus.FORBIDDEN);
+    private final RestTemplate simpleRestTemplate = new RestTemplate();
     private final URI orderExportUri = ORDER_EXPORT_URI;
     private final XmlMapper xmlMapper = createXmlMapper();
 
@@ -143,7 +146,7 @@ public class LinkInternalClient {
         var headers = new HttpHeaders();
         headers.add(HttpHeaders.COOKIE, cookie);
         headers.add(HttpHeaders.CONTENT_TYPE, "application/x-www-form-urlencoded");
-        return postOrderExportWithTor(orderRequest, headers, sessionRestTemplate);
+        return postOrderExport(orderRequest, headers, sessionRestTemplate);
     }
 
     private LinkResponse sendOrderExportWithToken(OrderExportRequest orderRequest) {
@@ -161,20 +164,20 @@ public class LinkInternalClient {
         headers.add(HttpHeaders.CONTENT_TYPE, "application/x-www-form-urlencoded");
         headers.add(LinkTokenAuthenticator.CLIENT_ID_HEADER, LinkTokenAuthenticator.CLIENT_ID);
         headers.add(LinkTokenAuthenticator.SESSION_TOKEN_HEADER, token);
-        return postOrderExportWithTor(orderRequest, headers, tokenRestTemplate);
+        return postOrderExport(orderRequest, headers, tokenRestTemplate);
     }
 
-    private LinkResponse postOrderExportWithTor(
+    private LinkResponse postOrderExport(
         OrderExportRequest orderRequest,
         HttpHeaders headers,
-        TorRestTemplate restTemplate
+        TorRestTemplate torRestTemplate
     ) {
         return exchange(
-            () -> restTemplate.exchange(
+            () -> exchange(
                 orderExportUri.toString(),
                 HttpMethod.POST,
                 new HttpEntity<>(formBody(orderRequest), headers),
-                byte[].class
+                torRestTemplate
             ),
             "BrickLink order export request failed"
         );
@@ -194,7 +197,7 @@ public class LinkInternalClient {
         var headers = new HttpHeaders();
         headers.add(HttpHeaders.ACCEPT, "application/pdf");
         headers.add(HttpHeaders.COOKIE, cookie);
-        return getVatInvoiceWithTor(orderId, headers, sessionRestTemplate);
+        return getVatInvoice(orderId, headers, sessionRestTemplate);
     }
 
     private LinkResponse sendVatInvoiceWithToken(long orderId) {
@@ -212,24 +215,36 @@ public class LinkInternalClient {
         headers.add(HttpHeaders.ACCEPT, "application/pdf");
         headers.add(LinkTokenAuthenticator.CLIENT_ID_HEADER, LinkTokenAuthenticator.CLIENT_ID);
         headers.add(LinkTokenAuthenticator.SESSION_TOKEN_HEADER, token);
-        return getVatInvoiceWithTor(orderId, headers, tokenRestTemplate);
+        return getVatInvoice(orderId, headers, tokenRestTemplate);
     }
 
-    private LinkResponse getVatInvoiceWithTor(
+    private LinkResponse getVatInvoice(
         long orderId,
         HttpHeaders headers,
-        TorRestTemplate restTemplate
+        TorRestTemplate torRestTemplate
     ) {
         var uri = URI.create(VAT_INVOICE_URI + "?oid=" + orderId + "&type=I");
         return exchange(
-            () -> restTemplate.exchange(
+            () -> exchange(
                 uri.toString(),
                 HttpMethod.GET,
                 new HttpEntity<Void>(headers),
-                byte[].class
+                torRestTemplate
             ),
             "BrickLink VAT invoice download failed for order " + orderId
         );
+    }
+
+    private ResponseEntity<byte[]> exchange(
+        String url,
+        HttpMethod method,
+        HttpEntity<?> requestEntity,
+        TorRestTemplate torRestTemplate
+    ) {
+        return switch (REST_TEMPLATE_MODE) {
+            case SIMPLE -> simpleRestTemplate.exchange(url, method, requestEntity, byte[].class);
+            case TOR -> torRestTemplate.exchange(url, method, requestEntity, byte[].class);
+        };
     }
 
     private LinkResponse exchange(Supplier<ResponseEntity<byte[]>> request, String failureMessage) {
@@ -303,6 +318,7 @@ public class LinkInternalClient {
         putIfNotBlank(fields, "getFiled", request.getGetFiled());
         putIfNotBlank(fields, "getDetail", request.getGetDetail());
         putIfNotBlank(fields, "getDateFormat", request.getGetDateFormat());
+        putIfNotBlank(fields, "useRealName", request.getUseRealName());
         putIfNotBlank(fields, "includeMyCost", request.getIncludeMyCost());
 
         if (request.getFromDate() != null) {

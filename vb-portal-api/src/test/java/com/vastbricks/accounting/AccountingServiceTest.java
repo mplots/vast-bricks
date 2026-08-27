@@ -61,12 +61,17 @@ class AccountingServiceTest {
         assertEquals(new BigDecimal("1.66"), owlOrder.getVat());
         assertEquals("Germany", owlOrder.getLocation());
         assertEquals(BigDecimal.ZERO, owlOrder.getMarketplaceTax());
+        assertEquals("PayPal", owlOrder.getPaymentMethod());
+        assertEquals("PAYPAL-3060526", owlOrder.getPaymentTransactionId());
+        assertEquals("EUR", owlOrder.getPaymentCurrency());
+        assertEquals(new BigDecimal("8.81"), owlOrder.getGrandTotal());
         assertEquals(BigDecimal.ZERO, owlTaxSchemeOrder.getVat());
         assertFalse(owlTaxSchemeOrder.isVatPresent());
         assertEquals(new BigDecimal("1.66"), owlTaxSchemeOrder.getMarketplaceTax());
         assertEquals(new BigDecimal("10.47"), owlTaxSchemeOrder.getCalculatedGrandTotal());
         assertFalse(owlTaxSchemeOrder.isGrandTotalMismatch());
         assertEquals("BrickLink", linkOrder.getSource());
+        assertEquals("Link Buyer Real Name", linkOrder.getBuyerName());
         assertEquals(new BigDecimal("3.95"), linkOrder.getOrderTotal());
         assertEquals(new BigDecimal("8.22"), linkOrder.getShipping());
         assertEquals(new BigDecimal("10.19"), linkOrder.getGrandTotal());
@@ -75,6 +80,8 @@ class AccountingServiceTest {
         assertEquals(new BigDecimal("1.77"), linkOrder.getVat());
         assertEquals(new BigDecimal("0.50"), linkOrder.getMarketplaceTax());
         assertEquals("Sweden", linkOrder.getLocation());
+        assertEquals("PayPal", linkOrder.getPaymentMethod());
+        assertEquals("EUR", linkOrder.getPaymentCurrency());
         assertEquals(List.of(2), batchSizes);
     }
 
@@ -104,7 +111,7 @@ class AccountingServiceTest {
         var order = new LinkOrderSummary();
         order.setOrderId(32266548L);
         order.setOrderDate(LocalDate.of(2026, 8, 5));
-        order.setBuyer("Link Buyer");
+        order.setBuyer("Link Buyer Real Name");
         order.setTotalLots(3);
         order.setTotalItems(3);
         order.setTotal(new BigDecimal("1.53"));
@@ -116,6 +123,8 @@ class AccountingServiceTest {
         order.setBaseGrandTotal(new BigDecimal("10.19"));
         order.setVatCharges(new BigDecimal("1.77"));
         order.setLocation("Sweden, Malmö");
+        order.setPaymentType("PayPal (Onsite)");
+        order.setPaymentCurrencyCode("EUR");
         return order;
     }
 
@@ -139,6 +148,10 @@ class AccountingServiceTest {
             body.put("sub_total", "4.28");
             body.put("ship_total", "4.53");
             body.put("base_order_total", orderId.equals("tax-scheme") ? "10.47" : "8.81");
+            body.put("payment_method_type", "paypal");
+            body.put("payment_currency", "EUR");
+            body.put("payment_total", orderId.equals("tax-scheme") ? "10.47" : "8.81");
+            body.put("payment_transaction_id", "PAYPAL-" + orderId);
             body.put("tax_amount", "1.66");
             if (orderId.equals("tax-scheme")) {
                 body.put("tax_scheme_id", "ioss");

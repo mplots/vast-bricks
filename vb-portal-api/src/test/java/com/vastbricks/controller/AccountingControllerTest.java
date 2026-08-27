@@ -7,7 +7,7 @@ import java.time.YearMonth;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class AccountingControllerTest {
-    private final AccountingController controller = new AccountingController(null);
+    private final AccountingController controller = new AccountingController(null, null, null, null);
 
     @Test
     void defaultsToPreviousMonth() {

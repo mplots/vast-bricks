@@ -80,7 +80,14 @@ public class AccountingService {
                         country(order.getLocation()),
                         add(order.getShipping(), order.getAdditionalCharge2()),
                         add(order.getSalesTax(), order.getVat()),
-                        order.getBaseGrandTotal()
+                        order.getBaseGrandTotal(),
+                        paymentSource(order.getPaymentType()),
+                        null,
+                        null,
+                        order.getPaymentCurrencyCode(),
+                        null,
+                        null,
+                        null
                 ))
                 .toList();
     }
@@ -123,11 +130,32 @@ public class AccountingService {
                             country(order.getShipCountry()),
                             order.getShipping(),
                             order.getTaxSchemeId() != null ? order.getTaxAmount() : BigDecimal.ZERO,
-                            order.getBaseOrderTotal()
+                            order.getBaseOrderTotal(),
+                            paymentSource(order.getPaymentMethodType()),
+                            null,
+                            order.getPaymentTransactionId(),
+                            order.getPaymentCurrency(),
+                            null,
+                            null,
+                            null
                     ))
                     .forEach(orders::add);
         }
         return orders;
+    }
+
+    private String paymentSource(String paymentMethod) {
+        if (paymentMethod == null || paymentMethod.isBlank()) {
+            return null;
+        }
+        var normalized = paymentMethod.trim();
+        if (normalized.toLowerCase().contains("paypal")) {
+            return "PayPal";
+        }
+        if (normalized.toLowerCase().contains("stripe")) {
+            return "Stripe";
+        }
+        return normalized;
     }
 
     private LocalDate orderDate(LocalDateTime isoOrderTime, LocalDateTime orderTime) {

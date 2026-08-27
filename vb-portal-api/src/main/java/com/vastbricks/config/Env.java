@@ -55,6 +55,18 @@ public class Env {
     @Value("#{environment.BRICKLINK_TOKEN_SECRET}")
     private String brickLinkTokenSecret;
 
+    @Value("#{environment.PAYPAL_CLIENT_ID}")
+    private String paypalClientId;
+
+    @Value("#{environment.PAYPAL_CLIENT_SECRET}")
+    private String paypalClientSecret;
+
+    @Value("#{environment.PAYPAL_ENVIRONMENT ?: 'SANDBOX'}")
+    private String paypalEnvironment;
+
+    @Value("#{environment.STRIPE_SECRET_KEY}")
+    private String stripeSecretKey;
+
     @Value("#{environment.BRICKLINK_ORDER_ARCHIVE_DIR ?: '/tmp/vast-bricks/order-archive'}")
     private String brickLinkOrderArchiveDir;
 

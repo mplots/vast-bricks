@@ -15,7 +15,7 @@
         }
 
         .page-shell {
-            max-width: 1180px;
+            max-width: 1500px;
             margin: 0 auto;
         }
 
@@ -266,12 +266,14 @@
                     <th>Number</th>
                     <th>Buyer name</th>
                     <th>Location</th>
+                    <th>Payment source</th>
                     <th class="number">Lots</th>
                     <th class="number">Items</th>
                     <th class="number">Order total</th>
                     <th class="number">Shipping</th>
                     <th class="number" title="Tax collected from the customer and remitted to the marketplace">Tax</th>
                     <th class="number">Grand total</th>
+                    <th class="number">Paid amount</th>
                     <th class="number">VAT</th>
                 </tr>
                 </thead>
@@ -286,6 +288,7 @@
                     <td th:text="${order.orderNumber}">32266548</td>
                     <td th:text="${order.buyerName}">Buyer</td>
                     <td th:text="${order.location == null ? '—' : order.location}">Sweden</td>
+                    <td th:text="${order.paymentMethod == null ? '—' : order.paymentMethod}">paypal</td>
                     <td class="number" th:text="${order.lotCount}">3</td>
                     <td class="number" th:text="${order.itemCount}">3</td>
                     <td class="number"
@@ -300,18 +303,21 @@
                         th:title="${order.grandTotalMismatch ? 'Calculated: ' + #numbers.formatDecimal(order.calculatedGrandTotal, 1, 2) : null}"
                         th:text="${order.grandTotal == null ? '—' : #numbers.formatDecimal(order.grandTotal, 1, 2)}">10.19</td>
                     <td class="number"
+                        th:text="${order.paidAmount == null ? '—' : #numbers.formatDecimal(order.paidAmount, 1, 2)}">27.69</td>
+                    <td class="number"
                         th:text="${order.vatPresent ? #numbers.formatDecimal(order.vat, 1, 2) : '—'}">1.77</td>
                 </tr>
                 </tbody>
                 <tfoot>
                 <tr>
-                    <th colspan="5">Total</th>
+                    <th colspan="6">Total</th>
                     <td class="number" th:text="${summary.lotCount}">3</td>
                     <td class="number" th:text="${summary.itemCount}">3</td>
                     <td class="number" th:text="${#numbers.formatDecimal(summary.orderTotal, 1, 2)}">3.95</td>
                     <td class="number" th:text="${#numbers.formatDecimal(summary.shipping, 1, 2)}">6.24</td>
                     <td class="number" th:text="${#numbers.formatDecimal(summary.marketplaceTax, 1, 2)}">0.50</td>
                     <td class="number" th:text="${#numbers.formatDecimal(summary.grandTotal, 1, 2)}">10.19</td>
+                    <td></td>
                     <td class="number" th:text="${#numbers.formatDecimal(summary.vat, 1, 2)}">1.77</td>
                 </tr>
                 </tfoot>

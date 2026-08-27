@@ -29,6 +29,8 @@ public class OrderExportRequest {
     @Builder.Default
     private final String getDateFormat = "0";
     @Builder.Default
+    private final String useRealName = "Y";
+    @Builder.Default
     private final String includeMyCost = "Y";
     private final String getOrders;
 
