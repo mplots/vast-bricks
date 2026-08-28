@@ -46,7 +46,7 @@ export class VastApiClient {
   }
 
   async requestNewTorCircuit(): Promise<TorCircuitResponse> {
-    const response = await this.fetchImpl(`${this.baseUrl}/api/vast/tor/circuit`, {
+    const response = await this.fetchImpl(`${this.baseUrl}/api/private/tor/circuit`, {
       method: 'POST',
       headers: {
         Accept: 'application/json'

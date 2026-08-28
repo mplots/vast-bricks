@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(value = "/api/vast/tor", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/private/tor", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class TorController {
 

@@ -65,6 +65,10 @@ to Java backend code only; do not create another frontend application.
   implementation.
 - New HTTP endpoints should use a coherent, explicitly owned API namespace and
   must not shadow legacy mappings accidentally.
+- Rewritten endpoints that must be private before authentication moves into the
+  rewrite must use the legacy private API path prefix `/api/private/**` so they
+  are protected by `vb-portal-api` when embedded in the legacy production
+  application.
 - Rewritten API controllers must explicitly declare JSON response production,
   preferably on their class-level `@RequestMapping` with
   `produces = MediaType.APPLICATION_JSON_VALUE`. Do not rely on default content
