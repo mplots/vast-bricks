@@ -18,4 +18,6 @@ test('tor circuit endpoint returns a changed IP address', async ({ baseURL }) =>
   expect(response.currentIpAddress).toMatch(ipAddressPattern);
   expect(response.changed).toBe(true);
   expect(response.currentIpAddress).not.toBe(response.previousIpAddress);
+  expect(response.elapsedMillis).toBeGreaterThanOrEqual(0);
+  expect(response.attempts).toBeGreaterThanOrEqual(1);
 });

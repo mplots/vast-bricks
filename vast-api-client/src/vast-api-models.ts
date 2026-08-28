@@ -6,6 +6,8 @@ export type TorCircuitResponse = {
   previousIpAddress: string;
   currentIpAddress: string;
   changed: boolean;
+  elapsedMillis: number;
+  attempts: number;
 };
 
 export function parseHealthResponse(value: unknown): HealthResponse {
@@ -30,6 +32,8 @@ export function parseTorCircuitResponse(value: unknown): TorCircuitResponse {
     previousIpAddress?: unknown;
     currentIpAddress?: unknown;
     changed?: unknown;
+    elapsedMillis?: unknown;
+    attempts?: unknown;
   };
 
   if (typeof response.previousIpAddress !== 'string' || response.previousIpAddress.length === 0) {
@@ -44,9 +48,19 @@ export function parseTorCircuitResponse(value: unknown): TorCircuitResponse {
     throw new Error('Invalid Tor circuit response: missing changed.');
   }
 
+  if (typeof response.elapsedMillis !== 'number' || response.elapsedMillis < 0) {
+    throw new Error('Invalid Tor circuit response: missing elapsedMillis.');
+  }
+
+  if (typeof response.attempts !== 'number' || !Number.isInteger(response.attempts) || response.attempts < 1) {
+    throw new Error('Invalid Tor circuit response: missing attempts.');
+  }
+
   return {
     previousIpAddress: response.previousIpAddress,
     currentIpAddress: response.currentIpAddress,
     changed: response.changed,
+    elapsedMillis: response.elapsedMillis,
+    attempts: response.attempts,
   };
 }

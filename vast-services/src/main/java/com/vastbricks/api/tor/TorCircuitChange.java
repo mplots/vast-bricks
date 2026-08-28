@@ -9,6 +9,8 @@ class TorCircuitChange {
 
     private final String previousIpAddress;
     private final String currentIpAddress;
+    private final long elapsedMillis;
+    private final int attempts;
 
     public boolean isChanged() {
         return !previousIpAddress.equals(currentIpAddress);

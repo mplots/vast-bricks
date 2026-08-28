@@ -1,6 +1,7 @@
 package com.vastbricks.api.tor;
 
 import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -10,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.time.Duration;
 import java.time.Instant;
 
 @Service
@@ -22,16 +24,19 @@ class TorCircuitService {
     private final TorIpAddressService torIpAddressService;
 
     public synchronized TorCircuitChange requestNewCircuit(boolean waitForNewIp) {
+        var startedAt = Instant.now();
         var previousIpAddress = torIpAddressService.currentIpAddress();
         sendNewCircuitSignal();
 
         if (!waitForNewIp) {
-            return new TorCircuitChange(previousIpAddress, torIpAddressService.currentIpAddress());
+            var currentIpAddress = torIpAddressService.currentIpAddress();
+            return new TorCircuitChange(previousIpAddress, currentIpAddress, elapsedMillis(startedAt), 1);
         }
 
-        var currentIpAddress = waitForChangedIp(previousIpAddress);
+        var waitResult = waitForChangedIp(previousIpAddress);
+        var currentIpAddress = waitResult.getIpAddress();
         log.info("New Tor IP assigned: {}", currentIpAddress);
-        return new TorCircuitChange(previousIpAddress, currentIpAddress);
+        return new TorCircuitChange(previousIpAddress, currentIpAddress, elapsedMillis(startedAt), waitResult.getAttempts());
     }
 
     private void sendNewCircuitSignal() {
@@ -57,26 +62,47 @@ class TorCircuitService {
         }
     }
 
-    private String waitForChangedIp(String previousIpAddress) {
+    private WaitResult waitForChangedIp(String previousIpAddress) {
         var deadline = Instant.now().plus(settings.getNewIpTimeout());
+        var pollInterval = settings.getNewIpInitialPollInterval();
+        var attempts = 0;
         while (Instant.now().isBefore(deadline)) {
+            attempts++;
             var currentIpAddress = torIpAddressService.currentIpAddress();
             if (!previousIpAddress.equals(currentIpAddress)) {
-                return currentIpAddress;
+                return new WaitResult(currentIpAddress, attempts);
             }
 
-            sleepOneSecond();
+            sleep(pollInterval);
+            pollInterval = nextPollInterval(pollInterval);
         }
 
         throw new TorCircuitException("Timed out waiting for Tor to assign a new IP address.");
     }
 
-    private void sleepOneSecond() {
+    private Duration nextPollInterval(Duration current) {
+        var next = current.multipliedBy(2);
+        return next.compareTo(settings.getNewIpMaxPollInterval()) > 0
+                ? settings.getNewIpMaxPollInterval()
+                : next;
+    }
+
+    private long elapsedMillis(Instant startedAt) {
+        return Duration.between(startedAt, Instant.now()).toMillis();
+    }
+
+    private void sleep(Duration duration) {
         try {
-            Thread.sleep(1000);
+            Thread.sleep(duration.toMillis());
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
             throw new TorCircuitException("Interrupted while waiting for a new Tor IP address.", ex);
         }
+    }
+
+    @Value
+    private static class WaitResult {
+        String ipAddress;
+        int attempts;
     }
 }

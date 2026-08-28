@@ -48,6 +48,8 @@ public class TorRestClientFactory {
                 new InetSocketAddress(settings.getProxyHost(), settings.getProxyPort())
         );
         factory.setProxy(proxy);
+        factory.setConnectTimeout(settings.getConnectTimeout());
+        factory.setReadTimeout(settings.getReadTimeout());
         return factory;
     }
 
