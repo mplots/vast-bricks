@@ -1,0 +1,14 @@
+{
+  "name": "vast-acceptance-tests",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "playwright test",
+    "test:api": "playwright test --project=api"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.54.2",
+    "typescript": "5.8.3"
+  }
+}

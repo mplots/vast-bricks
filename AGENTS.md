@@ -30,6 +30,11 @@ legacy backend remains in service. After all legacy functionality has moved and
 The names describe architectural roles, not migration status. Do not use
 temporary names such as `next`, `new`, or `rewrite` for the new modules.
 
+Any newly introduced project, module, package, or top-level tool that belongs
+to the rewrite must use the `vast-*` prefix. Treat `vast-*` as the durable
+rewrite namespace and do not introduce unprefixed project names for new rewrite
+work.
+
 `vast-portal` is already part of the rewrite. The current rewrite effort applies
 to Java backend code only; do not create another frontend application.
 
@@ -68,6 +73,32 @@ to Java backend code only; do not create another frontend application.
   `vast-api`.
 - Do not disable or override XML content negotiation globally because legacy
   endpoints still legitimately produce XML.
+
+## Rewrite coding guidelines
+
+- Structure rewritten backend code by vertical feature packages, not by broad
+  technical layers. Prefer packages such as `requirements`, `inventory`, or
+  `pricing` that contain that feature's controllers, services, models,
+  repositories, and configuration together.
+- Do not create shared top-level layer packages such as `controller`, `service`,
+  `repository`, `dto`, or `model` for rewrite code. Use technical subpackages
+  only inside a feature package when the feature is large enough to need them.
+- Cross-feature sharing is allowed when the shared capability is intentional and
+  stable. For example, a Tor HTTP client can be implemented once as an explicit
+  feature or infrastructure boundary and reused by other features. Do not share
+  by reaching into another feature's internal implementation details.
+- Shared feature boundaries must expose a small, intentional public API. For
+  the Tor feature, other features request configured Spring `RestClient`
+  instances from the public factory/options API and then use them as normal
+  clients. Circuit switching, control-port handling, and IP polling services
+  are internal implementation details and must not be exposed to other
+  features.
+- Do not use Java records in rewrite code. Prefer regular classes.
+- Use Lombok in rewrite Java code for repetitive boilerplate such as getters,
+  setters, constructors, builders, `equals`, and `hashCode` when it keeps the
+  code clearer.
+- Prefer direct environment-variable based configuration with explicit default
+  values over Spring properties classes for rewrite settings.
 
 ## Spring Boot composition
 
@@ -125,19 +156,29 @@ to Java backend code only; do not create another frontend application.
 ## Developer CLI
 
 - The repository-level developer command is `./vast`.
+- Developers who want to call it from any working directory should add a shell
+  alias using the absolute repository path, matching the `./saku` setup style:
+  `alias vast="/Users/mplots/git/vast-bricks/vast"`. Also source completions
+  with `source <(vast completion)`. Put both lines in the active shell config,
+  such as `~/.zshrc`, then restart the shell or source the updated config.
 - Follow the general model of Insaku's `./saku`: provide one stable interface
   for agents and developers to build, start, stop, restart, inspect, and test
   managed local services.
 - Once implemented, use `./vast` instead of ad hoc application start commands
   or direct Playwright invocations for managed acceptance workflows.
+- Use `./vast test` or the shortcut `./vast t` to run Playwright API
+  acceptance tests from `vast-acceptance-tests`. Pass `-b` or `--build` when
+  the managed `vast-api` should be rebuilt and restarted before running tests.
 - The CLI should eventually manage PostgreSQL readiness, migrations, service
   readiness, focused Playwright API runs, restarts after code changes, logs, and
   cleanup.
 - Add CLI capabilities incrementally with the workflow that needs them; do not
   build the entire final CLI during module scaffolding.
-- `./vast services` (alias `./vast svc`) manages `vast-api` and `vast-portal`.
-  Managed instances use ports 6362 and 3100 respectively, leaving the normal
-  IntelliJ ports 6262 and 3000 available for independently launched instances.
+- `./vast services` (alias `./vast svc`) manages `postgres`, `tor-proxy`,
+  `vast-api`, and `vast-portal`. Managed application instances use ports 6362
+  and 3100 respectively, leaving the normal IntelliJ ports 6262 and 3000
+  available for independently launched instances.
+- `./vast ps` is the shortcut for `./vast services list`.
 - Runtime process state and logs belong under the ignored `.vast` directory.
   Service stop operations must affect only processes recorded and verified as
   owned by `./vast`; never terminate an arbitrary process solely because it

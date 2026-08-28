@@ -66,21 +66,24 @@ function printHelp() {
   ./vast services <list|start|stop|restart> [services...] [options]
 
 Services:
-  vast-api | vast-portal
+  postgres | tor-proxy | vast-api | vast-portal
 
 Commands:
   list                  Print service health and managed process state
-  start [services...]   Start selected services, or both when omitted
-  stop [services...]    Stop selected managed services, or both when omitted
-  restart [services...] Stop and start selected services, or both when omitted
+  start [services...]   Start selected services, or all when omitted
+  stop [services...]    Stop selected managed services, or all when omitted
+  restart [services...] Stop and start selected services, or all when omitted
 
 Options:
   --skip-build, -sb     Use the existing vast-api executable JAR
   --help, -h            Show this help
 
 Managed ports:
+  postgres     2345
+  tor-proxy    8118
   vast-api     6362
   vast-portal  3100
 
+Postgres intentionally uses non-default host port 2345.
 IntelliJ launches keep their existing ports 6262 and 3000.`);
 }

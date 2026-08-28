@@ -16,5 +16,20 @@ services:
     shm_size: '256mb'
     command: ["postgres", "-c", "log_statement=all", "-c", "shared_preload_libraries=pg_stat_statements"]
 
+  tor-proxy:
+    image: dperson/torproxy
+    container_name: vast-bricks-tor-proxy
+    ports:
+      - target: 9050
+        published: 9050
+        host_ip: 127.0.0.1
+      - target: 8118
+        published: 8118
+        host_ip: 127.0.0.1
+      - target: 9051
+        published: 9051
+        host_ip: 127.0.0.1
+    command: ["-p", "yourpass"]
+
 volumes:
   postgres-vast-bricks:

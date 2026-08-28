@@ -3,7 +3,25 @@ import { resolve } from "node:path";
 
 import { repoRoot } from "./paths.mjs";
 
+const viteExecutable = resolve(repoRoot, "vast-portal", "node_modules", ".bin", process.platform === "win32" ? "vite.cmd" : "vite");
+
 export const managedServices = [
+  {
+    name: "postgres",
+    port: 2345,
+    healthCheck: "tcp",
+    host: "127.0.0.1",
+    dockerComposeService: "postgres",
+    containerName: "vast-bricks-postgres",
+  },
+  {
+    name: "tor-proxy",
+    port: 8118,
+    healthCheck: "tcp",
+    host: "127.0.0.1",
+    dockerComposeService: "tor-proxy",
+    containerName: "vast-bricks-tor-proxy",
+  },
   {
     name: "vast-api",
     port: 6362,
@@ -24,25 +42,27 @@ export const managedServices = [
     name: "vast-portal",
     port: 3100,
     healthUrl: "http://127.0.0.1:3100/",
-    command: "npm",
+    dependency: {
+      path: viteExecutable,
+      install: {
+        command: "yarn",
+        args: ["--cwd", "vast-portal", "install", "--frozen-lockfile"],
+      },
+    },
+    command: viteExecutable,
     args: [
-      "--prefix",
-      "vast-portal",
-      "run",
-      "start",
-      "--",
       "--host",
       "127.0.0.1",
       "--port",
       "3100",
       "--strictPort",
     ],
-    cwd: repoRoot,
+    cwd: resolve(repoRoot, "vast-portal"),
     env: {
       VAST_MANAGED: "true",
       VITE_APP_API_PROXY: "http://127.0.0.1:6362",
     },
-    processMarker: "vast-portal",
+    processMarker: "node_modules/.bin/vite",
   },
 ];
 

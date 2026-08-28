@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["DOM", "ES2022"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@vastbricks/vast-api-client": ["../vast-api-client/src/index.ts"]
+    }
+  },
+  "include": ["playwright.config.ts", "tests/**/*.ts"]
+}

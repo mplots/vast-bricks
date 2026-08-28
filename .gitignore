@@ -4,10 +4,13 @@
 .vast
 target
 node_modules
+playwright-report
+test-results
 .env
 !vast-portal/.env
 vb-portal-api/src/main/resources/db/migration/data
 vast-portal-full-version
+vb-portal-full-version
 orders
 inventory
 vb-chrome-plugin-manspasts/credentials.json

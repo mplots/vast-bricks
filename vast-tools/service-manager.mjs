@@ -12,12 +12,37 @@ import { resolve } from "node:path";
 import { execFileSync, spawn, spawnSync } from "node:child_process";
 import { Socket } from "node:net";
 
-import { logsRoot, runtimeRoot, servicesStatePath } from "./paths.mjs";
+import { logsRoot, repoRoot, runtimeRoot, servicesStatePath } from "./paths.mjs";
 import { findService, managedServices } from "./service-registry.mjs";
 
 const readinessTimeoutMs = 90_000;
 const stopTimeoutMs = 15_000;
 const pollIntervalMs = 250;
+const resetColor = "\x1b[0m";
+const statusLabels = {
+  healthy: { text: "HEALTHY", color: "\x1b[32m" },
+  missing: { text: "MISSING", color: "\x1b[38;5;208m" },
+  unhealthy: { text: "UNHEALTHY", color: "\x1b[31m" },
+  started: { text: "STARTED", color: "\x1b[33m" },
+  starting: { text: "STARTING", color: "\x1b[33m" },
+  stopping: { text: "STOPPING", color: "\x1b[36m" },
+  stopped: { text: "STOPPED", color: "\x1b[32m" },
+  build: { text: "BUILD", color: "\x1b[33m" },
+  install: { text: "INSTALL", color: "\x1b[33m" },
+  skipped: { text: "SKIPPED", color: "\x1b[2m" },
+  stale: { text: "STALE", color: "\x1b[38;5;208m" },
+  unmanaged: { text: "UNMANAGED", color: "\x1b[2m" },
+};
+
+function statusLabel(label) {
+  const config = statusLabels[label];
+  const text = config.text.padEnd(9);
+  return colorsEnabled() ? `${config.color}${text}${resetColor}` : text;
+}
+
+function colorsEnabled() {
+  return Boolean(process.stdout.isTTY) && !process.env.NO_COLOR;
+}
 
 export async function listServices(names) {
   const services = selectedServices(names).map(findService);
@@ -27,13 +52,15 @@ export async function listServices(names) {
   for (const service of services) {
     const record = state.find(({ name }) => name === service.name);
     const health = await checkHealth(service);
-    const ownership = record && isOwnedProcessRunning(service, record)
-      ? `managed pid=${record.pid}`
-      : record
-        ? "stale managed state"
-        : "unmanaged";
-    const status = health.healthy ? "HEALTHY" : health.reachable ? "UNHEALTHY" : "MISSING";
-    console.log(`${status.padEnd(10)} ${service.name.padEnd(12)} port=${service.port} ${ownership} ${health.detail}`);
+    const ownership = service.dockerComposeService
+      ? dockerOwnership(service)
+      : record && isOwnedProcessRunning(service, record)
+        ? `managed pid=${record.pid}`
+        : record
+          ? "stale managed state"
+          : "unmanaged";
+    const status = health.healthy ? "healthy" : health.reachable ? "unhealthy" : "missing";
+    console.log(`${statusLabel(status)} ${service.name.padEnd(12)} port=${service.port} ${ownership} ${health.detail}`);
     allHealthy &&= health.healthy;
   }
 
@@ -74,13 +101,18 @@ export async function restartServices(names, options = {}) {
 }
 
 async function startService(service, { skipBuild = false } = {}) {
+  if (service.dockerComposeService) {
+    await startDockerComposeService(service);
+    return;
+  }
+
   const state = readState();
   const record = state.find(({ name }) => name === service.name);
   const health = await checkHealth(service);
   const ownedProcessRunning = record && isOwnedProcessRunning(service, record);
 
   if (ownedProcessRunning && health.healthy) {
-    console.log(`HEALTHY    ${service.name.padEnd(12)} already managed pid=${record.pid} port=${service.port}`);
+    console.log(`${statusLabel("healthy")} ${service.name.padEnd(12)} already managed pid=${record.pid} port=${service.port}`);
     return;
   }
 
@@ -96,11 +128,12 @@ async function startService(service, { skipBuild = false } = {}) {
   removeStateRecord(service.name);
 
   if (service.build && !skipBuild) {
-    console.log(`BUILD      ${service.name}`);
-    runForeground(service.build.command, service.build.args, service.cwd);
+    runLoggedForeground(service.build.command, service.build.args, service.cwd, `${service.name}-build`, `${statusLabel("build")} ${service.name}`);
   } else if (service.build) {
-    console.log(`SKIP BUILD ${service.name}`);
+    console.log(`${statusLabel("skipped")} ${service.name} build skipped`);
   }
+
+  ensureServiceDependency(service);
 
   mkdirSync(logsRoot, { recursive: true });
   const logPath = resolve(logsRoot, `${service.name}.log`);
@@ -129,25 +162,30 @@ async function startService(service, { skipBuild = false } = {}) {
     port: service.port,
     startedAt: new Date().toISOString(),
   });
-  console.log(`STARTED    ${service.name.padEnd(12)} pid=${child.pid} port=${service.port} log=${logPath}`);
+  console.log(`${statusLabel("started")} ${service.name.padEnd(12)} pid=${child.pid} port=${service.port} log=${logPath}`);
 
   const ready = await waitForHealth(service, child.pid);
   if (!ready.healthy) {
     printLogTail(service.name);
     throw new Error(`${service.name} did not become healthy within ${readinessTimeoutMs / 1_000}s: ${ready.detail}`);
   }
-  console.log(`HEALTHY    ${service.name.padEnd(12)} ${service.healthUrl}`);
+  console.log(`${statusLabel("healthy")} ${service.name.padEnd(12)} ${service.healthUrl}`);
 }
 
 async function stopService(service) {
+  if (service.dockerComposeService) {
+    await stopDockerComposeService(service);
+    return;
+  }
+
   const record = readState().find(({ name }) => name === service.name);
   if (!record) {
-    console.log(`NOT MANAGED ${service.name.padEnd(12)} no recorded process`);
+    console.log(`${statusLabel("unmanaged")} ${service.name.padEnd(12)} no recorded process`);
     return;
   }
 
   if (!isOwnedProcessRunning(service, record)) {
-    console.log(`STALE      ${service.name.padEnd(12)} pid=${record.pid}`);
+    console.log(`${statusLabel("stale")} ${service.name.padEnd(12)} pid=${record.pid}`);
     removeStateRecord(service.name);
     return;
   }
@@ -159,14 +197,64 @@ async function stopService(service) {
       throw error;
     }
   }
-  console.log(`STOPPING   ${service.name.padEnd(12)} pid=${record.pid}`);
+  console.log(`${statusLabel("stopping")} ${service.name.padEnd(12)} pid=${record.pid}`);
 
   if (!(await waitForProcessGroupExit(record.pid, stopTimeoutMs))) {
     throw new Error(`${service.name} did not stop within ${stopTimeoutMs / 1_000}s. Its process was not force-killed.`);
   }
 
   removeStateRecord(service.name);
-  console.log(`STOPPED    ${service.name.padEnd(12)} port=${service.port}`);
+  console.log(`${statusLabel("stopped")} ${service.name.padEnd(12)} port=${service.port}`);
+}
+
+async function startDockerComposeService(service) {
+  const health = await checkHealth(service);
+  const containerRunning = isDockerContainerRunning(service);
+
+  if (containerRunning && health.healthy) {
+    console.log(`${statusLabel("healthy")} ${service.name.padEnd(12)} already managed container=${service.containerName} port=${service.port}`);
+    return;
+  }
+
+  if (!containerRunning && health.reachable) {
+    throw new Error(`${service.name} port ${service.port} is already in use and it was not started by ./vast. Stop that process or choose another managed port.`);
+  }
+
+  runLoggedForeground(
+    "docker",
+    ["compose", "up", service.dockerComposeService, "-d"],
+    repoRoot,
+    `${service.name}-compose-up`,
+    `${statusLabel("starting")} ${service.name}`,
+  );
+
+  const ready = await waitForHealth(service);
+  if (!ready.healthy) {
+    printDockerLogTail(service);
+    throw new Error(`${service.name} did not become healthy within ${readinessTimeoutMs / 1_000}s: ${ready.detail}`);
+  }
+  console.log(`${statusLabel("healthy")} ${service.name.padEnd(12)} tcp://${service.host}:${service.port}`);
+}
+
+async function stopDockerComposeService(service) {
+  if (!isDockerContainerRunning(service)) {
+    console.log(`${statusLabel("unmanaged")} ${service.name.padEnd(12)} container=${service.containerName}`);
+    return;
+  }
+
+  runLoggedForeground(
+    "docker",
+    ["compose", "stop", service.dockerComposeService],
+    repoRoot,
+    `${service.name}-compose-stop`,
+    `${statusLabel("stopping")} ${service.name}`,
+  );
+
+  if (!(await waitForPortClosed(service.port, stopTimeoutMs))) {
+    throw new Error(`${service.name} port ${service.port} remained open after docker compose stop.`);
+  }
+
+  console.log(`${statusLabel("stopped")} ${service.name.padEnd(12)} port=${service.port}`);
 }
 
 function runForeground(command, args, cwd) {
@@ -183,7 +271,57 @@ function runForeground(command, args, cwd) {
   }
 }
 
+function runLoggedForeground(command, args, cwd, logName, label) {
+  mkdirSync(logsRoot, { recursive: true });
+  const logPath = resolve(logsRoot, `${logName}.log`);
+  const logFd = openSync(logPath, "a");
+  console.log(`${label} log=${logPath}`);
+  let result;
+  try {
+    result = spawnSync(command, args, {
+      cwd,
+      env: process.env,
+      stdio: ["ignore", logFd, logFd],
+    });
+  } finally {
+    closeSync(logFd);
+  }
+
+  if (result.error) {
+    throw result.error;
+  }
+  if (result.status !== 0) {
+    printFileTail(logPath);
+    throw new Error(`${command} ${args.join(" ")} exited with status ${result.status}. Log: ${logPath}`);
+  }
+}
+
+function ensureServiceDependency(service) {
+  if (!service.dependency || existsSync(service.dependency.path)) {
+    return;
+  }
+
+  const install = service.dependency.install;
+  if (!install) {
+    throw new Error(`${service.name} dependency is missing at ${service.dependency.path}.`);
+  }
+
+  runLoggedForeground(install.command, install.args, repoRoot, `${service.name}-install`, `${statusLabel("install")} ${service.name}`);
+  if (!existsSync(service.dependency.path)) {
+    throw new Error(`${service.name} dependency install completed, but ${service.dependency.path} is still missing.`);
+  }
+}
+
 async function checkHealth(service) {
+  if (service.healthCheck === "tcp") {
+    const portOpen = await isPortOpen(service.port, service.host);
+    return {
+      healthy: portOpen,
+      reachable: portOpen,
+      detail: portOpen ? "TCP open" : "not reachable",
+    };
+  }
+
   try {
     const response = await fetch(service.healthUrl, { signal: AbortSignal.timeout(2_000) });
     return {
@@ -207,7 +345,7 @@ async function waitForHealth(service, pid) {
   const deadline = Date.now() + readinessTimeoutMs;
   let health = await checkHealth(service);
   while (!health.healthy && Date.now() < deadline) {
-    if (!isProcessGroupRunning(pid)) {
+    if (pid && !isProcessGroupRunning(pid)) {
       return { healthy: false, reachable: false, detail: "managed process exited during startup" };
     }
     await delay(1_000);
@@ -216,7 +354,7 @@ async function waitForHealth(service, pid) {
   return health;
 }
 
-function isPortOpen(port) {
+function isPortOpen(port, host = "127.0.0.1") {
   return new Promise((resolveCheck) => {
     const socket = new Socket();
     const finish = (open) => {
@@ -227,8 +365,19 @@ function isPortOpen(port) {
     socket.once("connect", () => finish(true));
     socket.once("timeout", () => finish(false));
     socket.once("error", () => finish(false));
-    socket.connect(port, "127.0.0.1");
+    socket.connect(port, host);
   });
+}
+
+async function waitForPortClosed(port, timeoutMs) {
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    if (!(await isPortOpen(port))) {
+      return true;
+    }
+    await delay(pollIntervalMs);
+  }
+  return !(await isPortOpen(port));
 }
 
 function isOwnedProcessRunning(service, record) {
@@ -254,6 +403,29 @@ function isProcessGroupRunning(pid) {
   } catch (error) {
     return error?.code !== "ESRCH";
   }
+}
+
+function isDockerContainerRunning(service) {
+  if (!service.containerName) {
+    return false;
+  }
+
+  try {
+    const running = execFileSync("docker", ["inspect", "--format", "{{.State.Running}}", service.containerName], {
+      cwd: repoRoot,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+    }).trim();
+    return running === "true";
+  } catch {
+    return false;
+  }
+}
+
+function dockerOwnership(service) {
+  return isDockerContainerRunning(service)
+    ? `managed container=${service.containerName}`
+    : "unmanaged";
 }
 
 async function waitForProcessGroupExit(pid, timeoutMs) {
@@ -309,9 +481,31 @@ function printLogTail(serviceName, lineCount = 80) {
   if (!existsSync(logPath)) {
     return;
   }
+  printFileTail(logPath, lineCount);
+}
+
+function printFileTail(logPath, lineCount = 80) {
   const lines = readFileSync(logPath, "utf8").split(/\r?\n/);
   console.error(`\nLast ${lineCount} lines from ${logPath}:`);
   console.error(lines.slice(-lineCount).join("\n").trimEnd());
+}
+
+function printDockerLogTail(service, lineCount = 80) {
+  if (!service.containerName) {
+    return;
+  }
+
+  try {
+    const output = execFileSync("docker", ["logs", "--tail", String(lineCount), service.containerName], {
+      cwd: repoRoot,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    console.error(`\nLast ${lineCount} lines from Docker container ${service.containerName}:`);
+    console.error(output.trimEnd());
+  } catch {
+    // Docker may not have created the container yet; the startup error is enough.
+  }
 }
 
 function delay(milliseconds) {
