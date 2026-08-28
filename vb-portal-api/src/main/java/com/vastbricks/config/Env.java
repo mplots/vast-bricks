@@ -79,8 +79,20 @@ public class Env {
     @Value("#{environment.BSX_INVENTORY_FILE}")
     private String bsxInventoryFile;
 
-    @Value("#{environment.PORTAL_JWT_SECRET ?: 'dummy-secret'}")
+    @Value("#{environment.PORTAL_JWT_SECRET ?: 'dummy-secret-not-to-be-deployed-on-production'}")
     private String portalJwtSecret;
+
+    @Value("#{environment.MANAKABATA_API_TOKEN ?: 'dummy-secret'}")
+    private String manakabataApiToken;
+
+    @Value("#{environment.MANAKABATA_API_BASE_URL ?: 'https://web.manakabata.lv/api/v1'}")
+    private String manakabataApiBaseUrl;
+
+    @Value("#{environment.MANAKABATA_INVOICE_NUMERATOR_UUID ?: '9e6394be-33e6-4736-88bc-0de2cc550fad'}")
+    private String manakabataInvoiceNumeratorUuid;
+
+    @Value("#{environment.MANAKABATA_TEAM_BANK_ACCOUNT_UUID ?: 'b96e3a87-7839-4bbe-82de-c19474a76d8e'}")
+    private String manakabataTeamBankAccountUuid;
 
     @Value("#{environment.CYPRESS_DOCKER_IMAGE ?: 'ghcr.io/mplots/vb-cypress-manspasts'}")
     private String cypressDockerImage;

@@ -10,6 +10,8 @@
     <version>1.0</version>
 
     <modules>
+        <module>vast-services</module>
+        <module>vast-api</module>
         <module>vb-portal-api</module>
     </modules>
 </project>

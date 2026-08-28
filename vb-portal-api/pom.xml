@@ -11,6 +11,11 @@
     <dependencies>
         <dependency>
             <groupId>com.vastbricks</groupId>
+            <artifactId>vast-services</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.vastbricks</groupId>
             <artifactId>vb-portal-grpc</artifactId>
             <version>1.0</version>
         </dependency>

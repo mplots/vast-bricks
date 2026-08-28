@@ -2,8 +2,8 @@ import { useMemo } from 'react';
 
 import useSWR from 'swr';
 
-import type { AccountingPage } from 'types/accounting';
-import { fetcher } from 'utils/axios';
+import type { AccountingPage, GenerateInvoiceResult } from 'types/accounting';
+import axiosServices, { fetcher } from 'utils/axios';
 
 const endpoint = '/api/private/accounting';
 
@@ -30,4 +30,9 @@ export function useGetAccounting(month: string) {
     }),
     [data, error, isLoading, mutate]
   );
+}
+
+export async function generateInvoice(orderId: string, source: string) {
+  const response = await axiosServices.post<GenerateInvoiceResult>(`${endpoint}/invoices`, { orderId, source });
+  return response.data;
 }

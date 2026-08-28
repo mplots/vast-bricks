@@ -1,16 +1,15 @@
-package com.vastbricks;
+package com.vastbricks.api;
 
 import com.vastbricks.api.config.ApiConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Import;
-import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
-@EnableScheduling
 @Import(ApiConfiguration.class)
-public class Application {
+public class VastApiApplication {
+
     public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
+        SpringApplication.run(VastApiApplication.class, args);
     }
 }

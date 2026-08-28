@@ -1,11 +1,13 @@
 .DS_Store
 .idea
 .bricksync-data
+.vast
 target
 node_modules
 .env
+!vast-portal/.env
 vb-portal-api/src/main/resources/db/migration/data
-vb-portal-full-version
+vast-portal-full-version
 orders
 inventory
 vb-chrome-plugin-manspasts/credentials.json

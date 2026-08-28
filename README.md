@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./vb-portal/public/logo.png" />
+  <img src="./vast-portal/public/logo.png" />
 </p>
 
 ## About
@@ -11,6 +11,23 @@
 - Calculates and displays part-out ratios.
 - Helps LEGO resellers identify valuable sets.
 
+## Rewritten backend
+
+`vast-api` is the standalone Spring Boot launcher. `vast-services` contains all
+rewritten controllers and business logic. Both `vast-api` and the legacy
+`vb-portal-api` launch the features provided by `vast-services`.
+
+Build and start the standalone service:
+
+```bash
+mvn -pl vast-api -am package -DskipTests
+java -jar vast-api/target/vast-api-1.0.jar
+```
+
+It listens on port `6262` by default. Override the port with `VAST_API_PORT`.
+The scaffolding health endpoint is available at
+`GET /api/vast/health`.
+
 
 # Tor
 sudo docker run -d --name torproxy -p 9050:9050 -p 8118:8118 -p 9051:9051 dperson/torproxy -p yourpass
@@ -21,7 +38,7 @@ sudo docker run -d --cpus=".1" -v /home/ubuntu/bricksync/data:/opt/bricksync/dat
 
 
 # Nginx
-sudo mkdir -p /opt/nginx/vb-portal
+sudo mkdir -p /opt/nginx/vast-portal
 
 sudo docker run -d \
     --name nginx-proxy \
@@ -33,7 +50,7 @@ sudo docker run -d \
     -v /etc/letsencrypt:/etc/letsencrypt:ro \
     -v /opt/nginx/logs:/var/log/nginx \
     -v /opt/nginx/acme:/var/www/acme \
-    -v /opt/nginx/vb-portal:/usr/share/nginx/html/vb-portal:ro \
+    -v /opt/nginx/vast-portal:/usr/share/nginx/html/vast-portal:ro \
     nginx:stable-alpine
 
 ## Obtain the portal certificate for the first time
@@ -45,11 +62,11 @@ sudo docker start nginx-proxy
 sudo docker exec nginx-proxy nginx -t
 
 ## Deploy portal
-cd vb-portal
+cd vast-portal
 npm ci
 npm run build
-sudo mkdir -p /opt/nginx/vb-portal
-sudo cp -a dist/. /opt/nginx/vb-portal/
+sudo mkdir -p /opt/nginx/vast-portal
+sudo cp -a dist/. /opt/nginx/vast-portal/
 sudo cp ../vb-nginx/portal.vastbricks.com.conf /opt/nginx/sites-enabled/
 sudo docker exec nginx-proxy nginx -t
 sudo docker exec nginx-proxy nginx -s reload

@@ -1,0 +1,6 @@
+server:
+  port: ${VAST_API_PORT:6262}
+
+spring:
+  application:
+    name: vast-api

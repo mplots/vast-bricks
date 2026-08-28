@@ -1,0 +1,6 @@
+CREATE TABLE manakabata_client_mapping (
+    reference_id VARCHAR(255) PRIMARY KEY,
+    manakabata_client_uuid UUID NOT NULL UNIQUE,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);

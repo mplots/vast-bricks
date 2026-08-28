@@ -3,7 +3,9 @@ import { FormEvent, useState } from 'react';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import CircularProgress from '@mui/material/CircularProgress';
 import Chip from '@mui/material/Chip';
+import IconButton from '@mui/material/IconButton';
 import Skeleton from '@mui/material/Skeleton';
 import Stack from '@mui/material/Stack';
 import Table from '@mui/material/Table';
@@ -16,8 +18,9 @@ import TableRow from '@mui/material/TableRow';
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
+import { ReceiptAdd } from 'iconsax-reactjs';
 
-import { useGetAccounting } from 'api/accounting';
+import { generateInvoice, useGetAccounting } from 'api/accounting';
 import MainCard from 'components/MainCard';
 import type { AccountingOrder, AccountingSummary } from 'types/accounting';
 
@@ -41,7 +44,15 @@ const formatDate = (value?: string | null) => {
 
 const numericCell = { textAlign: 'right', whiteSpace: 'nowrap' } as const;
 
-function OrderRow({ order }: { order: AccountingOrder }) {
+function OrderRow({
+  order,
+  generating,
+  onGenerate
+}: {
+  order: AccountingOrder;
+  generating: boolean;
+  onGenerate: () => void;
+}) {
   const rowColor = order.unmatchedOnlinePayment ? '#fee2e2' : order.bankTransfer ? '#fef3c7' : undefined;
   const rowHoverColor = order.unmatchedOnlinePayment ? '#fecaca' : order.bankTransfer ? '#fde68a' : undefined;
   const grandTotal = (
@@ -68,6 +79,21 @@ function OrderRow({ order }: { order: AccountingOrder }) {
           : undefined
       }
     >
+      <TableCell sx={{ width: 56, whiteSpace: 'nowrap' }}>
+        <Tooltip title="Generate invoice" arrow>
+          <span>
+            <IconButton
+              size="small"
+              color="primary"
+              disabled={generating}
+              aria-label={`Generate invoice for order ${order.orderNumber}`}
+              onClick={onGenerate}
+            >
+              {generating ? <CircularProgress size={18} color="inherit" /> : <ReceiptAdd size={20} color="currentColor" />}
+            </IconButton>
+          </span>
+        </Tooltip>
+      </TableCell>
       <TableCell>
         <Chip
           label={order.source}
@@ -102,6 +128,7 @@ function OrderRow({ order }: { order: AccountingOrder }) {
 function SummaryRow({ summary }: { summary: AccountingSummary }) {
   return (
     <TableRow>
+      <TableCell />
       <TableCell colSpan={6} sx={{ fontWeight: 700 }}>
         Total
       </TableCell>
@@ -121,11 +148,29 @@ export default function AccountingPage() {
   const initialMonth = previousMonth();
   const [selectedMonth, setSelectedMonth] = useState(initialMonth);
   const [requestedMonth, setRequestedMonth] = useState(initialMonth);
+  const [generatingOrder, setGeneratingOrder] = useState<string | null>(null);
+  const [generationError, setGenerationError] = useState<string | null>(null);
+  const [generationMessage, setGenerationMessage] = useState<string | null>(null);
   const { accounting, accountingError, accountingLoading } = useGetAccounting(requestedMonth);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setRequestedMonth(selectedMonth);
+  };
+
+  const handleGenerateInvoice = async (order: AccountingOrder) => {
+    const orderKey = `${order.source}-${order.orderNumber}`;
+    setGeneratingOrder(orderKey);
+    setGenerationError(null);
+    setGenerationMessage(null);
+    try {
+      const result = await generateInvoice(order.orderNumber, order.source);
+      setGenerationMessage(`Created Manakabata invoice ${result.invoiceNumber} for ${result.name}.`);
+    } catch (error) {
+      setGenerationError(error instanceof Error ? error.message : 'Failed to generate invoice.');
+    } finally {
+      setGeneratingOrder(null);
+    }
   };
 
   return (
@@ -162,14 +207,17 @@ export default function AccountingPage() {
       {accountingLoading && <Skeleton variant="rounded" height={420} />}
 
       {accountingError && <Alert severity="error">{accountingError.message || 'Failed to load accounting orders.'}</Alert>}
+      {generationError && <Alert severity="error">{generationError}</Alert>}
+      {generationMessage && <Alert severity="success">{generationMessage}</Alert>}
 
       {!accountingLoading && !accountingError && accounting && (
         <MainCard content={false}>
           {accounting.orders.length ? (
             <TableContainer>
-              <Table stickyHeader size="small" sx={{ minWidth: 1450 }} aria-label="Accounting orders">
+              <Table stickyHeader size="small" sx={{ minWidth: 1600 }} aria-label="Accounting orders">
                 <TableHead>
                   <TableRow>
+                    <TableCell>Actions</TableCell>
                     <TableCell>Source</TableCell>
                     <TableCell>Date</TableCell>
                     <TableCell>Number</TableCell>
@@ -188,7 +236,12 @@ export default function AccountingPage() {
                 </TableHead>
                 <TableBody>
                   {accounting.orders.map((order) => (
-                    <OrderRow key={`${order.source}-${order.orderNumber}`} order={order} />
+                    <OrderRow
+                      key={`${order.source}-${order.orderNumber}`}
+                      order={order}
+                      generating={generatingOrder === `${order.source}-${order.orderNumber}`}
+                      onGenerate={() => handleGenerateInvoice(order)}
+                    />
                   ))}
                 </TableBody>
                 <TableFooter>

@@ -37,3 +37,11 @@ export interface AccountingPage {
   orders: AccountingOrder[];
   summary: AccountingSummary;
 }
+
+export interface GenerateInvoiceResult {
+  invoiceUuid: string;
+  invoiceNumber: string;
+  clientUuid: string;
+  referenceId: string;
+  name: string;
+}
