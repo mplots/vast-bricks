@@ -2,55 +2,46 @@ package com.vastbricks.controller;
 
 import com.vastbricks.accounting.AccountingSummary;
 import com.vastbricks.archives.ArchiveOrder;
+import com.vastbricks.archives.ArchivesPage;
 import com.vastbricks.archives.ArchivesService;
 import com.vastbricks.job.BrickLinkOrderArchiveJob;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.time.YearMonth;
 import java.time.format.DateTimeParseException;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 public class ArchivesController {
     private final ArchivesService archivesService;
     private final BrickLinkOrderArchiveJob archiveJob;
 
-    @GetMapping("/archives")
-    public String archives(
-            @RequestParam(value = "month", required = false) String requestedMonth,
-            Model model
+    @GetMapping("/api/private/archives")
+    public ArchivesPage archives(
+        @RequestParam(value = "month", required = false) String requestedMonth
     ) {
         var month = parseMonth(requestedMonth);
         var orders = archivesService.findOrders(month);
-        model.addAttribute("selectedMonth", month.toString());
-        model.addAttribute("orders", orders);
-        model.addAttribute(
-            "summary",
+        return new ArchivesPage(
+            month.toString(),
+            orders,
             AccountingSummary.from(orders.stream().map(ArchiveOrder::getOrder).toList())
         );
-        return "archives";
     }
 
-    @PostMapping("/archives/{orderId}/download-missing")
-    public String downloadMissingArchives(
-        @PathVariable("orderId") long orderId,
-        @RequestParam("month") String requestedMonth,
-        RedirectAttributes redirectAttributes
-    ) throws IOException {
-        var month = parseMonth(requestedMonth);
+    @PostMapping("/api/private/archives/{orderId}/download-missing")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void downloadMissingArchives(@PathVariable("orderId") long orderId) throws IOException {
         archiveJob.archiveOrder(orderId);
-        redirectAttributes.addAttribute("month", month.toString());
-        return "redirect:/archives";
     }
 
     YearMonth parseMonth(String value) {

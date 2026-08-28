@@ -1,26 +1,18 @@
-package com.vastbricks.controller;
+package com.vastbricks.accounting;
 
-import com.vastbricks.accounting.AccountingService;
-import com.vastbricks.accounting.AccountingSummary;
-import com.vastbricks.accounting.AccountingPaymentMatcher;
-import com.vastbricks.accounting.paypal.PayPalTransaction;
 import com.vastbricks.accounting.paypal.PayPalTransactionService;
-import com.vastbricks.accounting.stripe.StripeTransaction;
 import com.vastbricks.accounting.stripe.StripeTransactionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.YearMonth;
 import java.time.format.DateTimeParseException;
-import java.util.List;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 public class AccountingController {
     private final AccountingService accountingService;
@@ -28,19 +20,19 @@ public class AccountingController {
     private final StripeTransactionService stripeTransactionService;
     private final AccountingPaymentMatcher accountingPaymentMatcher;
 
-    @GetMapping("/accounting")
-    public String accounting(
-            @RequestParam(value = "month", required = false) String requestedMonth,
-            Model model
+    @GetMapping("/api/private/accounting")
+    public AccountingPage accountingApi(
+            @RequestParam(value = "month", required = false) String requestedMonth
     ) {
+        return loadAccounting(requestedMonth);
+    }
+
+    AccountingPage loadAccounting(String requestedMonth) {
         var month = parseMonth(requestedMonth);
         var orders = accountingService.findOrders(month);
         accountingPaymentMatcher.matchPayPal(orders, payPalTransactionService.findTransactions(month));
         accountingPaymentMatcher.matchStripe(orders, stripeTransactionService.findTransactions(month));
-        model.addAttribute("selectedMonth", month.toString());
-        model.addAttribute("orders", orders);
-        model.addAttribute("summary", AccountingSummary.from(orders));
-        return "accounting";
+        return new AccountingPage(month.toString(), orders, AccountingSummary.from(orders));
     }
 
     YearMonth parseMonth(String value) {

@@ -9,39 +9,30 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 @RestController
-@RequestMapping("/api/account")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class AccountController {
 
     private final PortalAuthenticationService authenticationService;
     private final PortalTokenService tokenService;
 
-    @PostMapping("/login")
+    @PostMapping("/account/login")
     public LoginResponse login(@RequestBody LoginRequest request) {
         var user = authenticationService.authenticate(request.getEmail(), request.getPassword())
                 .orElseThrow(AccountController::unauthorized);
         return new LoginResponse(tokenService.createToken(user), toProfile(user));
     }
 
-    @GetMapping("/me")
-    public UserResponse me(@RequestHeader(value = "Authorization", required = false) String authorization) {
-        if (authorization == null || !authorization.startsWith("Bearer ")) {
-            throw unauthorized();
-        }
-
-        try {
-            var userId = tokenService.verifyAndGetUserId(authorization.substring("Bearer ".length()));
-            var user = authenticationService.findActiveById(userId).orElseThrow(AccountController::unauthorized);
-            return new UserResponse(toProfile(user));
-        } catch (PortalTokenService.InvalidTokenException e) {
-            throw unauthorized();
-        }
+    @GetMapping("/private/account/me")
+    public UserResponse me(
+            @RequestAttribute(PortalAuthenticationInterceptor.AUTHENTICATED_USER_ATTRIBUTE) PortalUser user) {
+        return new UserResponse(toProfile(user));
     }
 
     private static UserProfile toProfile(PortalUser user) {

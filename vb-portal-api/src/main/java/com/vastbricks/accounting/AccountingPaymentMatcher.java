@@ -58,6 +58,10 @@ public class AccountingPaymentMatcher {
             Map<String, PayPalTransaction> transactionsById,
             Map<String, PayPalTransaction> transactionsByInvoiceId
     ) {
+        if (!PAYPAL.equals(order.getPaymentMethod())) {
+            return;
+        }
+
         var transaction = transactionsById.get(order.getPaymentTransactionId());
         if (transaction == null) {
             transaction = transactionsByInvoiceId.get(order.getOrderNumber());
@@ -72,7 +76,12 @@ public class AccountingPaymentMatcher {
     }
 
     private void matchBrickLink(AccountingOrder order, List<PayPalTransaction> payPalTransactions) {
-        if (!PAYPAL.equals(order.getPaymentMethod()) || payPalTransactions == null || payPalTransactions.isEmpty()) {
+        if (!PAYPAL.equals(order.getPaymentMethod())) {
+            return;
+        }
+
+        if (payPalTransactions == null || payPalTransactions.isEmpty()) {
+            order.setPaymentMatchStatus("UNMATCHED");
             return;
         }
 
@@ -118,7 +127,12 @@ public class AccountingPaymentMatcher {
     }
 
     private void matchBrickLinkStripe(AccountingOrder order, List<StripeTransaction> stripeTransactions) {
-        if (!STRIPE.equals(order.getPaymentMethod()) || stripeTransactions == null || stripeTransactions.isEmpty()) {
+        if (!STRIPE.equals(order.getPaymentMethod())) {
+            return;
+        }
+
+        if (stripeTransactions == null || stripeTransactions.isEmpty()) {
+            order.setPaymentMatchStatus("UNMATCHED");
             return;
         }
 

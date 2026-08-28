@@ -278,7 +278,7 @@ public class ApiController {
         return "https://img.bricklink.com/ItemImage/PN/%s/%s.png".formatted(color, partNum.trim());
     }
 
-    @GetMapping(value = "/api/product-details")
+    @GetMapping(value = "/api/private/product-details")
     public List<ProductDetailsResponse> productDetails(
             @RequestParam(value = "limit", required = false, defaultValue = "200") Integer limit,
             @RequestParam(value = "set", required = false) Long set,

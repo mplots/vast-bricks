@@ -6,7 +6,7 @@ import { fetcher } from 'utils/axios';
 import { ProductDetails, ProductQueryParams } from 'types/product';
 
 const endpoints = {
-  list: '/api/product-details'
+  list: '/api/private/product-details'
 };
 
 const buildQueryString = (params: ProductQueryParams) => {

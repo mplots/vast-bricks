@@ -5,6 +5,7 @@ import lombok.Data;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.util.Locale;
 
 @Data
 public class AccountingOrder {
@@ -126,5 +127,18 @@ public class AccountingOrder {
         return calculatedGrandTotal != null
                 && grandTotal != null
                 && calculatedGrandTotal.compareTo(grandTotal) != 0;
+    }
+
+    public boolean isUnmatchedOnlinePayment() {
+        return "UNMATCHED".equals(paymentMatchStatus)
+                && ("PayPal".equalsIgnoreCase(paymentMethod) || "Stripe".equalsIgnoreCase(paymentMethod));
+    }
+
+    public boolean isBankTransfer() {
+        if (paymentMethod == null) {
+            return false;
+        }
+        var normalizedPaymentMethod = paymentMethod.trim().toLowerCase(Locale.ROOT);
+        return normalizedPaymentMethod.contains("bank") && normalizedPaymentMethod.contains("transfer");
     }
 }

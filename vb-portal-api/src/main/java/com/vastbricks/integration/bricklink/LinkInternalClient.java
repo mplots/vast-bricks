@@ -38,7 +38,7 @@ public class LinkInternalClient {
         LinkAuthenticationMode.TOKEN,
         LinkAuthenticationMode.SESSION_COOKIE
     };
-    private static final LinkRestTemplateMode REST_TEMPLATE_MODE = LinkRestTemplateMode.SIMPLE;
+    private static final LinkRestTemplateMode REST_TEMPLATE_MODE = LinkRestTemplateMode.TOR;
     private static final URI ORDER_EXPORT_URI = URI.create("https://www.bricklink.com/orderExcelFinal.asp");
     private static final URI VAT_INVOICE_URI = URI.create("https://www.bricklink.com/_file/orders/vat_invoice.file");
 

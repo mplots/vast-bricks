@@ -1,4 +1,4 @@
-package com.vastbricks.controller;
+package com.vastbricks.accounting;
 
 import org.junit.jupiter.api.Test;
 

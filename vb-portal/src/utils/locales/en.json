@@ -1,5 +1,8 @@
 {
   "sample-page": "Sample Page",
+  "accounting": "Accounting",
+  "accounting-orders": "Orders",
+  "archives": "Archives",
   "maintenance": "Maintenance",
   "error-404": "Error 404",
   "error-500": "Error 500",
