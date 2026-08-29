@@ -31,5 +31,13 @@ services:
         host_ip: 127.0.0.1
     command: ["-p", "yourpass"]
 
+  wiremock:
+    image: wiremock/wiremock:3.13.2
+    container_name: vast-bricks-wiremock
+    ports:
+      - target: 8080
+        published: 9010
+        host_ip: 127.0.0.1
+
 volumes:
   postgres-vast-bricks:

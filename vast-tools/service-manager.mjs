@@ -48,6 +48,7 @@ export async function listServices(names) {
   const services = selectedServices(names).map(findService);
   const state = readState();
   let allHealthy = true;
+  const rows = [];
 
   for (const service of services) {
     const record = state.find(({ name }) => name === service.name);
@@ -55,16 +56,52 @@ export async function listServices(names) {
     const ownership = service.dockerComposeService
       ? dockerOwnership(service)
       : record && isOwnedProcessRunning(service, record)
-        ? `managed pid=${record.pid}`
+        ? "managed"
         : record
           ? "stale managed state"
           : "unmanaged";
     const status = health.healthy ? "healthy" : health.reachable ? "unhealthy" : "missing";
-    console.log(`${statusLabel(status)} ${service.name.padEnd(12)} port=${service.port} ${ownership} ${health.detail}`);
+    rows.push({
+      status,
+      name: service.name,
+      port: String(service.port),
+      runtime: service.dockerComposeService ? "docker" : "native",
+      ownership,
+      detail: health.detail,
+    });
     allHealthy &&= health.healthy;
   }
 
+  printServiceList(rows);
+
   return allHealthy ? 0 : 1;
+}
+
+function printServiceList(rows) {
+  const serviceWidth = Math.max("SERVICE".length, 12, ...rows.map(({ name }) => name.length));
+  const portWidth = Math.max("PORT".length, ...rows.map(({ port }) => port.length));
+  const runtimeWidth = Math.max("RUNTIME".length, ...rows.map(({ runtime }) => runtime.length));
+  const ownershipWidth = Math.max("MANAGEMENT".length, ...rows.map(({ ownership }) => ownership.length));
+
+  console.log([
+    "STATUS".padEnd(9),
+    "SERVICE".padEnd(serviceWidth),
+    "PORT".padEnd(portWidth),
+    "RUNTIME".padEnd(runtimeWidth),
+    "MANAGEMENT".padEnd(ownershipWidth),
+    "DETAIL",
+  ].join(" "));
+
+  for (const row of rows) {
+    console.log([
+      statusLabel(row.status),
+      row.name.padEnd(serviceWidth),
+      row.port.padEnd(portWidth),
+      row.runtime.padEnd(runtimeWidth),
+      row.ownership.padEnd(ownershipWidth),
+      row.detail,
+    ].join(" "));
+  }
 }
 
 export async function startServices(names, options = {}) {
@@ -210,6 +247,7 @@ async function stopService(service) {
 async function startDockerComposeService(service) {
   const health = await checkHealth(service);
   const containerRunning = isDockerContainerRunning(service);
+  removeStateRecord(service.name);
 
   if (containerRunning && health.healthy) {
     console.log(`${statusLabel("healthy")} ${service.name.padEnd(12)} already managed container=${service.containerName} port=${service.port}`);
@@ -233,7 +271,7 @@ async function startDockerComposeService(service) {
     printDockerLogTail(service);
     throw new Error(`${service.name} did not become healthy within ${readinessTimeoutMs / 1_000}s: ${ready.detail}`);
   }
-  console.log(`${statusLabel("healthy")} ${service.name.padEnd(12)} tcp://${service.host}:${service.port}`);
+  console.log(`${statusLabel("healthy")} ${service.name.padEnd(12)} ${service.healthUrl ?? `tcp://${service.host}:${service.port}`}`);
 }
 
 async function stopDockerComposeService(service) {

@@ -1,11 +1,9 @@
-import { existsSync, readdirSync } from "node:fs";
-import { homedir } from "node:os";
+import { readdirSync } from "node:fs";
 import { resolve } from "node:path";
 
 import { repoRoot } from "./paths.mjs";
 
 const viteExecutable = resolve(repoRoot, "vast-portal", "node_modules", ".bin", process.platform === "win32" ? "vite.cmd" : "vite");
-const wireMockStandaloneVersion = "3.13.2";
 
 export const managedServices = [
   {
@@ -44,17 +42,8 @@ export const managedServices = [
     name: "wiremock",
     port: 9010,
     healthUrl: "http://127.0.0.1:9010/__admin",
-    command: "java",
-    args: () => ["-jar", resolveWireMockStandaloneJar(), "--port", "9010"],
-    cwd: repoRoot,
-    build: {
-      command: "mvn",
-      args: ["-N", "validate", "-DskipTests"],
-      env: {
-        MAVEN_OPTS: "",
-      },
-    },
-    processMarker: "wiremock-standalone",
+    dockerComposeService: "wiremock",
+    containerName: "vast-bricks-wiremock",
   },
   {
     name: "vast-portal",
@@ -108,55 +97,6 @@ function resolveApiJar() {
   }
 
   return resolve(targetDirectory, candidates[0]);
-}
-
-function resolveWireMockStandaloneJar() {
-  const checkedPaths = wireMockStandaloneJarCandidates();
-  const jarPath = checkedPaths.find((candidate) => existsSync(candidate));
-
-  if (!jarPath) {
-    throw new Error([
-      `WireMock standalone ${wireMockStandaloneVersion} was not found.`,
-      "Checked:",
-      ...checkedPaths.map((candidate) => `  - ${candidate}`),
-      "Run ./vast services start wiremock without --skip-build, or set ACCEPTANCE_MAVEN_REPOSITORY to the Maven repository path.",
-    ].join("\n"));
-  }
-
-  return jarPath;
-}
-
-function wireMockStandaloneJarCandidates() {
-  return mavenRepositoryCandidates()
-    .map((repository) => resolve(
-      repository,
-      "org",
-      "wiremock",
-      "wiremock-standalone",
-      wireMockStandaloneVersion,
-      `wiremock-standalone-${wireMockStandaloneVersion}.jar`,
-    ));
-}
-
-function mavenRepositoryCandidates() {
-  return dedupe([
-    process.env.ACCEPTANCE_MAVEN_REPOSITORY,
-    mavenRepositoryFromMavenOpts(process.env.MAVEN_OPTS),
-    resolve(homedir(), ".m2", "repository"),
-  ].filter(Boolean));
-}
-
-function mavenRepositoryFromMavenOpts(value) {
-  if (!value) {
-    return undefined;
-  }
-
-  const match = value.match(/(?:^|\s)-Dmaven\.repo\.local=(?:"([^"]+)"|'([^']+)'|(\S+))/);
-  return match?.[1] ?? match?.[2] ?? match?.[3];
-}
-
-function dedupe(values) {
-  return [...new Set(values)];
 }
 
 function safeReadDirectory(directory) {
