@@ -1,0 +1,9 @@
+package com.vastbricks.api.settings;
+
+import lombok.Value;
+
+@Value
+class HealthSettingsResponse {
+
+    String value;
+}

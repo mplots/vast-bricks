@@ -72,5 +72,11 @@ Options:
   --help, -h            Show this help
 
 Environment:
-  VAST_API_BASE_URL     Target API base URL, default http://127.0.0.1:6362`);
+  VAST_API_BASE_URL     Target API base URL, default http://127.0.0.1:6362
+  VAST_DB_HOST          PostgreSQL host for DB-backed setup, default 127.0.0.1
+  VAST_DB_PORT          PostgreSQL port for DB-backed setup, default 2345
+  VAST_DB_NAME          PostgreSQL database for DB-backed setup, default bricks
+  VAST_DB_USERNAME      PostgreSQL user for DB-backed setup, default bricks
+  VAST_DB_PASSWORD      PostgreSQL password for DB-backed setup, default bricks
+  VAST_DB_SCHEMA        Vast schema for DB-backed setup, default vast`);
 }

@@ -9,6 +9,8 @@
   },
   "devDependencies": {
     "@playwright/test": "1.54.2",
+    "@types/pg": "8.15.5",
+    "pg": "8.16.3",
     "typescript": "5.8.3"
   }
 }

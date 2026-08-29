@@ -1,5 +1,6 @@
 package com.vastbricks.api.tor;
 
+import com.vastbricks.api.settings.DatabaseBackedSettings;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -9,7 +10,7 @@ import java.util.Set;
 
 @Getter
 @Component
-class TorSettings {
+class TorSettings extends DatabaseBackedSettings {
 
     @Value("${VAST_TOR_PROXY_HOST:127.0.0.1}")
     private String proxyHost;
