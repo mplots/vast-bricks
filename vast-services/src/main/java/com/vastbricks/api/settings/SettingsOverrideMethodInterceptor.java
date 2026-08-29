@@ -44,10 +44,6 @@ class SettingsOverrideMethodInterceptor implements MethodInterceptor {
             return invocation.proceed();
         }
 
-        if (getter.hasAnnotationDefaultValue()) {
-            return invocation.proceed();
-        }
-
         Optional<String> override = settingsOverrideService.getObject().findConfiguredOverride(getter.getSettingKey());
         if (override.isEmpty()) {
             return invocation.proceed();

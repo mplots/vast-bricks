@@ -1,6 +1,6 @@
 import { expect, test } from './support/api-test';
 
-test('settings profile uses database only after environment and annotation defaults are missing', async ({
+test('settings profile overrides annotation defaults but not environment values', async ({
   request,
   settings,
 }) => {
@@ -27,13 +27,13 @@ test('settings profile uses database only after environment and annotation defau
   expect(overriddenResponse.ok()).toBe(true);
 
   await expect(overriddenResponse.json()).resolves.toEqual({
-    value: 'default-health-value',
+    value: 'profile-health-value',
     environmentValue: 'managed-health-env-value',
     databaseOnlyValue: 'profile-database-only-value',
   });
 });
 
-test('default settings profile is used only after environment and annotation defaults are missing', async ({
+test('default settings profile overrides annotation defaults but not environment values', async ({
   requestWithoutSettingsProfile,
   settings,
 }) => {
@@ -51,7 +51,7 @@ test('default settings profile is used only after environment and annotation def
   expect(response.ok()).toBe(true);
 
   await expect(response.json()).resolves.toEqual({
-    value: 'default-health-value',
+    value: 'default-profile-health-value',
     environmentValue: 'managed-health-env-value',
     databaseOnlyValue: 'default-profile-database-only-value',
   });

@@ -1,4 +1,6 @@
 import { spawnSync } from "node:child_process";
+import { availableParallelism } from "node:os";
+import { readFileSync } from "node:fs";
 
 import { repoRoot } from "./paths.mjs";
 import { restartServices } from "./service-manager.mjs";
@@ -26,9 +28,15 @@ export async function runTestCommand(args) {
     "--",
     ...options.matchers,
   ];
+  const wireMockPlan = wireMockPlaywrightPlan();
   const result = spawnSync("npm", commandArgs, {
     cwd: repoRoot,
-    env: process.env,
+    env: {
+      ...process.env,
+      ACCEPTANCE_PLAYWRIGHT_WORKERS: String(wireMockPlan.workers),
+      ACCEPTANCE_WIREMOCK_HOSTS: wireMockPlan.hosts.join(","),
+      ACCEPTANCE_WIREMOCK_MODE: wireMockPlan.mode,
+    },
     stdio: "inherit",
   });
 
@@ -79,4 +87,72 @@ Environment:
   VAST_DB_USERNAME      PostgreSQL user for DB-backed setup, default bricks
   VAST_DB_PASSWORD      PostgreSQL password for DB-backed setup, default bricks
   VAST_DB_SCHEMA        Vast schema for DB-backed setup, default vast`);
+}
+
+function wireMockPlaywrightPlan() {
+  const workers = playwrightWorkerCount();
+  const expectedHosts = Array.from({ length: workers }, (_, index) => `vast-wiremock-${index}`);
+  const availableHosts = wireMockHostsInHostfile();
+  const missingHosts = expectedHosts.filter((host) => !availableHosts.has(host));
+
+  if (missingHosts.length === 0) {
+    return {
+      workers,
+      mode: "parallel",
+      hosts: expectedHosts,
+    };
+  }
+
+  console.log("Not enough WireMock host aliases are defined in /etc/hosts.");
+  console.log("WireMock-backed API tests will run in serial mode with one Playwright worker. Add these lines to /etc/hosts to enable WireMock parallel isolation:");
+  for (const host of missingHosts) {
+    console.log(`  127.0.0.1 ${host}`);
+  }
+
+  return {
+    workers: 1,
+    mode: "serial",
+    hosts: ["localhost"],
+  };
+}
+
+function playwrightWorkerCount() {
+  const configuredWorkers = process.env.ACCEPTANCE_PLAYWRIGHT_WORKERS;
+  if (configuredWorkers?.trim()) {
+    const workers = Number(configuredWorkers);
+    if (Number.isInteger(workers) && workers > 0) {
+      return workers;
+    }
+    console.warn(`Ignoring invalid ACCEPTANCE_PLAYWRIGHT_WORKERS value '${configuredWorkers}'. Expected a positive integer.`);
+  }
+
+  return Math.max(1, Math.floor(availableParallelism() / 2));
+}
+
+function wireMockHostsInHostfile() {
+  try {
+    return loopbackHostAliases(readFileSync("/etc/hosts", "utf8"));
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.log(`Could not read /etc/hosts to check WireMock host aliases: ${message}`);
+    return new Set();
+  }
+}
+
+function loopbackHostAliases(hostfile) {
+  const hosts = new Set();
+
+  for (const line of hostfile.split(/\r?\n/)) {
+    const withoutComment = line.replace(/#.*/, "").trim();
+    if (!withoutComment) {
+      continue;
+    }
+
+    const [address, ...aliases] = withoutComment.split(/\s+/);
+    if (address === "127.0.0.1" || address === "::1") {
+      aliases.forEach((alias) => hosts.add(alias));
+    }
+  }
+
+  return hosts;
 }
