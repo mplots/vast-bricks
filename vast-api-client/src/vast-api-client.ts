@@ -28,7 +28,7 @@ export class VastApiClient {
   }
 
   async getHealth(): Promise<HealthResponse> {
-    const response = await this.fetchImpl(`${this.baseUrl}/api/vast/health`, {
+    const response = await this.fetchImpl(`${this.baseUrl}/api/health`, {
       headers: {
         Accept: 'application/json'
       }

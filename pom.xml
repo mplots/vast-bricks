@@ -9,9 +9,38 @@
     <packaging>pom</packaging>
     <version>1.0</version>
 
+    <properties>
+        <wiremock-standalone.version>3.13.2</wiremock-standalone.version>
+    </properties>
+
     <modules>
         <module>vast-services</module>
         <module>vast-api</module>
         <module>vb-portal-api</module>
     </modules>
+
+    <build>
+        <plugins>
+            <!-- Required by ./vast service orchestration. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.8.1</version>
+                <inherited>false</inherited>
+                <executions>
+                    <execution>
+                        <id>resolve-wiremock-standalone</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>get</goal>
+                        </goals>
+                        <configuration>
+                            <artifact>org.wiremock:wiremock-standalone:${wiremock-standalone.version}</artifact>
+                            <transitive>false</transitive>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

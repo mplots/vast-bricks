@@ -66,7 +66,7 @@ function printHelp() {
   ./vast services <list|start|stop|restart> [services...] [options]
 
 Services:
-  postgres | tor-proxy | vast-api | vast-portal
+  postgres | tor-proxy | vast-api | wiremock | vast-portal
 
 Commands:
   list                  Print service health and managed process state
@@ -75,13 +75,14 @@ Commands:
   restart [services...] Stop and start selected services, or all when omitted
 
 Options:
-  --skip-build, -sb     Use the existing vast-api executable JAR
+  --skip-build, -sb     Use existing built service artifacts
   --help, -h            Show this help
 
 Managed ports:
   postgres     2345
   tor-proxy    8118
   vast-api     6362
+  wiremock     9010
   vast-portal  3100
 
 Postgres intentionally uses non-default host port 2345.

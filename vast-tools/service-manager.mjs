@@ -128,7 +128,7 @@ async function startService(service, { skipBuild = false } = {}) {
   removeStateRecord(service.name);
 
   if (service.build && !skipBuild) {
-    runLoggedForeground(service.build.command, service.build.args, service.cwd, `${service.name}-build`, `${statusLabel("build")} ${service.name}`);
+    runLoggedForeground(service.build.command, service.build.args, service.cwd, `${service.name}-build`, `${statusLabel("build")} ${service.name}`, service.build.env);
   } else if (service.build) {
     console.log(`${statusLabel("skipped")} ${service.name} build skipped`);
   }
@@ -271,7 +271,7 @@ function runForeground(command, args, cwd) {
   }
 }
 
-function runLoggedForeground(command, args, cwd, logName, label) {
+function runLoggedForeground(command, args, cwd, logName, label, env = {}) {
   mkdirSync(logsRoot, { recursive: true });
   const logPath = resolve(logsRoot, `${logName}.log`);
   const logFd = openSync(logPath, "a");
@@ -280,7 +280,7 @@ function runLoggedForeground(command, args, cwd, logName, label) {
   try {
     result = spawnSync(command, args, {
       cwd,
-      env: process.env,
+      env: { ...process.env, ...env },
       stdio: ["ignore", logFd, logFd],
     });
   } finally {

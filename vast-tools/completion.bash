@@ -22,7 +22,7 @@ _vast_completion() {
           if [[ "${current}" == -* ]]; then
             COMPREPLY=($(compgen -W "--skip-build -sb --help -h" -- "${current}"))
           else
-            COMPREPLY=($(compgen -W "postgres tor-proxy vast-api vast-portal" -- "${current}"))
+            COMPREPLY=($(compgen -W "postgres tor-proxy vast-api wiremock vast-portal" -- "${current}"))
           fi
           return
           ;;
@@ -30,7 +30,7 @@ _vast_completion() {
           if [[ "${current}" == -* ]]; then
             COMPREPLY=($(compgen -W "--help -h" -- "${current}"))
           else
-            COMPREPLY=($(compgen -W "postgres tor-proxy vast-api vast-portal" -- "${current}"))
+            COMPREPLY=($(compgen -W "postgres tor-proxy vast-api wiremock vast-portal" -- "${current}"))
           fi
           return
           ;;
@@ -40,7 +40,7 @@ _vast_completion() {
       if [[ "${current}" == -* ]]; then
         COMPREPLY=($(compgen -W "--help -h" -- "${current}"))
       else
-        COMPREPLY=($(compgen -W "postgres tor-proxy vast-api vast-portal" -- "${current}"))
+        COMPREPLY=($(compgen -W "postgres tor-proxy vast-api wiremock vast-portal" -- "${current}"))
       fi
       return
       ;;

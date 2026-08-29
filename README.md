@@ -26,7 +26,7 @@ java -jar vast-api/target/vast-api-1.0.jar
 
 It listens on port `6262` by default. Override the port with `VAST_API_PORT`.
 The scaffolding health endpoint is available at
-`GET /api/vast/health`.
+`GET /api/health`.
 
 
 # Tor

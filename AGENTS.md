@@ -179,9 +179,9 @@ to Java backend code only; do not create another frontend application.
 - Add CLI capabilities incrementally with the workflow that needs them; do not
   build the entire final CLI during module scaffolding.
 - `./vast services` (alias `./vast svc`) manages `postgres`, `tor-proxy`,
-  `vast-api`, and `vast-portal`. Managed application instances use ports 6362
-  and 3100 respectively, leaving the normal IntelliJ ports 6262 and 3000
-  available for independently launched instances.
+  `vast-api`, `wiremock`, and `vast-portal`. Managed application instances use
+  ports 6362, 9010, and 3100 respectively, leaving the normal IntelliJ ports
+  6262 and 3000 available for independently launched instances.
 - `./vast ps` is the shortcut for `./vast services list`.
 - Runtime process state and logs belong under the ignored `.vast` directory.
   Service stop operations must affect only processes recorded and verified as
@@ -240,4 +240,9 @@ requires crossing a phase boundary, state why before expanding the change.
   module.
 - Do not edit generated files or files under build output and dependency
   directories such as `target`, `dist`, or `node_modules`.
+- Always respect user changes in the worktree. Do not revert, restore,
+  normalize, or "fix" existing user edits unless the user explicitly asks for
+  that exact change. If a user edit appears to break verification or conflicts
+  with the requested task, stop and explain the conflict instead of changing it
+  silently.
 - Never overwrite unrelated work in a dirty worktree.
