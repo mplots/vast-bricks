@@ -6,4 +6,6 @@ import lombok.Value;
 class HealthSettingsResponse {
 
     String value;
+    String environmentValue;
+    String databaseOnlyValue;
 }

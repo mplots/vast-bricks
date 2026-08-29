@@ -10,4 +10,7 @@ class SettingsOverrideSettings {
 
     @Value("${VAST_DB_SCHEMA:vast}")
     private String schema;
+
+    @Value("${VAST_SETTINGS_DEFAULT_PROFILE:default}")
+    private String defaultProfile;
 }

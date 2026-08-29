@@ -31,6 +31,8 @@ export const managedServices = [
     cwd: repoRoot,
     env: {
       VAST_API_PORT: "6362",
+      VAST_SETTINGS_DEFAULT_PROFILE: "vast-playwright-default",
+      VAST_HEALTH_SETTING_ENV_VALUE: "managed-health-env-value",
     },
     build: {
       command: "mvn",

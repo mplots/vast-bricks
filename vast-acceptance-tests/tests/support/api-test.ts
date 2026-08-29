@@ -1,15 +1,20 @@
-import { expect, test as base } from '@playwright/test';
+import { APIRequestContext, expect, test as base } from '@playwright/test';
 
 import { upsertSettingOverride } from './vast-db';
 
 const settingsProfileHeader = 'X-Vast-Settings-Profile';
+const defaultSettingsProfile = process.env.VAST_SETTINGS_DEFAULT_PROFILE ?? 'vast-playwright-default';
 
 export type SettingsOverrides = {
   readonly profile: string;
   set(settingKey: string, settingValue: string): Promise<void>;
+  setDefault(settingKey: string, settingValue: string): Promise<void>;
 };
 
-export const test = base.extend<{ settings: SettingsOverrides }>({
+export const test = base.extend<{
+  settings: SettingsOverrides;
+  requestWithoutSettingsProfile: APIRequestContext;
+}>({
   settings: async ({}, use, testInfo) => {
     const profile = [
       'playwright',
@@ -27,6 +32,9 @@ export const test = base.extend<{ settings: SettingsOverrides }>({
       set: async (settingKey, settingValue) => {
         await upsertSettingOverride(profile, settingKey, settingValue);
       },
+      setDefault: async (settingKey, settingValue) => {
+        await upsertSettingOverride(defaultSettingsProfile, settingKey, settingValue);
+      },
     });
   },
 
@@ -36,6 +44,18 @@ export const test = base.extend<{ settings: SettingsOverrides }>({
       extraHTTPHeaders: {
         Accept: 'application/json',
         [settingsProfileHeader]: settings.profile,
+      },
+    });
+
+    await use(request);
+    await request.dispose();
+  },
+
+  requestWithoutSettingsProfile: async ({ baseURL, playwright }, use) => {
+    const request = await playwright.request.newContext({
+      baseURL,
+      extraHTTPHeaders: {
+        Accept: 'application/json',
       },
     });
 

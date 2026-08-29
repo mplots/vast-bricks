@@ -16,14 +16,18 @@ import org.springframework.core.MethodParameter;
 import org.springframework.core.convert.ConversionException;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.TypeDescriptor;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.PropertySource;
 
 @RequiredArgsConstructor
 class SettingsOverrideMethodInterceptor implements MethodInterceptor {
 
-    private static final Pattern VALUE_EXPRESSION = Pattern.compile("^\\$\\{([^:}]+)(?::.*)?}$");
+    private static final Pattern VALUE_EXPRESSION = Pattern.compile("^\\$\\{([^:}]+)(?::([^}]*))?}$");
 
     private final Object target;
     private final ObjectProvider<SettingsOverrideService> settingsOverrideService;
+    private final Environment environment;
     private final ConversionService conversionService;
     private final Map<Method, Optional<SettingGetter>> getterCache = new ConcurrentHashMap<>();
 
@@ -35,16 +39,38 @@ class SettingsOverrideMethodInterceptor implements MethodInterceptor {
             return invocation.proceed();
         }
 
-        if (SettingsProfileContext.currentProfile().isEmpty()) {
+        SettingGetter getter = settingGetter.get();
+        if (hasEnvironmentValue(getter.getSettingKey())) {
             return invocation.proceed();
         }
 
-        Optional<String> override = settingsOverrideService.getObject().findOverride(settingGetter.get().getSettingKey());
+        if (getter.hasAnnotationDefaultValue()) {
+            return invocation.proceed();
+        }
+
+        Optional<String> override = settingsOverrideService.getObject().findConfiguredOverride(getter.getSettingKey());
         if (override.isEmpty()) {
             return invocation.proceed();
         }
 
-        return convert(override.get(), settingGetter.get());
+        return convert(override.get(), getter);
+    }
+
+    private boolean hasEnvironmentValue(String settingKey) {
+        if (!(environment instanceof ConfigurableEnvironment configurableEnvironment)) {
+            return hasText(environment.getProperty(settingKey));
+        }
+
+        for (PropertySource<?> propertySource : configurableEnvironment.getPropertySources()) {
+            if (propertySource.containsProperty(settingKey) && hasText(propertySource.getProperty(settingKey))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean hasText(Object value) {
+        return value != null && !value.toString().isBlank();
     }
 
     private Optional<SettingGetter> findSettingGetter(Method method) {
@@ -67,12 +93,14 @@ class SettingsOverrideMethodInterceptor implements MethodInterceptor {
             return Optional.empty();
         }
 
-        String settingKey = settingKey(value.value());
-        if (settingKey == null) {
+        Optional<ValueExpression> valueExpression = parseValueExpression(value.value());
+        if (valueExpression.isEmpty()) {
             return Optional.empty();
         }
 
-        return Optional.of(new SettingGetter(settingKey, TypeDescriptor.valueOf(String.class),
+        return Optional.of(new SettingGetter(valueExpression.get().getSettingKey(),
+                valueExpression.get().getAnnotationDefaultValue(),
+                TypeDescriptor.valueOf(String.class),
                 new TypeDescriptor(new MethodParameter(method, -1))));
     }
 
@@ -126,11 +154,18 @@ class SettingsOverrideMethodInterceptor implements MethodInterceptor {
         return null;
     }
 
-    private String settingKey(String valueExpression) {
+    private Optional<ValueExpression> parseValueExpression(String valueExpression) {
         Matcher matcher = VALUE_EXPRESSION.matcher(valueExpression);
         if (!matcher.matches()) {
-            return null;
+            return Optional.empty();
         }
-        return matcher.group(1);
+        return Optional.of(new ValueExpression(matcher.group(1), matcher.group(2)));
+    }
+
+    @lombok.Value
+    private static class ValueExpression {
+
+        String settingKey;
+        String annotationDefaultValue;
     }
 }

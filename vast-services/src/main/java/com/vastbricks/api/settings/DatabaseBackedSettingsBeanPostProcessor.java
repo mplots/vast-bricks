@@ -6,6 +6,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.convert.ApplicationConversionService;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Component;
 class DatabaseBackedSettingsBeanPostProcessor implements BeanPostProcessor {
 
     private final ObjectProvider<SettingsOverrideService> settingsOverrideService;
+    private final Environment environment;
 
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
@@ -25,6 +27,7 @@ class DatabaseBackedSettingsBeanPostProcessor implements BeanPostProcessor {
         proxyFactory.addAdvice(new SettingsOverrideMethodInterceptor(
                 bean,
                 settingsOverrideService,
+                environment,
                 ApplicationConversionService.getSharedInstance()
         ));
         return proxyFactory.getProxy(bean.getClass().getClassLoader());

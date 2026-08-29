@@ -9,6 +9,11 @@ import org.springframework.core.convert.TypeDescriptor;
 class SettingGetter {
 
     private final String settingKey;
+    private final String annotationDefaultValue;
     private final TypeDescriptor sourceType;
     private final TypeDescriptor returnType;
+
+    boolean hasAnnotationDefaultValue() {
+        return annotationDefaultValue != null && !annotationDefaultValue.isBlank();
+    }
 }

@@ -15,6 +15,10 @@ class HealthSettingsController {
 
     @GetMapping
     HealthSettingsResponse getHealthSettings() {
-        return new HealthSettingsResponse(healthSettings.getValue());
+        return new HealthSettingsResponse(
+                healthSettings.getValue(),
+                healthSettings.getEnvironmentValue(),
+                healthSettings.getDatabaseOnlyValue()
+        );
     }
 }
