@@ -23,7 +23,7 @@ export async function runServicesCommand(args) {
     case "stop":
       return stopServices(options.services);
     case "restart":
-      return restartServices(options.services, { skipBuild: options.skipBuild });
+      return restartServices(options.services, { skipBuild: options.skipBuild, cleanDb: options.cleanDb });
   }
 }
 
@@ -32,6 +32,7 @@ function parseOptions(args) {
     action: undefined,
     services: [],
     skipBuild: false,
+    cleanDb: false,
     help: false,
   };
 
@@ -43,6 +44,8 @@ function parseOptions(args) {
       options.action = arg;
     } else if (arg === "--skip-build" || arg === "-sb") {
       options.skipBuild = true;
+    } else if (arg === "--clean-db") {
+      options.cleanDb = true;
     } else if (arg === "--help" || arg === "-h") {
       options.help = true;
     } else if (arg.startsWith("-")) {
@@ -55,6 +58,18 @@ function parseOptions(args) {
   if (options.action === "list" || options.action === "stop") {
     if (options.skipBuild) {
       throw new Error("--skip-build is accepted only by start and restart.");
+    }
+    if (options.cleanDb) {
+      throw new Error("--clean-db is accepted only by restart.");
+    }
+  }
+
+  if (options.cleanDb) {
+    if (options.action !== "restart") {
+      throw new Error("--clean-db is accepted only by restart.");
+    }
+    if (options.services.length > 0 && !options.services.includes("vast-api")) {
+      throw new Error("--clean-db applies only when restarting vast-api.");
     }
   }
 
@@ -76,6 +91,7 @@ Commands:
 
 Options:
   --skip-build, -sb     Use existing built service artifacts
+  --clean-db            Clean the Vast database schema before restarting vast-api
   --help, -h            Show this help
 
 Managed ports:

@@ -137,7 +137,7 @@ export async function restartServices(names, options = {}) {
   return 0;
 }
 
-async function startService(service, { skipBuild = false } = {}) {
+async function startService(service, { skipBuild = false, cleanDb = false } = {}) {
   if (service.dockerComposeService) {
     await startDockerComposeService(service);
     return;
@@ -181,7 +181,7 @@ async function startService(service, { skipBuild = false } = {}) {
     child = spawn(service.command, args, {
       cwd: service.cwd,
       detached: true,
-      env: { ...process.env, ...service.env },
+      env: serviceEnvironment(service, { cleanDb }),
       stdio: ["ignore", logFd, logFd],
     });
   } finally {
@@ -207,6 +207,14 @@ async function startService(service, { skipBuild = false } = {}) {
     throw new Error(`${service.name} did not become healthy within ${readinessTimeoutMs / 1_000}s: ${ready.detail}`);
   }
   console.log(`${statusLabel("healthy")} ${service.name.padEnd(12)} ${service.healthUrl}`);
+}
+
+function serviceEnvironment(service, { cleanDb = false } = {}) {
+  return {
+    ...process.env,
+    ...service.env,
+    ...(cleanDb && service.name === "vast-api" ? { VAST_DB_CLEAN_ON_STARTUP: "true" } : {}),
+  };
 }
 
 async function stopService(service) {

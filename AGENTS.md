@@ -101,8 +101,12 @@ to Java backend code only; do not create another frontend application.
 - Use Lombok in rewrite Java code for repetitive boilerplate such as getters,
   setters, constructors, builders, `equals`, and `hashCode` when it keeps the
   code clearer.
-- Prefer direct environment-variable based configuration with explicit default
-  values over Spring properties classes for rewrite settings.
+- Prefer environment-variable based configuration with explicit default values
+  over Spring properties classes for rewrite settings. In Spring-managed code,
+  group related values in a small feature settings class and inject values with
+  field-level `@Value("${ENV_VAR:default}")`, similar to `TorSettings` and
+  `FlywaySettings`; do not read environment variables with `System.getenv()`
+  unless Spring injection is not available.
 
 ## Spring Boot composition
 

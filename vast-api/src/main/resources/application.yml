@@ -4,3 +4,10 @@ server:
 spring:
   application:
     name: vast-api
+  datasource:
+    url: ${VAST_DB_URL:jdbc:postgresql://localhost:2345/bricks}
+    username: ${VAST_DB_USERNAME:bricks}
+    password: ${VAST_DB_PASSWORD:bricks}
+    driver-class-name: org.postgresql.Driver
+  flyway:
+    enabled: false

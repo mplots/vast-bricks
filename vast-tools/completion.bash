@@ -18,9 +18,17 @@ _vast_completion() {
 
       service_action="${COMP_WORDS[2]}"
       case "${service_action}" in
-        start|restart)
+        start)
           if [[ "${current}" == -* ]]; then
             COMPREPLY=($(compgen -W "--skip-build -sb --help -h" -- "${current}"))
+          else
+            COMPREPLY=($(compgen -W "postgres tor-proxy vast-api wiremock vast-portal" -- "${current}"))
+          fi
+          return
+          ;;
+        restart)
+          if [[ "${current}" == -* ]]; then
+            COMPREPLY=($(compgen -W "--skip-build -sb --clean-db --help -h" -- "${current}"))
           else
             COMPREPLY=($(compgen -W "postgres tor-proxy vast-api wiremock vast-portal" -- "${current}"))
           fi

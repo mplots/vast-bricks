@@ -7,6 +7,7 @@ export default function completions() {
   const serviceActions = "list start stop restart";
   const serviceNames = managedServices.map(({ name }) => name).join(" ");
   const startOptions = "--skip-build -sb --help -h";
+  const restartOptions = "--skip-build -sb --clean-db --help -h";
   const testOptions = "--build -b --help -h";
   const basicOptions = "--help -h";
 
@@ -33,9 +34,17 @@ _vast_completion() {
 
       service_action="\${COMP_WORDS[2]}"
       case "\${service_action}" in
-        start|restart)
+        start)
           if [[ "\${current}" == -* ]]; then
             COMPREPLY=($(compgen -W "${startOptions}" -- "\${current}"))
+          else
+            COMPREPLY=($(compgen -W "${serviceNames}" -- "\${current}"))
+          fi
+          return
+          ;;
+        restart)
+          if [[ "\${current}" == -* ]]; then
+            COMPREPLY=($(compgen -W "${restartOptions}" -- "\${current}"))
           else
             COMPREPLY=($(compgen -W "${serviceNames}" -- "\${current}"))
           fi
