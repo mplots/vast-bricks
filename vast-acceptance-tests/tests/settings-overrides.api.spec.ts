@@ -1,4 +1,5 @@
 import { expect, test } from './support/api-test';
+import { findSettingOverride } from './support/vast-db';
 
 test('settings profile overrides annotation defaults but not environment values', async ({
   request,
@@ -11,6 +12,7 @@ test('settings profile overrides annotation defaults but not environment values'
     value: 'default-health-value',
     environmentValue: 'managed-health-env-value',
     databaseOnlyValue: '',
+    secretValue: '',
   });
 
   const profileValues = [
@@ -30,6 +32,7 @@ test('settings profile overrides annotation defaults but not environment values'
     value: 'profile-health-value',
     environmentValue: 'managed-health-env-value',
     databaseOnlyValue: 'profile-database-only-value',
+    secretValue: '',
   });
 });
 
@@ -54,5 +57,25 @@ test('default settings profile overrides annotation defaults but not environment
     value: 'default-profile-health-value',
     environmentValue: 'managed-health-env-value',
     databaseOnlyValue: 'default-profile-database-only-value',
+    secretValue: '',
+  });
+});
+
+test('secret settings profile overrides are encrypted at rest and decrypted when read', async ({
+  request,
+  settings,
+}) => {
+  await settings.setSecret('VAST_HEALTH_SETTING_SECRET_VALUE', 'profile-secret-value');
+
+  const storedValue = await findSettingOverride(settings.profile, 'VAST_HEALTH_SETTING_SECRET_VALUE');
+  expect(storedValue).not.toBeNull();
+  expect(storedValue).toMatch(/^v1:[^:]+:[^:]+$/);
+  expect(storedValue).not.toContain('profile-secret-value');
+
+  const response = await request.get('/api/private/settings/health');
+  expect(response.ok()).toBe(true);
+
+  await expect(response.json()).resolves.toMatchObject({
+    secretValue: 'profile-secret-value',
   });
 });

@@ -1,6 +1,8 @@
 import { Client } from 'pg';
+import { createCipheriv, randomBytes } from 'node:crypto';
 
 const databaseIdentifierPattern = /^[A-Za-z_][A-Za-z0-9_]*$/;
+const settingsEncryptionKeyEnv = 'VAST_SETTINGS_ENCRYPTION_KEY';
 
 export async function upsertSettingOverride(profile: string, settingKey: string, settingValue: string): Promise<void> {
   await withDatabaseClient(async (client) => {
@@ -16,6 +18,48 @@ export async function upsertSettingOverride(profile: string, settingKey: string,
       [profile, settingKey, settingValue],
     );
   });
+}
+
+export async function upsertSecretSettingOverride(
+  profile: string,
+  settingKey: string,
+  settingValue: string,
+): Promise<string> {
+  const encryptedValue = encryptSettingValue(settingValue);
+  await upsertSettingOverride(profile, settingKey, encryptedValue);
+  return encryptedValue;
+}
+
+export async function findSettingOverride(profile: string, settingKey: string): Promise<string | null> {
+  return withDatabaseClient(async (client) => {
+    const result = await client.query<{ setting_value: string }>(
+      `
+        SELECT setting_value
+        FROM ${settingsOverrideTable()}
+        WHERE profile = $1 AND setting_key = $2
+      `,
+      [profile, settingKey],
+    );
+
+    return result.rows[0]?.setting_value ?? null;
+  });
+}
+
+function encryptSettingValue(plaintext: string): string {
+  const encodedKey = process.env[settingsEncryptionKeyEnv];
+  if (!encodedKey) {
+    throw new Error(`${settingsEncryptionKeyEnv} is required to write secret setting overrides.`);
+  }
+
+  const key = Buffer.from(encodedKey, 'base64');
+  if (key.length !== 32) {
+    throw new Error(`${settingsEncryptionKeyEnv} must be a base64-encoded 32-byte key.`);
+  }
+
+  const iv = randomBytes(12);
+  const cipher = createCipheriv('aes-256-gcm', key, iv);
+  const ciphertext = Buffer.concat([cipher.update(plaintext, 'utf8'), cipher.final(), cipher.getAuthTag()]);
+  return `v1:${iv.toString('base64')}:${ciphertext.toString('base64')}`;
 }
 
 async function withDatabaseClient<T>(callback: (client: Client) => Promise<T>): Promise<T> {

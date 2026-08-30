@@ -1,6 +1,6 @@
 import { APIRequestContext, expect, test as base } from '@playwright/test';
 
-import { upsertSettingOverride } from './vast-db';
+import { upsertSecretSettingOverride, upsertSettingOverride } from './vast-db';
 
 const settingsProfileHeader = 'X-Vast-Settings-Profile';
 const defaultSettingsProfile = process.env.VAST_SETTINGS_DEFAULT_PROFILE ?? 'vast-playwright-default';
@@ -8,6 +8,7 @@ const defaultSettingsProfile = process.env.VAST_SETTINGS_DEFAULT_PROFILE ?? 'vas
 export type SettingsOverrides = {
   readonly profile: string;
   set(settingKey: string, settingValue: string): Promise<void>;
+  setSecret(settingKey: string, settingValue: string): Promise<void>;
   setDefault(settingKey: string, settingValue: string): Promise<void>;
 };
 
@@ -31,6 +32,9 @@ export const test = base.extend<{
       profile,
       set: async (settingKey, settingValue) => {
         await upsertSettingOverride(profile, settingKey, settingValue);
+      },
+      setSecret: async (settingKey, settingValue) => {
+        await upsertSecretSettingOverride(profile, settingKey, settingValue);
       },
       setDefault: async (settingKey, settingValue) => {
         await upsertSettingOverride(defaultSettingsProfile, settingKey, settingValue);

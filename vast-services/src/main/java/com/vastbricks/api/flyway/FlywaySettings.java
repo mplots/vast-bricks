@@ -1,19 +1,19 @@
 package com.vastbricks.api.flyway;
 
+import com.vastbricks.api.settings.VastSetting;
 import lombok.Getter;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Getter
 @Component
 class FlywaySettings {
 
-    @Value("${VAST_DB_SCHEMA:vast}")
-    private String schema;
+    @VastSetting(env = "VAST_DB_SCHEMA")
+    private String schema = "vast";
 
-    @Value("${VAST_DB_MIGRATIONS_ENABLED:true}")
-    private boolean migrationsEnabled;
+    @VastSetting(env = "VAST_DB_MIGRATIONS_ENABLED")
+    private boolean migrationsEnabled = true;
 
-    @Value("${VAST_DB_CLEAN_ON_STARTUP:false}")
-    private boolean cleanOnStartup;
+    @VastSetting(env = "VAST_DB_CLEAN_ON_STARTUP")
+    private boolean cleanOnStartup = false;
 }

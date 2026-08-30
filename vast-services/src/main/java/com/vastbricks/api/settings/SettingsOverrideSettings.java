@@ -1,16 +1,15 @@
 package com.vastbricks.api.settings;
 
 import lombok.Getter;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Getter
 @Component
 class SettingsOverrideSettings {
 
-    @Value("${VAST_DB_SCHEMA:vast}")
-    private String schema;
+    @VastSetting(env = "VAST_DB_SCHEMA")
+    private String schema = "vast";
 
-    @Value("${VAST_SETTINGS_DEFAULT_PROFILE:default}")
-    private String defaultProfile;
+    @VastSetting(env = "VAST_SETTINGS_DEFAULT_PROFILE")
+    private String defaultProfile = "default";
 }

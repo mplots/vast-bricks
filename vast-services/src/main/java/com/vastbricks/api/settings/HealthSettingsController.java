@@ -18,7 +18,8 @@ class HealthSettingsController {
         return new HealthSettingsResponse(
                 healthSettings.getValue(),
                 healthSettings.getEnvironmentValue(),
-                healthSettings.getDatabaseOnlyValue()
+                healthSettings.getDatabaseOnlyValue(),
+                healthSettings.getSecretValue()
         );
     }
 }

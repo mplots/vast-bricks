@@ -1,20 +1,20 @@
 package com.vastbricks.api.client.brickstore;
 
 import com.vastbricks.api.settings.DatabaseBackedSettings;
+import com.vastbricks.api.settings.VastSetting;
 import lombok.Getter;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
 @Getter
 class BrickStoreSettings extends DatabaseBackedSettings {
 
-    @Value("${VAST_BRICKSTORE_BASE_URL:https://www.bricklink.com}")
-    private String baseUrl;
+    @VastSetting(env = "VAST_BRICKSTORE_BASE_URL", databaseOverride = true)
+    private String baseUrl = "https://www.bricklink.com";
 
-    @Value("${VAST_BRICKSTORE_TOKEN:}")
-    private String token;
+    @VastSetting(env = "VAST_BRICKSTORE_TOKEN", databaseOverride = true, secret = true)
+    private String token = "";
 
-    @Value("${VAST_BRICKSTORE_TOR_ENABLED:false}")
-    private boolean torEnabled;
+    @VastSetting(env = "VAST_BRICKSTORE_TOR_ENABLED", databaseOverride = true)
+    private boolean torEnabled = true;
 }

@@ -33,6 +33,8 @@ export const managedServices = [
       VAST_API_PORT: "6362",
       VAST_SETTINGS_DEFAULT_PROFILE: "vast-playwright-default",
       VAST_HEALTH_SETTING_ENV_VALUE: "managed-health-env-value",
+      VAST_BRICKSTORE_TOR_ENABLED: "false",
+      VAST_SETTINGS_ENCRYPTION_KEY: "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=",
     },
     build: {
       command: "mvn",

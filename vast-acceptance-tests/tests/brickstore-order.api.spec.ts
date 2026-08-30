@@ -14,7 +14,7 @@ test('brickstore order endpoint returns an order fetched from BrickStore XML exp
   await wireMock.reset();
 
   await settings.set('VAST_BRICKSTORE_BASE_URL', wireMock.baseUrl);
-  await settings.set('VAST_BRICKSTORE_TOKEN', 'playwright-client-token');
+  await settings.setSecret('VAST_BRICKSTORE_TOKEN', 'playwright-client-token');
 
   await wireMock.addMethodHostMapping('POST', '/api/v1/actions/verify-and-create-session', {
     request: {

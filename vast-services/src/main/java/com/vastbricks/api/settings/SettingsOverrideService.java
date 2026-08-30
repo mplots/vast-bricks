@@ -10,6 +10,7 @@ class SettingsOverrideService {
 
     private final SettingsOverrideRepository settingsOverrideRepository;
     private final SettingsOverrideSettings settings;
+    private final SettingsEncryption settingsEncryption;
 
     Optional<String> findOverride(String settingKey) {
         Optional<String> profile = SettingsProfileContext.currentProfile();
@@ -25,6 +26,11 @@ class SettingsOverrideService {
             return settingsOverrideRepository.findValue(profile.get(), settingKey);
         }
         return findDefaultOverride(settingKey);
+    }
+
+    Optional<String> findConfiguredOverride(String settingKey, boolean secret) {
+        return findConfiguredOverride(settingKey)
+                .map(value -> secret ? settingsEncryption.decrypt(value) : value);
     }
 
     Optional<String> findDefaultOverride(String settingKey) {

@@ -1,8 +1,8 @@
 package com.vastbricks.api.tor;
 
 import com.vastbricks.api.settings.DatabaseBackedSettings;
+import com.vastbricks.api.settings.VastSetting;
 import lombok.Getter;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
@@ -12,42 +12,42 @@ import java.util.Set;
 @Component
 class TorSettings extends DatabaseBackedSettings {
 
-    @Value("${VAST_TOR_PROXY_HOST:127.0.0.1}")
-    private String proxyHost;
+    @VastSetting(env = "VAST_TOR_PROXY_HOST", databaseOverride = true)
+    private String proxyHost = "127.0.0.1";
 
-    @Value("${VAST_TOR_PROXY_PORT:8118}")
-    private int proxyPort;
+    @VastSetting(env = "VAST_TOR_PROXY_PORT", databaseOverride = true)
+    private int proxyPort = 8118;
 
-    @Value("${VAST_TOR_CONTROL_HOST:127.0.0.1}")
-    private String controlHost;
+    @VastSetting(env = "VAST_TOR_CONTROL_HOST", databaseOverride = true)
+    private String controlHost = "127.0.0.1";
 
-    @Value("${VAST_TOR_CONTROL_PORT:9051}")
-    private int controlPort;
+    @VastSetting(env = "VAST_TOR_CONTROL_PORT", databaseOverride = true)
+    private int controlPort = 9051;
 
-    @Value("${VAST_TOR_CONTROL_PASSWORD:yourpass}")
-    private String controlPassword;
+    @VastSetting(env = "VAST_TOR_CONTROL_PASSWORD", databaseOverride = true, secret = true)
+    private String controlPassword = "yourpass";
 
-    @Value("${VAST_TOR_IP_ADDRESS_URL:https://check.torproject.org/api/ip}")
-    private String ipAddressUrl;
+    @VastSetting(env = "VAST_TOR_IP_ADDRESS_URL", databaseOverride = true)
+    private String ipAddressUrl = "https://check.torproject.org/api/ip";
 
-    @Value("${VAST_TOR_FALLBACK_IP_ADDRESS_URL:}")
-    private String fallbackIpAddressUrl;
+    @VastSetting(env = "VAST_TOR_FALLBACK_IP_ADDRESS_URL", databaseOverride = true)
+    private String fallbackIpAddressUrl = "";
 
-    @Value("${VAST_TOR_CONNECT_TIMEOUT:PT5S}")
-    private Duration connectTimeout;
+    @VastSetting(env = "VAST_TOR_CONNECT_TIMEOUT", databaseOverride = true)
+    private Duration connectTimeout = Duration.parse("PT5S");
 
-    @Value("${VAST_TOR_READ_TIMEOUT:PT10S}")
-    private Duration readTimeout;
+    @VastSetting(env = "VAST_TOR_READ_TIMEOUT", databaseOverride = true)
+    private Duration readTimeout = Duration.parse("PT10S");
 
-    @Value("${VAST_TOR_NEW_IP_TIMEOUT:PT100S}")
-    private Duration newIpTimeout;
+    @VastSetting(env = "VAST_TOR_NEW_IP_TIMEOUT", databaseOverride = true)
+    private Duration newIpTimeout = Duration.parse("PT100S");
 
-    @Value("${VAST_TOR_NEW_IP_INITIAL_POLL_INTERVAL:PT0.25S}")
-    private Duration newIpInitialPollInterval;
+    @VastSetting(env = "VAST_TOR_NEW_IP_INITIAL_POLL_INTERVAL", databaseOverride = true)
+    private Duration newIpInitialPollInterval = Duration.parse("PT0.25S");
 
-    @Value("${VAST_TOR_NEW_IP_MAX_POLL_INTERVAL:PT1S}")
-    private Duration newIpMaxPollInterval;
+    @VastSetting(env = "VAST_TOR_NEW_IP_MAX_POLL_INTERVAL", databaseOverride = true)
+    private Duration newIpMaxPollInterval = Duration.parse("PT1S");
 
-    @Value("${VAST_TOR_DEFAULT_RETRY_STATUSES:403}")
-    private Set<Integer> defaultRetryStatuses;
+    @VastSetting(env = "VAST_TOR_DEFAULT_RETRY_STATUSES", databaseOverride = true)
+    private Set<Integer> defaultRetryStatuses = Set.of(403);
 }

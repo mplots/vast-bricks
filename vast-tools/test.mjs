@@ -36,6 +36,8 @@ export async function runTestCommand(args) {
       ACCEPTANCE_PLAYWRIGHT_WORKERS: String(wireMockPlan.workers),
       ACCEPTANCE_WIREMOCK_HOSTS: wireMockPlan.hosts.join(","),
       ACCEPTANCE_WIREMOCK_MODE: wireMockPlan.mode,
+      VAST_SETTINGS_ENCRYPTION_KEY: process.env.VAST_SETTINGS_ENCRYPTION_KEY
+        ?? "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=",
     },
     stdio: "inherit",
   });
@@ -86,7 +88,9 @@ Environment:
   VAST_DB_NAME          PostgreSQL database for DB-backed setup, default bricks
   VAST_DB_USERNAME      PostgreSQL user for DB-backed setup, default bricks
   VAST_DB_PASSWORD      PostgreSQL password for DB-backed setup, default bricks
-  VAST_DB_SCHEMA        Vast schema for DB-backed setup, default vast`);
+  VAST_DB_SCHEMA        Vast schema for DB-backed setup, default vast
+  VAST_SETTINGS_ENCRYPTION_KEY
+                       Base64 32-byte key for encrypted secret settings`);
 }
 
 function wireMockPlaywrightPlan() {

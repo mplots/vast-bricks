@@ -143,6 +143,11 @@ to Java backend code only; do not create another frontend application.
 
 ## Testing strategy
 
+- When code changes affect behavior covered by acceptance tests, verification
+  must rebuild the affected runtime and run the Playwright API acceptance tests.
+  Use the repository CLI for this workflow, normally `./vast test --build` or
+  `./vast t -b`, unless the task explicitly narrows verification or the
+  acceptance-test infrastructure is unavailable.
 - Do not add new Java tests to either the legacy or rewritten applications.
 - Do not delete or weaken existing legacy Java tests unless a task explicitly
   requests it.
