@@ -1,5 +1,6 @@
 package com.vastbricks.api.tor;
 
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
@@ -17,17 +18,13 @@ import java.net.Proxy;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
+@RequiredArgsConstructor
 public class TorRestClientFactory {
 
     private static final Logger log = LoggerFactory.getLogger(TorRestClientFactory.class);
 
     private final TorSettings settings;
     private final ObjectProvider<TorCircuitService> torCircuitService;
-
-    TorRestClientFactory(TorSettings settings, ObjectProvider<TorCircuitService> torCircuitService) {
-        this.settings = settings;
-        this.torCircuitService = torCircuitService;
-    }
 
     public RestClient create() {
         return create(TorRestClientOptions.defaults(settings.getDefaultRetryStatuses()));

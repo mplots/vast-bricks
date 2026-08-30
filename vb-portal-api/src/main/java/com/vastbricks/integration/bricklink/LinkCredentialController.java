@@ -1,5 +1,6 @@
 package com.vastbricks.integration.bricklink;
 
+import com.vastbricks.api.client.brickstore.BrickStoreTokenService;
 import com.vastbricks.config.Env;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -34,6 +35,7 @@ public class LinkCredentialController {
 
     private final Env env;
     private final LinkCredentialService service;
+    private final BrickStoreTokenService brickStoreTokenService;
 
     @PostMapping("/session-cookie")
     public LinkCredentialResponse storeSessionCookie(
@@ -50,6 +52,7 @@ public class LinkCredentialController {
         @RequestHeader(value = API_KEY_HEADER, required = false) String apiKey,
         @Valid @RequestBody TokenRequest request) {
         requireApiKey(apiKey);
+        brickStoreTokenService.storeDefaultToken(request.getToken());
         return LinkCredentialResponse.from(
             service.store(LinkCredentialType.TOKEN, request.getToken())
         );

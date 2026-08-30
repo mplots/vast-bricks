@@ -32,6 +32,17 @@ class SettingsOverrideRepository {
         );
     }
 
+    void upsertValue(String profile, String settingKey, String settingValue) {
+        jdbcTemplate.update(
+                "INSERT INTO " + tableName + " (profile, setting_key, setting_value) VALUES (?, ?, ?) "
+                        + "ON CONFLICT (profile, setting_key) DO UPDATE SET "
+                        + "setting_value = EXCLUDED.setting_value, updated_at = now()",
+                profile,
+                settingKey,
+                settingValue
+        );
+    }
+
     private String quotedIdentifier(String value) {
         if (!DATABASE_IDENTIFIER.matcher(value).matches()) {
             throw new SettingsOverrideException("Unsupported database schema name for settings overrides: " + value);

@@ -101,6 +101,10 @@ to Java backend code only; do not create another frontend application.
 - Use Lombok in rewrite Java code for repetitive boilerplate such as getters,
   setters, constructors, builders, `equals`, and `hashCode` when it keeps the
   code clearer.
+- For Spring controllers, services, repositories, and configuration classes,
+  prefer final dependencies with Lombok `@RequiredArgsConstructor` over
+  handwritten dependency-injection constructors. Write an explicit constructor
+  only when it contains real custom initialization logic.
 - Prefer environment-variable based configuration with explicit default values
   over Spring properties classes for rewrite settings. In Spring-managed code,
   group related values in a small feature settings class and inject values with

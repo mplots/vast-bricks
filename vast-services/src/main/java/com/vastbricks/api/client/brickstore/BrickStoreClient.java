@@ -14,6 +14,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import javax.xml.stream.XMLInputFactory;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -41,6 +42,7 @@ public class BrickStoreClient {
     private final Object authenticationLock = new Object();
 
     private volatile String sessionToken;
+    private volatile String sessionClientToken;
 
     BrickStoreClient(BrickStoreSettings settings, TorRestClientFactory torRestClientFactory) {
         this.settings = settings;
@@ -53,12 +55,17 @@ public class BrickStoreClient {
 
     public List<BrickStoreOrder> listOrders(BrickStoreOrderExportRequest request) {
         validateOrderListRequest(request);
+        return parseOrderExport(exportOrders(request));
+    }
+
+    public byte[] exportOrders(BrickStoreOrderExportRequest request) {
+        Objects.requireNonNull(request, "request");
         var response = sendOrderExportWithToken(request);
         if (authenticationExpired(response)) {
             invalidateSessionToken(response.sessionToken);
             response = sendOrderExportWithToken(request);
         }
-        return parseOrderExport(bodyOrThrow(response));
+        return bodyOrThrow(response);
     }
 
     private BrickStoreResponse sendOrderExportWithToken(BrickStoreOrderExportRequest orderRequest) {
@@ -69,14 +76,16 @@ public class BrickStoreClient {
     }
 
     private String getOrCreateSessionToken() {
+        var clientToken = configuredClientToken();
         var current = sessionToken;
-        if (current != null) {
+        if (current != null && clientToken.equals(sessionClientToken)) {
             return current;
         }
 
         synchronized (authenticationLock) {
-            if (sessionToken == null) {
-                sessionToken = createSessionToken();
+            if (sessionToken == null || !clientToken.equals(sessionClientToken)) {
+                sessionToken = createSessionToken(clientToken);
+                sessionClientToken = clientToken;
             }
             return sessionToken;
         }
@@ -86,18 +95,30 @@ public class BrickStoreClient {
         synchronized (authenticationLock) {
             if (rejectedToken != null && rejectedToken.equals(sessionToken)) {
                 sessionToken = null;
+                sessionClientToken = null;
             }
         }
     }
 
-    private String createSessionToken() {
-        if (settings.getToken().isBlank()) {
+    void invalidateSessionToken() {
+        synchronized (authenticationLock) {
+            sessionToken = null;
+            sessionClientToken = null;
+        }
+    }
+
+    private String configuredClientToken() {
+        var token = settings.getToken();
+        if (token == null || token.isBlank()) {
             throw new BrickStoreClientException("BrickStore token is not configured");
         }
+        return token.trim();
+    }
 
+    private String createSessionToken(String clientToken) {
         String body;
         try {
-            body = objectMapper.writeValueAsString(new SessionRequest(CLIENT_ID, settings.getToken()));
+            body = objectMapper.writeValueAsString(new SessionRequest(CLIENT_ID, clientToken));
         } catch (com.fasterxml.jackson.core.JsonProcessingException ex) {
             throw new BrickStoreClientException("Could not create BrickStore session request", ex);
         }

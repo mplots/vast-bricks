@@ -38,7 +38,7 @@ export const managedServices = [
     },
     build: {
       command: "mvn",
-      args: ["-pl", "vast-api", "-am", "package", "-DskipTests"],
+      args: ["-pl", "vast-api", "-am", "clean", "package", "-DskipTests"],
     },
     processMarker: "vast-api-",
   },
