@@ -1,6 +1,13 @@
 import { APIRequestContext, expect, test as base } from '@playwright/test';
 
-import { upsertSecretSettingOverride, upsertSettingOverride } from './vast-db';
+import {
+  createVastUser,
+  deleteVastUser,
+  upsertSecretSettingOverride,
+  upsertSettingOverride,
+  vastTestPassword,
+  VastUser,
+} from './vast-db';
 
 const settingsProfileHeader = 'X-Vast-Settings-Profile';
 const defaultSettingsProfile = process.env.VAST_SETTINGS_DEFAULT_PROFILE ?? 'vast-playwright-default';
@@ -12,10 +19,42 @@ export type SettingsOverrides = {
   setDefault(settingKey: string, settingValue: string): Promise<void>;
 };
 
+export type Authentication = {
+  readonly user: VastUser;
+  readonly serviceToken: string;
+};
+
 export const test = base.extend<{
+  authentication: Authentication;
   settings: SettingsOverrides;
   requestWithoutSettingsProfile: APIRequestContext;
+  anonymousRequest: APIRequestContext;
 }>({
+  authentication: async ({ baseURL, playwright }, use, testInfo) => {
+    const email = `playwright-${testInfo.workerIndex}-${testInfo.parallelIndex}-${Date.now()}-${Math.random().toString(36).slice(2)}@example.test`;
+    const user = await createVastUser(email);
+    const loginRequest = await playwright.request.newContext({ baseURL });
+
+    try {
+      const loginResponse = await loginRequest.post('/api/account/login', {
+        data: { email, password: vastTestPassword },
+      });
+      if (!loginResponse.ok()) {
+        throw new Error(`Test-user login failed with HTTP ${loginResponse.status()}.`);
+      }
+
+      const body = await loginResponse.json() as { serviceToken?: string };
+      if (!body.serviceToken) {
+        throw new Error('Test-user login did not return a service token.');
+      }
+
+      await use({ user, serviceToken: body.serviceToken });
+    } finally {
+      await loginRequest.dispose();
+      await deleteVastUser(user.id);
+    }
+  },
+
   settings: async ({}, use, testInfo) => {
     const profile = [
       'playwright',
@@ -42,11 +81,12 @@ export const test = base.extend<{
     });
   },
 
-  request: async ({ baseURL, playwright, settings }, use) => {
+  request: async ({ authentication, baseURL, playwright, settings }, use) => {
     const request = await playwright.request.newContext({
       baseURL,
       extraHTTPHeaders: {
         Accept: 'application/json',
+        Authorization: `Bearer ${authentication.serviceToken}`,
         [settingsProfileHeader]: settings.profile,
       },
     });
@@ -55,7 +95,20 @@ export const test = base.extend<{
     await request.dispose();
   },
 
-  requestWithoutSettingsProfile: async ({ baseURL, playwright }, use) => {
+  requestWithoutSettingsProfile: async ({ authentication, baseURL, playwright }, use) => {
+    const request = await playwright.request.newContext({
+      baseURL,
+      extraHTTPHeaders: {
+        Accept: 'application/json',
+        Authorization: `Bearer ${authentication.serviceToken}`,
+      },
+    });
+
+    await use(request);
+    await request.dispose();
+  },
+
+  anonymousRequest: async ({ baseURL, playwright }, use) => {
     const request = await playwright.request.newContext({
       baseURL,
       extraHTTPHeaders: {

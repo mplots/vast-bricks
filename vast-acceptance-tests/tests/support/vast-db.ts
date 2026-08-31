@@ -3,6 +3,37 @@ import { createCipheriv, randomBytes } from 'node:crypto';
 
 const databaseIdentifierPattern = /^[A-Za-z_][A-Za-z0-9_]*$/;
 const settingsEncryptionKeyEnv = 'VAST_SETTINGS_ENCRYPTION_KEY';
+export const vastTestPassword = 'vast-playwright-password';
+const vastTestPasswordHash = '$2y$12$7UNCtzivmQcahGUhaeNGueQ4MNwka2uvb0YUyxF9b25Xhy8CmusVy';
+
+export type VastUser = {
+  readonly id: number;
+  readonly email: string;
+  readonly name: string;
+  readonly role: string;
+};
+
+export async function createVastUser(email: string): Promise<VastUser> {
+  return withDatabaseClient(async (client) => {
+    const result = await client.query<VastUser>(
+      `
+        INSERT INTO ${vastTable('users')} (email, password_hash, name, role)
+        VALUES ($1, $2, $3, $4)
+        RETURNING id, email, name, role
+      `,
+      [email, vastTestPasswordHash, 'Playwright User', 'user'],
+    );
+
+    const user = result.rows[0]!;
+    return { ...user, id: Number(user.id) };
+  });
+}
+
+export async function deleteVastUser(id: number): Promise<void> {
+  await withDatabaseClient(async (client) => {
+    await client.query(`DELETE FROM ${vastTable('users')} WHERE id = $1`, [id]);
+  });
+}
 
 export async function upsertSettingOverride(profile: string, settingKey: string, settingValue: string): Promise<void> {
   await withDatabaseClient(async (client) => {
@@ -80,7 +111,11 @@ async function withDatabaseClient<T>(callback: (client: Client) => Promise<T>): 
 }
 
 function settingsOverrideTable(): string {
-  return `${quotedIdentifier(process.env.VAST_DB_SCHEMA ?? 'vast')}.settings_override`;
+  return vastTable('settings_override');
+}
+
+function vastTable(table: string): string {
+  return `${quotedIdentifier(process.env.VAST_DB_SCHEMA ?? 'vast')}.${table}`;
 }
 
 function quotedIdentifier(identifier: string): string {

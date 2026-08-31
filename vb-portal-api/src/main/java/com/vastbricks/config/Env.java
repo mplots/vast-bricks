@@ -79,9 +79,6 @@ public class Env {
     @Value("#{environment.BSX_INVENTORY_FILE}")
     private String bsxInventoryFile;
 
-    @Value("#{environment.PORTAL_JWT_SECRET ?: 'dummy-secret-not-to-be-deployed-on-production'}")
-    private String portalJwtSecret;
-
     @Value("#{environment.MANAKABATA_API_TOKEN ?: 'dummy-secret'}")
     private String manakabataApiToken;
 

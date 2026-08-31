@@ -71,15 +71,17 @@ sudo cp ../vb-nginx/portal.vastbricks.com.conf /opt/nginx/sites-enabled/
 sudo docker exec nginx-proxy nginx -t
 sudo docker exec nginx-proxy nginx -s reload
 
-## Portal users
+## Vast users
 # The API service requires a stable secret of at least 32 bytes. Set this in
-# the bricks systemd service environment, then restart the service.
-PORTAL_JWT_SECRET=replace-with-a-long-random-secret
+# the service environment, then restart the service. Preserve the previous
+# PORTAL_JWT_SECRET value when migrating production so existing 12-hour tokens
+# remain valid for Vast users created with the same numeric IDs.
+VAST_AUTH_JWT_SECRET=replace-with-a-long-random-secret
 
 # Generate a BCrypt hash and insert users directly into PostgreSQL.
 htpasswd -bnBC 12 "" "your-password" | tr -d ':\n'
 
-INSERT INTO portal_user (email, password_hash, name, role)
+INSERT INTO vast.users (email, password_hash, name, role)
 VALUES ('admin@example.com', '$2y$12$...', 'Administrator', 'admin');
 
 # Renew Certificate

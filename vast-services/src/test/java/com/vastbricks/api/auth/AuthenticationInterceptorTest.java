@@ -1,80 +1,52 @@
-package com.vastbricks.auth;
+package com.vastbricks.api.auth;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.vastbricks.config.Env;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpHeaders;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-
-import java.lang.reflect.Field;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpHeaders;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class PortalAuthenticationInterceptorTest {
+class AuthenticationInterceptorTest {
 
     @Test
     void acceptsAValidTokenAndExposesTheAuthenticatedUser() throws Exception {
-        var user = user();
-        var tokenService = tokenService();
-        var interceptor = new PortalAuthenticationInterceptor(tokenService, authenticationService(user));
-        var attributes = new HashMap<String, Object>();
-        var request = request("Bearer " + tokenService.createToken(user), attributes);
+        User user = TokenServiceTest.user();
+        TokenService tokenService = TokenServiceTest.tokenService();
+        AuthenticationInterceptor interceptor = new AuthenticationInterceptor(tokenService, authenticationService(user));
+        Map<String, Object> attributes = new HashMap<>();
+        HttpServletRequest request = request("Bearer " + tokenService.createToken(user), attributes);
 
         assertTrue(interceptor.preHandle(request, response(new int[1]), new Object()));
-        assertSame(user, attributes.get(PortalAuthenticationInterceptor.AUTHENTICATED_USER_ATTRIBUTE));
+        assertSame(user, attributes.get(AuthenticationInterceptor.AUTHENTICATED_USER_ATTRIBUTE));
     }
 
     @Test
     void rejectsRequestsWithoutABearerToken() throws Exception {
-        var interceptor = new PortalAuthenticationInterceptor(tokenService(), authenticationService(user()));
-        var status = new int[1];
+        AuthenticationInterceptor interceptor = new AuthenticationInterceptor(
+                TokenServiceTest.tokenService(), authenticationService(TokenServiceTest.user()));
+        int[] status = new int[1];
 
         assertFalse(interceptor.preHandle(request(null, new HashMap<>()), response(status), new Object()));
         assertEquals(HttpServletResponse.SC_UNAUTHORIZED, status[0]);
     }
 
-    private PortalAuthenticationService authenticationService(PortalUser user) {
-        var repository = (PortalUserRepository) Proxy.newProxyInstance(
-                PortalUserRepository.class.getClassLoader(),
-                new Class<?>[]{PortalUserRepository.class},
-                (proxy, method, arguments) -> {
-                    if ("findById".equals(method.getName()) && user.getId().equals(arguments[0])) {
-                        return Optional.of(user);
-                    }
-                    if ("findById".equals(method.getName()) || "findByEmailIgnoreCase".equals(method.getName())) {
-                        return Optional.empty();
-                    }
-                    throw new UnsupportedOperationException(method.getName());
-                }
-        );
-        return new PortalAuthenticationService(repository, new BCryptPasswordEncoder(4));
-    }
-
-    private PortalTokenService tokenService() throws ReflectiveOperationException {
-        var env = new Env();
-        Field secretField = Env.class.getDeclaredField("portalJwtSecret");
-        secretField.setAccessible(true);
-        secretField.set(env, "test-secret-that-is-at-least-thirty-two-bytes");
-        return new PortalTokenService(new ObjectMapper(), env);
-    }
-
-    private PortalUser user() {
-        var user = new PortalUser();
-        user.setId(42L);
-        user.setEmail("user@example.com");
-        user.setName("Test User");
-        user.setRole("admin");
-        user.setActive(true);
-        return user;
+    private AuthenticationService authenticationService(User user) {
+        UserRepository repository = new UserRepository(null) {
+            @Override
+            Optional<User> findById(Long id) {
+                return user.getId().equals(id) ? Optional.of(user) : Optional.empty();
+            }
+        };
+        return new AuthenticationService(repository, new BCryptPasswordEncoder(4));
     }
 
     private HttpServletRequest request(String authorization, Map<String, Object> attributes) {
@@ -90,8 +62,7 @@ class PortalAuthenticationInterceptorTest {
                         return null;
                     }
                     return defaultValue(method.getReturnType());
-                }
-        );
+                });
     }
 
     private HttpServletResponse response(int[] status) {
@@ -104,8 +75,7 @@ class PortalAuthenticationInterceptorTest {
                         return null;
                     }
                     return defaultValue(method.getReturnType());
-                }
-        );
+                });
     }
 
     private Object defaultValue(Class<?> type) {

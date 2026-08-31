@@ -1,15 +1,15 @@
-package com.vastbricks.auth;
+package com.vastbricks.api.auth;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-@Configuration
-public class PortalAuthConfig {
+@Configuration(proxyBeanMethods = false)
+class AuthConfiguration {
 
     @Bean
-    public PasswordEncoder portalPasswordEncoder() {
+    PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(12);
     }
 }

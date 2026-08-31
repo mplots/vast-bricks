@@ -139,6 +139,9 @@ to Java backend code only; do not create another frontend application.
   runtime dependency on the legacy data model.
 - New migrations must have clear ownership and must not be mixed into the
   legacy migration history accidentally.
+- Vast migration scripts must be self-contained: they may create and evolve
+  only Vast-owned objects and must never query, copy from, or otherwise depend
+  on legacy or other existing schemas.
 - Migration execution must be safe in both runtime modes: standalone through
   `vast-api` and embedded through `vb-portal-api`.
 - Database credentials and connection settings may point both runtimes at the

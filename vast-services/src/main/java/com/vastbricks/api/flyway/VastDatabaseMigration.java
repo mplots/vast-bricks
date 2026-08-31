@@ -10,6 +10,7 @@ import org.flywaydb.core.Flyway;
 class VastDatabaseMigration {
 
     private static final String MIGRATION_LOCATION = "classpath:db/vast/migration";
+    private static final String LOCAL_DATA_MIGRATION_LOCATION = "classpath:db/vast/migration/data";
     private static final String HISTORY_TABLE = "vast_schema_history";
 
     private final DataSource dataSource;
@@ -24,7 +25,7 @@ class VastDatabaseMigration {
         String schema = settings.getSchema();
         Flyway flyway = Flyway.configure()
                 .dataSource(dataSource)
-                .locations(MIGRATION_LOCATION)
+                .locations(MIGRATION_LOCATION, LOCAL_DATA_MIGRATION_LOCATION)
                 .schemas(schema)
                 .defaultSchema(schema)
                 .table(HISTORY_TABLE)

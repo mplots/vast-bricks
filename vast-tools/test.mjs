@@ -94,6 +94,7 @@ Environment:
   VAST_DB_USERNAME      PostgreSQL user for DB-backed setup, default bricks
   VAST_DB_PASSWORD      PostgreSQL password for DB-backed setup, default bricks
   VAST_DB_SCHEMA        Vast schema for DB-backed setup, default vast
+  VAST_AUTH_JWT_SECRET  JWT signing secret, supplied automatically for the managed test service
   VAST_SETTINGS_ENCRYPTION_KEY
                        Base64 32-byte key for encrypted secret settings`);
 }

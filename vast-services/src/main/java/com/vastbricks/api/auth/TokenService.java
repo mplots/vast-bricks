@@ -1,14 +1,8 @@
-package com.vastbricks.auth;
+package com.vastbricks.api.auth;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.vastbricks.config.Env;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Service;
-
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
@@ -17,9 +11,12 @@ import java.time.Instant;
 import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import org.springframework.stereotype.Service;
 
 @Service
-public class PortalTokenService {
+class TokenService {
 
     private static final Base64.Encoder ENCODER = Base64.getUrlEncoder().withoutPadding();
     private static final Base64.Decoder DECODER = Base64.getUrlDecoder();
@@ -29,18 +26,18 @@ public class PortalTokenService {
     private final ObjectMapper objectMapper;
     private final byte[] signingKey;
 
-    public PortalTokenService(ObjectMapper objectMapper, Env env) {
+    TokenService(ObjectMapper objectMapper, AuthSettings settings) {
         this.objectMapper = objectMapper;
-        var secret = env.getPortalJwtSecret();
-        if (StringUtils.isBlank(secret) || secret.getBytes(StandardCharsets.UTF_8).length < 32) {
-            throw new IllegalStateException("PORTAL_JWT_SECRET must contain at least 32 bytes");
+        String secret = settings.getJwtSecret();
+        if (secret == null || secret.isBlank() || secret.getBytes(StandardCharsets.UTF_8).length < 32) {
+            throw new IllegalStateException("VAST_AUTH_JWT_SECRET must contain at least 32 bytes");
         }
         this.signingKey = secret.getBytes(StandardCharsets.UTF_8);
     }
 
-    public String createToken(PortalUser user) {
-        var now = Instant.now();
-        var claims = new LinkedHashMap<String, Object>();
+    String createToken(User user) {
+        Instant now = Instant.now();
+        Map<String, Object> claims = new LinkedHashMap<>();
         claims.put("iss", "vastbricks-portal");
         claims.put("sub", user.getId().toString());
         claims.put("email", user.getEmail());
@@ -50,22 +47,22 @@ public class PortalTokenService {
         claims.put("exp", now.plus(TOKEN_LIFETIME).getEpochSecond());
 
         try {
-            var payload = encodeBytes(objectMapper.writeValueAsBytes(claims));
-            var unsignedToken = JWT_HEADER + "." + payload;
+            String payload = encodeBytes(objectMapper.writeValueAsBytes(claims));
+            String unsignedToken = JWT_HEADER + "." + payload;
             return unsignedToken + "." + encodeBytes(sign(unsignedToken));
-        } catch (JsonProcessingException e) {
-            throw new IllegalStateException("Failed to create portal token", e);
+        } catch (JsonProcessingException exception) {
+            throw new IllegalStateException("Failed to create authentication token", exception);
         }
     }
 
-    public Long verifyAndGetUserId(String token) {
+    Long verifyAndGetUserId(String token) {
         try {
-            var parts = token.split("\\.", -1);
+            String[] parts = token.split("\\.", -1);
             if (parts.length != 3 || !JWT_HEADER.equals(parts[0])) {
                 throw new InvalidTokenException();
             }
 
-            var unsignedToken = parts[0] + "." + parts[1];
+            String unsignedToken = parts[0] + "." + parts[1];
             if (!MessageDigest.isEqual(sign(unsignedToken), DECODER.decode(parts[2]))) {
                 throw new InvalidTokenException();
             }
@@ -75,26 +72,26 @@ public class PortalTokenService {
                 throw new InvalidTokenException();
             }
 
-            var expiresAt = ((Number) claims.get("exp")).longValue();
+            long expiresAt = ((Number) claims.get("exp")).longValue();
             if (expiresAt <= Instant.now().getEpochSecond()) {
                 throw new InvalidTokenException();
             }
 
             return Long.valueOf(claims.get("sub").toString());
-        } catch (InvalidTokenException e) {
-            throw e;
-        } catch (Exception e) {
+        } catch (InvalidTokenException exception) {
+            throw exception;
+        } catch (Exception exception) {
             throw new InvalidTokenException();
         }
     }
 
     private byte[] sign(String value) {
         try {
-            var mac = Mac.getInstance("HmacSHA256");
+            Mac mac = Mac.getInstance("HmacSHA256");
             mac.init(new SecretKeySpec(signingKey, "HmacSHA256"));
             return mac.doFinal(value.getBytes(StandardCharsets.US_ASCII));
-        } catch (GeneralSecurityException e) {
-            throw new IllegalStateException("HMAC-SHA256 is unavailable", e);
+        } catch (GeneralSecurityException exception) {
+            throw new IllegalStateException("HMAC-SHA256 is unavailable", exception);
         }
     }
 
@@ -102,6 +99,6 @@ public class PortalTokenService {
         return ENCODER.encodeToString(value);
     }
 
-    public static class InvalidTokenException extends RuntimeException {
+    static class InvalidTokenException extends RuntimeException {
     }
 }

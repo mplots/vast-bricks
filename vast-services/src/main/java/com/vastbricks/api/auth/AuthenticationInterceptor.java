@@ -1,40 +1,39 @@
-package com.vastbricks.auth;
+package com.vastbricks.api.auth;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import java.io.IOException;
-
 @Component
 @RequiredArgsConstructor
-public class PortalAuthenticationInterceptor implements HandlerInterceptor {
+class AuthenticationInterceptor implements HandlerInterceptor {
 
-    public static final String AUTHENTICATED_USER_ATTRIBUTE = "portalAuthenticatedUser";
+    static final String AUTHENTICATED_USER_ATTRIBUTE = "vastAuthenticatedUser";
 
-    private final PortalTokenService tokenService;
-    private final PortalAuthenticationService authenticationService;
+    private final TokenService tokenService;
+    private final AuthenticationService authenticationService;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws IOException {
-        var authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
+        String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (authorization == null || !authorization.startsWith("Bearer ")) {
             return unauthorized(response);
         }
 
         try {
-            var userId = tokenService.verifyAndGetUserId(authorization.substring("Bearer ".length()));
-            var user = authenticationService.findActiveById(userId).orElse(null);
+            Long userId = tokenService.verifyAndGetUserId(authorization.substring("Bearer ".length()));
+            User user = authenticationService.findActiveById(userId).orElse(null);
             if (user == null) {
                 return unauthorized(response);
             }
 
             request.setAttribute(AUTHENTICATED_USER_ATTRIBUTE, user);
             return true;
-        } catch (PortalTokenService.InvalidTokenException e) {
+        } catch (TokenService.InvalidTokenException exception) {
             return unauthorized(response);
         }
     }
