@@ -193,7 +193,7 @@ to Java backend code only; do not create another frontend application.
   build the entire final CLI during module scaffolding.
 - `./vast services` (alias `./vast svc`) manages `postgres`, `tor-proxy`,
   `vast-api`, `wiremock`, and `vast-portal`. Managed application instances use
-  ports 6362, 9010, and 3100 respectively, leaving the normal IntelliJ ports
+  ports 6362, 9011, and 3100 respectively, leaving the normal IntelliJ ports
   6262 and 3000 available for independently launched instances.
 - `./vast ps` is the shortcut for `./vast services list`.
 - Runtime process state and logs belong under the ignored `.vast` directory.

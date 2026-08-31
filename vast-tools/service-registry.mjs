@@ -44,8 +44,8 @@ export const managedServices = [
   },
   {
     name: "wiremock",
-    port: 9010,
-    healthUrl: "http://127.0.0.1:9010/__admin",
+    port: 9011,
+    healthUrl: "http://127.0.0.1:9011/__admin",
     dockerComposeService: "wiremock",
     containerName: "vast-bricks-wiremock",
   },

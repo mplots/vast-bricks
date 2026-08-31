@@ -98,7 +98,7 @@ Managed ports:
   postgres     2345
   tor-proxy    8118
   vast-api     6362
-  wiremock     9010
+  wiremock     9011
   vast-portal  3100
 
 Postgres intentionally uses non-default host port 2345.

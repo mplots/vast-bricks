@@ -36,7 +36,7 @@ services:
     container_name: vast-bricks-wiremock
     ports:
       - target: 8080
-        published: 9010
+        published: 9011
         host_ip: 127.0.0.1
 
 volumes:

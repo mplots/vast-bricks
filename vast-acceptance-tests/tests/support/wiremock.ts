@@ -103,7 +103,7 @@ export class WireMockApi {
 
   constructor(
     readonly request: APIRequestContext,
-    readonly baseUrl = process.env.ACCEPTANCE_WIREMOCK_URL ?? 'http://localhost:9010',
+    readonly baseUrl = process.env.ACCEPTANCE_WIREMOCK_URL ?? 'http://localhost:9011',
     readonly hostHeader = new URL(baseUrl).host,
     readonly mode: WireMockMode = wireMockMode(),
   ) {}
@@ -230,7 +230,7 @@ export function wireMockMode(): WireMockMode {
 }
 
 export function wireMockBaseUrlForTest(testInfo: TestInfo): string {
-  const configuredUrl = process.env.ACCEPTANCE_WIREMOCK_URL ?? 'http://localhost:9010';
+  const configuredUrl = process.env.ACCEPTANCE_WIREMOCK_URL ?? 'http://localhost:9011';
   if (wireMockMode() === 'serial') {
     return configuredUrl;
   }
@@ -243,13 +243,13 @@ export function wireMockHostHeaderForTest(testInfo: TestInfo): string {
 
 function wireMockHostForTest(testInfo: TestInfo): string {
   const hosts = wireMockHosts();
-  return hosts[testInfo.parallelIndex] ?? hosts[0] ?? new URL(process.env.ACCEPTANCE_WIREMOCK_URL ?? 'http://localhost:9010').hostname;
+  return hosts[testInfo.parallelIndex] ?? hosts[0] ?? new URL(process.env.ACCEPTANCE_WIREMOCK_URL ?? 'http://localhost:9011').hostname;
 }
 
 function wireMockHosts(): string[] {
   const value = process.env.ACCEPTANCE_WIREMOCK_HOSTS;
   if (!value?.trim()) {
-    return [new URL(process.env.ACCEPTANCE_WIREMOCK_URL ?? 'http://localhost:9010').hostname];
+    return [new URL(process.env.ACCEPTANCE_WIREMOCK_URL ?? 'http://localhost:9011').hostname];
   }
   return value.split(',').map((host) => host.trim()).filter(Boolean);
 }
