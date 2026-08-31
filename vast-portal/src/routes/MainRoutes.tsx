@@ -21,6 +21,7 @@ const ContactUS = Loadable(lazy(() => import('pages/contact-us')));
 const ProductsPage = Loadable(lazy(() => import('pages/products')));
 const AccountingPage = Loadable(lazy(() => import('pages/accounting')));
 const ArchivesPage = Loadable(lazy(() => import('pages/archives')));
+const ReconciliationPage = Loadable(lazy(() => import('pages/reconciliation')));
 
 // ==============================|| MAIN ROUTES ||============================== //
 
@@ -46,6 +47,10 @@ const MainRoutes = {
         {
           path: 'archives',
           element: <ArchivesPage />
+        },
+        {
+          path: 'reconciliation',
+          element: <ReconciliationPage />
         }
       ]
     },

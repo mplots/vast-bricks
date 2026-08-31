@@ -53,7 +53,8 @@ public class BrickStoreOrderExportRequest {
             BrickStoreOrderType orderType,
             LocalDate fromDate,
             LocalDate toDate,
-            String orderId
+            String orderId,
+            boolean useRealName
     ) {
         Objects.requireNonNull(orderType, "orderType");
         orderId = orderId == null ? null : orderId.trim();
@@ -71,11 +72,12 @@ public class BrickStoreOrderExportRequest {
                 .toDate(toDate)
                 .orderId(orderId)
                 .getOrders(fromDate == null ? null : "date")
+                .useRealName(useRealName ? "y" : "n")
                 .build();
     }
 
     public static BrickStoreOrderExportRequest all(BrickStoreOrderType orderType) {
-        return create(orderType, null, null, null);
+        return create(orderType, null, null, null, true);
     }
 
     public static BrickStoreOrderExportRequest forDateRange(
@@ -83,14 +85,23 @@ public class BrickStoreOrderExportRequest {
             LocalDate fromDate,
             LocalDate toDate
     ) {
-        return create(orderType, fromDate, toDate, null);
+        return create(orderType, fromDate, toDate, null, true);
+    }
+
+    public static BrickStoreOrderExportRequest forDateRange(
+            BrickStoreOrderType orderType,
+            LocalDate fromDate,
+            LocalDate toDate,
+            boolean useRealName
+    ) {
+        return create(orderType, fromDate, toDate, null, useRealName);
     }
 
     public static BrickStoreOrderExportRequest forOrderId(BrickStoreOrderType orderType, String orderId) {
         if (orderId == null || orderId.isBlank()) {
             throw new IllegalArgumentException("orderId is required");
         }
-        return create(orderType, null, null, orderId);
+        return create(orderType, null, null, orderId, true);
     }
 
     public static BrickStoreOrderExportRequest forOrderIdInDateRange(
@@ -102,6 +113,6 @@ public class BrickStoreOrderExportRequest {
         if (orderId == null || orderId.isBlank()) {
             throw new IllegalArgumentException("orderId is required");
         }
-        return create(orderType, fromDate, toDate, orderId);
+        return create(orderType, fromDate, toDate, orderId, true);
     }
 }

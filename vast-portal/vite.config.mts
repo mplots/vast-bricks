@@ -5,16 +5,17 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   const API_URL = `${env.VITE_APP_BASE_NAME}`;
-  const API_PROXY = process.env.VITE_APP_API_PROXY || env.VITE_APP_API_PROXY || 'http://localhost:6161';
+  const API_PROXY = process.env.VITE_APP_API_PROXY || env.VITE_APP_API_PROXY || 'http://127.0.0.1:6161';
   const managedByVast = process.env.VAST_MANAGED === 'true';
-  const PORT = 3000;
+  const PORT = 3200;
 
   return {
     server: {
       // this ensures that the browser opens upon server start
       open: !managedByVast,
-      // this sets a default port to 3000
+      // IntelliJ portal development port; ./vast uses 3100 instead.
       port: PORT,
+      strictPort: true,
       host: true,
       proxy: {
         '/api': {

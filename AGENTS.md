@@ -142,11 +142,20 @@ here as they are provided; do not invent unspecified behavior prematurely.
 - The screen is backed entirely by live data sources. Reconciliation records,
   provider responses, and reconciliation results are not stored in the Vast
   database.
+- The initial reconciliation order-list slice reads received BrickLink orders
+  from the BrickStore XML export for the selected month. Its server response
+  and table expose only the marketplace source (`BrickLink` or `BrickOwl`),
+  order ID, and buyer. Add further fields and providers incrementally as their
+  processing requirements are supplied.
 - Data is requested from the providers on demand when the screen is opened.
 - Provider requests should run in parallel so far as their dependencies allow.
 - Potential performance problems from live, on-demand aggregation are accepted
   for now and will be addressed when concrete requirements or measurements are
   available.
+- Keep reconciliation API acceptance scenarios focused on business behavior.
+  Provider-specific WireMock protocol setup belongs in compact test-support
+  fixtures, so a scenario states only the provider response and its business
+  assertions.
 - Orders have a shared identifier across systems, but exact identifier matching
   will not cover every case. Some sources will require more involved search or
   matching algorithms. Those algorithms will be specified during incremental
@@ -273,7 +282,7 @@ here as they are provided; do not invent unspecified behavior prematurely.
 - `./vast services` (alias `./vast svc`) manages `postgres`, `tor-proxy`,
   `vast-api`, `wiremock`, and `vast-portal`. Managed application instances use
   ports 6362, 9011, and 3100 respectively, leaving the normal IntelliJ ports
-  6262 and 3000 available for independently launched instances.
+  6161, 6262, and 3200 available for independently launched instances.
 - `./vast ps` is the shortcut for `./vast services list`.
 - Runtime process state and logs belong under the ignored `.vast` directory.
   Service stop operations must affect only processes recorded and verified as

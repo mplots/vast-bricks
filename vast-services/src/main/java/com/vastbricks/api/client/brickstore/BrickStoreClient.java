@@ -124,7 +124,7 @@ public class BrickStoreClient {
         }
 
         var response = exchange(() -> restClient().post()
-                .uri(resolve(SESSION_PATH))
+                .uri(resolveSession(SESSION_PATH))
                 .contentType(MediaType.APPLICATION_JSON)
                 .header(CLIENT_ID_HEADER, CLIENT_ID)
                 .body(body)
@@ -180,6 +180,10 @@ public class BrickStoreClient {
 
     private URI resolve(String path) {
         return URI.create(settings.getBaseUrl()).resolve(path);
+    }
+
+    private URI resolveSession(String path) {
+        return URI.create(settings.getSessionBaseUrl()).resolve(path);
     }
 
     private void validateOrderListRequest(BrickStoreOrderExportRequest request) {

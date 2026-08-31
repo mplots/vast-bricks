@@ -3,6 +3,8 @@
   "accounting": "Accounting",
   "accounting-orders": "Orders",
   "archives": "Archives",
+  "reconciliation": "Reconciliation",
+  "reconciliation-orders": "Orders",
   "maintenance": "Maintenance",
   "error-404": "Error 404",
   "error-500": "Error 500",

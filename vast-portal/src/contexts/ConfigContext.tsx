@@ -33,6 +33,7 @@ type ConfigProviderProps = {
 
 function ConfigProvider({ children }: ConfigProviderProps) {
   const [config, setConfig] = useLocalStorage('able-pro-material-react-ts-config', initialState);
+  const currentConfig = config.i18n === 'lv' ? config : { ...config, i18n: 'en' as const };
 
   const onChangeContainer = (container: string) => {
     let containerValue: boolean;
@@ -43,49 +44,49 @@ function ConfigProvider({ children }: ConfigProviderProps) {
       containerValue = true;
     }
     setConfig({
-      ...config,
+      ...currentConfig,
       container: containerValue
     });
   };
 
   const onChangeLocalization = (lang: I18n) => {
     setConfig({
-      ...config,
+      ...currentConfig,
       i18n: lang
     });
   };
 
   const onChangeMode = (mode: ThemeMode) => {
     setConfig({
-      ...config,
+      ...currentConfig,
       mode
     });
   };
 
   const onChangePresetColor = (theme: PresetColor) => {
     setConfig({
-      ...config,
+      ...currentConfig,
       presetColor: theme
     });
   };
 
   const onChangeDirection = (direction: ThemeDirection) => {
     setConfig({
-      ...config,
+      ...currentConfig,
       themeDirection: direction
     });
   };
 
   const onChangeMiniDrawer = (miniDrawer: boolean) => {
     setConfig({
-      ...config,
+      ...currentConfig,
       miniDrawer
     });
   };
 
   const onChangeThemeLayout = (direction: ThemeDirection, miniDrawer: boolean) => {
     setConfig({
-      ...config,
+      ...currentConfig,
       miniDrawer,
       themeDirection: direction
     });
@@ -100,7 +101,7 @@ function ConfigProvider({ children }: ConfigProviderProps) {
       contrastValue = false;
     }
     setConfig({
-      ...config,
+      ...currentConfig,
       themeContrast: contrastValue
     });
   };
@@ -114,21 +115,21 @@ function ConfigProvider({ children }: ConfigProviderProps) {
       captionValue = false;
     }
     setConfig({
-      ...config,
+      ...currentConfig,
       menuCaption: captionValue
     });
   };
 
   const onChangeMenuOrientation = (layout: MenuOrientation) => {
     setConfig({
-      ...config,
+      ...currentConfig,
       menuOrientation: layout
     });
   };
 
   const onChangeFontFamily = (fontFamily: FontFamily) => {
     setConfig({
-      ...config,
+      ...currentConfig,
       fontFamily
     });
   };
@@ -136,7 +137,7 @@ function ConfigProvider({ children }: ConfigProviderProps) {
   return (
     <ConfigContext
       value={{
-        ...config,
+        ...currentConfig,
         onChangeContainer,
         onChangeLocalization,
         onChangeMode,

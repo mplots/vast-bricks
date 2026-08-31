@@ -12,6 +12,7 @@ test('brickstore token endpoint stores an encrypted token used by raw order expo
   await wireMock.reset();
 
   await settings.set('VAST_BRICKSTORE_BASE_URL', wireMock.baseUrl);
+  await settings.set('VAST_BRICKSTORE_SESSION_BASE_URL', wireMock.baseUrl);
 
   const tokenResponse = await request.post('/api/private/brickstore/token', {
     data: {
