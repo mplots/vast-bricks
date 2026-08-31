@@ -58,7 +58,7 @@ _vast_completion() {
       ;;
     test|t)
       if [[ "${current}" == -* ]]; then
-        COMPREPLY=($(compgen -W "--build -b --help -h" -- "${current}"))
+        COMPREPLY=($(compgen -W "--build -b --clean-build -cb --help -h" -- "${current}"))
       else
         COMPREPLY=()
       fi

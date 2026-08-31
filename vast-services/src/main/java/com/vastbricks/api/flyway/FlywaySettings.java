@@ -1,19 +1,21 @@
 package com.vastbricks.api.flyway;
 
-import com.vastbricks.api.settings.VastSetting;
 import lombok.Getter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Getter
 @Component
 class FlywaySettings {
 
-    @VastSetting(env = "VAST_DB_SCHEMA")
+    // Migration bootstrap must not depend on @VastSetting because its database
+    // override table is created by these migrations.
+    @Value("${VAST_DB_SCHEMA:vast}")
     private String schema = "vast";
 
-    @VastSetting(env = "VAST_DB_MIGRATIONS_ENABLED")
+    @Value("${VAST_DB_MIGRATIONS_ENABLED:true}")
     private boolean migrationsEnabled = true;
 
-    @VastSetting(env = "VAST_DB_CLEAN_ON_STARTUP")
+    @Value("${VAST_DB_CLEAN_ON_STARTUP:false}")
     private boolean cleanOnStartup = false;
 }

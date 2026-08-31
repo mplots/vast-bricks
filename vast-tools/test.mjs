@@ -14,7 +14,7 @@ export async function runTestCommand(args) {
   }
 
   if (options.build) {
-    const restartStatus = await restartServices(["vast-api"]);
+    const restartStatus = await restartServices(["vast-api"], { cleanDb: options.cleanBuild });
     if (restartStatus !== 0) {
       return restartStatus;
     }
@@ -51,6 +51,7 @@ export async function runTestCommand(args) {
 function parseOptions(args) {
   const options = {
     build: false,
+    cleanBuild: false,
     help: false,
     matchers: [],
   };
@@ -58,6 +59,9 @@ function parseOptions(args) {
   for (const arg of args) {
     if (arg === "--build" || arg === "-b") {
       options.build = true;
+    } else if (arg === "--clean-build" || arg === "-cb") {
+      options.build = true;
+      options.cleanBuild = true;
     } else if (arg === "--help" || arg === "-h") {
       options.help = true;
     } else if (arg.startsWith("-")) {
@@ -79,6 +83,7 @@ Runs Playwright API acceptance tests from vast-acceptance-tests.
 
 Options:
   --build, -b           Rebuild and restart managed vast-api before testing
+  --clean-build, -cb    Rebuild vast-api and test with a freshly migrated Vast schema
   --help, -h            Show this help
 
 Environment:

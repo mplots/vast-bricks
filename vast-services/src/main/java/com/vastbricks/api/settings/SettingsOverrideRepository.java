@@ -2,10 +2,12 @@ package com.vastbricks.api.settings;
 
 import java.util.Optional;
 import java.util.regex.Pattern;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 @Repository
+@DependsOn("vastDatabaseMigration")
 class SettingsOverrideRepository {
 
     private static final Pattern DATABASE_IDENTIFIER = Pattern.compile("[A-Za-z_][A-Za-z0-9_]*");

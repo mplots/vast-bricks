@@ -186,6 +186,8 @@ to Java backend code only; do not create another frontend application.
 - Use `./vast test` or the shortcut `./vast t` to run Playwright API
   acceptance tests from `vast-acceptance-tests`. Pass `-b` or `--build` when
   the managed `vast-api` should be rebuilt and restarted before running tests.
+  Pass `-cb` or `--clean-build` to rebuild it and run the tests with the Vast
+  database schema cleaned and migrated from scratch.
 - The CLI should eventually manage PostgreSQL readiness, migrations, service
   readiness, focused Playwright API runs, restarts after code changes, logs, and
   cleanup.
