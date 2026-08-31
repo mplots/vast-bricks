@@ -1,5 +1,6 @@
 import { runServicesCommand } from "./services.mjs";
 import { runTestCommand } from "./test.mjs";
+import { runLogsCommand } from "./logs.mjs";
 import completions, { completionLoadedEnvName } from "./completion.mjs";
 import { repoRoot } from "./paths.mjs";
 
@@ -24,6 +25,10 @@ async function main() {
 
   if (command === "test" || command === "t") {
     return runTestCommand(args);
+  }
+
+  if (command === "logs") {
+    return runLogsCommand(args);
   }
 
   if (command === "completion") {
@@ -52,9 +57,10 @@ Commands:
   test, t         Run acceptance tests
   services, svc    Inspect and control local managed services
   ps              Shortcut for: ./vast services list
+  logs            Print, follow, or clear managed service logs
   completion       Print shell completion setup
 
-Run ./vast services --help for command details.${shellSetupHelp}`);
+Run ./vast <command> --help for command details.${shellSetupHelp}`);
 }
 
 function highlight(text) {

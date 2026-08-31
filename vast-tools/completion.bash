@@ -5,7 +5,7 @@ _vast_completion() {
   command="${COMP_WORDS[1]}"
 
   if [[ ${COMP_CWORD} -eq 1 ]]; then
-    COMPREPLY=($(compgen -W "test t services svc ps completion help" -- "${current}"))
+    COMPREPLY=($(compgen -W "test t services svc ps logs completion help" -- "${current}"))
     return
   fi
 
@@ -52,6 +52,28 @@ _vast_completion() {
       fi
       return
       ;;
+    logs)
+      case "${previous}" in
+        --tail|-t)
+          COMPREPLY=()
+          return
+          ;;
+      esac
+      if [[ "${COMP_WORDS[2]}" == "clear" ]]; then
+        if [[ "${current}" == -* ]]; then
+          COMPREPLY=($(compgen -W "--help -h" -- "${current}"))
+        else
+          COMPREPLY=($(compgen -W "postgres tor-proxy vast-api wiremock vast-portal" -- "${current}"))
+        fi
+      elif [[ "${current}" == -* ]]; then
+        COMPREPLY=($(compgen -W "--follow -f --tail -t --help -h" -- "${current}"))
+      elif [[ ${COMP_CWORD} -eq 2 ]]; then
+        COMPREPLY=($(compgen -W "clear postgres tor-proxy vast-api wiremock vast-portal" -- "${current}"))
+      else
+        COMPREPLY=()
+      fi
+      return
+      ;;
     completion|help)
       COMPREPLY=()
       return
@@ -66,7 +88,7 @@ _vast_completion() {
       ;;
   esac
 
-  COMPREPLY=($(compgen -W "test t services svc ps completion help" -- "${current}"))
+  COMPREPLY=($(compgen -W "test t services svc ps logs completion help" -- "${current}"))
 }
 
 complete -F _vast_completion vast
