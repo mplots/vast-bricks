@@ -17,13 +17,15 @@ class SettingsOverrideService {
         if (profile.isEmpty()) {
             return Optional.empty();
         }
-        return settingsOverrideRepository.findValue(profile.get(), settingKey);
+        return settingsOverrideRepository.findByProfileAndSettingKey(profile.get(), settingKey)
+                .map(SettingsOverride::getSettingValue);
     }
 
     Optional<String> findConfiguredOverride(String settingKey) {
         Optional<String> profile = SettingsProfileContext.currentProfile();
         if (profile.isPresent()) {
-            return settingsOverrideRepository.findValue(profile.get(), settingKey);
+            return settingsOverrideRepository.findByProfileAndSettingKey(profile.get(), settingKey)
+                    .map(SettingsOverride::getSettingValue);
         }
         return findDefaultOverride(settingKey);
     }
@@ -38,6 +40,7 @@ class SettingsOverrideService {
         if (defaultProfile == null || defaultProfile.isBlank()) {
             return Optional.empty();
         }
-        return settingsOverrideRepository.findValue(defaultProfile.trim(), settingKey);
+        return settingsOverrideRepository.findByProfileAndSettingKey(defaultProfile.trim(), settingKey)
+                .map(SettingsOverride::getSettingValue);
     }
 }

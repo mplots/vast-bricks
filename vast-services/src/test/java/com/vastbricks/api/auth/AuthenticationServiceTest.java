@@ -1,6 +1,7 @@
 package com.vastbricks.api.auth;
 
 import java.time.Instant;
+import java.lang.reflect.Proxy;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -36,16 +37,18 @@ class AuthenticationServiceTest {
     }
 
     private UserRepository repository(User user) {
-        return new UserRepository(null) {
-            @Override
-            Optional<User> findByEmail(String email) {
-                return user.getEmail().equalsIgnoreCase(email) ? Optional.of(user) : Optional.empty();
-            }
-
-            @Override
-            Optional<User> findById(Long id) {
-                return user.getId().equals(id) ? Optional.of(user) : Optional.empty();
-            }
-        };
+        return (UserRepository) Proxy.newProxyInstance(
+                UserRepository.class.getClassLoader(),
+                new Class<?>[]{UserRepository.class},
+                (proxy, method, arguments) -> {
+                    if ("findByEmail".equals(method.getName())) {
+                        String email = (String) arguments[0];
+                        return user.getEmail().equalsIgnoreCase(email) ? Optional.of(user) : Optional.empty();
+                    }
+                    if ("findById".equals(method.getName())) {
+                        return user.getId().equals(arguments[0]) ? Optional.of(user) : Optional.empty();
+                    }
+                    throw new UnsupportedOperationException(method.getName());
+                });
     }
 }

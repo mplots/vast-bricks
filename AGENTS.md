@@ -131,6 +131,9 @@ to Java backend code only; do not create another frontend application.
 ## Database boundary
 
 - New backend code uses a new PostgreSQL schema with a new database design.
+- Use Spring Data JPA for Vast feature persistence. Do not introduce direct
+  JDBC repositories in rewritten feature code; Flyway migration/bootstrap
+  infrastructure is the exception.
 - New code may access only tables owned by the new schema.
 - Do not map, query, update, or add foreign-key dependencies to legacy tables
   from new code.

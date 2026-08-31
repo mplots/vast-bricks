@@ -40,12 +40,15 @@ class AuthenticationInterceptorTest {
     }
 
     private AuthenticationService authenticationService(User user) {
-        UserRepository repository = new UserRepository(null) {
-            @Override
-            Optional<User> findById(Long id) {
-                return user.getId().equals(id) ? Optional.of(user) : Optional.empty();
-            }
-        };
+        UserRepository repository = (UserRepository) Proxy.newProxyInstance(
+                UserRepository.class.getClassLoader(),
+                new Class<?>[]{UserRepository.class},
+                (proxy, method, arguments) -> {
+                    if ("findById".equals(method.getName())) {
+                        return user.getId().equals(arguments[0]) ? Optional.of(user) : Optional.empty();
+                    }
+                    throw new UnsupportedOperationException(method.getName());
+                });
         return new AuthenticationService(repository, new BCryptPasswordEncoder(4));
     }
 

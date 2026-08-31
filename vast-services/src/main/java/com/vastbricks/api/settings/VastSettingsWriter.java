@@ -14,12 +14,12 @@ public class VastSettingsWriter {
 
     @Transactional
     public void storeSecret(String settingKey, String settingValue) {
-        settingsOverrideRepository.upsertValue(resolveProfile(), settingKey, settingsEncryption.encrypt(settingValue));
+        storeValue(resolveProfile(), settingKey, settingsEncryption.encrypt(settingValue));
     }
 
     @Transactional
     public void storeDefaultSecret(String settingKey, String settingValue) {
-        settingsOverrideRepository.upsertValue(resolveDefaultProfile(), settingKey, settingsEncryption.encrypt(settingValue));
+        storeValue(resolveDefaultProfile(), settingKey, settingsEncryption.encrypt(settingValue));
     }
 
     private String resolveProfile() {
@@ -32,5 +32,12 @@ public class VastSettingsWriter {
             throw new SettingsOverrideException("Default settings profile is required to write setting overrides.");
         }
         return defaultProfile.trim();
+    }
+
+    private void storeValue(String profile, String settingKey, String settingValue) {
+        SettingsOverride override = settingsOverrideRepository.findByProfileAndSettingKey(profile, settingKey)
+                .orElseGet(() -> new SettingsOverride(profile, settingKey, settingValue));
+        override.setSettingValue(settingValue);
+        settingsOverrideRepository.save(override);
     }
 }

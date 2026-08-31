@@ -7,9 +7,6 @@ import org.springframework.stereotype.Component;
 @Component
 class SettingsOverrideSettings {
 
-    @VastSetting(env = "VAST_DB_SCHEMA")
-    private String schema = "vast";
-
     @VastSetting(env = "VAST_SETTINGS_DEFAULT_PROFILE")
     private String defaultProfile = "default";
 }
