@@ -112,6 +112,77 @@ to Java backend code only; do not create another frontend application.
   `FlywaySettings`; do not read environment variables with `System.getenv()`
   unless Spring injection is not available.
 
+## Reconciliation feature requirements
+
+Reconciliation is a planned large migration feature intended to replace a
+substantial amount of legacy functionality incrementally. The requirements in
+this section are the source of truth whenever work is requested for the
+reconciliation feature. Add detailed reconciliation rules and processing steps
+here as they are provided; do not invent unspecified behavior prematurely.
+
+### User experience and scope
+
+- The end result is a unified reconciliation screen in `vast-portal` that shows
+  all relevant orders, similarly to the current Orders screen.
+- The reconciliation screen must coexist with the current Orders screen during
+  migration. In the long term, it is intended to replace the current screen.
+- The screen takes one month as its input and reconciles orders for that month.
+- The purpose of the screen is to identify discrepancies for an order across
+  the systems involved in commerce, payment, shipping, accounting, and store
+  synchronization.
+- An order whose reconciliation fails is colored red in the orders table.
+- Selecting a failed order shows all available details explaining why its
+  reconciliation failed.
+- The first iteration is read-only.
+- Only the failed state is currently required. Do not introduce additional
+  reconciliation states until their requirements are provided.
+
+### Data collection and reconciliation
+
+- The screen is backed entirely by live data sources. Reconciliation records,
+  provider responses, and reconciliation results are not stored in the Vast
+  database.
+- Data is requested from the providers on demand when the screen is opened.
+- Provider requests should run in parallel so far as their dependencies allow.
+- Potential performance problems from live, on-demand aggregation are accepted
+  for now and will be addressed when concrete requirements or measurements are
+  available.
+- Orders have a shared identifier across systems, but exact identifier matching
+  will not cover every case. Some sources will require more involved search or
+  matching algorithms. Those algorithms will be specified during incremental
+  implementation.
+- Reconciliation rules are conditional. Implement only the rules supplied for
+  the current processing step rather than assuming that every order must have a
+  record in every system.
+- An order normally has one order source, one payment source, one shipping
+  source, and corresponding single sources for the other reconciliation
+  categories.
+
+### Data-source boundaries and current clients
+
+- Every reconciliation category must expose a common boundary that permits
+  multiple provider implementations. Adding another payment, accounting,
+  shipping, order, or synchronization provider should be straightforward and
+  must not require redesigning the reconciliation feature.
+- A low-level API client is not necessarily a reconciliation data source by
+  itself. A data-source implementation may combine multiple clients and expose
+  their collected data through the category's common boundary.
+- Current order access includes:
+  - a combined BrickLink-oriented source that uses both the reverse-engineered
+    API client from the BrickStore application and the BrickLink API client;
+  - a BrickOwl source that returns order data through the same common order
+    boundary.
+- Current payment client implementations are Stripe and PayPal.
+- The current shipping client implementation is Mans Pasts.
+- The current accounting client implementation is Manakabata.
+- The current e-commerce store synchronization client implementation is
+  BrickSync.
+- These are the implementations currently known, not an exhaustive or closed
+  provider list.
+- Some of these clients already exist in legacy code. Migrate them into the
+  rewrite incrementally as required by each supplied reconciliation processing
+  step; do not migrate all clients preemptively.
+
 ## Spring Boot composition
 
 - `vast-api` defines only the new Spring Boot launcher.
