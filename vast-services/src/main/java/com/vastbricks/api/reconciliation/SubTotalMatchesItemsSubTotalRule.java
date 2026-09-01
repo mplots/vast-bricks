@@ -1,5 +1,8 @@
 package com.vastbricks.api.reconciliation;
 
+import static com.vastbricks.api.reconciliation.ReconciliationOrderField.ITEMS_SUB_TOTAL;
+import static com.vastbricks.api.reconciliation.ReconciliationOrderField.SUB_TOTAL;
+
 import java.util.List;
 import org.springframework.stereotype.Component;
 
@@ -10,7 +13,8 @@ import org.springframework.stereotype.Component;
 @Component
 class SubTotalMatchesItemsSubTotalRule implements ReconciliationRule {
 
-    private static final String RULE = "subTotalMatchesItemsSubTotal";
+    private static final String AMOUNT_MISSING = "amount-missing";
+    private static final String SUB_TOTAL_MISMATCH = "sub-total-mismatch";
 
     @Override
     public List<ReconciliationFailure> evaluate(ReconciliationOrder order) {
@@ -18,19 +22,14 @@ class SubTotalMatchesItemsSubTotalRule implements ReconciliationRule {
         var itemsSubTotal = order.getItemsSubTotal();
 
         if (subTotal == null) {
-            return List.of(failure("Order sub-total is missing."));
+            return List.of(new ReconciliationFailure(AMOUNT_MISSING, List.of(SUB_TOTAL)));
         }
         if (itemsSubTotal == null) {
-            return List.of(failure("Items sub-total is missing."));
+            return List.of(new ReconciliationFailure(AMOUNT_MISSING, List.of(ITEMS_SUB_TOTAL)));
         }
         if (subTotal.compareTo(itemsSubTotal) != 0) {
-            return List.of(failure("Order sub-total %s does not match the items sub-total %s."
-                    .formatted(subTotal.toPlainString(), itemsSubTotal.toPlainString())));
+            return List.of(new ReconciliationFailure(SUB_TOTAL_MISMATCH, List.of(SUB_TOTAL, ITEMS_SUB_TOTAL)));
         }
         return List.of();
-    }
-
-    private ReconciliationFailure failure(String message) {
-        return new ReconciliationFailure(RULE, message);
     }
 }

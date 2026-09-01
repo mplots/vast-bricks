@@ -1,6 +1,8 @@
 export interface ReconciliationFailure {
-  rule: string;
-  message: string;
+  /** Stable reason code; the portal words it via the `reconciliation-failure-<code>` message. */
+  code: string;
+  /** Order property names the rule used, in the order the message mentions them. */
+  fields: string[];
 }
 
 export interface ReconciliationOrder {

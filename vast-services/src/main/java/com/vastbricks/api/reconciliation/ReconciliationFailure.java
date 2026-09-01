@@ -1,14 +1,20 @@
 package com.vastbricks.api.reconciliation;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+/**
+ * One reason an order failed reconciliation. It carries no display text: the code identifies the reason and the client
+ * words it, interpolating the values of the listed fields.
+ */
 @Getter
 @AllArgsConstructor
 public class ReconciliationFailure {
 
-    /** Stable rule code, so a client can react to a specific failure without parsing the message. */
-    private final String rule;
+    /** Stable reason code. One rule may report different codes. */
+    private final String code;
 
-    private final String message;
+    /** Fields the rule used, in the order the reason mentions them. */
+    private final List<ReconciliationOrderField> fields;
 }

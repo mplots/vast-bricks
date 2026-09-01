@@ -39,10 +39,7 @@ test('fails an order whose sub-total does not match its items sub-total', async 
   expect(body.orders.map((order: { orderId: string }) => order.orderId)).toEqual(['32456563', '32456564']);
   expect(body.orders[0].failures).toEqual([]);
   expect(body.orders[1].failures).toEqual([
-    {
-      rule: 'subTotalMatchesItemsSubTotal',
-      message: 'Order sub-total 10.00 does not match the items sub-total 3.00.',
-    },
+    { code: 'sub-total-mismatch', fields: ['subTotal', 'itemsSubTotal'] },
   ]);
 });
 
@@ -70,12 +67,8 @@ test('fails an order that is missing an amount the rule needs', async ({
 
   expect(response.status(), await response.text()).toBe(200);
   const body = await response.json();
-  expect(body.orders[0].failures).toEqual([
-    { rule: 'subTotalMatchesItemsSubTotal', message: 'Items sub-total is missing.' },
-  ]);
-  expect(body.orders[1].failures).toEqual([
-    { rule: 'subTotalMatchesItemsSubTotal', message: 'Order sub-total is missing.' },
-  ]);
+  expect(body.orders[0].failures).toEqual([{ code: 'amount-missing', fields: ['itemsSubTotal'] }]);
+  expect(body.orders[1].failures).toEqual([{ code: 'amount-missing', fields: ['subTotal'] }]);
 });
 
 test('reconciles amounts that differ only below the cent', async ({ request, settings }, testInfo) => {

@@ -174,7 +174,16 @@ here as they are provided; do not invent unspecified behavior prematurely.
   boundary. Adding a rule must not require changing the evaluation pipeline,
   the API contract, or the reconciliation screen.
 - A rule inspects one collected order and returns zero or more failures. Each
-  failure carries a stable rule code and a human-readable message.
+  failure carries a stable reason code and the ordered list of collected order
+  fields the rule used. Codes identify a reason, not a rule: one rule may report
+  different codes.
+- A failure must not carry display text. The backend returns no user-facing
+  strings for reconciliation. All wording lives in the `vast-portal` translation
+  catalogs, keyed by failure code, and is interpolated with the field values the
+  portal already holds.
+- Field names in a failure are the API property names of the collected order,
+  declared once in the reconciliation order field enum so the wire name and the
+  property cannot drift apart.
 - Rule conditionality is about whether a rule applies to an order at all. A rule
   that applies to an order and finds the data it needs missing fails that order
   rather than staying silent.
@@ -186,7 +195,10 @@ here as they are provided; do not invent unspecified behavior prematurely.
   define their own tolerances.
 - The orders table colors an order red when it has at least one failure.
   Selecting any order opens a read-only detail view listing every collected
-  field and the order's failed rules.
+  field and the order's failed rules. Selecting a failed rule highlights the
+  fields that rule used.
+- Reconciliation screen text is translated through `vast-portal`'s `en.json` and
+  `lv.json`. Every new user-visible string must be added to both.
 - The table shows only a subset of the collected fields. Fields that can fail
   reconciliation without being table columns are visible in the detail view.
 - Only the failed state exists. Do not introduce a reconciliation status enum
