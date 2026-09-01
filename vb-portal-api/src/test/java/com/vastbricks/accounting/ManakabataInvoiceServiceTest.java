@@ -2,10 +2,10 @@ package com.vastbricks.accounting;
 
 import com.vastbricks.integration.bricklink.LinkOrder;
 import com.vastbricks.integration.manakabata.ManakabataInvoiceRequest;
-import com.vastbricks.integration.manakabata.client.model.ClientResource;
-import com.vastbricks.integration.manakabata.client.model.InvoiceResource;
-import com.vastbricks.integration.manakabata.client.model.PersonTypeEnum;
-import com.vastbricks.integration.manakabata.client.model.StoreClientRequest;
+import com.vastbricks.api.client.manakabata.model.ClientResource;
+import com.vastbricks.api.client.manakabata.model.InvoiceResource;
+import com.vastbricks.api.client.manakabata.model.PersonTypeEnum;
+import com.vastbricks.api.client.manakabata.model.StoreClientRequest;
 import com.vastbricks.market.owl.OrderView;
 import org.junit.jupiter.api.Test;
 

@@ -1,11 +1,11 @@
 package com.vastbricks.integration.manakabata;
 
-import com.vastbricks.integration.manakabata.client.model.ClientIndex200Response;
-import com.vastbricks.integration.manakabata.client.model.ClientResource;
-import com.vastbricks.integration.manakabata.client.model.InvoiceIndex200ResponseMeta;
-import com.vastbricks.integration.manakabata.client.model.PersonTypeEnum;
-import com.vastbricks.integration.manakabata.client.model.StoreClientRequest;
-import com.vastbricks.integration.manakabata.client.model.UpdateClientRequest;
+import com.vastbricks.api.client.manakabata.model.ClientIndex200Response;
+import com.vastbricks.api.client.manakabata.model.ClientResource;
+import com.vastbricks.api.client.manakabata.model.InvoiceIndex200ResponseMeta;
+import com.vastbricks.api.client.manakabata.model.PersonTypeEnum;
+import com.vastbricks.api.client.manakabata.model.StoreClientRequest;
+import com.vastbricks.api.client.manakabata.model.UpdateClientRequest;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;

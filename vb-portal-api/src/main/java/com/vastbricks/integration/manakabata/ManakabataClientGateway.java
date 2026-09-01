@@ -1,13 +1,13 @@
 package com.vastbricks.integration.manakabata;
 
 import com.vastbricks.config.Env;
-import com.vastbricks.integration.manakabata.client.ApiClient;
-import com.vastbricks.integration.manakabata.client.api.ClientsApi;
-import com.vastbricks.integration.manakabata.client.model.ClientIndex200Response;
-import com.vastbricks.integration.manakabata.client.model.ClientStore200Response;
-import com.vastbricks.integration.manakabata.client.model.ClientResource;
-import com.vastbricks.integration.manakabata.client.model.StoreClientRequest;
-import com.vastbricks.integration.manakabata.client.model.UpdateClientRequest;
+import com.vastbricks.api.client.manakabata.ApiClient;
+import com.vastbricks.api.client.manakabata.api.ClientsApi;
+import com.vastbricks.api.client.manakabata.model.ClientIndex200Response;
+import com.vastbricks.api.client.manakabata.model.ClientStore200Response;
+import com.vastbricks.api.client.manakabata.model.ClientResource;
+import com.vastbricks.api.client.manakabata.model.StoreClientRequest;
+import com.vastbricks.api.client.manakabata.model.UpdateClientRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;

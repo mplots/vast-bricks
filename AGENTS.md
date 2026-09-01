@@ -229,6 +229,13 @@ here as they are provided; do not invent unspecified behavior prematurely.
 - Some of these clients already exist in legacy code. Migrate them into the
   rewrite incrementally as required by each supplied reconciliation processing
   step; do not migrate all clients preemptively.
+- Where a provider publishes an OpenAPI specification, generate its client
+  instead of handwriting one. `vast-services` owns the specification and the
+  `openapi-generator-maven-plugin` execution, and generated clients belong under
+  `com.vastbricks.api.client.<provider>`. The Manakabata accounting client is
+  generated this way from `vast-services/src/main/openapi/manakabata-api.json`;
+  legacy Manakabata gateways in `vb-portal-api` consume that generated client
+  through the `vast-services` dependency.
 
 ## Spring Boot composition
 

@@ -1,6 +1,6 @@
 package com.vastbricks.integration.manakabata;
 
-import com.vastbricks.integration.manakabata.client.ApiClient;
+import com.vastbricks.api.client.manakabata.ApiClient;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;

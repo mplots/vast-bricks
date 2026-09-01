@@ -1,9 +1,9 @@
 package com.vastbricks.integration.manakabata;
 
 import com.vastbricks.config.Env;
-import com.vastbricks.integration.manakabata.client.ApiClient;
-import com.vastbricks.integration.manakabata.client.model.InvoiceResource;
-import com.vastbricks.integration.manakabata.client.model.InvoiceStore200Response;
+import com.vastbricks.api.client.manakabata.ApiClient;
+import com.vastbricks.api.client.manakabata.model.InvoiceResource;
+import com.vastbricks.api.client.manakabata.model.InvoiceStore200Response;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
