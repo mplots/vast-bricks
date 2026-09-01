@@ -8,10 +8,12 @@ export interface ReconciliationFailure {
 export interface ReconciliationOrder {
   source: string;
   orderId: string;
+  orderDate: string | null;
   buyer: string;
   buyerUsername: string | null;
   subTotal: number | null;
   itemsSubTotal: number | null;
+  invoiceSubTotal: number | null;
   failures: ReconciliationFailure[];
 }
 

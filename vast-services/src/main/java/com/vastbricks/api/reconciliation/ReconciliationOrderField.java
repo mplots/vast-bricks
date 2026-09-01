@@ -14,10 +14,12 @@ public enum ReconciliationOrderField {
 
     SOURCE("source"),
     ORDER_ID("orderId"),
+    ORDER_DATE("orderDate"),
     BUYER("buyer"),
     BUYER_USERNAME("buyerUsername"),
     SUB_TOTAL("subTotal"),
-    ITEMS_SUB_TOTAL("itemsSubTotal");
+    ITEMS_SUB_TOTAL("itemsSubTotal"),
+    INVOICE_SUB_TOTAL("invoiceSubTotal");
 
     @JsonValue
     private final String name;

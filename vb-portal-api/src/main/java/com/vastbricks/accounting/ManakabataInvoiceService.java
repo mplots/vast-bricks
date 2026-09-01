@@ -190,12 +190,7 @@ public class ManakabataInvoiceService {
     }
 
     private String invoiceNote(String normalizedSource, String orderId) {
-        var sourceLabel = switch (normalizedSource) {
-            case BRICK_LINK -> "BrickLink";
-            case BRICK_OWL -> "BrickOwl";
-            default -> normalizedSource;
-        };
-        return sourceLabel + " order " + orderId;
+        return normalizedSource + ":" + orderId;
     }
 
     private String normalizeSource(String source) {

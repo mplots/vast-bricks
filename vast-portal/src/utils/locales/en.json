@@ -45,10 +45,14 @@
   "reconciliation-detail-close": "Close",
   "reconciliation-field-source": "Source",
   "reconciliation-field-orderId": "Order ID",
+  "reconciliation-field-orderDate": "Order date",
   "reconciliation-field-buyer": "Buyer",
   "reconciliation-field-buyerUsername": "Buyer username",
   "reconciliation-field-subTotal": "Sub-total",
   "reconciliation-field-itemsSubTotal": "Items sub-total",
+  "reconciliation-field-invoiceSubTotal": "Invoice sub-total",
   "reconciliation-failure-sub-total-mismatch": "Sub-total {subTotal} does not match the items sub-total {itemsSubTotal}.",
+  "reconciliation-failure-invoice-sub-total-mismatch": "Invoice sub-total {invoiceSubTotal} does not match the order sub-total {subTotal}.",
+  "reconciliation-failure-invoice-items-sub-total-mismatch": "Invoice sub-total {invoiceSubTotal} does not match the items sub-total {itemsSubTotal}.",
   "reconciliation-failure-amount-missing": "Missing: {fields}."
 }

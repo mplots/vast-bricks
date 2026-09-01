@@ -9,11 +9,13 @@ import com.vastbricks.api.client.brickowl.BrickOwlOrder;
 import com.vastbricks.api.client.brickowl.BrickOwlOrderItem;
 import com.vastbricks.api.client.brickowl.BrickOwlOrderListItem;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -23,7 +25,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 class BrickOwlOrderSource implements ReconciliationOrderSource {
 
-    private static final String SOURCE = "BrickOwl";
     private static final String ORDER_ENDPOINT = "order/view";
     private static final String ITEMS_ENDPOINT = "order/items";
 
@@ -31,10 +32,16 @@ class BrickOwlOrderSource implements ReconciliationOrderSource {
 
     @Override
     public List<ReconciliationOrder> findOrders(YearMonth month) {
-        var orderIds = findOrderIds(month);
-        if (orderIds.isEmpty()) {
+        var listedOrders = findListedOrders(month);
+        if (listedOrders.isEmpty()) {
             return List.of();
         }
+        // The order list is the only response that always carries the order date, so it is carried into the details.
+        var orderDates = listedOrders.stream().collect(Collectors.toMap(
+                BrickOwlOrderListItem::getOrderId,
+                order -> order.getOrderDate().toLocalDate()
+        ));
+        var orderIds = listedOrders.stream().map(BrickOwlOrderListItem::getOrderId).toList();
 
         try (var tasks = new ParallelTasks()) {
             var orderBatches = new ArrayList<Supplier<List<BrickOwlBatchResponse>>>();
@@ -46,16 +53,20 @@ class BrickOwlOrderSource implements ReconciliationOrderSource {
 
             var orders = new ArrayList<ReconciliationOrder>();
             for (var index = 0; index < orderBatches.size(); index++) {
-                appendReconciliationOrders(orders, orderBatches.get(index).get(), itemBatches.get(index).get());
+                appendReconciliationOrders(
+                        orders,
+                        orderDates,
+                        orderBatches.get(index).get(),
+                        itemBatches.get(index).get()
+                );
             }
             return List.copyOf(orders);
         }
     }
 
-    private List<String> findOrderIds(YearMonth month) {
+    private List<BrickOwlOrderListItem> findListedOrders(YearMonth month) {
         return brickOwlClient.listOrders().stream()
                 .filter(order -> order.getOrderDate() != null && YearMonth.from(order.getOrderDate()).equals(month))
-                .map(BrickOwlOrderListItem::getOrderId)
                 .toList();
     }
 
@@ -77,6 +88,7 @@ class BrickOwlOrderSource implements ReconciliationOrderSource {
 
     private void appendReconciliationOrders(
             List<ReconciliationOrder> result,
+            Map<String, LocalDate> orderDates,
             List<BrickOwlBatchResponse> orderResponses,
             List<BrickOwlBatchResponse> itemResponses
     ) {
@@ -87,14 +99,15 @@ class BrickOwlOrderSource implements ReconciliationOrderSource {
             var orderResponse = orderResponses.get(index);
             validateBatchResponse(orderResponse);
             var order = orderResponse.bodyAs(BrickOwlOrder.class);
-            result.add(new ReconciliationOrder(
-                    SOURCE,
-                    order.getOrderId(),
-                    order.getBuyerName(),
-                    order.getCustomerUsername(),
-                    ReconciliationAmount.normalize(order.getSubTotal()),
-                    ReconciliationAmount.normalize(sumItemBasePrices(itemResponses.get(index)))
-            ));
+            result.add(ReconciliationOrder.builder()
+                    .source(ReconciliationSource.BRICK_OWL)
+                    .orderId(order.getOrderId())
+                    .orderDate(orderDates.get(order.getOrderId()))
+                    .buyer(order.getBuyerName())
+                    .buyerUsername(order.getCustomerUsername())
+                    .subTotal(ReconciliationAmount.normalize(order.getSubTotal()))
+                    .itemsSubTotal(ReconciliationAmount.normalize(sumItemBasePrices(itemResponses.get(index))))
+                    .build());
         }
     }
 

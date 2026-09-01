@@ -4,10 +4,15 @@ import { wireMockMode } from './support/wiremock';
 
 test.describe.configure({ mode: wireMockMode() });
 
-const brickLinkOrderXml = (orderId: string, orderTotal: string, items: Array<[string, string]>) => `
+const brickLinkOrderXml = (
+  orderId: string,
+  orderTotal: string,
+  items: Array<[string, string]>,
+  orderDate = '8/30/2026'
+) => `
   <ORDER>
     <ORDERID>${orderId}</ORDERID>
-    <ORDERDATE>8/30/2026</ORDERDATE>
+    <ORDERDATE>${orderDate}</ORDERDATE>
     <BUYER>some buyer</BUYER>
     <ORDERTOTAL>${orderTotal}</ORDERTOTAL>
     <BASECURRENCYCODE>EUR</BASECURRENCYCODE>
@@ -16,6 +21,8 @@ const brickLinkOrderXml = (orderId: string, orderTotal: string, items: Array<[st
 
 const brickLinkOrdersXml = (...orders: string[]) =>
   `<?xml version="1.0" encoding="UTF-8"?><ORDERS>${orders.join('')}</ORDERS>`;
+
+const emptyOrdersXml = brickLinkOrdersXml();
 
 test('fails an order whose sub-total does not match its items sub-total', async ({
   request,
@@ -28,7 +35,7 @@ test('fails an order whose sub-total does not match its items sub-total', async 
         brickLinkOrderXml('32456563', '5.00', [['2.5000', '2']]),
         brickLinkOrderXml('32456564', '10.00', [['1.0000', '3']])
       ),
-      usernameOrdersXml: '<?xml version="1.0" encoding="UTF-8"?><ORDERS/>',
+      usernameOrdersXml: emptyOrdersXml,
     },
   });
 
@@ -51,7 +58,7 @@ test('fails an order that is missing an amount the rule needs', async ({
     month: '2026-08',
     brickLink: {
       fullNameOrdersXml: brickLinkOrdersXml(brickLinkOrderXml('32456565', '5.00', [])),
-      usernameOrdersXml: '<?xml version="1.0" encoding="UTF-8"?><ORDERS/>',
+      usernameOrdersXml: emptyOrdersXml,
     },
     brickOwl: [
       {
@@ -81,7 +88,7 @@ test('reconciles amounts that differ only below the cent', async ({ request, set
           ['0.2299', '1'],
         ])
       ),
-      usernameOrdersXml: '<?xml version="1.0" encoding="UTF-8"?><ORDERS/>',
+      usernameOrdersXml: emptyOrdersXml,
     },
   });
 
@@ -90,5 +97,109 @@ test('reconciles amounts that differ only below the cent', async ({ request, set
   expect(response.status(), await response.text()).toBe(200);
   const body = await response.json();
   expect(body.orders[0].itemsSubTotal).toBe(0.43);
+  expect(body.orders[0].failures).toEqual([]);
+});
+
+test('reconciles an order whose accounting invoice sub-total matches its amounts', async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: '2026-09',
+    brickLink: {
+      fullNameOrdersXml: brickLinkOrdersXml(brickLinkOrderXml('32466549', '5.00', [['2.5000', '2']], '9/1/2026')),
+      usernameOrdersXml: emptyOrdersXml,
+    },
+    manakabata: [{ invoiceNote: 'bricklink:32466549', subtotal: '5.00' }],
+  });
+
+  const response = await request.get('/api/private/reconciliation/orders?month=2026-09');
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  expect(body.orders[0].invoiceSubTotal).toBe(5);
+  expect(body.orders[0].failures).toEqual([]);
+});
+
+test('fails an order whose accounting invoice sub-total does not match its amounts', async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: '2026-09',
+    brickLink: {
+      fullNameOrdersXml: brickLinkOrdersXml(brickLinkOrderXml('32466550', '5.00', [['2.5000', '2']], '9/1/2026')),
+      usernameOrdersXml: emptyOrdersXml,
+    },
+    manakabata: [{ invoiceNote: 'bricklink:32466550', subtotal: '4.00' }],
+  });
+
+  const response = await request.get('/api/private/reconciliation/orders?month=2026-09');
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  expect(body.orders[0].invoiceSubTotal).toBe(4);
+  expect(body.orders[0].failures).toEqual([
+    { code: 'invoice-sub-total-mismatch', fields: ['invoiceSubTotal', 'subTotal'] },
+    { code: 'invoice-items-sub-total-mismatch', fields: ['invoiceSubTotal', 'itemsSubTotal'] },
+  ]);
+});
+
+test('fails an order that has no accounting invoice', async ({ request, settings }, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: '2026-09',
+    brickLink: {
+      fullNameOrdersXml: brickLinkOrdersXml(brickLinkOrderXml('32466551', '5.00', [['2.5000', '2']], '9/1/2026')),
+      usernameOrdersXml: emptyOrdersXml,
+    },
+    manakabata: [{ invoiceNote: 'bricklink:99999999', subtotal: '5.00' }],
+  });
+
+  const response = await request.get('/api/private/reconciliation/orders?month=2026-09');
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  expect(body.orders[0].invoiceSubTotal).toBeNull();
+  expect(body.orders[0].failures).toEqual([{ code: 'amount-missing', fields: ['invoiceSubTotal'] }]);
+});
+
+test('does not require an accounting invoice for an order placed before invoicing started', async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: '2026-08',
+    brickLink: {
+      fullNameOrdersXml: brickLinkOrdersXml(brickLinkOrderXml('32466552', '5.00', [['2.5000', '2']], '8/31/2026')),
+      usernameOrdersXml: emptyOrdersXml,
+    },
+  });
+
+  const response = await request.get('/api/private/reconciliation/orders?month=2026-08');
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  expect(body.orders[0].invoiceSubTotal).toBeNull();
+  expect(body.orders[0].failures).toEqual([]);
+});
+
+test('reconciles an order invoiced under the legacy invoice note format', async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: '2026-09',
+    brickLink: {
+      fullNameOrdersXml: brickLinkOrdersXml(brickLinkOrderXml('32466553', '5.00', [['2.5000', '2']], '9/1/2026')),
+      usernameOrdersXml: emptyOrdersXml,
+    },
+    manakabata: [{ invoiceNote: 'BrickLink order 32466553', subtotal: '5.00' }],
+  });
+
+  const response = await request.get('/api/private/reconciliation/orders?month=2026-09');
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  expect(body.orders[0].invoiceSubTotal).toBe(5);
   expect(body.orders[0].failures).toEqual([]);
 });

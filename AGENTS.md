@@ -145,9 +145,17 @@ here as they are provided; do not invent unspecified behavior prematurely.
 - The reconciliation order list currently collects received BrickLink orders
   from the BrickStore XML export and BrickOwl orders from the BrickOwl API for
   the selected month. Each collected order carries its marketplace source
-  (`BrickLink` or `BrickOwl`), order ID, buyer, buyer username, sub-total, and
-  items sub-total, together with its rule failures. Add further fields and
-  providers incrementally as their processing requirements are supplied.
+  (`BrickLink` or `BrickOwl`), order ID, order date, buyer, buyer username,
+  sub-total, items sub-total, and accounting invoice sub-total, together with its
+  rule failures. Add further fields and providers incrementally as their
+  processing requirements are supplied.
+- Accounting invoices are collected from Manakabata alongside the marketplace
+  orders. The invoice list endpoint accepts no filter beyond the page size, so
+  the whole list is requested as one page and searched; an invoice is matched to
+  an order by the compact invoice-note key `<source>:<orderId>`, for example
+  `bricklink:32466549`. Legacy notes such as `BrickLink order 32466549` remain
+  readable. A list longer than one page fails the request rather than
+  reconciling against truncated data.
 - Data is requested from the providers on demand when the screen is opened.
 - Provider requests should run in parallel so far as their dependencies allow.
 - Potential performance problems from live, on-demand aggregation are accepted
@@ -203,7 +211,12 @@ here as they are provided; do not invent unspecified behavior prematurely.
   reconciliation without being table columns are visible in the detail view.
 - Only the failed state exists. Do not introduce a reconciliation status enum
   until additional states are specified.
-- Current rules: an order's sub-total must equal the sum of its item prices.
+- Current rules:
+  - An order's sub-total must equal the sum of its item prices.
+  - An order must have an accounting invoice whose sub-total equals both the
+    order's sub-total and its items sub-total. Invoicing started on 2026-09-01,
+    so the rule applies only to orders placed on or after that date; the cut-off
+    is hardcoded. An order on or after it with no invoice fails.
 
 ### Data-source boundaries and current clients
 
@@ -221,7 +234,8 @@ here as they are provided; do not invent unspecified behavior prematurely.
     boundary.
 - Current payment client implementations are Stripe and PayPal.
 - The current shipping client implementation is Mans Pasts.
-- The current accounting client implementation is Manakabata.
+- The current accounting client implementation is Manakabata, migrated into
+  `vast-services` as a reconciliation invoice source.
 - The current e-commerce store synchronization client implementation is
   BrickSync.
 - These are the implementations currently known, not an exhaustive or closed

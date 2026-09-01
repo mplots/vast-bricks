@@ -18,8 +18,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 class BrickLinkOrderSource implements ReconciliationOrderSource {
 
-    private static final String SOURCE = "BrickLink";
-
     private final BrickStoreClient brickStoreClient;
 
     @Override
@@ -62,14 +60,15 @@ class BrickLinkOrderSource implements ReconciliationOrderSource {
 
     private ReconciliationOrder toReconciliationOrder(BrickStoreOrder order, Map<String, String> usernamesByOrderId) {
         var orderId = order.getOrderId() == null ? null : order.getOrderId().toString();
-        return new ReconciliationOrder(
-                SOURCE,
-                orderId,
-                order.getBuyer(),
-                orderId == null ? null : usernamesByOrderId.get(orderId),
-                ReconciliationAmount.normalize(order.getTotal()),
-                ReconciliationAmount.normalize(sumItemPrices(order))
-        );
+        return ReconciliationOrder.builder()
+                .source(ReconciliationSource.BRICK_LINK)
+                .orderId(orderId)
+                .orderDate(order.getOrderDate())
+                .buyer(order.getBuyer())
+                .buyerUsername(orderId == null ? null : usernamesByOrderId.get(orderId))
+                .subTotal(ReconciliationAmount.normalize(order.getTotal()))
+                .itemsSubTotal(ReconciliationAmount.normalize(sumItemPrices(order)))
+                .build();
     }
 
     private BigDecimal sumItemPrices(BrickStoreOrder order) {

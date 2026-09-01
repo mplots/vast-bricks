@@ -22,6 +22,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import { darken, Theme } from '@mui/material/styles';
 import { useIntl } from 'react-intl';
 
 import { useGetReconciliationOrders } from 'api/reconciliation';
@@ -29,11 +30,11 @@ import MainCard from 'components/MainCard';
 import type { ReconciliationFailure, ReconciliationOrder } from 'types/reconciliation';
 
 // Order property names, matching the backend ReconciliationOrderField enum.
-const orderFields = ['source', 'orderId', 'buyer', 'buyerUsername', 'subTotal', 'itemsSubTotal'] as const;
-const amountFields: string[] = ['subTotal', 'itemsSubTotal'];
+const orderFields = ['source', 'orderId', 'orderDate', 'buyer', 'buyerUsername', 'subTotal', 'itemsSubTotal', 'invoiceSubTotal'] as const;
+const amountFields: string[] = ['subTotal', 'itemsSubTotal', 'invoiceSubTotal'];
 
 // Fields shown as table columns; the detail view shows all of them.
-const columnFields: string[] = ['source', 'orderId', 'buyer', 'buyerUsername', 'subTotal', 'itemsSubTotal'];
+const columnFields: string[] = ['source', 'orderId', 'buyer', 'buyerUsername', 'subTotal', 'itemsSubTotal', 'invoiceSubTotal'];
 
 const formatAmount = (value?: number | null) => {
   if (value === null || value === undefined || Number.isNaN(value)) {
@@ -167,7 +168,12 @@ export default function ReconciliationPage() {
                       onClick={() => openOrder(order)}
                       sx={{
                         cursor: 'pointer',
-                        ...(isFailed(order) && { bgcolor: 'error.lighter', '& td': { color: 'error.dark' } })
+                        ...(isFailed(order) && {
+                          bgcolor: 'error.lighter',
+                          // The theme tints every hovered row, so a failed row paints its own deeper red over it.
+                          '& td': { color: 'error.dark' },
+                          '&:hover td': { bgcolor: (theme: Theme) => darken(theme.palette.error.lighter, 0.08) }
+                        })
                       }}
                     >
                       {columnFields.map((field) => (

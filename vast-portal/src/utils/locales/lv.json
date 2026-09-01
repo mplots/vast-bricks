@@ -45,10 +45,14 @@
   "reconciliation-detail-close": "Aizvērt",
   "reconciliation-field-source": "Avots",
   "reconciliation-field-orderId": "Pasūtījuma ID",
+  "reconciliation-field-orderDate": "Pasūtījuma datums",
   "reconciliation-field-buyer": "Pircējs",
   "reconciliation-field-buyerUsername": "Pircēja lietotājvārds",
   "reconciliation-field-subTotal": "Starpsumma",
   "reconciliation-field-itemsSubTotal": "Preču starpsumma",
+  "reconciliation-field-invoiceSubTotal": "Rēķina starpsumma",
   "reconciliation-failure-sub-total-mismatch": "Starpsumma {subTotal} neatbilst preču starpsummai {itemsSubTotal}.",
+  "reconciliation-failure-invoice-sub-total-mismatch": "Rēķina starpsumma {invoiceSubTotal} neatbilst pasūtījuma starpsummai {subTotal}.",
+  "reconciliation-failure-invoice-items-sub-total-mismatch": "Rēķina starpsumma {invoiceSubTotal} neatbilst preču starpsummai {itemsSubTotal}.",
   "reconciliation-failure-amount-missing": "Trūkst datu: {fields}."
 }

@@ -18,11 +18,18 @@ export type BrickOwlOrderMock = {
   items?: Array<Record<string, unknown>>;
 };
 
+export type ManakabataInvoiceMock = {
+  /** Source/order key, e.g. `bricklink:32466549`; legacy `BrickLink order 32466549` is also accepted. */
+  invoiceNote: string;
+  subtotal: string;
+};
+
 export type ReconciliationProviders = {
   /** Reconciled month, as sent to the API. BrickOwl only serves order details for orders within it. */
   month?: string;
   brickLink?: BrickLinkOrdersMock;
   brickOwl?: BrickOwlOrderMock[];
+  manakabata?: ManakabataInvoiceMock[];
 };
 
 /**
@@ -40,6 +47,7 @@ export async function mockReconciliationOrders(
 
   await mockBrickLink(wireMock, settings, providers.brickLink);
   await mockBrickOwl(wireMock, settings, providers.brickOwl ?? [], providers.month);
+  await mockManakabata(wireMock, settings, providers.manakabata ?? []);
 
   return wireMock;
 }
@@ -116,4 +124,27 @@ function brickOwlBatches(orders: BrickOwlOrderMock[]): BrickOwlOrderMock[][] {
     batches.push(orders.slice(start, start + brickOwlMaxBatchRequests));
   }
   return batches;
+}
+
+async function mockManakabata(wireMock: WireMockApi, settings: SettingsOverrides, invoices: ManakabataInvoiceMock[]) {
+  await settings.set('VAST_MANAKABATA_BASE_URL', wireMock.baseUrl);
+  await settings.setSecret('VAST_MANAKABATA_API_TOKEN', 'test-manakabata-api-token');
+  await wireMock.addMethodHostMapping('GET', '/invoices', {
+    response: {
+      json: {
+        data: invoices.map((invoice, index) => ({
+          uuid: `00000000-0000-0000-0000-${String(index + 1).padStart(12, '0')}`,
+          invoice_number: `${index + 1}/0001EC`,
+          invoice_note: invoice.invoiceNote,
+          currency: 'EUR',
+          subtotal: invoice.subtotal,
+          tax: '0.00',
+          total: invoice.subtotal,
+          products: []
+        })),
+        links: { first: null, last: null, prev: null, next: null },
+        meta: { current_page: 1, last_page: 1, per_page: invoices.length, total: invoices.length }
+      }
+    }
+  });
 }
