@@ -9,5 +9,5 @@ import lombok.Getter;
 class ReconciliationOrdersResponse {
 
     private final String selectedMonth;
-    private final List<ReconciliationOrder> orders;
+    private final List<ReconciliationOrderResult> orders;
 }

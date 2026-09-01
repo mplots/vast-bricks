@@ -1,5 +1,5 @@
 import { expect, test } from './support/api-test';
-import { mockBrickLinkOrders } from './support/bricklink';
+import { BrickOwlOrderMock, mockReconciliationOrders } from './support/reconciliation';
 import { wireMockMode } from './support/wiremock';
 
 test.describe.configure({ mode: wireMockMode() });
@@ -8,32 +8,17 @@ test('lists BrickLink reconciliation orders for the selected month', async ({
   request,
   settings,
 }, testInfo) => {
-  await mockBrickLinkOrders(settings, request, testInfo, `<?xml version="1.0" encoding="UTF-8"?>
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: '2026-08',
+    brickLink: {
+      fullNameOrdersXml: `<?xml version="1.0" encoding="UTF-8"?>
 <ORDERS>
   <ORDER>
     <ORDERID>32456563</ORDERID>
     <ORDERDATE>8/30/2026</ORDERDATE>
     <BUYER>some buyer</BUYER>
-    <ORDERSHIPPING>5.51</ORDERSHIPPING>
-    <ORDERINSURANCE></ORDERINSURANCE>
-    <ORDERADDCHRG1>2.42</ORDERADDCHRG1>
-    <ORDERADDCHRG2></ORDERADDCHRG2>
-    <ORDERCREDIT></ORDERCREDIT>
-    <ORDERCREDITCOUPON></ORDERCREDITCOUPON>
     <ORDERTOTAL>0.43</ORDERTOTAL>
-    <ORDERSALESTAX>0.00</ORDERSALESTAX>
-    <ORDERVAT>0.00</ORDERVAT>
     <BASECURRENCYCODE>EUR</BASECURRENCYCODE>
-    <BASEGRANDTOTAL>8.36</BASEGRANDTOTAL>
-    <PAYCURRENCYCODE>EUR</PAYCURRENCYCODE>
-    <ORDERLOTS>2</ORDERLOTS>
-    <ORDERITEMS>4</ORDERITEMS>
-    <ORDERSTATUS>Packed</ORDERSTATUS>
-    <PAYMENTTYPE>Credit/Debit (Powered by Stripe)</PAYMENTTYPE>
-    <ORDERREMARKS></ORDERREMARKS>
-    <ORDERTRACKNO></ORDERTRACKNO>
-    <LOCATION>Belgium, West-Vlaanderen</LOCATION>
-    <VATCHARGES>1.45</VATCHARGES>
     <ITEM>
       <ITEMID>3001</ITEMID>
       <PRICE>0.1000</PRICE>
@@ -49,7 +34,7 @@ test('lists BrickLink reconciliation orders for the selected month', async ({
     <ORDERID>32456564</ORDERID>
     <ORDERDATE>8/31/2026</ORDERDATE>
     <BUYER>another buyer</BUYER>
-    <ORDERTOTAL>10.00</ORDERTOTAL>
+    <ORDERTOTAL>3.00</ORDERTOTAL>
     <BASECURRENCYCODE>EUR</BASECURRENCYCODE>
     <ITEM>
       <ITEMID>3003</ITEMID>
@@ -57,7 +42,8 @@ test('lists BrickLink reconciliation orders for the selected month', async ({
       <QTY>3</QTY>
     </ITEM>
   </ORDER>
-</ORDERS>`, `<?xml version="1.0" encoding="UTF-8"?>
+</ORDERS>`,
+      usernameOrdersXml: `<?xml version="1.0" encoding="UTF-8"?>
 <ORDERS>
   <ORDER>
     <ORDERID>32456563</ORDERID>
@@ -67,7 +53,9 @@ test('lists BrickLink reconciliation orders for the selected month', async ({
     <ORDERID>32456564</ORDERID>
     <BUYER>another-buyer-username</BUYER>
   </ORDER>
-</ORDERS>`);
+</ORDERS>`,
+    },
+  });
 
   const response = await request.get('/api/private/reconciliation/orders?month=2026-08');
 
@@ -83,30 +71,122 @@ test('lists BrickLink reconciliation orders for the selected month', async ({
         buyerUsername: 'some-buyer-username',
         subTotal: 0.43,
         itemsSubTotal: 0.43,
+        failures: [],
       },
       {
         source: 'BrickLink',
         orderId: '32456564',
         buyer: 'another buyer',
         buyerUsername: 'another-buyer-username',
-        subTotal: 10,
+        subTotal: 3,
         itemsSubTotal: 3,
+        failures: [],
       },
     ],
   });
 });
 
-test('returns no reconciliation orders for an empty BrickStore export', async ({
+test('lists BrickOwl reconciliation orders for the selected month', async ({
   request,
   settings,
 }, testInfo) => {
-  await mockBrickLinkOrders(
-    settings,
-    request,
-    testInfo,
-    '<?xml version="1.0" encoding="UTF-8"?><ORDERS/>',
-    '<?xml version="1.0" encoding="UTF-8"?><ORDERS/>'
-  );
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: '2026-08',
+    brickOwl: [
+      {
+        orderId: 'test-order-0810',
+        orderDate: '1786320000',
+        view: { buyer_name: 'Test Buyer Alpha', customer_username: 'test_alpha', sub_total: '2.70' },
+        items: [
+          { base_price: '1.20', ordered_quantity: '2' },
+          { base_price: '0.30', ordered_quantity: '1' },
+        ],
+      },
+      {
+        orderId: 'test-order-0811',
+        orderDate: '1786406400',
+        view: { buyer_name: 'Test Buyer Beta', customer_username: 'test_beta', sub_total: '6.00' },
+        items: [{ base_price: '2.00', ordered_quantity: '3' }],
+      },
+      {
+        orderId: 'test-order-0901',
+        orderDate: '1788220800',
+        view: { buyer_name: 'Test Buyer Gamma', customer_username: 'test_gamma', sub_total: '9.99' },
+        items: [{ base_price: '9.99', ordered_quantity: '1' }],
+      },
+    ],
+  });
+
+  const response = await request.get('/api/private/reconciliation/orders?month=2026-08');
+
+  expect(response.status(), await response.text()).toBe(200);
+  expect(response.headers()['content-type']).toContain('application/json');
+  await expect(response.json()).resolves.toEqual({
+    selectedMonth: '2026-08',
+    orders: [
+      {
+        source: 'BrickOwl',
+        orderId: 'test-order-0810',
+        buyer: 'Test Buyer Alpha',
+        buyerUsername: 'test_alpha',
+        subTotal: 2.7,
+        itemsSubTotal: 2.7,
+        failures: [],
+      },
+      {
+        source: 'BrickOwl',
+        orderId: 'test-order-0811',
+        buyer: 'Test Buyer Beta',
+        buyerUsername: 'test_beta',
+        subTotal: 6,
+        itemsSubTotal: 6,
+        failures: [],
+      },
+    ],
+  });
+});
+
+test('lists BrickOwl reconciliation orders that span several batch requests', async ({
+  request,
+  settings,
+}, testInfo) => {
+  const brickOwlOrders: BrickOwlOrderMock[] = Array.from({ length: 60 }, (_, index) => ({
+    orderId: `bulk-order-${index + 1}`,
+    orderDate: '1786320000',
+    view: { buyer_name: `Bulk Buyer ${index + 1}`, customer_username: `bulk_${index + 1}`, sub_total: '1.00' },
+    items: [{ base_price: '0.50', ordered_quantity: '2' }],
+  }));
+
+  const wireMock = await mockReconciliationOrders(settings, request, testInfo, {
+    month: '2026-08',
+    brickOwl: brickOwlOrders,
+  });
+
+  const response = await request.get('/api/private/reconciliation/orders?month=2026-08');
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  expect(body.orders).toHaveLength(60);
+  expect(body.orders[0]).toEqual({
+    source: 'BrickOwl',
+    orderId: 'bulk-order-1',
+    buyer: 'Bulk Buyer 1',
+    buyerUsername: 'bulk_1',
+    subTotal: 1,
+    itemsSubTotal: 1,
+    failures: [],
+  });
+  expect(body.orders[59].orderId).toBe('bulk-order-60');
+
+  const batchRequests = await wireMock.findMethodHostRequests('POST', '/v1/bulk/batch');
+  expect(batchRequests).toHaveLength(4);
+});
+
+test('returns no reconciliation orders when no provider reports orders', async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo);
 
   const response = await request.get('/api/private/reconciliation/orders?month=2026-08');
 

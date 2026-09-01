@@ -1,3 +1,8 @@
+export interface ReconciliationFailure {
+  rule: string;
+  message: string;
+}
+
 export interface ReconciliationOrder {
   source: string;
   orderId: string;
@@ -5,6 +10,7 @@ export interface ReconciliationOrder {
   buyerUsername: string | null;
   subTotal: number | null;
   itemsSubTotal: number | null;
+  failures: ReconciliationFailure[];
 }
 
 export interface ReconciliationOrdersPage {

@@ -1,5 +1,6 @@
 package com.vastbricks.api.reconciliation;
 
+import com.vastbricks.api.client.brickowl.BrickOwlClientException;
 import com.vastbricks.api.client.brickstore.BrickStoreClientException;
 import java.time.YearMonth;
 import java.time.format.DateTimeParseException;
@@ -30,9 +31,9 @@ class ReconciliationController {
         );
     }
 
-    @ExceptionHandler(BrickStoreClientException.class)
+    @ExceptionHandler({BrickStoreClientException.class, BrickOwlClientException.class})
     @ResponseStatus(HttpStatus.BAD_GATEWAY)
-    String handleBrickStoreClientException(BrickStoreClientException exception) {
+    String handleOrderSourceException(RuntimeException exception) {
         return exception.getMessage();
     }
 

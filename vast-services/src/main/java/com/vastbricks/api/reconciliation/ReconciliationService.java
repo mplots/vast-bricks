@@ -10,10 +10,29 @@ import org.springframework.stereotype.Service;
 class ReconciliationService {
 
     private final List<ReconciliationOrderSource> orderSources;
+    private final List<ReconciliationRule> rules;
 
-    List<ReconciliationOrder> findOrders(YearMonth month) {
-        return orderSources.stream()
-                .flatMap(source -> source.findOrders(month).stream())
+    List<ReconciliationOrderResult> findOrders(YearMonth month) {
+        return collectOrders(month).stream()
+                .map(this::reconcile)
                 .toList();
+    }
+
+    private List<ReconciliationOrder> collectOrders(YearMonth month) {
+        try (var tasks = new ParallelTasks()) {
+            var sourceOrders = orderSources.stream()
+                    .map(source -> tasks.start(() -> source.findOrders(month)))
+                    .toList();
+            return sourceOrders.stream()
+                    .flatMap(orders -> orders.get().stream())
+                    .toList();
+        }
+    }
+
+    private ReconciliationOrderResult reconcile(ReconciliationOrder order) {
+        var failures = rules.stream()
+                .flatMap(rule -> rule.evaluate(order).stream())
+                .toList();
+        return new ReconciliationOrderResult(order, failures);
     }
 }

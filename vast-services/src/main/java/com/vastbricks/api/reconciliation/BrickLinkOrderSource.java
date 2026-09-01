@@ -4,20 +4,17 @@ import com.vastbricks.api.client.brickstore.BrickStoreClient;
 import com.vastbricks.api.client.brickstore.BrickStoreOrder;
 import com.vastbricks.api.client.brickstore.BrickStoreOrderExportRequest;
 import com.vastbricks.api.client.brickstore.BrickStoreOrderType;
-import com.vastbricks.api.settings.SettingsProfileContext;
 import java.math.BigDecimal;
 import java.time.YearMonth;
 import java.util.Map;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
-import java.util.concurrent.Executors;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 @Component
+@Order(1)
 @RequiredArgsConstructor
 class BrickLinkOrderSource implements ReconciliationOrderSource {
 
@@ -40,12 +37,10 @@ class BrickLinkOrderSource implements ReconciliationOrderSource {
                 false
         );
 
-        try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
-            var fullNameOrders = CompletableFuture.supplyAsync(
-                    SettingsProfileContext.propagate(() -> brickStoreClient.listOrders(fullNameRequest)), executor);
-            var usernameOrders = CompletableFuture.supplyAsync(
-                    SettingsProfileContext.propagate(() -> brickStoreClient.listOrders(usernameRequest)), executor);
-            return toReconciliationOrders(await(fullNameOrders), await(usernameOrders));
+        try (var tasks = new ParallelTasks()) {
+            var fullNameOrders = tasks.start(() -> brickStoreClient.listOrders(fullNameRequest));
+            var usernameOrders = tasks.start(() -> brickStoreClient.listOrders(usernameRequest));
+            return toReconciliationOrders(fullNameOrders.get(), usernameOrders.get());
         }
     }
 
@@ -72,8 +67,8 @@ class BrickLinkOrderSource implements ReconciliationOrderSource {
                 orderId,
                 order.getBuyer(),
                 orderId == null ? null : usernamesByOrderId.get(orderId),
-                order.getTotal(),
-                sumItemPrices(order)
+                ReconciliationAmount.normalize(order.getTotal()),
+                ReconciliationAmount.normalize(sumItemPrices(order))
         );
     }
 
@@ -85,16 +80,5 @@ class BrickLinkOrderSource implements ReconciliationOrderSource {
                 .filter(item -> item.getPrice() != null && item.getQuantity() != null)
                 .map(item -> item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
-
-    private <T> T await(CompletableFuture<T> future) {
-        try {
-            return future.join();
-        } catch (CompletionException exception) {
-            if (exception.getCause() instanceof RuntimeException runtimeException) {
-                throw runtimeException;
-            }
-            throw exception;
-        }
     }
 }

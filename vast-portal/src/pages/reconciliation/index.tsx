@@ -4,6 +4,11 @@ import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import Divider from '@mui/material/Divider';
 import Skeleton from '@mui/material/Skeleton';
 import Stack from '@mui/material/Stack';
 import Table from '@mui/material/Table';
@@ -17,6 +22,7 @@ import Typography from '@mui/material/Typography';
 
 import { useGetReconciliationOrders } from 'api/reconciliation';
 import MainCard from 'components/MainCard';
+import type { ReconciliationOrder } from 'types/reconciliation';
 
 const formatAmount = (value?: number | null) => {
   if (value === null || value === undefined || Number.isNaN(value)) {
@@ -24,6 +30,20 @@ const formatAmount = (value?: number | null) => {
   }
   return `€${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 };
+
+const formatText = (value?: string | null) => value ?? '—';
+
+// Every collected field, including the ones the table does not show as a column.
+const detailFields = (order: ReconciliationOrder): Array<[string, string]> => [
+  ['Source', formatText(order.source)],
+  ['Order ID', formatText(order.orderId)],
+  ['Buyer', formatText(order.buyer)],
+  ['Buyer username', formatText(order.buyerUsername)],
+  ['Sub-total', formatAmount(order.subTotal)],
+  ['Items sub-total', formatAmount(order.itemsSubTotal)]
+];
+
+const isFailed = (order: ReconciliationOrder) => order.failures.length > 0;
 
 const previousMonth = () => {
   const date = new Date();
@@ -36,12 +56,15 @@ export default function ReconciliationPage() {
   const initialMonth = previousMonth();
   const [selectedMonth, setSelectedMonth] = useState(initialMonth);
   const [requestedMonth, setRequestedMonth] = useState(initialMonth);
+  const [selectedOrder, setSelectedOrder] = useState<ReconciliationOrder | null>(null);
   const { reconciliationOrders, reconciliationOrdersError, reconciliationOrdersLoading } = useGetReconciliationOrders(requestedMonth);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setRequestedMonth(selectedMonth);
   };
+
+  const failedCount = reconciliationOrders?.orders.filter(isFailed).length ?? 0;
 
   return (
     <Stack spacing={3}>
@@ -65,11 +88,13 @@ export default function ReconciliationPage() {
             Show orders
           </Button>
           {reconciliationOrders && (
-            <Chip
-              label={`${reconciliationOrders.orders.length} ${reconciliationOrders.orders.length === 1 ? 'order' : 'orders'}`}
-              variant="outlined"
-              sx={{ alignSelf: { sm: 'center' }, ml: { sm: 'auto !important' } }}
-            />
+            <Stack direction="row" spacing={1} sx={{ alignSelf: { sm: 'center' }, ml: { sm: 'auto !important' } }}>
+              <Chip
+                label={`${reconciliationOrders.orders.length} ${reconciliationOrders.orders.length === 1 ? 'order' : 'orders'}`}
+                variant="outlined"
+              />
+              {failedCount > 0 && <Chip label={`${failedCount} failed`} color="error" variant="outlined" />}
+            </Stack>
           )}
         </Stack>
       </MainCard>
@@ -97,13 +122,21 @@ export default function ReconciliationPage() {
                 </TableHead>
                 <TableBody>
                   {reconciliationOrders.orders.map((order) => (
-                    <TableRow hover key={`${order.source}-${order.orderId}`}>
+                    <TableRow
+                      hover
+                      key={`${order.source}-${order.orderId}`}
+                      onClick={() => setSelectedOrder(order)}
+                      sx={{
+                        cursor: 'pointer',
+                        ...(isFailed(order) && { bgcolor: 'error.lighter', '& td': { color: 'error.dark' } })
+                      }}
+                    >
                       <TableCell>
-                        <Chip label={order.source} size="small" color="primary" variant="outlined" />
+                        <Chip label={order.source} size="small" color={isFailed(order) ? 'error' : 'primary'} variant="outlined" />
                       </TableCell>
                       <TableCell>{order.orderId}</TableCell>
                       <TableCell>{order.buyer}</TableCell>
-                      <TableCell>{order.buyerUsername ?? '—'}</TableCell>
+                      <TableCell>{formatText(order.buyerUsername)}</TableCell>
                       <TableCell align="right">{formatAmount(order.subTotal)}</TableCell>
                       <TableCell align="right">{formatAmount(order.itemsSubTotal)}</TableCell>
                     </TableRow>
@@ -118,6 +151,44 @@ export default function ReconciliationPage() {
           )}
         </MainCard>
       )}
+
+      <Dialog open={Boolean(selectedOrder)} onClose={() => setSelectedOrder(null)} fullWidth maxWidth="sm">
+        {selectedOrder && (
+          <>
+            <DialogTitle>
+              {selectedOrder.source} order #{selectedOrder.orderId}
+            </DialogTitle>
+            <DialogContent dividers>
+              <Stack spacing={1}>
+                {detailFields(selectedOrder).map(([label, value]) => (
+                  <Stack key={label} direction="row" justifyContent="space-between" spacing={2}>
+                    <Typography color="text.secondary">{label}</Typography>
+                    <Typography>{value}</Typography>
+                  </Stack>
+                ))}
+              </Stack>
+              <Divider sx={{ my: 2 }} />
+              <Typography variant="subtitle1" gutterBottom>
+                Failed reconciliation
+              </Typography>
+              {isFailed(selectedOrder) ? (
+                <Stack spacing={1}>
+                  {selectedOrder.failures.map((failure) => (
+                    <Alert key={failure.rule} severity="error" variant="outlined">
+                      {failure.message}
+                    </Alert>
+                  ))}
+                </Stack>
+              ) : (
+                <Typography color="text.secondary">No reconciliation failures.</Typography>
+              )}
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setSelectedOrder(null)}>Close</Button>
+            </DialogActions>
+          </>
+        )}
+      </Dialog>
     </Stack>
   );
 }

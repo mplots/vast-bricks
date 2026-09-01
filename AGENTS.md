@@ -131,7 +131,7 @@ here as they are provided; do not invent unspecified behavior prematurely.
   the systems involved in commerce, payment, shipping, accounting, and store
   synchronization.
 - An order whose reconciliation fails is colored red in the orders table.
-- Selecting a failed order shows all available details explaining why its
+- Selecting an order shows all available details, including why its
   reconciliation failed.
 - The first iteration is read-only.
 - Only the failed state is currently required. Do not introduce additional
@@ -142,11 +142,12 @@ here as they are provided; do not invent unspecified behavior prematurely.
 - The screen is backed entirely by live data sources. Reconciliation records,
   provider responses, and reconciliation results are not stored in the Vast
   database.
-- The initial reconciliation order-list slice reads received BrickLink orders
-  from the BrickStore XML export for the selected month. Its server response
-  and table expose only the marketplace source (`BrickLink` or `BrickOwl`),
-  order ID, and buyer. Add further fields and providers incrementally as their
-  processing requirements are supplied.
+- The reconciliation order list currently collects received BrickLink orders
+  from the BrickStore XML export and BrickOwl orders from the BrickOwl API for
+  the selected month. Each collected order carries its marketplace source
+  (`BrickLink` or `BrickOwl`), order ID, buyer, buyer username, sub-total, and
+  items sub-total, together with its rule failures. Add further fields and
+  providers incrementally as their processing requirements are supplied.
 - Data is requested from the providers on demand when the screen is opened.
 - Provider requests should run in parallel so far as their dependencies allow.
 - Potential performance problems from live, on-demand aggregation are accepted
@@ -160,12 +161,37 @@ here as they are provided; do not invent unspecified behavior prematurely.
   will not cover every case. Some sources will require more involved search or
   matching algorithms. Those algorithms will be specified during incremental
   implementation.
-- Reconciliation rules are conditional. Implement only the rules supplied for
-  the current processing step rather than assuming that every order must have a
-  record in every system.
+- Implement only the rules supplied for the current processing step rather than
+  assuming that every order must have a record in every system. See
+  "Reconciliation rules" for how a rule decides that it applies to an order.
 - An order normally has one order source, one payment source, one shipping
   source, and corresponding single sources for the other reconciliation
   categories.
+
+### Reconciliation rules
+
+- A reconciliation rule is a backend Java class implementing the common rule
+  boundary. Adding a rule must not require changing the evaluation pipeline,
+  the API contract, or the reconciliation screen.
+- A rule inspects one collected order and returns zero or more failures. Each
+  failure carries a stable rule code and a human-readable message.
+- Rule conditionality is about whether a rule applies to an order at all. A rule
+  that applies to an order and finds the data it needs missing fails that order
+  rather than staying silent.
+- Rule results are part of the order-list response. The screen must not issue a
+  second request for reconciliation detail: nothing is stored, so a detail
+  request would re-query every provider.
+- Monetary amounts are normalized to two decimals, `HALF_UP`, by the data source
+  that collects them. Rules compare normalized amounts exactly and must not
+  define their own tolerances.
+- The orders table colors an order red when it has at least one failure.
+  Selecting any order opens a read-only detail view listing every collected
+  field and the order's failed rules.
+- The table shows only a subset of the collected fields. Fields that can fail
+  reconciliation without being table columns are visible in the detail view.
+- Only the failed state exists. Do not introduce a reconciliation status enum
+  until additional states are specified.
+- Current rules: an order's sub-total must equal the sum of its item prices.
 
 ### Data-source boundaries and current clients
 
