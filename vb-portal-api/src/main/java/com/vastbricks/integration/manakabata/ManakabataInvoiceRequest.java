@@ -20,6 +20,7 @@ public class ManakabataInvoiceRequest {
     private LocalDate invoicedAt;
     private String invoiceLocale;
     private String currency;
+    private String invoiceNote;
     private boolean showCode;
     private boolean showDiscount;
     @JsonProperty("is_public_link")

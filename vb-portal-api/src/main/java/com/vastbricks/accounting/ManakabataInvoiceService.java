@@ -76,13 +76,18 @@ public class ManakabataInvoiceService {
         }
 
         var normalizedSource = normalizeSource(source);
+        var normalizedOrderId = orderId.trim();
         var order = switch (normalizedSource) {
-            case BRICK_LINK -> brickLinkOrder(orderId.trim());
-            case BRICK_OWL -> brickOwlOrder(orderId.trim());
+            case BRICK_LINK -> brickLinkOrder(normalizedOrderId);
+            case BRICK_OWL -> brickOwlOrder(normalizedOrderId);
             default -> throw new IllegalArgumentException("Unsupported order source: " + source);
         };
         var client = upsertClient.apply(order.getClientRequest());
-        var invoice = createInvoice.apply(invoiceRequest(client.getUuid(), order.getOrderDate()));
+        var invoice = createInvoice.apply(invoiceRequest(
+            client.getUuid(),
+            order.getOrderDate(),
+            invoiceNote(normalizedSource, normalizedOrderId)
+        ));
         return new GenerateInvoiceResult(
             invoice.getUuid(),
             invoice.getInvoiceNumber(),
@@ -146,7 +151,7 @@ public class ManakabataInvoiceService {
         );
     }
 
-    private ManakabataInvoiceRequest invoiceRequest(String clientUuid, LocalDate orderDate) {
+    private ManakabataInvoiceRequest invoiceRequest(String clientUuid, LocalDate orderDate, String invoiceNote) {
         return ManakabataInvoiceRequest.builder()
             .invoiceCategory("product")
             .invoiceType("bill_of_landing")
@@ -156,6 +161,7 @@ public class ManakabataInvoiceService {
             .invoicedAt(orderDate)
             .invoiceLocale("en")
             .currency("EUR")
+            .invoiceNote(invoiceNote)
             .showCode(true)
             .showDiscount(true)
             .publicLink(true)
@@ -181,6 +187,15 @@ public class ManakabataInvoiceService {
             .isVatSpecial(false)
             .isSyncEnabled(false)
             ;
+    }
+
+    private String invoiceNote(String normalizedSource, String orderId) {
+        var sourceLabel = switch (normalizedSource) {
+            case BRICK_LINK -> "BrickLink";
+            case BRICK_OWL -> "BrickOwl";
+            default -> normalizedSource;
+        };
+        return sourceLabel + " order " + orderId;
     }
 
     private String normalizeSource(String source) {

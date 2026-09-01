@@ -63,6 +63,7 @@ class ManakabataInvoiceServiceTest {
         assertEquals(clientId, capturedInvoice.get().getRecipient().getUuid());
         assertEquals("numerator-uuid", capturedInvoice.get().getInvoiceNumerator().getUuid());
         assertEquals("bank-account-uuid", capturedInvoice.get().getTeamBankAccount().getUuid());
+        assertEquals("BrickLink order 32266548", capturedInvoice.get().getInvoiceNote());
     }
 
     @Test
@@ -99,5 +100,6 @@ class ManakabataInvoiceServiceTest {
         assertFalse(request.getIsSelfEmployed());
         assertFalse(request.getIsVatSpecial());
         assertEquals(LocalDate.of(2026, 8, 26), capturedInvoice.get().getInvoicedAt());
+        assertEquals("BrickOwl order 3060526", capturedInvoice.get().getInvoiceNote());
     }
 }

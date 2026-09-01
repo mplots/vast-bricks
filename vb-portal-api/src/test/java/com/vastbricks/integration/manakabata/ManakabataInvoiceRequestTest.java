@@ -22,6 +22,7 @@ class ManakabataInvoiceRequestTest {
             .invoicedAt(LocalDate.of(2026, 8, 25))
             .invoiceLocale("en")
             .currency("EUR")
+            .invoiceNote("BrickLink order 32266548")
             .showCode(true)
             .showDiscount(true)
             .publicLink(true)
@@ -39,6 +40,7 @@ class ManakabataInvoiceRequestTest {
         assertEquals("2026-08-25", json.path("invoiced_at").asText());
         assertTrue(json.path("is_public_link").asBoolean());
         assertFalse(json.has("public_link"));
-        assertEquals(15, json.size());
+        assertEquals("BrickLink order 32266548", json.path("invoice_note").asText());
+        assertEquals(16, json.size());
     }
 }
