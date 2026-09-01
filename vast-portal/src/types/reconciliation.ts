@@ -3,6 +3,8 @@ export interface ReconciliationOrder {
   orderId: string;
   buyer: string;
   buyerUsername: string | null;
+  subTotal: number | null;
+  itemsSubTotal: number | null;
 }
 
 export interface ReconciliationOrdersPage {

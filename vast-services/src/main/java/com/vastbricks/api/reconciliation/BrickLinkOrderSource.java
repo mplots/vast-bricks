@@ -4,6 +4,8 @@ import com.vastbricks.api.client.brickstore.BrickStoreClient;
 import com.vastbricks.api.client.brickstore.BrickStoreOrder;
 import com.vastbricks.api.client.brickstore.BrickStoreOrderExportRequest;
 import com.vastbricks.api.client.brickstore.BrickStoreOrderType;
+import com.vastbricks.api.settings.SettingsProfileContext;
+import java.math.BigDecimal;
 import java.time.YearMonth;
 import java.util.Map;
 import java.util.List;
@@ -39,8 +41,10 @@ class BrickLinkOrderSource implements ReconciliationOrderSource {
         );
 
         try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
-            var fullNameOrders = CompletableFuture.supplyAsync(() -> brickStoreClient.listOrders(fullNameRequest), executor);
-            var usernameOrders = CompletableFuture.supplyAsync(() -> brickStoreClient.listOrders(usernameRequest), executor);
+            var fullNameOrders = CompletableFuture.supplyAsync(
+                    SettingsProfileContext.propagate(() -> brickStoreClient.listOrders(fullNameRequest)), executor);
+            var usernameOrders = CompletableFuture.supplyAsync(
+                    SettingsProfileContext.propagate(() -> brickStoreClient.listOrders(usernameRequest)), executor);
             return toReconciliationOrders(await(fullNameOrders), await(usernameOrders));
         }
     }
@@ -67,8 +71,20 @@ class BrickLinkOrderSource implements ReconciliationOrderSource {
                 SOURCE,
                 orderId,
                 order.getBuyer(),
-                orderId == null ? null : usernamesByOrderId.get(orderId)
+                orderId == null ? null : usernamesByOrderId.get(orderId),
+                order.getTotal(),
+                sumItemPrices(order)
         );
+    }
+
+    private BigDecimal sumItemPrices(BrickStoreOrder order) {
+        if (order.getItems() == null) {
+            return null;
+        }
+        return order.getItems().stream()
+                .filter(item -> item.getPrice() != null && item.getQuantity() != null)
+                .map(item -> item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     private <T> T await(CompletableFuture<T> future) {

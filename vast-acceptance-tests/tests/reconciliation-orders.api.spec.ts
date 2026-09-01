@@ -34,12 +34,38 @@ test('lists BrickLink reconciliation orders for the selected month', async ({
     <ORDERTRACKNO></ORDERTRACKNO>
     <LOCATION>Belgium, West-Vlaanderen</LOCATION>
     <VATCHARGES>1.45</VATCHARGES>
+    <ITEM>
+      <ITEMID>3001</ITEMID>
+      <PRICE>0.1000</PRICE>
+      <QTY>2</QTY>
+    </ITEM>
+    <ITEM>
+      <ITEMID>3002</ITEMID>
+      <PRICE>0.2300</PRICE>
+      <QTY>1</QTY>
+    </ITEM>
+  </ORDER>
+  <ORDER>
+    <ORDERID>32456564</ORDERID>
+    <ORDERDATE>8/31/2026</ORDERDATE>
+    <BUYER>another buyer</BUYER>
+    <ORDERTOTAL>10.00</ORDERTOTAL>
+    <BASECURRENCYCODE>EUR</BASECURRENCYCODE>
+    <ITEM>
+      <ITEMID>3003</ITEMID>
+      <PRICE>1.0000</PRICE>
+      <QTY>3</QTY>
+    </ITEM>
   </ORDER>
 </ORDERS>`, `<?xml version="1.0" encoding="UTF-8"?>
 <ORDERS>
   <ORDER>
     <ORDERID>32456563</ORDERID>
     <BUYER>some-buyer-username</BUYER>
+  </ORDER>
+  <ORDER>
+    <ORDERID>32456564</ORDERID>
+    <BUYER>another-buyer-username</BUYER>
   </ORDER>
 </ORDERS>`);
 
@@ -55,6 +81,16 @@ test('lists BrickLink reconciliation orders for the selected month', async ({
         orderId: '32456563',
         buyer: 'some buyer',
         buyerUsername: 'some-buyer-username',
+        subTotal: 0.43,
+        itemsSubTotal: 0.43,
+      },
+      {
+        source: 'BrickLink',
+        orderId: '32456564',
+        buyer: 'another buyer',
+        buyerUsername: 'another-buyer-username',
+        subTotal: 10,
+        itemsSubTotal: 3,
       },
     ],
   });

@@ -18,6 +18,13 @@ import Typography from '@mui/material/Typography';
 import { useGetReconciliationOrders } from 'api/reconciliation';
 import MainCard from 'components/MainCard';
 
+const formatAmount = (value?: number | null) => {
+  if (value === null || value === undefined || Number.isNaN(value)) {
+    return '—';
+  }
+  return `€${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+};
+
 const previousMonth = () => {
   const date = new Date();
   date.setDate(1);
@@ -84,6 +91,8 @@ export default function ReconciliationPage() {
                     <TableCell>Order ID</TableCell>
                     <TableCell>Buyer</TableCell>
                     <TableCell>Buyer username</TableCell>
+                    <TableCell align="right">Sub-total</TableCell>
+                    <TableCell align="right">Items sub-total</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -95,6 +104,8 @@ export default function ReconciliationPage() {
                       <TableCell>{order.orderId}</TableCell>
                       <TableCell>{order.buyer}</TableCell>
                       <TableCell>{order.buyerUsername ?? '—'}</TableCell>
+                      <TableCell align="right">{formatAmount(order.subTotal)}</TableCell>
+                      <TableCell align="right">{formatAmount(order.itemsSubTotal)}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
