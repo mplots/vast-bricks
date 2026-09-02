@@ -98,10 +98,19 @@ public class BrickStoreOrderExportRequest {
     }
 
     public static BrickStoreOrderExportRequest forOrderId(BrickStoreOrderType orderType, String orderId) {
+        return forOrderId(orderType, orderId, true);
+    }
+
+    /** The export names the buyer either by real name or by username, never both, so both are requested separately. */
+    public static BrickStoreOrderExportRequest forOrderId(
+            BrickStoreOrderType orderType,
+            String orderId,
+            boolean useRealName
+    ) {
         if (orderId == null || orderId.isBlank()) {
             throw new IllegalArgumentException("orderId is required");
         }
-        return create(orderType, null, null, orderId, true);
+        return create(orderType, null, null, orderId, useRealName);
     }
 
     public static BrickStoreOrderExportRequest forOrderIdInDateRange(

@@ -18,6 +18,7 @@ type WireMockRequestPattern = {
   urlPath?: string;
   urlPattern?: string;
   headers?: Record<string, WireMockValueMatcher>;
+  queryParameters?: Record<string, WireMockValueMatcher>;
   bodyPatterns?: WireMockBodyPattern[];
 };
 

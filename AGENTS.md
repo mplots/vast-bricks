@@ -235,7 +235,10 @@ here as they are provided; do not invent unspecified behavior prematurely.
 - Current payment client implementations are Stripe and PayPal.
 - The current shipping client implementation is Mans Pasts.
 - The current accounting client implementation is Manakabata, migrated into
-  `vast-services` as a reconciliation invoice source.
+  `vast-services`: it collects invoices as a reconciliation invoice source, and the
+  `invoice` feature creates them for an order. A provider has one root client per
+  feature, and a client stays transport: what an invoice says is decided by the
+  `invoice` feature, not by `ManakabataClient`.
 - The current e-commerce store synchronization client implementation is
   BrickSync.
 - These are the implementations currently known, not an exhaustive or closed
@@ -247,9 +250,11 @@ here as they are provided; do not invent unspecified behavior prematurely.
   instead of handwriting one. `vast-services` owns the specification and the
   `openapi-generator-maven-plugin` execution, and generated clients belong under
   `com.vastbricks.api.client.<provider>`. The Manakabata accounting client is
-  generated this way from `vast-services/src/main/openapi/manakabata-api.json`;
-  legacy Manakabata gateways in `vb-portal-api` consume that generated client
-  through the `vast-services` dependency.
+  generated this way from `vast-services/src/main/openapi/manakabata-api.json`.
+  Where a published specification is wrong, the payload is declared by hand next to the
+  generated client rather than by patching the vendor's specification: Manakabata's
+  invoice store request types its recipient, numerator and bank-account fields as arrays
+  of strings although the API expects lookup objects.
 
 ## Spring Boot composition
 

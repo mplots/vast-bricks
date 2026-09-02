@@ -34,6 +34,9 @@ services:
   wiremock:
     image: wiremock/wiremock:3.13.2
     container_name: vast-bricks-wiremock
+    # Plain HTTP/2 is off so every request keeps a Host header: a client that upgrades to h2c sends the authority as a
+    # pseudo-header instead, and the per-worker stub isolation matches on Host.
+    command: ["--disable-http2-plain"]
     ports:
       - target: 8080
         published: 9011

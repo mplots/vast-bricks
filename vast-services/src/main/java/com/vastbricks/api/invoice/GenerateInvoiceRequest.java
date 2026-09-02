@@ -1,13 +1,11 @@
-package com.vastbricks.accounting;
+package com.vastbricks.api.invoice;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
-public class GenerateInvoiceRequest {
+class GenerateInvoiceRequest {
     private String orderId;
     private String source;
 }
