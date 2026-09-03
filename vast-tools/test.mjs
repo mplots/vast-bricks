@@ -14,7 +14,7 @@ export async function runTestCommand(args) {
   }
 
   if (options.build) {
-    const restartStatus = await restartServices(["vast-api"], { cleanDb: options.cleanBuild });
+    const restartStatus = await restartServices(["vast-api-test"], { cleanDb: options.cleanBuild });
     if (restartStatus !== 0) {
       return restartStatus;
     }
@@ -107,8 +107,8 @@ Both types run when neither --tech nor --logic is given.
 Options:
   --tech                Run only the tech tests
   --logic               Run only the logic tests
-  --build, -b           Rebuild and restart managed vast-api before testing
-  --clean-build, -cb    Rebuild vast-api and test with a freshly migrated Vast schema
+  --build, -b           Rebuild and restart managed vast-api-test before testing
+  --clean-build, -cb    Rebuild vast-api-test and test with a freshly migrated Vast schema
   --help, -h            Show this help
 
 Environment:

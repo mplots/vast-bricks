@@ -414,21 +414,23 @@ supplied and do not invent unspecified amounts.
   or direct Playwright invocations for managed acceptance workflows.
 - Use `./vast test` or the shortcut `./vast t` to run Playwright API
   acceptance tests from `vast-acceptance-tests`. Both test types run by
-  default; pass `--tech` or `--logic` to run only one. Pass `-b` or `--build` when
-  the managed `vast-api` should be rebuilt and restarted before running tests.
-  Pass `-cb` or `--clean-build` to rebuild it and run the tests with the Vast
-  database schema cleaned and migrated from scratch.
+  default; pass `--tech` or `--logic` to run only one. Pass `-b` or `--build`
+  when the managed `vast-api-test` should be rebuilt and restarted before
+  running tests. Pass `-cb` or `--clean-build` to rebuild it and run the tests
+  with the Vast database schema cleaned and migrated from scratch.
 - The CLI should eventually manage PostgreSQL readiness, migrations, service
   readiness, focused Playwright API runs, restarts after code changes, logs, and
   cleanup.
 - Add CLI capabilities incrementally with the workflow that needs them; do not
   build the entire final CLI during module scaffolding.
-- The managed service named `vast-api` builds and runs the
+- The managed service named `vast-api-test` builds and runs the
   `vast-acceptance-tests` JAR, so the test-only endpoints are available locally.
-  The service keeps the `vast-api` name, port, and health URL.
+  It is named apart from the `vast-api` module because it launches the
+  test-only JAR, not that module's own artifact, and it keeps the port and
+  health URL a standalone `vast-api` launch uses.
 - `./vast services` (alias `./vast svc`) manages `postgres`, `tor-proxy`,
-  `vast-api`, `wiremock`, and `vast-portal`. Managed application instances use
-  ports 6362, 9011, and 3100 respectively, leaving the normal IntelliJ ports
+  `vast-api-test`, `wiremock`, and `vast-portal`. Managed application instances
+  use ports 6362, 9011, and 3100 respectively, leaving the normal IntelliJ ports
   6161, 6262, and 3200 available for independently launched instances.
 - `./vast ps` is the shortcut for `./vast services list`.
 - Runtime process state and logs belong under the ignored `.vast` directory.

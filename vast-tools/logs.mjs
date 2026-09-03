@@ -304,8 +304,8 @@ Options:
   --help, -h               Show this help
 
 Examples:
-  ./vast logs vast-api
-  ./vast logs vast-api --tail 100
-  ./vast logs vast-api --follow
-  ./vast logs clear vast-api`);
+  ./vast logs vast-api-test
+  ./vast logs vast-api-test --tail 100
+  ./vast logs vast-api-test --follow
+  ./vast logs clear vast-api-test`);
 }

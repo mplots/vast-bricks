@@ -68,8 +68,8 @@ function parseOptions(args) {
     if (options.action !== "restart") {
       throw new Error("--clean-db is accepted only by restart.");
     }
-    if (options.services.length > 0 && !options.services.includes("vast-api")) {
-      throw new Error("--clean-db applies only when restarting vast-api.");
+    if (options.services.length > 0 && !options.services.includes("vast-api-test")) {
+      throw new Error("--clean-db applies only when restarting vast-api-test.");
     }
   }
 
@@ -81,7 +81,7 @@ function printHelp() {
   ./vast services <list|start|stop|restart> [services...] [options]
 
 Services:
-  postgres | tor-proxy | vast-api | wiremock | vast-portal
+  postgres | tor-proxy | vast-api-test | wiremock | vast-portal
 
 Commands:
   list                  Print service health and managed process state
@@ -91,15 +91,15 @@ Commands:
 
 Options:
   --skip-build, -sb     Use existing built service artifacts
-  --clean-db            Clean the Vast database schema before restarting vast-api
+  --clean-db            Clean the Vast database schema before restarting vast-api-test
   --help, -h            Show this help
 
 Managed ports:
-  postgres     2345
-  tor-proxy    8118
-  vast-api     6362
-  wiremock     9011
-  vast-portal  3100
+  postgres       2345
+  tor-proxy      8118
+  vast-api-test  6362
+  wiremock       9011
+  vast-portal    3100
 
 Postgres intentionally uses non-default host port 2345.
 IntelliJ launches keep their existing ports 6262 and 3000.`);

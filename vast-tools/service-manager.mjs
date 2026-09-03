@@ -149,7 +149,7 @@ async function startService(service, { skipBuild = false, cleanDb = false } = {}
   const ownedProcessRunning = record && isOwnedProcessRunning(service, record);
 
   if (ownedProcessRunning && health.healthy) {
-    console.log(`${statusLabel("healthy")} ${service.name.padEnd(12)} already managed pid=${record.pid} port=${service.port}`);
+    console.log(`${statusLabel("healthy")} ${service.name.padEnd(13)} already managed pid=${record.pid} port=${service.port}`);
     return;
   }
 
@@ -199,21 +199,21 @@ async function startService(service, { skipBuild = false, cleanDb = false } = {}
     port: service.port,
     startedAt: new Date().toISOString(),
   });
-  console.log(`${statusLabel("started")} ${service.name.padEnd(12)} pid=${child.pid} port=${service.port} log=${logPath}`);
+  console.log(`${statusLabel("started")} ${service.name.padEnd(13)} pid=${child.pid} port=${service.port} log=${logPath}`);
 
   const ready = await waitForHealth(service, child.pid);
   if (!ready.healthy) {
     printLogTail(service.name);
     throw new Error(`${service.name} did not become healthy within ${readinessTimeoutMs / 1_000}s: ${ready.detail}`);
   }
-  console.log(`${statusLabel("healthy")} ${service.name.padEnd(12)} ${service.healthUrl}`);
+  console.log(`${statusLabel("healthy")} ${service.name.padEnd(13)} ${service.healthUrl}`);
 }
 
 function serviceEnvironment(service, { cleanDb = false } = {}) {
   return {
     ...process.env,
     ...service.env,
-    ...(cleanDb && service.name === "vast-api" ? { VAST_DB_CLEAN_ON_STARTUP: "true" } : {}),
+    ...(cleanDb && service.name === "vast-api-test" ? { VAST_DB_CLEAN_ON_STARTUP: "true" } : {}),
   };
 }
 
@@ -225,12 +225,12 @@ async function stopService(service) {
 
   const record = readState().find(({ name }) => name === service.name);
   if (!record) {
-    console.log(`${statusLabel("unmanaged")} ${service.name.padEnd(12)} no recorded process`);
+    console.log(`${statusLabel("unmanaged")} ${service.name.padEnd(13)} no recorded process`);
     return;
   }
 
   if (!isOwnedProcessRunning(service, record)) {
-    console.log(`${statusLabel("stale")} ${service.name.padEnd(12)} pid=${record.pid}`);
+    console.log(`${statusLabel("stale")} ${service.name.padEnd(13)} pid=${record.pid}`);
     removeStateRecord(service.name);
     return;
   }
@@ -242,14 +242,14 @@ async function stopService(service) {
       throw error;
     }
   }
-  console.log(`${statusLabel("stopping")} ${service.name.padEnd(12)} pid=${record.pid}`);
+  console.log(`${statusLabel("stopping")} ${service.name.padEnd(13)} pid=${record.pid}`);
 
   if (!(await waitForProcessGroupExit(record.pid, stopTimeoutMs))) {
     throw new Error(`${service.name} did not stop within ${stopTimeoutMs / 1_000}s. Its process was not force-killed.`);
   }
 
   removeStateRecord(service.name);
-  console.log(`${statusLabel("stopped")} ${service.name.padEnd(12)} port=${service.port}`);
+  console.log(`${statusLabel("stopped")} ${service.name.padEnd(13)} port=${service.port}`);
 }
 
 async function startDockerComposeService(service) {
@@ -258,7 +258,7 @@ async function startDockerComposeService(service) {
   removeStateRecord(service.name);
 
   if (containerRunning && health.healthy) {
-    console.log(`${statusLabel("healthy")} ${service.name.padEnd(12)} already managed container=${service.containerName} port=${service.port}`);
+    console.log(`${statusLabel("healthy")} ${service.name.padEnd(13)} already managed container=${service.containerName} port=${service.port}`);
     return;
   }
 
@@ -279,12 +279,12 @@ async function startDockerComposeService(service) {
     printDockerLogTail(service);
     throw new Error(`${service.name} did not become healthy within ${readinessTimeoutMs / 1_000}s: ${ready.detail}`);
   }
-  console.log(`${statusLabel("healthy")} ${service.name.padEnd(12)} ${service.healthUrl ?? `tcp://${service.host}:${service.port}`}`);
+  console.log(`${statusLabel("healthy")} ${service.name.padEnd(13)} ${service.healthUrl ?? `tcp://${service.host}:${service.port}`}`);
 }
 
 async function stopDockerComposeService(service) {
   if (!isDockerContainerRunning(service)) {
-    console.log(`${statusLabel("unmanaged")} ${service.name.padEnd(12)} container=${service.containerName}`);
+    console.log(`${statusLabel("unmanaged")} ${service.name.padEnd(13)} container=${service.containerName}`);
     return;
   }
 
@@ -300,7 +300,7 @@ async function stopDockerComposeService(service) {
     throw new Error(`${service.name} port ${service.port} remained open after docker compose stop.`);
   }
 
-  console.log(`${statusLabel("stopped")} ${service.name.padEnd(12)} port=${service.port}`);
+  console.log(`${statusLabel("stopped")} ${service.name.padEnd(13)} port=${service.port}`);
 }
 
 function runForeground(command, args, cwd) {

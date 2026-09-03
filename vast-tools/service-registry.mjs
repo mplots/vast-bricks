@@ -23,7 +23,7 @@ export const managedServices = [
     containerName: "vast-bricks-tor-proxy",
   },
   {
-    name: "vast-api",
+    name: "vast-api-test",
     port: 6362,
     healthUrl: "http://127.0.0.1:6362/api/health",
     command: "java",

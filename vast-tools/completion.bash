@@ -22,7 +22,7 @@ _vast_completion() {
           if [[ "${current}" == -* ]]; then
             COMPREPLY=($(compgen -W "--skip-build -sb --help -h" -- "${current}"))
           else
-            COMPREPLY=($(compgen -W "postgres tor-proxy vast-api wiremock vast-portal" -- "${current}"))
+            COMPREPLY=($(compgen -W "postgres tor-proxy vast-api-test wiremock vast-portal" -- "${current}"))
           fi
           return
           ;;
@@ -30,7 +30,7 @@ _vast_completion() {
           if [[ "${current}" == -* ]]; then
             COMPREPLY=($(compgen -W "--skip-build -sb --clean-db --help -h" -- "${current}"))
           else
-            COMPREPLY=($(compgen -W "postgres tor-proxy vast-api wiremock vast-portal" -- "${current}"))
+            COMPREPLY=($(compgen -W "postgres tor-proxy vast-api-test wiremock vast-portal" -- "${current}"))
           fi
           return
           ;;
@@ -38,7 +38,7 @@ _vast_completion() {
           if [[ "${current}" == -* ]]; then
             COMPREPLY=($(compgen -W "--help -h" -- "${current}"))
           else
-            COMPREPLY=($(compgen -W "postgres tor-proxy vast-api wiremock vast-portal" -- "${current}"))
+            COMPREPLY=($(compgen -W "postgres tor-proxy vast-api-test wiremock vast-portal" -- "${current}"))
           fi
           return
           ;;
@@ -48,7 +48,7 @@ _vast_completion() {
       if [[ "${current}" == -* ]]; then
         COMPREPLY=($(compgen -W "--help -h" -- "${current}"))
       else
-        COMPREPLY=($(compgen -W "postgres tor-proxy vast-api wiremock vast-portal" -- "${current}"))
+        COMPREPLY=($(compgen -W "postgres tor-proxy vast-api-test wiremock vast-portal" -- "${current}"))
       fi
       return
       ;;
@@ -63,12 +63,12 @@ _vast_completion() {
         if [[ "${current}" == -* ]]; then
           COMPREPLY=($(compgen -W "--help -h" -- "${current}"))
         else
-          COMPREPLY=($(compgen -W "postgres tor-proxy vast-api wiremock vast-portal" -- "${current}"))
+          COMPREPLY=($(compgen -W "postgres tor-proxy vast-api-test wiremock vast-portal" -- "${current}"))
         fi
       elif [[ "${current}" == -* ]]; then
         COMPREPLY=($(compgen -W "--follow -f --tail -t --help -h" -- "${current}"))
       elif [[ ${COMP_CWORD} -eq 2 ]]; then
-        COMPREPLY=($(compgen -W "clear postgres tor-proxy vast-api wiremock vast-portal" -- "${current}"))
+        COMPREPLY=($(compgen -W "clear postgres tor-proxy vast-api-test wiremock vast-portal" -- "${current}"))
       else
         COMPREPLY=()
       fi
