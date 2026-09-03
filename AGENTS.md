@@ -424,14 +424,30 @@ supplied and do not invent unspecified amounts.
 - Add CLI capabilities incrementally with the workflow that needs them; do not
   build the entire final CLI during module scaffolding.
 - The managed service named `vast-api-test` builds and runs the
-  `vast-acceptance-tests` JAR, so the test-only endpoints are available locally.
-  It is named apart from the `vast-api` module because it launches the
-  test-only JAR, not that module's own artifact, and it keeps the port and
-  health URL a standalone `vast-api` launch uses.
+  `vast-acceptance-tests` JAR on port 6362, so the test-only endpoints are
+  available locally. Acceptance tests always run against it.
+- The managed service named `vast-api` builds and runs the `vast-api` module's
+  own executable JAR on port 6363, without the test-only endpoints. It is the
+  service to launch when the rewritten backend must behave exactly as it does
+  when deployed.
+- `vast-api` reads its configuration from an external environment file of
+  `KEY=value` lines, by default `~/.vast/vast-api.env` and otherwise the path
+  `VAST_API_ENV_FILE` names. The file holds production credentials, so it lives
+  outside the repository, `./vast` refuses a path inside the working tree or a
+  file readable beyond its owner, and its values are passed only to the
+  `vast-api` process.
+- No other managed service may ever read that file. `vast-api-test` runs
+  acceptance tests against mocked providers and must never be given production
+  credentials, by an environment file, a shell that sourced one, or any other
+  route. Only `./vast`'s own settings for the managed port win over the file.
+- Because it runs against real credentials, `vast-api` starts only when it is
+  named: `./vast services start` and `./vast services restart` without service
+  names leave it alone. Listing and stopping still include it.
 - `./vast services` (alias `./vast svc`) manages `postgres`, `tor-proxy`,
-  `vast-api-test`, `wiremock`, and `vast-portal`. Managed application instances
-  use ports 6362, 9011, and 3100 respectively, leaving the normal IntelliJ ports
-  6161, 6262, and 3200 available for independently launched instances.
+  `vast-api-test`, `vast-api`, `wiremock`, and `vast-portal`. Managed
+  application instances use ports 6362, 6363, 9011, and 3100 respectively,
+  leaving the normal IntelliJ ports 6161, 6262, and 3200 available for
+  independently launched instances.
 - `./vast ps` is the shortcut for `./vast services list`.
 - Runtime process state and logs belong under the ignored `.vast` directory.
   Service stop operations must affect only processes recorded and verified as

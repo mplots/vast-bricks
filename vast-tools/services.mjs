@@ -81,13 +81,13 @@ function printHelp() {
   ./vast services <list|start|stop|restart> [services...] [options]
 
 Services:
-  postgres | tor-proxy | vast-api-test | wiremock | vast-portal
+  postgres | tor-proxy | vast-api-test | vast-api | wiremock | vast-portal
 
 Commands:
   list                  Print service health and managed process state
-  start [services...]   Start selected services, or all when omitted
+  start [services...]   Start selected services, or all but vast-api when omitted
   stop [services...]    Stop selected managed services, or all when omitted
-  restart [services...] Stop and start selected services, or all when omitted
+  restart [services...] Restart selected services, or all but vast-api when omitted
 
 Options:
   --skip-build, -sb     Use existing built service artifacts
@@ -98,9 +98,15 @@ Managed ports:
   postgres       2345
   tor-proxy      8118
   vast-api-test  6362
+  vast-api       6363
   wiremock       9011
   vast-portal    3100
 
 Postgres intentionally uses non-default host port 2345.
-IntelliJ launches keep their existing ports 6262 and 3000.`);
+IntelliJ launches keep their existing ports 6262 and 3000.
+
+vast-api runs the standalone launcher and starts only when named, because it
+reads real credentials from the external file VAST_API_ENV_FILE points at,
+by default ~/.vast/vast-api.env. Acceptance tests run against vast-api-test,
+which never reads that file.`);
 }

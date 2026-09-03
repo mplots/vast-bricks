@@ -1,6 +1,7 @@
 import { readdirSync } from "node:fs";
-import { resolve } from "node:path";
+import { resolve, sep } from "node:path";
 
+import { vastApiEnvFile } from "./env-file.mjs";
 import { repoRoot } from "./paths.mjs";
 
 const viteExecutable = resolve(repoRoot, "vast-portal", "node_modules", ".bin", process.platform === "win32" ? "vite.cmd" : "vite");
@@ -42,6 +43,26 @@ export const managedServices = [
       args: ["-pl", "vast-acceptance-tests", "-am", "clean", "package", "-DskipTests"],
     },
     processMarker: "vast-acceptance-tests-",
+  },
+  {
+    // The standalone launcher, run from its own executable JAR without the test-only endpoints. It is started only
+    // when named, because its environment file holds real credentials that no test run should ever reach.
+    name: "vast-api",
+    port: 6363,
+    healthUrl: "http://127.0.0.1:6363/api/health",
+    command: "java",
+    args: () => ["-jar", resolveStandaloneJar()],
+    cwd: repoRoot,
+    envFile: vastApiEnvFile,
+    env: {
+      VAST_API_PORT: "6363",
+    },
+    build: {
+      command: "mvn",
+      args: ["-pl", "vast-api", "-am", "clean", "package", "-DskipTests"],
+    },
+    processMarker: `vast-api${sep}target${sep}vast-api-`,
+    startWhenNamed: true,
   },
   {
     name: "wiremock",
@@ -88,21 +109,28 @@ export function findService(name) {
   return service;
 }
 
-// The managed service runs vast-acceptance-tests, which adds test-only endpoints on top of the
-// vast-api launcher it depends on. vast-api's own executable JAR carries the "exec" classifier.
+// vast-acceptance-tests adds test-only endpoints on top of the vast-api launcher it depends on.
 function resolveAcceptanceJar() {
-  const targetDirectory = resolve(repoRoot, "vast-acceptance-tests", "target");
+  return resolveSingleJar(resolve(repoRoot, "vast-acceptance-tests", "target"), "vast-acceptance-tests-", ".jar");
+}
+
+function resolveSingleJar(targetDirectory, prefix, suffix) {
   const candidates = safeReadDirectory(targetDirectory)
-    .filter((name) => name.startsWith("vast-acceptance-tests-") && name.endsWith(".jar"))
+    .filter((name) => name.startsWith(prefix) && name.endsWith(suffix))
     .sort();
 
   if (candidates.length !== 1) {
     throw new Error(
-      `Expected one executable vast-acceptance-tests JAR in ${targetDirectory}, found ${candidates.length}. Run without --skip-build.`,
+      `Expected one executable ${prefix}*${suffix} in ${targetDirectory}, found ${candidates.length}. Run without --skip-build.`,
     );
   }
 
   return resolve(targetDirectory, candidates[0]);
+}
+
+// vast-api's own executable JAR carries the "exec" classifier because another module depends on the plain one.
+function resolveStandaloneJar() {
+  return resolveSingleJar(resolve(repoRoot, "vast-api", "target"), "vast-api-", "-exec.jar");
 }
 
 function safeReadDirectory(directory) {

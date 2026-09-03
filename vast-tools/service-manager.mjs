@@ -12,6 +12,7 @@ import { resolve } from "node:path";
 import { execFileSync, spawn, spawnSync } from "node:child_process";
 import { Socket } from "node:net";
 
+import { readEnvFile } from "./env-file.mjs";
 import { logsRoot, repoRoot, runtimeRoot, servicesStatePath } from "./paths.mjs";
 import { findService, managedServices } from "./service-registry.mjs";
 
@@ -105,7 +106,7 @@ function printServiceList(rows) {
 }
 
 export async function startServices(names, options = {}) {
-  const services = selectedServices(names).map(findService);
+  const services = startableServices(names).map(findService);
 
   for (const service of services) {
     await startService(service, options);
@@ -125,7 +126,7 @@ export async function stopServices(names) {
 }
 
 export async function restartServices(names, options = {}) {
-  const services = selectedServices(names).map(findService);
+  const services = startableServices(names).map(findService);
 
   for (const service of [...services].reverse()) {
     await stopService(service);
@@ -164,6 +165,9 @@ async function startService(service, { skipBuild = false, cleanDb = false } = {}
 
   removeStateRecord(service.name);
 
+  // Read before building: a missing or world-readable credentials file should fail in seconds, not after a build.
+  const externalEnvironment = service.envFile ? readEnvFile(service.envFile(), service.name) : {};
+
   if (service.build && !skipBuild) {
     runLoggedForeground(service.build.command, service.build.args, service.cwd, `${service.name}-build`, `${statusLabel("build")} ${service.name}`, service.build.env);
   } else if (service.build) {
@@ -181,7 +185,7 @@ async function startService(service, { skipBuild = false, cleanDb = false } = {}
     child = spawn(service.command, args, {
       cwd: service.cwd,
       detached: true,
-      env: serviceEnvironment(service, { cleanDb }),
+      env: serviceEnvironment(service, { cleanDb, externalEnvironment }),
       stdio: ["ignore", logFd, logFd],
     });
   } finally {
@@ -209,9 +213,13 @@ async function startService(service, { skipBuild = false, cleanDb = false } = {}
   console.log(`${statusLabel("healthy")} ${service.name.padEnd(13)} ${service.healthUrl}`);
 }
 
-function serviceEnvironment(service, { cleanDb = false } = {}) {
+function serviceEnvironment(service, { cleanDb = false, externalEnvironment = {} } = {}) {
   return {
     ...process.env,
+    // Only the service that declares an environment file is given its values, and they are never loaded into this
+    // process, so a file holding real credentials cannot leak into the acceptance runtime or any other service.
+    ...externalEnvironment,
+    // The managed port belongs to ./vast, so registry values win over anything the environment file sets.
     ...service.env,
     ...(cleanDb && service.name === "vast-api-test" ? { VAST_DB_CLEAN_ON_STARTUP: "true" } : {}),
   };
@@ -560,4 +568,14 @@ function delay(milliseconds) {
 
 function selectedServices(names) {
   return names.length > 0 ? names : managedServices.map(({ name }) => name);
+}
+
+/**
+ * A service marked startWhenNamed is left out of "all", so starting or restarting everything never launches a
+ * service that runs against real credentials. Listing and stopping still cover it.
+ */
+function startableServices(names) {
+  return names.length > 0
+    ? names
+    : managedServices.filter(({ startWhenNamed }) => !startWhenNamed).map(({ name }) => name);
 }
