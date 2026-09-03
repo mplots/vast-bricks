@@ -1,4 +1,4 @@
-import { expect, test } from './support/api-test';
+import { expect, test } from '../support/api-test';
 
 test('login creates a token that returns the authenticated Vast user profile', async ({
   authentication,

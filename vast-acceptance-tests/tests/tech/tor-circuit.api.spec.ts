@@ -1,4 +1,4 @@
-import { expect, test } from './support/api-test';
+import { expect, test } from '../support/api-test';
 
 const ipAddressPattern =
   /^(?:(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(?:\.|$)){4}$|^(?:[a-fA-F0-9]{1,4}:){2,}[a-fA-F0-9:]{1,}$/;

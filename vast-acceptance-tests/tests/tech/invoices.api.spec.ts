@@ -1,4 +1,4 @@
-import { expect, test } from './support/api-test';
+import { expect, test } from '../support/api-test';
 import {
   createdClientUuid,
   createdInvoiceNumber,
@@ -6,8 +6,8 @@ import {
   invoiceNumeratorUuid,
   mockInvoiceGeneration,
   teamBankAccountUuid
-} from './support/invoices';
-import { wireMockMode } from './support/wiremock';
+} from '../support/invoices';
+import { wireMockMode } from '../support/wiremock';
 
 test.describe.configure({ mode: wireMockMode() });
 

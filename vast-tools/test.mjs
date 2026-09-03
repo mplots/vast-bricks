@@ -24,7 +24,7 @@ export async function runTestCommand(args) {
     "--prefix",
     "vast-acceptance-tests",
     "run",
-    "test:api",
+    testScript(options),
     "--",
     ...options.matchers,
   ];
@@ -48,11 +48,24 @@ export async function runTestCommand(args) {
   return result.status ?? 1;
 }
 
+// Selects the npm script matching the requested acceptance test type.
+function testScript({ tech, logic }) {
+  if (tech && !logic) {
+    return "test:tech";
+  }
+  if (logic && !tech) {
+    return "test:logic";
+  }
+  return "test:api";
+}
+
 function parseOptions(args) {
   const options = {
     build: false,
     cleanBuild: false,
     help: false,
+    tech: false,
+    logic: false,
     matchers: [],
   };
 
@@ -62,6 +75,10 @@ function parseOptions(args) {
     } else if (arg === "--clean-build" || arg === "-cb") {
       options.build = true;
       options.cleanBuild = true;
+    } else if (arg === "--tech") {
+      options.tech = true;
+    } else if (arg === "--logic") {
+      options.logic = true;
     } else if (arg === "--help" || arg === "-h") {
       options.help = true;
     } else if (arg.startsWith("-")) {
@@ -81,7 +98,15 @@ function printHelp() {
 
 Runs Playwright API acceptance tests from vast-acceptance-tests.
 
+Test types:
+  tech    Drive the real API endpoints and their providers end to end
+  logic   Address one component through the test-only /api/test endpoints
+
+Both types run when neither --tech nor --logic is given.
+
 Options:
+  --tech                Run only the tech tests
+  --logic               Run only the logic tests
   --build, -b           Rebuild and restart managed vast-api before testing
   --clean-build, -cb    Rebuild vast-api and test with a freshly migrated Vast schema
   --help, -h            Show this help

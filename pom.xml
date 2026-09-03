@@ -12,6 +12,7 @@
     <modules>
         <module>vast-services</module>
         <module>vast-api</module>
+        <module>vast-acceptance-tests</module>
         <module>vb-portal-api</module>
     </modules>
 </project>

@@ -271,6 +271,17 @@ here as they are provided; do not invent unspecified behavior prematurely.
   for rewritten endpoints.
 - Use separate ports for local standalone and legacy launches. Do not require
   both applications to run for normal development of new features.
+- `vast-acceptance-tests` is a third launchable module used only for testing. It
+  depends on `vast-api`, adds no launcher class, no `application.yml`, and no
+  Spring configuration of its own, and inherits the whole runtime composition
+  from `vast-api`. Its Maven POM declares
+  `mainClass` `com.vastbricks.api.VastApiApplication` and nothing else runnable.
+  Do not add runtime configuration to it; configuration belongs in `vast-api`.
+- Because another module depends on `vast-api`, its executable JAR carries the
+  `exec` classifier. `vast-api-1.0.jar` is a plain library JAR;
+  `vast-api-1.0-exec.jar` is the one to launch.
+- `vb-portal-api` must never depend on `vast-acceptance-tests`, and
+  `vast-acceptance-tests` must never be deployed.
 
 ## Database boundary
 
@@ -309,6 +320,36 @@ here as they are provided; do not invent unspecified behavior prematurely.
   against a running application. Browser UI acceptance tests are out of scope.
 - Acceptance tests must exercise public HTTP behavior rather than call Java
   implementation classes.
+- Acceptance tests are organized into two types, each its own Playwright project
+  and directory under `vast-acceptance-tests/tests`:
+  - **tech tests** (`tests/tech`) drive the real API endpoints and their
+    providers end to end. They own transport concerns: status codes, error
+    responses, authentication, and content negotiation.
+  - **logic tests** (`tests/logic`) address one component through the test-only
+    `/api/test/**` endpoints and assert its business behavior in isolation.
+  Shared fixtures stay in `tests/support` and serve both types.
+- Put a scenario in the type that matches how it reaches the code, not the
+  feature it covers. One feature normally has tests of both types.
+- Components that no public endpoint exposes are tested through minimal
+  test-only controllers in `vast-acceptance-tests`, mapped under `/api/test/**`.
+  A test controller lives in the same package as the code it exercises so that
+  code can stay package-private, and must be named so it cannot collide with a
+  `vast-services` class in that package. Give it a distinct name such as
+  `VastHealthTestController`; duplicate fully qualified names across the two
+  JARs are silently shadowed rather than reported.
+- A test-only controller is a thin adapter: it accepts input, calls the
+  component, and returns its result. Do not put business logic in it.
+- `/api/test/**` is anonymous, outside the `/api/private/**` authentication
+  interceptor, so scenarios need no login for it.
+- Do not write acceptance tests for the transport behavior of `/api/test/**`
+  endpoints: no status-code, error-message, or content-negotiation scenarios.
+  Assert business behavior only. Introducing a test endpoint does not replace
+  the normal fixtures; logic tests still drive providers through WireMock and
+  use the existing database and settings-profile support where the component
+  needs them.
+- Never add `spring-boot-devtools` to `vast-acceptance-tests`. Its restart
+  classloader splits the runtime package and breaks the package-private access
+  the test controllers depend on.
 - Tests must be deterministic, independently runnable, safe to run in parallel,
   and must not depend on state created by another test.
 - Prefer API-based test setup. Add direct database setup only where the public
@@ -334,7 +375,8 @@ here as they are provided; do not invent unspecified behavior prematurely.
 - Once implemented, use `./vast` instead of ad hoc application start commands
   or direct Playwright invocations for managed acceptance workflows.
 - Use `./vast test` or the shortcut `./vast t` to run Playwright API
-  acceptance tests from `vast-acceptance-tests`. Pass `-b` or `--build` when
+  acceptance tests from `vast-acceptance-tests`. Both test types run by
+  default; pass `--tech` or `--logic` to run only one. Pass `-b` or `--build` when
   the managed `vast-api` should be rebuilt and restarted before running tests.
   Pass `-cb` or `--clean-build` to rebuild it and run the tests with the Vast
   database schema cleaned and migrated from scratch.
@@ -343,6 +385,9 @@ here as they are provided; do not invent unspecified behavior prematurely.
   cleanup.
 - Add CLI capabilities incrementally with the workflow that needs them; do not
   build the entire final CLI during module scaffolding.
+- The managed service named `vast-api` builds and runs the
+  `vast-acceptance-tests` JAR, so the test-only endpoints are available locally.
+  The service keeps the `vast-api` name, port, and health URL.
 - `./vast services` (alias `./vast svc`) manages `postgres`, `tor-proxy`,
   `vast-api`, `wiremock`, and `vast-portal`. Managed application instances use
   ports 6362, 9011, and 3100 respectively, leaving the normal IntelliJ ports
@@ -396,6 +441,12 @@ requires crossing a phase boundary, state why before expanding the change.
   and rewritten functionality.
 - Local development should normally require only PostgreSQL and `vast-api` for
   work on rewritten features.
+
+## Version control workflow
+
+- Do not create a branch for new feature work. Work on the currently checked-out
+  branch unless the user explicitly asks for a branch.
+- Do not switch branches, and do not commit or push unless the user asks.
 
 ## Existing module conventions
 

@@ -6,7 +6,6 @@ const workers = process.env.ACCEPTANCE_PLAYWRIGHT_WORKERS
   : undefined;
 
 export default defineConfig({
-  testDir: './tests',
   timeout: 30_000,
   workers,
   fullyParallel: true,
@@ -18,8 +17,17 @@ export default defineConfig({
     }
   },
   projects: [
+    // Tech tests drive the real API endpoints and their providers end to end.
     {
-      name: 'api',
+      name: 'tech',
+      testDir: './tests/tech',
+      testMatch: /.*\.api\.spec\.ts/
+    },
+    // Logic tests address one component through the test-only /api/test endpoints
+    // that vast-acceptance-tests adds on top of the vast-api launcher.
+    {
+      name: 'logic',
+      testDir: './tests/logic',
       testMatch: /.*\.api\.spec\.ts/
     }
   ]

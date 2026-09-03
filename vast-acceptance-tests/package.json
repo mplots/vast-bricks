@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "test": "playwright test",
-    "test:api": "playwright test --project=api"
+    "test:api": "playwright test --project=tech --project=logic",
+    "test:tech": "playwright test --project=tech",
+    "test:logic": "playwright test --project=logic"
   },
   "devDependencies": {
     "@playwright/test": "1.54.2",

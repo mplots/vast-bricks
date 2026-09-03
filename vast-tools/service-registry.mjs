@@ -27,7 +27,7 @@ export const managedServices = [
     port: 6362,
     healthUrl: "http://127.0.0.1:6362/api/health",
     command: "java",
-    args: () => ["-jar", resolveApiJar()],
+    args: () => ["-jar", resolveAcceptanceJar()],
     cwd: repoRoot,
     env: {
       VAST_API_PORT: "6362",
@@ -39,9 +39,9 @@ export const managedServices = [
     },
     build: {
       command: "mvn",
-      args: ["-pl", "vast-api", "-am", "clean", "package", "-DskipTests"],
+      args: ["-pl", "vast-acceptance-tests", "-am", "clean", "package", "-DskipTests"],
     },
-    processMarker: "vast-api-",
+    processMarker: "vast-acceptance-tests-",
   },
   {
     name: "wiremock",
@@ -88,16 +88,17 @@ export function findService(name) {
   return service;
 }
 
-function resolveApiJar() {
-  const targetDirectory = resolve(repoRoot, "vast-api", "target");
+// The managed service runs vast-acceptance-tests, which adds test-only endpoints on top of the
+// vast-api launcher it depends on. vast-api's own executable JAR carries the "exec" classifier.
+function resolveAcceptanceJar() {
+  const targetDirectory = resolve(repoRoot, "vast-acceptance-tests", "target");
   const candidates = safeReadDirectory(targetDirectory)
-    .filter((name) => name.startsWith("vast-api-") && name.endsWith(".jar"))
-    .filter((name) => !name.endsWith(".jar.original"))
+    .filter((name) => name.startsWith("vast-acceptance-tests-") && name.endsWith(".jar"))
     .sort();
 
   if (candidates.length !== 1) {
     throw new Error(
-      `Expected one executable vast-api JAR in ${targetDirectory}, found ${candidates.length}. Run without --skip-build.`,
+      `Expected one executable vast-acceptance-tests JAR in ${targetDirectory}, found ${candidates.length}. Run without --skip-build.`,
     );
   }
 

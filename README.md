@@ -21,12 +21,21 @@ Build and start the standalone service:
 
 ```bash
 mvn -pl vast-api -am package -DskipTests
-java -jar vast-api/target/vast-api-1.0.jar
+java -jar vast-api/target/vast-api-1.0-exec.jar
 ```
 
 It listens on port `6262` by default. Override the port with `VAST_API_PORT`.
 The scaffolding health endpoint is available at
 `GET /api/health`.
+
+`vast-acceptance-tests` is a test-only launcher that depends on `vast-api` and adds
+test-only `/api/test/**` endpoints for acceptance tests. `./vast` runs it in
+place of `vast-api`. It is never deployed.
+
+```bash
+mvn -pl vast-acceptance-tests -am package -DskipTests
+java -jar vast-acceptance-tests/target/vast-acceptance-tests-1.0.jar
+```
 
 
 # Tor

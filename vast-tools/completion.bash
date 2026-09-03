@@ -80,7 +80,7 @@ _vast_completion() {
       ;;
     test|t)
       if [[ "${current}" == -* ]]; then
-        COMPREPLY=($(compgen -W "--build -b --clean-build -cb --help -h" -- "${current}"))
+        COMPREPLY=($(compgen -W "--tech --logic --build -b --clean-build -cb --help -h" -- "${current}"))
       else
         COMPREPLY=()
       fi

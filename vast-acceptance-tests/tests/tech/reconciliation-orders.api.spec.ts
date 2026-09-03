@@ -1,6 +1,6 @@
-import { expect, test } from './support/api-test';
-import { BrickOwlOrderMock, mockReconciliationOrders } from './support/reconciliation';
-import { wireMockMode } from './support/wiremock';
+import { expect, test } from '../support/api-test';
+import { BrickOwlOrderMock, mockReconciliationOrders } from '../support/reconciliation';
+import { wireMockMode } from '../support/wiremock';
 
 test.describe.configure({ mode: wireMockMode() });
 

@@ -1,6 +1,6 @@
-import { expect, test } from './support/api-test';
-import { WireMockApi, wireMockMode } from './support/wiremock';
-import { findSettingOverride } from './support/vast-db';
+import { expect, test } from '../support/api-test';
+import { WireMockApi, wireMockMode } from '../support/wiremock';
+import { findSettingOverride } from '../support/vast-db';
 
 test.describe.configure({ mode: wireMockMode() });
 

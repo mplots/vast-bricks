@@ -1,5 +1,5 @@
-import { expect, test } from './support/api-test';
-import { findSettingOverride } from './support/vast-db';
+import { expect, test } from '../support/api-test';
+import { findSettingOverride } from '../support/vast-db';
 
 test('settings profile overrides annotation defaults but not environment values', async ({
   request,
