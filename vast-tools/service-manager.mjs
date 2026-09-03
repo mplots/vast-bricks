@@ -131,7 +131,7 @@ export async function stopServices(names) {
 }
 
 export async function restartServices(names, options = {}) {
-  const services = startableServices(names).map(findService);
+  const services = restartableServices(names).map(findService);
 
   for (const service of [...services].reverse()) {
     await stopService(service);
@@ -576,11 +576,31 @@ function selectedServices(names) {
 }
 
 /**
- * A service marked startWhenNamed is left out of "all", so starting or restarting everything never launches a
- * service that runs against real credentials. Listing and stopping still cover it.
+ * A service marked startWhenNamed is left out of "all", so starting everything never launches a service that runs
+ * against real credentials. Listing and stopping still cover it.
  */
 function startableServices(names) {
   return names.length > 0
     ? names
     : managedServices.filter(({ startWhenNamed }) => !startWhenNamed).map(({ name }) => name);
+}
+
+/**
+ * Restarting everything also rebuilds a running startWhenNamed service, so it never keeps serving a JAR older than
+ * the rest. One that is not running stays down: restart refreshes what is up, it does not launch anything new.
+ */
+function restartableServices(names) {
+  if (names.length > 0) {
+    return names;
+  }
+
+  const state = readState();
+  return managedServices
+    .filter((service) => !service.startWhenNamed || isRunningManagedService(service, state))
+    .map(({ name }) => name);
+}
+
+function isRunningManagedService(service, state) {
+  const record = state.find(({ name }) => name === service.name);
+  return Boolean(record) && isOwnedProcessRunning(service, record);
 }

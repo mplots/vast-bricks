@@ -440,9 +440,11 @@ supplied and do not invent unspecified amounts.
   acceptance tests against mocked providers and must never be given production
   credentials, by an environment file, a shell that sourced one, or any other
   route. Only `./vast`'s own settings for the managed port win over the file.
-- Because it runs against real credentials, `vast-api` starts only when it is
-  named: `./vast services start` and `./vast services restart` without service
-  names leave it alone. Listing and stopping still include it.
+- Because it runs against real credentials, `vast-api` is never launched
+  implicitly: `./vast services start` without service names leaves it alone.
+  `./vast services restart` without names does rebuild and restart it when it is
+  already running, so it never serves a JAR older than the rest, and leaves it
+  down when it is not. Listing and stopping always include it.
 - `./vast services` (alias `./vast svc`) manages `postgres`, `tor-proxy`,
   `vast-api-test`, `vast-api`, `wiremock`, and `vast-portal`. Managed
   application instances use ports 6362, 6363, 9011, and 3100 respectively,

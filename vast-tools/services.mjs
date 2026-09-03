@@ -87,7 +87,7 @@ Commands:
   list                  Print service health and managed process state
   start [services...]   Start selected services, or all but vast-api when omitted
   stop [services...]    Stop selected managed services, or all when omitted
-  restart [services...] Restart selected services, or all but vast-api when omitted
+  restart [services...] Restart selected services, or all running ones when omitted
 
 Options:
   --skip-build, -sb     Use existing built service artifacts
