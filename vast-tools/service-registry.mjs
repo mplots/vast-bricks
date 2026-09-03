@@ -45,23 +45,25 @@ export const managedServices = [
     processMarker: "vast-acceptance-tests-",
   },
   {
-    // The standalone launcher, run from its own executable JAR without the test-only endpoints. It is started only
-    // when named, because its environment file holds real credentials that no test run should ever reach.
+    // The deployable runtime: vb-portal-api serving legacy and rewritten features from one launch, as production
+    // does. It is started only when named, because its environment file holds real credentials that no test run
+    // should ever reach.
     name: "vast-api",
     port: 6363,
     healthUrl: "http://127.0.0.1:6363/api/health",
     command: "java",
-    args: () => ["-jar", resolveStandaloneJar()],
+    args: () => ["-jar", resolveLegacyJar()],
     cwd: repoRoot,
     envFile: vastApiEnvFile,
     env: {
-      VAST_API_PORT: "6363",
+      // The legacy application fixes server.port at 6161 for IntelliJ launches, so the managed port is set here.
+      SERVER_PORT: "6363",
     },
     build: {
       command: "mvn",
-      args: ["-pl", "vast-api", "-am", "clean", "package", "-DskipTests"],
+      args: ["-pl", "vb-portal-api", "-am", "clean", "package", "-DskipTests"],
     },
-    processMarker: `vast-api${sep}target${sep}vast-api-`,
+    processMarker: `vb-portal-api${sep}target${sep}vb-portal-api-`,
     startWhenNamed: true,
   },
   {
@@ -129,9 +131,9 @@ function resolveSingleJar(targetDirectory, prefix, suffix) {
   return resolve(targetDirectory, candidates[0]);
 }
 
-// vast-api's own executable JAR carries the "exec" classifier because another module depends on the plain one.
-function resolveStandaloneJar() {
-  return resolveSingleJar(resolve(repoRoot, "vast-api", "target"), "vast-api-", "-exec.jar");
+// vb-portal-api embeds vast-services, so one launch serves the legacy and rewritten halves of the backend.
+function resolveLegacyJar() {
+  return resolveSingleJar(resolve(repoRoot, "vb-portal-api", "target"), "vb-portal-api-", ".jar");
 }
 
 function safeReadDirectory(directory) {

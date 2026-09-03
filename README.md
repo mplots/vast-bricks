@@ -28,17 +28,19 @@ It listens on port `6262` by default. Override the port with `VAST_API_PORT`.
 The scaffolding health endpoint is available at
 `GET /api/health`.
 
-Or run it as a managed service on port `6363`:
+The managed `vast-api` service runs the deployable artifact instead: the
+`vb-portal-api` JAR, which embeds `vast-services` and therefore serves the legacy
+and rewritten backend from one launch, on port `6363`.
 
 ```bash
 ./vast services start vast-api
 ```
 
-The managed service reads `KEY=value` configuration from an external file, by
-default `~/.vast/vast-api.env` and otherwise the path `VAST_API_ENV_FILE` names.
-That file holds real credentials: keep it outside the repository, `chmod 600` it,
-and never let a test run read it. Because of those credentials the service starts
-only when it is named, never as part of starting all services.
+It reads `KEY=value` configuration from an external file, by default
+`~/.vast/vast-api.env` and otherwise the path `VAST_API_ENV_FILE` names. That file
+holds real credentials: keep it outside the repository, `chmod 600` it, and never
+let a test run read it. Because of those credentials the service starts only when
+it is named, never as part of starting all services.
 
 `vast-acceptance-tests` is a test-only launcher that depends on `vast-api` and adds
 test-only `/api/test/**` endpoints for acceptance tests. `./vast` runs it as the

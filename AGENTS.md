@@ -426,12 +426,12 @@ supplied and do not invent unspecified amounts.
 - The managed service named `vast-api-test` builds and runs the
   `vast-acceptance-tests` JAR on port 6362, so the test-only endpoints are
   available locally. Acceptance tests always run against it.
-- The managed service named `vast-api` builds and runs the `vast-api` module's
-  own executable JAR on port 6363, without the test-only endpoints. It is the
-  service to launch when the rewritten backend must behave exactly as it does
-  when deployed.
+- The managed service named `vast-api` builds and runs the `vb-portal-api`
+  JAR on port 6363, so one launch serves the legacy and rewritten halves of the
+  backend exactly as the deployed artifact does. `./vast` sets `SERVER_PORT`
+  because the legacy application fixes port 6161 for IntelliJ launches.
 - `vast-api` reads its configuration from an external environment file of
-  `KEY=value` lines, by default `~/.vast/vast-api.env` and otherwise the path
+  `KEY=value` lines, legacy settings and rewrite settings alike, by default `~/.vast/vast-api.env` and otherwise the path
   `VAST_API_ENV_FILE` names. The file holds production credentials, so it lives
   outside the repository, `./vast` refuses a path inside the working tree or a
   file readable beyond its owner, and its values are passed only to the

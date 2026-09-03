@@ -105,8 +105,9 @@ Managed ports:
 Postgres intentionally uses non-default host port 2345.
 IntelliJ launches keep their existing ports 6262 and 3000.
 
-vast-api runs the standalone launcher and starts only when named, because it
-reads real credentials from the external file VAST_API_ENV_FILE points at,
-by default ~/.vast/vast-api.env. Acceptance tests run against vast-api-test,
-which never reads that file.`);
+vast-api runs the deployable vb-portal-api JAR, serving the legacy and
+rewritten backend together. It starts only when named, because it reads real
+credentials from the external file VAST_API_ENV_FILE points at, by default
+~/.vast/vast-api.env. Acceptance tests run against vast-api-test, which never
+reads that file.`);
 }
