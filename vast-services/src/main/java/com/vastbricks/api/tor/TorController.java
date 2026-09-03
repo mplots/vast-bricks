@@ -1,5 +1,6 @@
 package com.vastbricks.api.tor;
 
+import com.vastbricks.api.tor.TorPayload.TorCircuitResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;

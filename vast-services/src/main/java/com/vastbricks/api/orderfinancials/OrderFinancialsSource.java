@@ -1,5 +1,7 @@
 package com.vastbricks.api.orderfinancials;
 
+import com.vastbricks.api.orderfinancials.OrderFinancialsPayload.ReportedOrderFinancials;
+
 /**
  * Collects one order's reported financials from the marketplace it was placed on. Adding a marketplace means adding an
  * implementation; the service selects one by its marketplace and does not know how the order is fetched.

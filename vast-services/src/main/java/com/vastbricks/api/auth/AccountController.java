@@ -1,10 +1,10 @@
 package com.vastbricks.api.auth;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.vastbricks.api.auth.AuthPayload.LoginRequest;
+import com.vastbricks.api.auth.AuthPayload.LoginResponse;
+import com.vastbricks.api.auth.AuthPayload.UserProfile;
+import com.vastbricks.api.auth.AuthPayload.UserResponse;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,35 +41,5 @@ public class AccountController {
 
     private static ResponseStatusException unauthorized() {
         return new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
-    }
-
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    public static class LoginRequest {
-        private String email;
-        private String password;
-    }
-
-    @Getter
-    @AllArgsConstructor
-    public static class LoginResponse {
-        private String serviceToken;
-        private UserProfile user;
-    }
-
-    @Getter
-    @AllArgsConstructor
-    public static class UserResponse {
-        private UserProfile user;
-    }
-
-    @Getter
-    @AllArgsConstructor
-    public static class UserProfile {
-        private Long id;
-        private String email;
-        private String name;
-        private String role;
     }
 }

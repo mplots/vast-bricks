@@ -2,6 +2,7 @@ package com.vastbricks.api.invoice;
 
 import com.vastbricks.api.client.manakabata.ManakabataClient;
 import com.vastbricks.api.client.manakabata.model.ClientResource;
+import com.vastbricks.api.invoice.InvoicePayload.GenerateInvoiceResult;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

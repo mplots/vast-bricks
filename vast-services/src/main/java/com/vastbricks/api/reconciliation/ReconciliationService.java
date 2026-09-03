@@ -1,5 +1,6 @@
 package com.vastbricks.api.reconciliation;
 
+import com.vastbricks.api.reconciliation.ReconciliationPayload.ReconciliationOrderResult;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.Map;

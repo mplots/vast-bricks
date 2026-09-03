@@ -3,6 +3,8 @@ package com.vastbricks.api.invoice;
 import com.vastbricks.api.client.brickowl.BrickOwlClientException;
 import com.vastbricks.api.client.brickstore.BrickStoreClientException;
 import com.vastbricks.api.client.manakabata.ManakabataClientException;
+import com.vastbricks.api.invoice.InvoicePayload.GenerateInvoiceRequest;
+import com.vastbricks.api.invoice.InvoicePayload.GenerateInvoiceResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

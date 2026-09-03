@@ -4,6 +4,7 @@ import com.vastbricks.api.client.brickowl.BrickOwlBatchRequest;
 import com.vastbricks.api.client.brickowl.BrickOwlClient;
 import com.vastbricks.api.client.brickowl.BrickOwlClientException;
 import com.vastbricks.api.client.brickowl.BrickOwlOrder;
+import com.vastbricks.api.orderfinancials.OrderFinancialsPayload.ReportedOrderFinancials;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;

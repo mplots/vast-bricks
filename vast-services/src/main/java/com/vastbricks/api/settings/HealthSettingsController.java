@@ -1,5 +1,6 @@
 package com.vastbricks.api.settings;
 
+import com.vastbricks.api.settings.SettingsPayload.HealthSettingsResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;

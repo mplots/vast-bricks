@@ -98,6 +98,21 @@ to Java backend code only; do not create another frontend application.
   are internal implementation details and must not be exposed to other
   features.
 - Do not use Java records in rewrite code. Prefer regular classes.
+- Keep all of a feature's HTTP request and response DTOs in one Java file, a
+  `<Feature>Payload` class named after the feature package: `InvoicePayload`,
+  `OrderFinancialsPayload`, `ReconciliationPayload`. Declare every request and
+  response inside it as a `public static final` class, together with the nested
+  objects those payloads are built from, for example
+  `OrderFinancialsPayload.ReportedOrderFinancials`. Do not give a request or
+  response its own file, and do not nest them in a controller.
+- The payload class is a container only: give it a private constructor and no
+  behavior. Declare it package-private, and public only when code outside the
+  feature package uses it, as with a public controller's payloads.
+- This covers the types that shape this API's own request and response bodies.
+  A model, enum, or value type used by the feature's services, sources, or
+  rules beyond a single payload keeps its own file, and so do the payloads of
+  outbound clients to external APIs under `com.vastbricks.api.client`; do not
+  move either into the payload class to satisfy the rule.
 - Use Lombok in rewrite Java code for repetitive boilerplate such as getters,
   setters, constructors, builders, `equals`, and `hashCode` when it keeps the
   code clearer.
