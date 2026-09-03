@@ -448,6 +448,10 @@ supplied and do not invent unspecified amounts.
   application instances use ports 6362, 6363, 9011, and 3100 respectively,
   leaving the normal IntelliJ ports 6161, 6262, and 3200 available for
   independently launched instances.
+- The managed `vast-portal` proxies `/api/**` to the managed `vast-api` service
+  on port 6363, so the portal runs against the same backend a deployment
+  serves. Start `vast-api` alongside it; the acceptance runtime is for tests,
+  not for the portal.
 - `./vast ps` is the shortcut for `./vast services list`.
 - Runtime process state and logs belong under the ignored `.vast` directory.
   Service stop operations must affect only processes recorded and verified as

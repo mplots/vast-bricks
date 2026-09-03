@@ -93,7 +93,8 @@ export const managedServices = [
     cwd: resolve(repoRoot, "vast-portal"),
     env: {
       VAST_MANAGED: "true",
-      VITE_APP_API_PROXY: "http://127.0.0.1:6362",
+      // The portal proxies to the standalone launcher, not to the acceptance runtime with its test-only endpoints.
+      VITE_APP_API_PROXY: "http://127.0.0.1:6363",
     },
     processMarker: "node_modules/.bin/vite",
   },
