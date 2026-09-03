@@ -68,6 +68,8 @@ export async function listServices(names) {
       port: String(service.port),
       runtime: service.dockerComposeService ? "docker" : "native",
       ownership,
+      // The health URL is the page worth opening for every HTTP service, so the list stays copy-and-click.
+      url: service.healthUrl ?? "-",
       detail: health.detail,
     });
     allHealthy &&= health.healthy;
@@ -83,6 +85,7 @@ function printServiceList(rows) {
   const portWidth = Math.max("PORT".length, ...rows.map(({ port }) => port.length));
   const runtimeWidth = Math.max("RUNTIME".length, ...rows.map(({ runtime }) => runtime.length));
   const ownershipWidth = Math.max("MANAGEMENT".length, ...rows.map(({ ownership }) => ownership.length));
+  const urlWidth = Math.max("URL".length, ...rows.map(({ url }) => url.length));
 
   console.log([
     "STATUS".padEnd(9),
@@ -90,6 +93,7 @@ function printServiceList(rows) {
     "PORT".padEnd(portWidth),
     "RUNTIME".padEnd(runtimeWidth),
     "MANAGEMENT".padEnd(ownershipWidth),
+    "URL".padEnd(urlWidth),
     "DETAIL",
   ].join(" "));
 
@@ -100,6 +104,7 @@ function printServiceList(rows) {
       row.port.padEnd(portWidth),
       row.runtime.padEnd(runtimeWidth),
       row.ownership.padEnd(ownershipWidth),
+      row.url.padEnd(urlWidth),
       row.detail,
     ].join(" "));
   }
