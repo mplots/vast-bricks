@@ -69,19 +69,6 @@ test('lists BrickLink reconciliation orders for the selected month', async ({
     orders: [
       {
         source: 'BrickLink',
-        orderId: '32456563',
-        orderDate: '2026-08-30',
-        buyer: 'some buyer',
-        buyerUsername: 'some-buyer-username',
-        paymentMethod: 'Stripe',
-        subTotal: 0.43,
-        itemsSubTotal: 0.43,
-        grandTotal: 3.44,
-        invoiceSubTotal: null,
-        failures: [],
-      },
-      {
-        source: 'BrickLink',
         orderId: '32456564',
         orderDate: '2026-08-31',
         buyer: 'another buyer',
@@ -90,6 +77,19 @@ test('lists BrickLink reconciliation orders for the selected month', async ({
         subTotal: 3,
         itemsSubTotal: 3,
         grandTotal: null,
+        invoiceSubTotal: null,
+        failures: [],
+      },
+      {
+        source: 'BrickLink',
+        orderId: '32456563',
+        orderDate: '2026-08-30',
+        buyer: 'some buyer',
+        buyerUsername: 'some-buyer-username',
+        paymentMethod: 'Stripe',
+        subTotal: 0.43,
+        itemsSubTotal: 0.43,
+        grandTotal: 3.44,
         invoiceSubTotal: null,
         failures: [],
       },
@@ -143,19 +143,6 @@ test('lists BrickOwl reconciliation orders for the selected month', async ({
     orders: [
       {
         source: 'BrickOwl',
-        orderId: 'test-order-0810',
-        orderDate: '2026-08-10',
-        buyer: 'Test Buyer Alpha',
-        buyerUsername: 'test_alpha',
-        paymentMethod: 'PayPal',
-        subTotal: 2.7,
-        itemsSubTotal: 2.7,
-        grandTotal: 5.2,
-        invoiceSubTotal: null,
-        failures: [],
-      },
-      {
-        source: 'BrickOwl',
         orderId: 'test-order-0811',
         orderDate: '2026-08-11',
         buyer: 'Test Buyer Beta',
@@ -164,6 +151,19 @@ test('lists BrickOwl reconciliation orders for the selected month', async ({
         subTotal: 6,
         itemsSubTotal: 6,
         grandTotal: null,
+        invoiceSubTotal: null,
+        failures: [],
+      },
+      {
+        source: 'BrickOwl',
+        orderId: 'test-order-0810',
+        orderDate: '2026-08-10',
+        buyer: 'Test Buyer Alpha',
+        buyerUsername: 'test_alpha',
+        paymentMethod: 'PayPal',
+        subTotal: 2.7,
+        itemsSubTotal: 2.7,
+        grandTotal: 5.2,
         invoiceSubTotal: null,
         failures: [],
       },
@@ -209,6 +209,49 @@ test('lists BrickOwl reconciliation orders that span several batch requests', as
 
   const batchRequests = await wireMock.findMethodHostRequests('POST', '/v1/bulk/batch');
   expect(batchRequests).toHaveLength(4);
+});
+
+test('lists the reconciled orders of every provider newest first', async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: '2026-08',
+    brickLink: {
+      fullNameOrdersXml: `<?xml version="1.0" encoding="UTF-8"?>
+<ORDERS>
+  <ORDER>
+    <ORDERID>32456570</ORDERID>
+    <ORDERDATE>8/5/2026</ORDERDATE>
+    <BUYER>early buyer</BUYER>
+  </ORDER>
+  <ORDER>
+    <ORDERID>32456575</ORDERID>
+    <ORDERDATE>8/25/2026</ORDERDATE>
+    <BUYER>late buyer</BUYER>
+  </ORDER>
+</ORDERS>`,
+      usernameOrdersXml: `<?xml version="1.0" encoding="UTF-8"?><ORDERS/>`,
+    },
+    brickOwl: [
+      {
+        orderId: 'owl-order-0815',
+        orderDate: '1786752000',
+        view: { buyer_name: 'Middle Buyer' },
+      },
+    ],
+  });
+
+  const response = await request.get('/api/private/reconciliation/orders?month=2026-08');
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  // The providers are collected one after another, so interleaved dates prove the whole list is sorted.
+  expect(body.orders.map((order: { orderId: string; orderDate: string }) => [order.orderId, order.orderDate])).toEqual([
+    ['32456575', '2026-08-25'],
+    ['owl-order-0815', '2026-08-15'],
+    ['32456570', '2026-08-05'],
+  ]);
 });
 
 test('returns no reconciliation orders when no provider reports orders', async ({

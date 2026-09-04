@@ -49,9 +49,10 @@ const orderFields = [
   'invoiceSubTotal'
 ] as const;
 const amountFields: string[] = ['subTotal', 'itemsSubTotal', 'grandTotal', 'invoiceSubTotal'];
+const dateFields: string[] = ['orderDate'];
 
 // Fields shown as table columns; the detail view shows all of them.
-const columnFields: string[] = ['source', 'orderId', 'buyer', 'paymentMethod', 'grandTotal'];
+const columnFields: string[] = ['source', 'orderId', 'orderDate', 'buyer', 'paymentMethod', 'grandTotal'];
 
 const formatAmount = (value?: number | null) => {
   if (value === null || value === undefined || Number.isNaN(value)) {
@@ -62,9 +63,21 @@ const formatAmount = (value?: number | null) => {
 
 const formatText = (value?: string | null) => value ?? '—';
 
+// Dates arrive as ISO days and are shown the way the rest of the portal shows them.
+const formatDate = (value?: string | null) => {
+  if (!value) {
+    return '—';
+  }
+  const [year, month, day] = value.split('-');
+  return year && month && day ? `${day}.${month}.${year}` : value;
+};
+
 const formatFieldValue = (order: ReconciliationOrder, field: string) => {
   const value = order[field as keyof ReconciliationOrder];
-  return amountFields.includes(field) ? formatAmount(value as number | null) : formatText(value as string | null);
+  if (amountFields.includes(field)) {
+    return formatAmount(value as number | null);
+  }
+  return dateFields.includes(field) ? formatDate(value as string | null) : formatText(value as string | null);
 };
 
 // The levels a failure is shown at, quietest first. `silent` is absent: those failures are not shown at all.
@@ -263,7 +276,11 @@ export default function ReconciliationPage() {
                         </Stack>
                       </TableCell>
                       {columnFields.map((field) => (
-                        <TableCell key={field} align={amountFields.includes(field) ? 'right' : 'left'}>
+                        <TableCell
+                          key={field}
+                          align={amountFields.includes(field) ? 'right' : 'left'}
+                          sx={dateFields.includes(field) ? { whiteSpace: 'nowrap' } : undefined}
+                        >
                           {field === 'source' ? (
                             <Chip label={order.source} size="small" color={sourceColor(order.source)} variant="outlined" />
                           ) : (

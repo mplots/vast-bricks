@@ -4,6 +4,7 @@ import com.vastbricks.api.reconciliation.ReconciliationPayload.ReconciliationOrd
 import com.vastbricks.api.reconciliation.rule.ReconciliationFailure;
 import com.vastbricks.api.reconciliation.rule.Rule;
 import java.time.YearMonth;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,13 @@ import org.springframework.stereotype.Service;
  */
 @Service
 class ReconciliationService {
+
+    /**
+     * The order the API returns: newest order first, an order with no date last. Orders sharing a date keep the order
+     * the mappers collected them in, because the sort is stable.
+     */
+    private static final Comparator<ReconciledOrder> NEWEST_FIRST =
+            Comparator.comparing(ReconciledOrder::getOrderDate, Comparator.nullsLast(Comparator.reverseOrder()));
 
     private final Map<Class<?>, Source<?>> sources;
     private final List<OrderMapper<?>> orderMappers;
@@ -62,9 +70,10 @@ class ReconciliationService {
         return orders;
     }
 
-    /** Rules: every rule judges every collected order. */
+    /** Rules: every rule judges every collected order, and the judged orders are returned newest first. */
     private List<ReconciliationOrderResult> reconcile(ReconciledOrders orders) {
         return orders.all().stream()
+                .sorted(NEWEST_FIRST)
                 .map(order -> new ReconciliationOrderResult(order, evaluate(order)))
                 .toList();
     }

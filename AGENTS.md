@@ -243,8 +243,11 @@ here as they are provided; do not invent unspecified behavior prematurely.
 - An `OrderMapper<T>` appends new orders to the list; a `DetailMapper<T>` merges
   fields onto orders already collected and adds none, so its data with no
   matching order is dropped. All order mappers run before all detail mappers.
-- The mapping stage runs sequentially in declared bean order, so the order the
-  order mappers run in is the order the API returns.
+- The mapping stage runs sequentially in declared bean order. That order is only
+  the tiebreaker of the returned list: the orchestrator sorts every collected
+  order by order date, newest first, so one month reads as one list rather than
+  as one block per provider. An order with no date sorts last, and orders sharing
+  a date keep the order the mappers collected them in.
 - Rules: a `Rule` inspects one collected order and returns its failures. See
   "Reconciliation rules".
 - Adding a provider means adding a source and a mapper. Adding a check means
@@ -320,11 +323,12 @@ here as they are provided; do not invent unspecified behavior prematurely.
   exactly once before any rule sees it. Sources return provider amounts
   untouched. Rules compare normalized amounts exactly and must not define their
   own tolerances.
-- The orders table shows `Actions`, source, order ID, buyer, payment method, and
-  grand total. The actions cell leads with a dot colored by the loudest level
-  among the order's failures, or `success` green when it has none to show; the
-  dot's level is named in its tooltip, so color alone never carries it. Rows are
-  not tinted, which leaves each cell free to color what it shows.
+- The orders table shows `Actions`, source, order ID, order date, buyer, payment
+  method, and grand total, newest order first as the API returns them. The
+  actions cell leads with a dot colored by the loudest level among the order's
+  failures, or `success` green when it has none to show; the dot's level is named
+  in its tooltip, so color alone never carries it. Rows are not tinted, which
+  leaves each cell free to color what it shows.
 - The source chip is colored per marketplace, not by failure level: BrickLink
   `primary` and BrickOwl `secondary`, as the accounting screen colors them.
 - Selecting any order opens a read-only detail view listing every collected field
@@ -337,6 +341,8 @@ here as they are provided; do not invent unspecified behavior prematurely.
   it.
 - The order counts above the table are one chip per level, loudest first,
   counting the orders that level is the loudest one of.
+- Dates are shown as `dd.mm.yyyy`, as the accounting and archive screens show
+  them. The API carries them as ISO days.
 - Reconciliation screen text is translated through `vast-portal`'s `en.json` and
   `lv.json`. Every new user-visible string must be added to both.
 - The table shows only a subset of the collected fields. Fields that can fail
