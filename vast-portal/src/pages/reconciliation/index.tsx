@@ -4,11 +4,13 @@ import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
+import CircularProgress from '@mui/material/CircularProgress';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Divider from '@mui/material/Divider';
+import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
@@ -21,10 +23,14 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import TextField from '@mui/material/TextField';
+import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { darken, Theme } from '@mui/material/styles';
+import { ReceiptAdd } from 'iconsax-reactjs';
 import { useIntl } from 'react-intl';
 
+// The invoice endpoint lives under the accounting namespace and is shared with the accounting screen.
+import { generateInvoice } from 'api/accounting';
 import { useGetReconciliationOrders } from 'api/reconciliation';
 import MainCard from 'components/MainCard';
 import type { ReconciliationFailure, ReconciliationOrder } from 'types/reconciliation';
@@ -54,25 +60,44 @@ const isFailed = (order: ReconciliationOrder) => order.failures.length > 0;
 
 const failureKey = (failure: ReconciliationFailure) => `${failure.code}-${failure.fields.join('-')}`;
 
-const previousMonth = () => {
+const currentMonth = () => {
   const date = new Date();
-  date.setDate(1);
-  date.setMonth(date.getMonth() - 1);
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
 };
 
+const orderKey = (order: ReconciliationOrder) => `${order.source}-${order.orderId}`;
+
 export default function ReconciliationPage() {
   const intl = useIntl();
-  const initialMonth = previousMonth();
+  const initialMonth = currentMonth();
   const [selectedMonth, setSelectedMonth] = useState(initialMonth);
   const [requestedMonth, setRequestedMonth] = useState(initialMonth);
   const [selectedOrder, setSelectedOrder] = useState<ReconciliationOrder | null>(null);
   const [selectedFailure, setSelectedFailure] = useState<string | null>(null);
+  const [generatingOrder, setGeneratingOrder] = useState<string | null>(null);
+  const [generationError, setGenerationError] = useState<string | null>(null);
+  const [generationMessage, setGenerationMessage] = useState<string | null>(null);
   const { reconciliationOrders, reconciliationOrdersError, reconciliationOrdersLoading } = useGetReconciliationOrders(requestedMonth);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setRequestedMonth(selectedMonth);
+  };
+
+  const handleGenerateInvoice = async (order: ReconciliationOrder) => {
+    setGeneratingOrder(orderKey(order));
+    setGenerationError(null);
+    setGenerationMessage(null);
+    try {
+      const result = await generateInvoice(order.orderId, order.source);
+      setGenerationMessage(
+        intl.formatMessage({ id: 'reconciliation-invoice-generated' }, { invoiceNumber: result.invoiceNumber, name: result.name })
+      );
+    } catch (error) {
+      setGenerationError(error instanceof Error ? error.message : intl.formatMessage({ id: 'reconciliation-invoice-error' }));
+    } finally {
+      setGeneratingOrder(null);
+    }
   };
 
   const openOrder = (order: ReconciliationOrder) => {
@@ -146,6 +171,9 @@ export default function ReconciliationPage() {
         <Alert severity="error">{reconciliationOrdersError.message || intl.formatMessage({ id: 'reconciliation-load-error' })}</Alert>
       )}
 
+      {generationError && <Alert severity="error">{generationError}</Alert>}
+      {generationMessage && <Alert severity="success">{generationMessage}</Alert>}
+
       {!reconciliationOrdersLoading && !reconciliationOrdersError && reconciliationOrders && (
         <MainCard content={false}>
           {reconciliationOrders.orders.length ? (
@@ -153,6 +181,7 @@ export default function ReconciliationPage() {
               <Table stickyHeader size="small" aria-label={intl.formatMessage({ id: 'reconciliation-orders-table' })}>
                 <TableHead>
                   <TableRow>
+                    <TableCell sx={{ width: 56 }}>{intl.formatMessage({ id: 'reconciliation-actions' })}</TableCell>
                     {columnFields.map((field) => (
                       <TableCell key={field} align={amountFields.includes(field) ? 'right' : 'left'}>
                         {fieldLabel(field)}
@@ -164,7 +193,7 @@ export default function ReconciliationPage() {
                   {reconciliationOrders.orders.map((order) => (
                     <TableRow
                       hover
-                      key={`${order.source}-${order.orderId}`}
+                      key={orderKey(order)}
                       onClick={() => openOrder(order)}
                       sx={{
                         cursor: 'pointer',
@@ -176,6 +205,29 @@ export default function ReconciliationPage() {
                         })
                       }}
                     >
+                      {/* The row opens the detail dialog, so the action cell must not bubble its click. */}
+                      <TableCell sx={{ width: 56, whiteSpace: 'nowrap' }} onClick={(event) => event.stopPropagation()}>
+                        <Tooltip title={intl.formatMessage({ id: 'reconciliation-generate-invoice' })} arrow>
+                          <span>
+                            <IconButton
+                              size="small"
+                              color="primary"
+                              disabled={generatingOrder === orderKey(order)}
+                              aria-label={intl.formatMessage(
+                                { id: 'reconciliation-generate-invoice-for' },
+                                { source: order.source, orderId: order.orderId }
+                              )}
+                              onClick={() => handleGenerateInvoice(order)}
+                            >
+                              {generatingOrder === orderKey(order) ? (
+                                <CircularProgress size={18} color="inherit" />
+                              ) : (
+                                <ReceiptAdd size={20} color="currentColor" />
+                              )}
+                            </IconButton>
+                          </span>
+                        </Tooltip>
+                      </TableCell>
                       {columnFields.map((field) => (
                         <TableCell key={field} align={amountFields.includes(field) ? 'right' : 'left'}>
                           {field === 'source' ? (

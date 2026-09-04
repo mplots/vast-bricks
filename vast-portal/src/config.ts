@@ -3,7 +3,7 @@ import { DefaultConfigProps } from 'types/config';
 
 // ==============================|| THEME CONSTANT ||============================== //
 
-export const APP_DEFAULT_PATH = '/sample-page';
+export const APP_DEFAULT_PATH = '/reconciliation';
 export const HORIZONTAL_MAX_ITEM = 8;
 export const DRAWER_WIDTH = 280;
 export const MINI_DRAWER_WIDTH = 90;

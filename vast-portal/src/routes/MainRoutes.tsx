@@ -1,8 +1,9 @@
 import { lazy } from 'react';
+import { Navigate } from 'react-router-dom';
 
 // project-imports
 import Loadable from 'components/Loadable';
-import { SimpleLayoutType } from 'config';
+import { APP_DEFAULT_PATH, SimpleLayoutType } from 'config';
 import DashboardLayout from 'layout/Dashboard';
 import PagesLayout from 'layout/Pages';
 import SimpleLayout from 'layout/Simple';
@@ -32,6 +33,10 @@ const MainRoutes = {
       path: '/',
       element: <DashboardLayout />,
       children: [
+        {
+          index: true,
+          element: <Navigate to={APP_DEFAULT_PATH} replace />
+        },
         {
           path: 'sample-page',
           element: <SamplePage />
