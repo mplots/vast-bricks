@@ -145,7 +145,10 @@ here as they are provided; do not invent unspecified behavior prematurely.
 - The purpose of the screen is to identify discrepancies for an order across
   the systems involved in commerce, payment, shipping, accounting, and store
   synchronization.
-- An order whose reconciliation fails is colored red in the orders table.
+- An order whose reconciliation fails is marked by a dot in the actions column,
+  colored by the loudest level among its failures. An order with nothing to show
+  gets a green dot, so every row states its verdict in the same place. The row
+  itself is not tinted.
 - Selecting an order shows all available details, including why its
   reconciliation failed.
 - The first iteration is read-only.
@@ -161,9 +164,27 @@ here as they are provided; do not invent unspecified behavior prematurely.
   from the BrickStore XML export and BrickOwl orders from the BrickOwl API for
   the selected month. Each collected order carries its marketplace source
   (`BrickLink` or `BrickOwl`), order ID, order date, buyer, buyer username,
-  sub-total, items sub-total, and accounting invoice sub-total, together with its
-  rule failures. Add further fields and providers incrementally as their
-  processing requirements are supplied.
+  payment method, sub-total, items sub-total, grand total, and accounting invoice
+  sub-total, together with its rule failures. Add further fields and providers
+  incrementally as their processing requirements are supplied.
+- The grand total is the order total in the store's base currency with shipping
+  and additional charges included: BrickLink's `BASEGRANDTOTAL` and BrickOwl's
+  `base_order_total`. No rule compares it yet.
+- The payment method is collected from BrickLink's `PAYMENTTYPE` and BrickOwl's
+  `payment_method_type`. The marketplaces word one payment provider differently
+  — BrickLink for a person (`Credit/Debit (Powered by Stripe)`, `PayPal
+  (Onsite)`), BrickOwl as a code (`stripe`, `paypal`) — so the mapping unifies
+  them to one name per provider: `PayPal` and `Stripe`. Matching is on the
+  marketplace wording containing the provider's name, case-insensitively.
+- A payment method no provider is known for is collected as the marketplace
+  worded it, trimmed, rather than dropped or lumped into an "other" name: the
+  screen must still show how the order was paid. A missing or blank method is
+  collected as no method at all.
+- Unifying happens in the mapping stage, once, for the same reason amounts are
+  normalized there: every rule and the screen then see one name per provider and
+  never match on a marketplace's wording. Adding a provider name is a change to
+  `ReconciliationPaymentMethod`, which the category packages see alongside
+  `ReconciliationAmount`.
 - Accounting invoices are collected from Manakabata alongside the marketplace
   orders. The invoice list endpoint accepts no filter beyond the page size, so
   the whole list is requested as one page and searched; an invoice is matched to
@@ -247,7 +268,7 @@ here as they are provided; do not invent unspecified behavior prematurely.
   orchestrator, and the HTTP edge. It declares a small API and nothing more: the
   category packages see `Source`, `Mapper`, `OrderMapper`, `DetailMapper`,
   `ReconciledOrder`, `ReconciledOrders.find`, `Marketplace`,
-  `ReconciliationAmount`, and `ParallelTasks`; the rule package exposes `Rule`
+  `ReconciliationAmount`, `ReconciliationPaymentMethod`, and `ParallelTasks`; the rule package exposes `Rule`
   and `ReconciliationFailure` back to the root, which the orchestrator and the
   payload need. Everything else stays package-private: the orchestrator,
   `SourcedData`, the payload, the controller, `ReconciliationOrderField`,
@@ -299,14 +320,21 @@ here as they are provided; do not invent unspecified behavior prematurely.
   exactly once before any rule sees it. Sources return provider amounts
   untouched. Rules compare normalized amounts exactly and must not define their
   own tolerances.
-- The orders table colors an order in the loudest level among its failures, and
-  leaves it uncolored when it has none to show. Selecting any order opens a
-  read-only detail view listing every collected field and the order's failed
-  rules, each named and colored by its level. Selecting a failed rule highlights
-  the fields that rule used, in that failure's level color.
-- A `silent` failure is not represented in the screen at all: it does not color
-  its order, is not counted, and is not listed in the detail view. It exists so
-  a rule can report a reason without asking anyone to act on it.
+- The orders table shows `Actions`, source, order ID, buyer, payment method, and
+  grand total. The actions cell leads with a dot colored by the loudest level
+  among the order's failures, or `success` green when it has none to show; the
+  dot's level is named in its tooltip, so color alone never carries it. Rows are
+  not tinted, which leaves each cell free to color what it shows.
+- The source chip is colored per marketplace, not by failure level: BrickLink
+  `primary` and BrickOwl `secondary`, as the accounting screen colors them.
+- Selecting any order opens a read-only detail view listing every collected field
+  and the order's failed rules, each named and colored by its level. Selecting a
+  failed rule highlights the fields that rule used, in that failure's level
+  color.
+- A `silent` failure is not represented in the screen at all: it does not raise
+  its order's dot above green, is not counted, and is not listed in the detail
+  view. It exists so a rule can report a reason without asking anyone to act on
+  it.
 - The order counts above the table are one chip per level, loudest first,
   counting the orders that level is the loudest one of.
 - Reconciliation screen text is translated through `vast-portal`'s `en.json` and

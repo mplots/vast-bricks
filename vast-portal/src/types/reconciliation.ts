@@ -16,8 +16,12 @@ export interface ReconciliationOrder {
   orderDate: string | null;
   buyer: string;
   buyerUsername: string | null;
+  /** How the order was paid, in the provider's own wording. */
+  paymentMethod: string | null;
   subTotal: number | null;
   itemsSubTotal: number | null;
+  /** Order total in the store's base currency, shipping and additional charges included. */
+  grandTotal: number | null;
   invoiceSubTotal: number | null;
   failures: ReconciliationFailure[];
 }

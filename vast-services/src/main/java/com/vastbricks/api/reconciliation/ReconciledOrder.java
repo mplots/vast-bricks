@@ -22,8 +22,18 @@ public class ReconciledOrder {
     private LocalDate orderDate;
     private String buyer;
     private String buyerUsername;
+
+    /**
+     * How the order was paid: one name per payment provider, or the marketplace's own wording for a method no
+     * provider is known for.
+     */
+    private String paymentMethod;
+
     private BigDecimal subTotal;
     private BigDecimal itemsSubTotal;
+
+    /** What the order came to in the store's base currency, shipping and additional charges included. */
+    private BigDecimal grandTotal;
 
     /** Sub-total of the accounting invoice for this order, or {@code null} when no invoice was found. */
     private BigDecimal invoiceSubTotal;

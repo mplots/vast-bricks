@@ -5,6 +5,7 @@ import com.vastbricks.api.reconciliation.Marketplace;
 import com.vastbricks.api.reconciliation.OrderMapper;
 import com.vastbricks.api.reconciliation.ReconciledOrder;
 import com.vastbricks.api.reconciliation.ReconciliationAmount;
+import com.vastbricks.api.reconciliation.ReconciliationPaymentMethod;
 import java.math.BigDecimal;
 import java.util.List;
 import org.springframework.core.annotation.Order;
@@ -31,8 +32,10 @@ class MapperBrickLinkOrders implements OrderMapper<BrickStoreOrder> {
                 .orderId(order.getOrderId() == null ? null : order.getOrderId().toString())
                 .orderDate(order.getOrderDate())
                 .buyer(order.getBuyer())
+                .paymentMethod(ReconciliationPaymentMethod.normalize(order.getPaymentType()))
                 .subTotal(ReconciliationAmount.normalize(order.getTotal()))
                 .itemsSubTotal(ReconciliationAmount.normalize(sumItemPrices(order)))
+                .grandTotal(ReconciliationAmount.normalize(order.getBaseGrandTotal()))
                 .build();
     }
 

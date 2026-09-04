@@ -17,8 +17,10 @@ enum ReconciliationOrderField {
     ORDER_DATE("orderDate"),
     BUYER("buyer"),
     BUYER_USERNAME("buyerUsername"),
+    PAYMENT_METHOD("paymentMethod"),
     SUB_TOTAL("subTotal"),
     ITEMS_SUB_TOTAL("itemsSubTotal"),
+    GRAND_TOTAL("grandTotal"),
     INVOICE_SUB_TOTAL("invoiceSubTotal");
 
     @JsonValue

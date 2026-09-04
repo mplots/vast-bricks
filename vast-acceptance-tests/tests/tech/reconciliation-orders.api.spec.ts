@@ -19,6 +19,8 @@ test('lists BrickLink reconciliation orders for the selected month', async ({
     <BUYER>some buyer</BUYER>
     <ORDERTOTAL>0.43</ORDERTOTAL>
     <BASECURRENCYCODE>EUR</BASECURRENCYCODE>
+    <BASEGRANDTOTAL>3.435</BASEGRANDTOTAL>
+    <PAYMENTTYPE>Credit/Debit (Powered by Stripe)</PAYMENTTYPE>
     <ITEM>
       <ITEMID>3001</ITEMID>
       <PRICE>0.1000</PRICE>
@@ -36,6 +38,7 @@ test('lists BrickLink reconciliation orders for the selected month', async ({
     <BUYER>another buyer</BUYER>
     <ORDERTOTAL>3.00</ORDERTOTAL>
     <BASECURRENCYCODE>EUR</BASECURRENCYCODE>
+    <PAYMENTTYPE>Bank Transfer</PAYMENTTYPE>
     <ITEM>
       <ITEMID>3003</ITEMID>
       <PRICE>1.0000</PRICE>
@@ -70,8 +73,10 @@ test('lists BrickLink reconciliation orders for the selected month', async ({
         orderDate: '2026-08-30',
         buyer: 'some buyer',
         buyerUsername: 'some-buyer-username',
+        paymentMethod: 'Stripe',
         subTotal: 0.43,
         itemsSubTotal: 0.43,
+        grandTotal: 3.44,
         invoiceSubTotal: null,
         failures: [],
       },
@@ -81,8 +86,10 @@ test('lists BrickLink reconciliation orders for the selected month', async ({
         orderDate: '2026-08-31',
         buyer: 'another buyer',
         buyerUsername: 'another-buyer-username',
+        paymentMethod: 'Bank Transfer',
         subTotal: 3,
         itemsSubTotal: 3,
+        grandTotal: null,
         invoiceSubTotal: null,
         failures: [],
       },
@@ -100,7 +107,13 @@ test('lists BrickOwl reconciliation orders for the selected month', async ({
       {
         orderId: 'test-order-0810',
         orderDate: '1786320000',
-        view: { buyer_name: 'Test Buyer Alpha', customer_username: 'test_alpha', sub_total: '2.70' },
+        view: {
+          buyer_name: 'Test Buyer Alpha',
+          customer_username: 'test_alpha',
+          sub_total: '2.70',
+          payment_method_type: 'paypal',
+          base_order_total: '5.20',
+        },
         items: [
           { base_price: '1.20', ordered_quantity: '2' },
           { base_price: '0.30', ordered_quantity: '1' },
@@ -134,8 +147,10 @@ test('lists BrickOwl reconciliation orders for the selected month', async ({
         orderDate: '2026-08-10',
         buyer: 'Test Buyer Alpha',
         buyerUsername: 'test_alpha',
+        paymentMethod: 'PayPal',
         subTotal: 2.7,
         itemsSubTotal: 2.7,
+        grandTotal: 5.2,
         invoiceSubTotal: null,
         failures: [],
       },
@@ -145,8 +160,10 @@ test('lists BrickOwl reconciliation orders for the selected month', async ({
         orderDate: '2026-08-11',
         buyer: 'Test Buyer Beta',
         buyerUsername: 'test_beta',
+        paymentMethod: null,
         subTotal: 6,
         itemsSubTotal: 6,
+        grandTotal: null,
         invoiceSubTotal: null,
         failures: [],
       },
@@ -181,8 +198,10 @@ test('lists BrickOwl reconciliation orders that span several batch requests', as
     orderDate: '2026-08-10',
     buyer: 'Bulk Buyer 1',
     buyerUsername: 'bulk_1',
+    paymentMethod: null,
     subTotal: 1,
     itemsSubTotal: 1,
+    grandTotal: null,
     invoiceSubTotal: null,
     failures: [],
   });

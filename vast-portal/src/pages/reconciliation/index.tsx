@@ -3,7 +3,7 @@ import { FormEvent, useState } from 'react';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Chip from '@mui/material/Chip';
+import Chip, { ChipProps } from '@mui/material/Chip';
 import CircularProgress from '@mui/material/CircularProgress';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -25,22 +25,33 @@ import TableRow from '@mui/material/TableRow';
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import { darken, Theme } from '@mui/material/styles';
 import { ReceiptAdd } from 'iconsax-reactjs';
 import { useIntl } from 'react-intl';
 
 // The invoice endpoint lives under the accounting namespace and is shared with the accounting screen.
 import { generateInvoice } from 'api/accounting';
 import { useGetReconciliationOrders } from 'api/reconciliation';
+import Dot from 'components/@extended/Dot';
 import MainCard from 'components/MainCard';
 import type { ReconciliationFailure, ReconciliationFailureLevel, ReconciliationOrder } from 'types/reconciliation';
 
 // Order property names, matching the backend ReconciliationOrderField enum.
-const orderFields = ['source', 'orderId', 'orderDate', 'buyer', 'buyerUsername', 'subTotal', 'itemsSubTotal', 'invoiceSubTotal'] as const;
-const amountFields: string[] = ['subTotal', 'itemsSubTotal', 'invoiceSubTotal'];
+const orderFields = [
+  'source',
+  'orderId',
+  'orderDate',
+  'buyer',
+  'buyerUsername',
+  'paymentMethod',
+  'subTotal',
+  'itemsSubTotal',
+  'grandTotal',
+  'invoiceSubTotal'
+] as const;
+const amountFields: string[] = ['subTotal', 'itemsSubTotal', 'grandTotal', 'invoiceSubTotal'];
 
 // Fields shown as table columns; the detail view shows all of them.
-const columnFields: string[] = ['source', 'orderId', 'buyer', 'buyerUsername', 'subTotal', 'itemsSubTotal', 'invoiceSubTotal'];
+const columnFields: string[] = ['source', 'orderId', 'buyer', 'paymentMethod', 'grandTotal'];
 
 const formatAmount = (value?: number | null) => {
   if (value === null || value === undefined || Number.isNaN(value)) {
@@ -72,16 +83,8 @@ const orderLevel = (order: ReconciliationOrder): ShownLevel | null =>
 
 const failureKey = (failure: ReconciliationFailure) => `${failure.code}-${failure.fields.join('-')}`;
 
-// A row that has something to show is tinted in its loudest level's color.
-const rowStyle = (level: ShownLevel | null) =>
-  level
-    ? {
-        bgcolor: `${level}.lighter`,
-        // The theme tints every hovered row, so a failed row paints its own deeper tint over it.
-        '& td': { color: `${level}.dark` },
-        '&:hover td': { bgcolor: (theme: Theme) => darken(theme.palette[level].lighter, 0.08) }
-      }
-    : {};
+// Each marketplace keeps its own chip color, as the accounting screen colors it.
+const sourceColor = (source: string): ChipProps['color'] => (source === 'BrickOwl' ? 'secondary' : 'primary');
 
 const currentMonth = () => {
   const date = new Date();
@@ -152,6 +155,9 @@ export default function ReconciliationPage() {
 
   const levelLabel = (level: ReconciliationFailureLevel) => intl.formatMessage({ id: `reconciliation-level-${level}` });
 
+  // The dot in the action cell states the order's loudest level, and reads as reconciled when it has none.
+  const dotLabel = (level: ShownLevel | null) => (level ? levelLabel(level) : intl.formatMessage({ id: 'reconciliation-level-none' }));
+
   // One chip per level, loudest first, counting the orders that level is the loudest one of.
   const levelCounts = [...shownLevels]
     .reverse()
@@ -214,7 +220,7 @@ export default function ReconciliationPage() {
               <Table stickyHeader size="small" aria-label={intl.formatMessage({ id: 'reconciliation-orders-table' })}>
                 <TableHead>
                   <TableRow>
-                    <TableCell sx={{ width: 56 }}>{intl.formatMessage({ id: 'reconciliation-actions' })}</TableCell>
+                    <TableCell sx={{ width: 84 }}>{intl.formatMessage({ id: 'reconciliation-actions' })}</TableCell>
                     {columnFields.map((field) => (
                       <TableCell key={field} align={amountFields.includes(field) ? 'right' : 'left'}>
                         {fieldLabel(field)}
@@ -224,39 +230,42 @@ export default function ReconciliationPage() {
                 </TableHead>
                 <TableBody>
                   {reconciliationOrders.orders.map((order) => (
-                    <TableRow
-                      hover
-                      key={orderKey(order)}
-                      onClick={() => openOrder(order)}
-                      sx={{ cursor: 'pointer', ...rowStyle(orderLevel(order)) }}
-                    >
+                    <TableRow hover key={orderKey(order)} onClick={() => openOrder(order)} sx={{ cursor: 'pointer' }}>
                       {/* The row opens the detail dialog, so the action cell must not bubble its click. */}
-                      <TableCell sx={{ width: 56, whiteSpace: 'nowrap' }} onClick={(event) => event.stopPropagation()}>
-                        <Tooltip title={intl.formatMessage({ id: 'reconciliation-generate-invoice' })} arrow>
-                          <span>
-                            <IconButton
-                              size="small"
-                              color="primary"
-                              disabled={generatingOrder === orderKey(order)}
-                              aria-label={intl.formatMessage(
-                                { id: 'reconciliation-generate-invoice-for' },
-                                { source: order.source, orderId: order.orderId }
-                              )}
-                              onClick={() => handleGenerateInvoice(order)}
-                            >
-                              {generatingOrder === orderKey(order) ? (
-                                <CircularProgress size={18} color="inherit" />
-                              ) : (
-                                <ReceiptAdd size={20} color="currentColor" />
-                              )}
-                            </IconButton>
-                          </span>
-                        </Tooltip>
+                      <TableCell sx={{ width: 84, whiteSpace: 'nowrap' }} onClick={(event) => event.stopPropagation()}>
+                        <Stack direction="row" spacing={0.75} alignItems="center">
+                          {/* The level is named as well as colored, so the dot does not carry it by color alone. */}
+                          <Tooltip title={dotLabel(orderLevel(order))} arrow>
+                            <Box component="span" role="img" aria-label={dotLabel(orderLevel(order))} sx={{ display: 'flex' }}>
+                              <Dot size={8} color={orderLevel(order) ?? 'success'} />
+                            </Box>
+                          </Tooltip>
+                          <Tooltip title={intl.formatMessage({ id: 'reconciliation-generate-invoice' })} arrow>
+                            <span>
+                              <IconButton
+                                size="small"
+                                color="primary"
+                                disabled={generatingOrder === orderKey(order)}
+                                aria-label={intl.formatMessage(
+                                  { id: 'reconciliation-generate-invoice-for' },
+                                  { source: order.source, orderId: order.orderId }
+                                )}
+                                onClick={() => handleGenerateInvoice(order)}
+                              >
+                                {generatingOrder === orderKey(order) ? (
+                                  <CircularProgress size={18} color="inherit" />
+                                ) : (
+                                  <ReceiptAdd size={20} color="currentColor" />
+                                )}
+                              </IconButton>
+                            </span>
+                          </Tooltip>
+                        </Stack>
                       </TableCell>
                       {columnFields.map((field) => (
                         <TableCell key={field} align={amountFields.includes(field) ? 'right' : 'left'}>
                           {field === 'source' ? (
-                            <Chip label={order.source} size="small" color={orderLevel(order) ?? 'primary'} variant="outlined" />
+                            <Chip label={order.source} size="small" color={sourceColor(order.source)} variant="outlined" />
                           ) : (
                             formatFieldValue(order, field)
                           )}
