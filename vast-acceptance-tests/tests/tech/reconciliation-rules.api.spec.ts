@@ -46,7 +46,7 @@ test('fails an order whose sub-total does not match its items sub-total', async 
   expect(body.orders.map((order: { orderId: string }) => order.orderId)).toEqual(['32456563', '32456564']);
   expect(body.orders[0].failures).toEqual([]);
   expect(body.orders[1].failures).toEqual([
-    { code: 'sub-total-mismatch', fields: ['subTotal', 'itemsSubTotal'] },
+    { code: 'sub-total-mismatch', level: 'info', fields: ['subTotal', 'itemsSubTotal'] },
   ]);
 });
 
@@ -74,8 +74,8 @@ test('fails an order that is missing an amount the rule needs', async ({
 
   expect(response.status(), await response.text()).toBe(200);
   const body = await response.json();
-  expect(body.orders[0].failures).toEqual([{ code: 'amount-missing', fields: ['itemsSubTotal'] }]);
-  expect(body.orders[1].failures).toEqual([{ code: 'amount-missing', fields: ['subTotal'] }]);
+  expect(body.orders[0].failures).toEqual([{ code: 'amount-missing', level: 'info', fields: ['itemsSubTotal'] }]);
+  expect(body.orders[1].failures).toEqual([{ code: 'amount-missing', level: 'info', fields: ['subTotal'] }]);
 });
 
 test('reconciles amounts that differ only below the cent', async ({ request, settings }, testInfo) => {
@@ -140,8 +140,8 @@ test('fails an order whose accounting invoice sub-total does not match its amoun
   const body = await response.json();
   expect(body.orders[0].invoiceSubTotal).toBe(4);
   expect(body.orders[0].failures).toEqual([
-    { code: 'invoice-sub-total-mismatch', fields: ['invoiceSubTotal', 'subTotal'] },
-    { code: 'invoice-items-sub-total-mismatch', fields: ['invoiceSubTotal', 'itemsSubTotal'] },
+    { code: 'invoice-sub-total-mismatch', level: 'info', fields: ['invoiceSubTotal', 'subTotal'] },
+    { code: 'invoice-items-sub-total-mismatch', level: 'info', fields: ['invoiceSubTotal', 'itemsSubTotal'] },
   ]);
 });
 
@@ -160,7 +160,7 @@ test('fails an order that has no accounting invoice', async ({ request, settings
   expect(response.status(), await response.text()).toBe(200);
   const body = await response.json();
   expect(body.orders[0].invoiceSubTotal).toBeNull();
-  expect(body.orders[0].failures).toEqual([{ code: 'amount-missing', fields: ['invoiceSubTotal'] }]);
+  expect(body.orders[0].failures).toEqual([{ code: 'amount-missing', level: 'info', fields: ['invoiceSubTotal'] }]);
 });
 
 test('does not require an accounting invoice for an order placed before invoicing started', async ({

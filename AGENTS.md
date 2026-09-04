@@ -240,7 +240,7 @@ here as they are provided; do not invent unspecified behavior prematurely.
   unrelated to the sibling `com.vastbricks.api.invoice` feature that creates
   invoices.
 - Every rule lives in `reconciliation.rule`, together with the rule boundary,
-  the failure, and the order field enum. Rules are not grouped by category: a
+  the failure, its level, and the order field enum. Rules are not grouped by category: a
   rule reasons across categories, as the invoice rule does when it compares an
   invoice amount with two order amounts, so any category would be arbitrary.
 - The feature root keeps the stage boundaries, the reconciled order model, the
@@ -250,8 +250,9 @@ here as they are provided; do not invent unspecified behavior prematurely.
   `ReconciliationAmount`, and `ParallelTasks`; the rule package exposes `Rule`
   and `ReconciliationFailure` back to the root, which the orchestrator and the
   payload need. Everything else stays package-private: the orchestrator,
-  `SourcedData`, the payload, the controller, `ReconciliationOrderField`, every
-  source, mapper, carrier, and rule implementation. Do not widen that API to
+  `SourcedData`, the payload, the controller, `ReconciliationOrderField`,
+  `ReconciliationFailureLevel`, every source, mapper, carrier, and rule
+  implementation. Do not widen that API to
   make a subpackage's work easier; if one needs more, the need itself is worth
   stating here first.
 - A carrier type stays package-private in its category package, because only its
@@ -273,9 +274,13 @@ here as they are provided; do not invent unspecified behavior prematurely.
   boundary. Adding a rule must not require changing the evaluation pipeline,
   the API contract, or the reconciliation screen.
 - A rule inspects one collected order and returns zero or more failures. Each
-  failure carries a stable reason code and the ordered list of collected order
-  fields the rule used. Codes identify a reason, not a rule: one rule may report
-  different codes.
+  failure carries a stable reason code, a level, and the ordered list of
+  collected order fields the rule used. Codes identify a reason, not a rule: one
+  rule may report different codes.
+- A failure's level is how loudly it asks to be dealt with: `silent`, `info`,
+  `warning`, or `error`. It belongs to the failure, not to the rule, so one rule
+  may report different levels. Every current rule reports `info`, the level a
+  failure gets when its rule states none.
 - A failure must not carry display text. The backend returns no user-facing
   strings for reconciliation. All wording lives in the `vast-portal` translation
   catalogs, keyed by failure code, and is interpolated with the field values the
@@ -294,22 +299,31 @@ here as they are provided; do not invent unspecified behavior prematurely.
   exactly once before any rule sees it. Sources return provider amounts
   untouched. Rules compare normalized amounts exactly and must not define their
   own tolerances.
-- The orders table colors an order red when it has at least one failure.
-  Selecting any order opens a read-only detail view listing every collected
-  field and the order's failed rules. Selecting a failed rule highlights the
-  fields that rule used.
+- The orders table colors an order in the loudest level among its failures, and
+  leaves it uncolored when it has none to show. Selecting any order opens a
+  read-only detail view listing every collected field and the order's failed
+  rules, each named and colored by its level. Selecting a failed rule highlights
+  the fields that rule used, in that failure's level color.
+- A `silent` failure is not represented in the screen at all: it does not color
+  its order, is not counted, and is not listed in the detail view. It exists so
+  a rule can report a reason without asking anyone to act on it.
+- The order counts above the table are one chip per level, loudest first,
+  counting the orders that level is the loudest one of.
 - Reconciliation screen text is translated through `vast-portal`'s `en.json` and
   `lv.json`. Every new user-visible string must be added to both.
 - The table shows only a subset of the collected fields. Fields that can fail
   reconciliation without being table columns are visible in the detail view.
 - Only the failed state exists. Do not introduce a reconciliation status enum
-  until additional states are specified.
+  until additional states are specified. A level is not a status: it grades a
+  single failure, not the order.
 - Current rules:
   - An order's sub-total must equal the sum of its item prices.
   - An order must have an accounting invoice whose sub-total equals both the
     order's sub-total and its items sub-total. Invoicing started on 2026-09-01,
     so the rule applies only to orders placed on or after that date; the cut-off
     is hardcoded. An order on or after it with no invoice fails.
+  - Both rules report every failure at `info`. No rule has been specified at
+    another level yet.
 
 ### Data-source boundaries and current clients
 

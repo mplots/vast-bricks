@@ -33,7 +33,7 @@ import { useIntl } from 'react-intl';
 import { generateInvoice } from 'api/accounting';
 import { useGetReconciliationOrders } from 'api/reconciliation';
 import MainCard from 'components/MainCard';
-import type { ReconciliationFailure, ReconciliationOrder } from 'types/reconciliation';
+import type { ReconciliationFailure, ReconciliationFailureLevel, ReconciliationOrder } from 'types/reconciliation';
 
 // Order property names, matching the backend ReconciliationOrderField enum.
 const orderFields = ['source', 'orderId', 'orderDate', 'buyer', 'buyerUsername', 'subTotal', 'itemsSubTotal', 'invoiceSubTotal'] as const;
@@ -56,9 +56,32 @@ const formatFieldValue = (order: ReconciliationOrder, field: string) => {
   return amountFields.includes(field) ? formatAmount(value as number | null) : formatText(value as string | null);
 };
 
-const isFailed = (order: ReconciliationOrder) => order.failures.length > 0;
+// The levels a failure is shown at, quietest first. `silent` is absent: those failures are not shown at all.
+const shownLevels = ['info', 'warning', 'error'] as const;
+
+type ShownLevel = (typeof shownLevels)[number];
+
+const shownFailures = (order: ReconciliationOrder) => order.failures.filter((failure) => failure.level !== 'silent');
+
+// The loudest level the order is shown at, or null when it has nothing to show.
+const orderLevel = (order: ReconciliationOrder): ShownLevel | null =>
+  shownLevels.reduce<ShownLevel | null>(
+    (loudest, level) => (order.failures.some((failure) => failure.level === level) ? level : loudest),
+    null
+  );
 
 const failureKey = (failure: ReconciliationFailure) => `${failure.code}-${failure.fields.join('-')}`;
+
+// A row that has something to show is tinted in its loudest level's color.
+const rowStyle = (level: ShownLevel | null) =>
+  level
+    ? {
+        bgcolor: `${level}.lighter`,
+        // The theme tints every hovered row, so a failed row paints its own deeper tint over it.
+        '& td': { color: `${level}.dark` },
+        '&:hover td': { bgcolor: (theme: Theme) => darken(theme.palette[level].lighter, 0.08) }
+      }
+    : {};
 
 const currentMonth = () => {
   const date = new Date();
@@ -102,8 +125,9 @@ export default function ReconciliationPage() {
 
   const openOrder = (order: ReconciliationOrder) => {
     setSelectedOrder(order);
-    // Select the first failure so the highlighted fields are visible without a click.
-    setSelectedFailure(order.failures.length ? failureKey(order.failures[0]) : null);
+    // Select the first shown failure so the highlighted fields are visible without a click.
+    const [first] = shownFailures(order);
+    setSelectedFailure(first ? failureKey(first) : null);
   };
 
   const closeOrder = () => {
@@ -122,9 +146,17 @@ export default function ReconciliationPage() {
       }
     );
 
-  const highlightedFields = selectedOrder?.failures.find((failure) => failureKey(failure) === selectedFailure)?.fields ?? [];
+  const highlighted = selectedOrder?.failures.find((failure) => failureKey(failure) === selectedFailure);
+  const highlightedFields = highlighted?.fields ?? [];
+  const highlightLevel = (highlighted?.level ?? 'info') as ShownLevel;
 
-  const failedCount = reconciliationOrders?.orders.filter(isFailed).length ?? 0;
+  const levelLabel = (level: ReconciliationFailureLevel) => intl.formatMessage({ id: `reconciliation-level-${level}` });
+
+  // One chip per level, loudest first, counting the orders that level is the loudest one of.
+  const levelCounts = [...shownLevels]
+    .reverse()
+    .map((level) => ({ level, count: reconciliationOrders?.orders.filter((order) => orderLevel(order) === level).length ?? 0 }))
+    .filter(({ count }) => count > 0);
 
   return (
     <Stack spacing={3}>
@@ -153,13 +185,14 @@ export default function ReconciliationPage() {
                 label={intl.formatMessage({ id: 'reconciliation-order-count' }, { count: reconciliationOrders.orders.length })}
                 variant="outlined"
               />
-              {failedCount > 0 && (
+              {levelCounts.map(({ level, count }) => (
                 <Chip
-                  label={intl.formatMessage({ id: 'reconciliation-failed-count' }, { count: failedCount })}
-                  color="error"
+                  key={level}
+                  label={intl.formatMessage({ id: `reconciliation-${level}-count` }, { count })}
+                  color={level}
                   variant="outlined"
                 />
-              )}
+              ))}
             </Stack>
           )}
         </Stack>
@@ -195,15 +228,7 @@ export default function ReconciliationPage() {
                       hover
                       key={orderKey(order)}
                       onClick={() => openOrder(order)}
-                      sx={{
-                        cursor: 'pointer',
-                        ...(isFailed(order) && {
-                          bgcolor: 'error.lighter',
-                          // The theme tints every hovered row, so a failed row paints its own deeper red over it.
-                          '& td': { color: 'error.dark' },
-                          '&:hover td': { bgcolor: (theme: Theme) => darken(theme.palette.error.lighter, 0.08) }
-                        })
-                      }}
+                      sx={{ cursor: 'pointer', ...rowStyle(orderLevel(order)) }}
                     >
                       {/* The row opens the detail dialog, so the action cell must not bubble its click. */}
                       <TableCell sx={{ width: 56, whiteSpace: 'nowrap' }} onClick={(event) => event.stopPropagation()}>
@@ -231,7 +256,7 @@ export default function ReconciliationPage() {
                       {columnFields.map((field) => (
                         <TableCell key={field} align={amountFields.includes(field) ? 'right' : 'left'}>
                           {field === 'source' ? (
-                            <Chip label={order.source} size="small" color={isFailed(order) ? 'error' : 'primary'} variant="outlined" />
+                            <Chip label={order.source} size="small" color={orderLevel(order) ?? 'primary'} variant="outlined" />
                           ) : (
                             formatFieldValue(order, field)
                           )}
@@ -268,8 +293,8 @@ export default function ReconciliationPage() {
                       px: 1,
                       py: 0.5,
                       borderLeft: 3,
-                      borderColor: highlightedFields.includes(field) ? 'error.main' : 'transparent',
-                      bgcolor: highlightedFields.includes(field) ? 'error.lighter' : 'transparent'
+                      borderColor: highlightedFields.includes(field) ? `${highlightLevel}.main` : 'transparent',
+                      bgcolor: highlightedFields.includes(field) ? `${highlightLevel}.lighter` : 'transparent'
                     }}
                   >
                     <Typography color="text.secondary">{fieldLabel(field)}</Typography>
@@ -281,17 +306,23 @@ export default function ReconciliationPage() {
               <Typography variant="subtitle1" gutterBottom>
                 {intl.formatMessage({ id: 'reconciliation-detail-failures' })}
               </Typography>
-              {isFailed(selectedOrder) ? (
+              {shownFailures(selectedOrder).length ? (
                 <List disablePadding>
-                  {selectedOrder.failures.map((failure) => {
+                  {shownFailures(selectedOrder).map((failure) => {
                     const key = failureKey(failure);
+                    const level = failure.level as ShownLevel;
                     return (
                       <ListItemButton
                         key={key}
                         selected={key === selectedFailure}
                         onClick={() => setSelectedFailure(key === selectedFailure ? null : key)}
                       >
-                        <ListItemText primary={failureMessage(selectedOrder, failure)} slotProps={{ primary: { color: 'error.dark' } }} />
+                        <ListItemText
+                          primary={failureMessage(selectedOrder, failure)}
+                          slotProps={{ primary: { color: `${level}.dark` } }}
+                        />
+                        {/* The level is named as well as colored, so it does not rely on color alone. */}
+                        <Chip label={levelLabel(level)} size="small" color={level} variant="outlined" sx={{ ml: 1 }} />
                       </ListItemButton>
                     );
                   })}
