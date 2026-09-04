@@ -170,7 +170,9 @@ here as they are provided; do not invent unspecified behavior prematurely.
   an order by the compact invoice-note key `<source>:<orderId>`, for example
   `bricklink:32466549`. Legacy notes such as `BrickLink order 32466549` remain
   readable. A list longer than one page fails the request rather than
-  reconciling against truncated data.
+  reconciling against truncated data. The note pattern and the marketplace label
+  it yields decide which order an invoice attaches to, so they belong to the
+  invoice mapper, not to the client or the source.
 - Data is requested from the providers on demand when the screen is opened.
 - Provider requests should run in parallel so far as their dependencies allow.
 - Potential performance problems from live, on-demand aggregation are accepted
@@ -190,6 +192,80 @@ here as they are provided; do not invent unspecified behavior prematurely.
 - An order normally has one order source, one payment source, one shipping
   source, and corresponding single sources for the other reconciliation
   categories.
+
+### Processing stages
+
+- Reconciliation runs three explicit stages for one month: sourcing, mapping,
+  and rules. Each stage is a separate boundary, and a class belongs to exactly
+  one of them.
+- `ReconciliationService` injects the sources, the mappers, and the rules as
+  separate lists and controls the flow between them. It runs one stage per
+  method, in order: fetch every provider, map everything that was fetched, then
+  judge every collected order.
+- Sourcing: a `Source<T>` takes the month and returns that provider's data as
+  received, assembled only as far as the provider's own protocol requires —
+  several calls of one provider joined, batches paired, transport failures
+  raised. A source makes no reconciliation decision and normalizes nothing.
+- Every source runs in parallel, started before the first result is joined. The
+  sourcing stage finishes before mapping begins.
+- Mapping: a `Mapper<T>` turns what one source returned into the single
+  reconciled order list. It never calls a client itself.
+- A source declares the class it returns and a mapper declares the class it
+  reads. That class is the whole glue between the two stages: neither side names
+  the other, and a mapper has no dependency on a source.
+- Exactly one source may return a given class. A second one claiming it is a
+  wiring mistake and fails the application start, not a request. Several mappers
+  may read one sourced class.
+- A mapper whose class no source returns maps nothing, so a source and the
+  mapper that reads it can be added in separate steps; a sourced class no mapper
+  reads is simply not mapped yet.
+- An `OrderMapper<T>` appends new orders to the list; a `DetailMapper<T>` merges
+  fields onto orders already collected and adds none, so its data with no
+  matching order is dropped. All order mappers run before all detail mappers.
+- The mapping stage runs sequentially in declared bean order, so the order the
+  order mappers run in is the order the API returns.
+- Rules: a `Rule` inspects one collected order and returns its failures. See
+  "Reconciliation rules".
+- Adding a provider means adding a source and a mapper. Adding a check means
+  adding a rule. Neither changes the orchestrator, the API contract, or the
+  reconciliation screen.
+- A source, its carrier type, and its mappers live in a subpackage named after
+  the reconciliation category they serve: `reconciliation.order`,
+  `reconciliation.invoice`, and later `payment`, `shipping`, and the store
+  synchronization one. Category, not provider: a category is the vocabulary the
+  requirements use, a provider's transport knowledge already lives in its
+  `com.vastbricks.api.client.<provider>` package, and the categories stay a
+  bounded set as providers are added. The accounting category's package is named
+  `invoice` after what it collects; it is a subpackage of `reconciliation` and
+  unrelated to the sibling `com.vastbricks.api.invoice` feature that creates
+  invoices.
+- Every rule lives in `reconciliation.rule`, together with the rule boundary,
+  the failure, and the order field enum. Rules are not grouped by category: a
+  rule reasons across categories, as the invoice rule does when it compares an
+  invoice amount with two order amounts, so any category would be arbitrary.
+- The feature root keeps the stage boundaries, the reconciled order model, the
+  orchestrator, and the HTTP edge. It declares a small API and nothing more: the
+  category packages see `Source`, `Mapper`, `OrderMapper`, `DetailMapper`,
+  `ReconciledOrder`, `ReconciledOrders.find`, `Marketplace`,
+  `ReconciliationAmount`, and `ParallelTasks`; the rule package exposes `Rule`
+  and `ReconciliationFailure` back to the root, which the orchestrator and the
+  payload need. Everything else stays package-private: the orchestrator,
+  `SourcedData`, the payload, the controller, `ReconciliationOrderField`, every
+  source, mapper, carrier, and rule implementation. Do not widen that API to
+  make a subpackage's work easier; if one needs more, the need itself is worth
+  stating here first.
+- A carrier type stays package-private in its category package, because only its
+  own source and mappers name it.
+- Inside the reconciliation package the stage boundaries are named short:
+  `Source`, `Mapper`, `OrderMapper`, `DetailMapper`, `Rule`, `ReconciledOrder`,
+  `ReconciledOrders`, and `SourcedData` for what the sourcing stage handed the
+  mappers. An implementation is prefixed by its stage and named after what it
+  handles: `SourceBrickLinkOrders`, `MapperBrickLinkOrders`,
+  `RuleSubTotalMatchesItems`. A source's carrier type is
+  `Sourced<Provider><Thing>`, such as `SourcedBrickOwlOrder`; a source that
+  assembles nothing declares the provider's own model as its class instead of
+  wrapping it in a carrier that adds no field. Everything stays package-private
+  unless code outside the package uses it.
 
 ### Reconciliation rules
 
@@ -213,9 +289,11 @@ here as they are provided; do not invent unspecified behavior prematurely.
 - Rule results are part of the order-list response. The screen must not issue a
   second request for reconciliation detail: nothing is stored, so a detail
   request would re-query every provider.
-- Monetary amounts are normalized to two decimals, `HALF_UP`, by the data source
-  that collects them. Rules compare normalized amounts exactly and must not
-  define their own tolerances.
+- Monetary amounts are normalized to two decimals, `HALF_UP`, by the mapper
+  that produces the reconciled order field, so every amount is normalized
+  exactly once before any rule sees it. Sources return provider amounts
+  untouched. Rules compare normalized amounts exactly and must not define their
+  own tolerances.
 - The orders table colors an order red when it has at least one failure.
   Selecting any order opens a read-only detail view listing every collected
   field and the order's failed rules. Selecting a failed rule highlights the
@@ -235,25 +313,35 @@ here as they are provided; do not invent unspecified behavior prematurely.
 
 ### Data-source boundaries and current clients
 
-- Every reconciliation category must expose a common boundary that permits
-  multiple provider implementations. Adding another payment, accounting,
-  shipping, order, or synchronization provider should be straightforward and
-  must not require redesigning the reconciliation feature.
+- The sourcing and mapping boundaries are common to every reconciliation
+  category, so adding another payment, accounting, shipping, order, or
+  synchronization provider is a source plus a mapper and must not require
+  redesigning the reconciliation feature.
 - A low-level API client is not necessarily a reconciliation data source by
-  itself. A data-source implementation may combine multiple clients and expose
-  their collected data through the category's common boundary.
+  itself. A source implementation may combine multiple clients of one provider
+  and expose what they returned through the common sourcing boundary.
+- Conversely, one provider may need several sources. Split independent calls of
+  a provider into a source each, so the sourcing stage's own fan-out runs them
+  rather than one waiting inside the other; keep them in one source only when a
+  call depends on an earlier call's result.
 - Current order access includes:
-  - a combined BrickLink-oriented source that uses both the reverse-engineered
-    API client from the BrickStore application and the BrickLink API client;
-  - a BrickOwl source that returns order data through the same common order
-    boundary.
+  - a BrickLink order source and a BrickLink username source, both using the
+    reverse-engineered API client from the BrickStore application, alongside the
+    BrickLink API client. The export names the buyer by real name or by
+    username but never both, and the two requests are independent, so they are
+    two sources: an order mapper produces the marketplace order and a detail
+    mapper merges the username onto it;
+  - a BrickOwl source that fetches the order list and its detail batches, with a
+    mapper that produces the marketplace order. Its batches stay in one source
+    because they need the order ids the list returned.
 - Current payment client implementations are Stripe and PayPal.
 - The current shipping client implementation is Mans Pasts.
 - The current accounting client implementation is Manakabata, migrated into
-  `vast-services`: it collects invoices as a reconciliation invoice source, and the
-  `invoice` feature creates them for an order. A provider has one root client per
-  feature, and a client stays transport: what an invoice says is decided by the
-  `invoice` feature, not by `ManakabataClient`.
+  `vast-services`: an invoice source fetches the invoice list and a detail
+  mapper merges each invoice onto its order, and the `invoice` feature creates
+  invoices for an order. A provider has one root client per feature, and a
+  client stays transport: what an invoice says is decided by the `invoice`
+  feature, not by `ManakabataClient`.
 - The current e-commerce store synchronization client implementation is
   BrickSync.
 - These are the implementations currently known, not an exhaustive or closed

@@ -1,4 +1,4 @@
-package com.vastbricks.api.reconciliation;
+package com.vastbricks.api.reconciliation.rule;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
  */
 @Getter
 @RequiredArgsConstructor
-public enum ReconciliationOrderField {
+enum ReconciliationOrderField {
 
     SOURCE("source"),
     ORDER_ID("orderId"),

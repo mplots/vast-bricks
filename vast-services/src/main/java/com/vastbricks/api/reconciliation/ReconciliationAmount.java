@@ -4,17 +4,17 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 /**
- * Normalizes collected monetary amounts to the scale reconciliation rules compare on. Sources round once, so a rule
+ * Normalizes collected monetary amounts to the scale reconciliation rules compare on. Mappings round once, so a rule
  * never has to define its own tolerance.
  */
-final class ReconciliationAmount {
+public final class ReconciliationAmount {
 
     private static final int SCALE = 2;
 
     private ReconciliationAmount() {
     }
 
-    static BigDecimal normalize(BigDecimal value) {
+    public static BigDecimal normalize(BigDecimal value) {
         return value == null ? null : value.setScale(SCALE, RoundingMode.HALF_UP);
     }
 }

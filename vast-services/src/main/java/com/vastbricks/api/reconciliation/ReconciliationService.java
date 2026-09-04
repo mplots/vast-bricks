@@ -1,72 +1,106 @@
 package com.vastbricks.api.reconciliation;
 
 import com.vastbricks.api.reconciliation.ReconciliationPayload.ReconciliationOrderResult;
+import com.vastbricks.api.reconciliation.rule.ReconciliationFailure;
+import com.vastbricks.api.reconciliation.rule.Rule;
 import java.time.YearMonth;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+/**
+ * Reconciles one month in three stages: the sources fetch every provider, the mappers build the single reconciled
+ * order list out of what they fetched, and the rules judge each collected order. Adding a provider adds a source and a
+ * mapper, adding a check adds a rule, and neither touches this orchestration.
+ *
+ * <p>A source and a mapper are joined by the class the source returns and the mapper reads. Neither names the other.
+ */
 @Service
-@RequiredArgsConstructor
 class ReconciliationService {
 
-    private final List<ReconciliationOrderSource> orderSources;
-    private final List<ReconciliationInvoiceSource> invoiceSources;
-    private final List<ReconciliationRule> rules;
+    private final Map<Class<?>, Source<?>> sources;
+    private final List<OrderMapper<?>> orderMappers;
+    private final List<DetailMapper<?>> detailMappers;
+    private final List<Rule> rules;
+
+    ReconciliationService(
+            List<Source<?>> sources,
+            List<OrderMapper<?>> orderMappers,
+            List<DetailMapper<?>> detailMappers,
+            List<Rule> rules
+    ) {
+        this.sources = sourcesByType(sources);
+        this.orderMappers = orderMappers;
+        this.detailMappers = detailMappers;
+        this.rules = rules;
+    }
 
     List<ReconciliationOrderResult> findOrders(YearMonth month) {
-        // Every source starts before the first result is joined, so all categories are requested concurrently.
-        try (var tasks = new ParallelTasks()) {
-            var sourceOrders = orderSources.stream()
-                    .map(source -> tasks.start(() -> source.findOrders(month)))
-                    .toList();
-            var sourceInvoices = invoiceSources.stream()
-                    .map(source -> tasks.start(() -> source.findInvoices(month)))
-                    .toList();
+        return reconcile(map(source(month)));
+    }
 
-            var invoices = collectInvoices(sourceInvoices);
-            return collect(sourceOrders).stream()
-                    .map(order -> withInvoice(order, invoices))
-                    .map(this::reconcile)
-                    .toList();
+    /** Sourcing: every provider is fetched, all of them in parallel. */
+    private SourcedData source(YearMonth month) {
+        try (var tasks = new ParallelTasks()) {
+            // Every source starts before the first result is joined, so no provider waits for another.
+            var fetches = new LinkedHashMap<Class<?>, Supplier<? extends List<?>>>();
+            sources.forEach((type, source) -> fetches.put(type, tasks.start(() -> source.fetch(month))));
+
+            var sourced = new LinkedHashMap<Class<?>, List<?>>();
+            fetches.forEach((type, fetch) -> sourced.put(type, fetch.get()));
+            return new SourcedData(sourced);
         }
     }
 
-    private Map<String, ReconciliationInvoice> collectInvoices(
-            List<Supplier<List<ReconciliationInvoice>>> sourceInvoices
-    ) {
-        return collect(sourceInvoices).stream().collect(Collectors.toMap(
-                invoice -> invoiceKey(invoice.getSource(), invoice.getOrderId()),
-                invoice -> invoice,
-                (first, duplicate) -> first
-        ));
+    /** Mapping: the order mappers collect the orders, then the detail mappers merge their data onto them. */
+    private ReconciledOrders map(SourcedData sourced) {
+        var orders = new ReconciledOrders();
+        orderMappers.forEach(mapper -> collect(mapper, sourced, orders));
+        detailMappers.forEach(mapper -> merge(mapper, sourced, orders));
+        return orders;
     }
 
-    private <T> List<T> collect(List<Supplier<List<T>>> sourceResults) {
-        return sourceResults.stream()
-                .flatMap(results -> results.get().stream())
+    /** Rules: every rule judges every collected order. */
+    private List<ReconciliationOrderResult> reconcile(ReconciledOrders orders) {
+        return orders.all().stream()
+                .map(order -> new ReconciliationOrderResult(order, evaluate(order)))
                 .toList();
     }
 
-    private ReconciliationOrder withInvoice(ReconciliationOrder order, Map<String, ReconciliationInvoice> invoices) {
-        var invoice = invoices.get(invoiceKey(order.getSource(), order.getOrderId()));
-        if (invoice == null) {
-            return order;
-        }
-        return order.toBuilder().invoiceSubTotal(invoice.getSubTotal()).build();
+    private <T> void collect(OrderMapper<T> mapper, SourcedData sourced, ReconciledOrders orders) {
+        orders.addAll(mapper.map(sourced.of(mapper.type())));
     }
 
-    private String invoiceKey(String source, String orderId) {
-        return source + '/' + orderId;
+    private <T> void merge(DetailMapper<T> mapper, SourcedData sourced, ReconciledOrders orders) {
+        mapper.map(sourced.of(mapper.type()), orders);
     }
 
-    private ReconciliationOrderResult reconcile(ReconciliationOrder order) {
-        var failures = rules.stream()
+    private List<ReconciliationFailure> evaluate(ReconciledOrder order) {
+        return rules.stream()
                 .flatMap(rule -> rule.evaluate(order).stream())
                 .toList();
-        return new ReconciliationOrderResult(order, failures);
+    }
+
+    /**
+     * Indexes the sources by the class each returns. A class is the whole glue between a source and its mappers, so an
+     * ambiguous one is a wiring mistake and fails the application start rather than a request.
+     */
+    private static Map<Class<?>, Source<?>> sourcesByType(List<Source<?>> sources) {
+        var byType = new LinkedHashMap<Class<?>, Source<?>>();
+        for (var source : sources) {
+            var claimed = byType.putIfAbsent(source.type(), source);
+            if (claimed != null) {
+                throw new IllegalStateException(
+                        "Sources %s and %s both return %s: a sourced class must have exactly one source".formatted(
+                                claimed.getClass().getSimpleName(),
+                                source.getClass().getSimpleName(),
+                                source.type().getSimpleName()
+                        )
+                );
+            }
+        }
+        return byType;
     }
 }

@@ -1,5 +1,7 @@
-package com.vastbricks.api.reconciliation;
+package com.vastbricks.api.reconciliation.order;
 
+import com.vastbricks.api.reconciliation.ParallelTasks;
+import com.vastbricks.api.reconciliation.Source;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.vastbricks.api.client.brickowl.BrickOwlBatchRequest;
 import com.vastbricks.api.client.brickowl.BrickOwlBatchResponse;
@@ -8,7 +10,6 @@ import com.vastbricks.api.client.brickowl.BrickOwlClientException;
 import com.vastbricks.api.client.brickowl.BrickOwlOrder;
 import com.vastbricks.api.client.brickowl.BrickOwlOrderItem;
 import com.vastbricks.api.client.brickowl.BrickOwlOrderListItem;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.ArrayList;
@@ -17,13 +18,17 @@ import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+/**
+ * Fetches the BrickOwl orders of the month. The list endpoint cannot be filtered and carries no amounts, so the month
+ * is filtered client-side and each order's detail and items are requested in batches; every batch starts before the
+ * first is joined. Pairing the batch responses back onto their requests is BrickOwl's batch protocol, so it happens
+ * here rather than in the mapper.
+ */
 @Component
-@Order(2)
 @RequiredArgsConstructor
-class BrickOwlOrderSource implements ReconciliationOrderSource {
+class SourceBrickOwlOrders implements Source<SourcedBrickOwlOrder> {
 
     private static final String ORDER_ENDPOINT = "order/view";
     private static final String ITEMS_ENDPOINT = "order/items";
@@ -31,7 +36,12 @@ class BrickOwlOrderSource implements ReconciliationOrderSource {
     private final BrickOwlClient brickOwlClient;
 
     @Override
-    public List<ReconciliationOrder> findOrders(YearMonth month) {
+    public Class<SourcedBrickOwlOrder> type() {
+        return SourcedBrickOwlOrder.class;
+    }
+
+    @Override
+    public List<SourcedBrickOwlOrder> fetch(YearMonth month) {
         var listedOrders = findListedOrders(month);
         if (listedOrders.isEmpty()) {
             return List.of();
@@ -51,14 +61,9 @@ class BrickOwlOrderSource implements ReconciliationOrderSource {
                 itemBatches.add(tasks.start(() -> executeBatch(batchOrderIds, ITEMS_ENDPOINT)));
             }
 
-            var orders = new ArrayList<ReconciliationOrder>();
+            var orders = new ArrayList<SourcedBrickOwlOrder>();
             for (var index = 0; index < orderBatches.size(); index++) {
-                appendReconciliationOrders(
-                        orders,
-                        orderDates,
-                        orderBatches.get(index).get(),
-                        itemBatches.get(index).get()
-                );
+                appendSourcedOrders(orders, orderDates, orderBatches.get(index).get(), itemBatches.get(index).get());
             }
             return List.copyOf(orders);
         }
@@ -86,8 +91,8 @@ class BrickOwlOrderSource implements ReconciliationOrderSource {
         return brickOwlClient.executeBatch(requests);
     }
 
-    private void appendReconciliationOrders(
-            List<ReconciliationOrder> result,
+    private void appendSourcedOrders(
+            List<SourcedBrickOwlOrder> result,
             Map<String, LocalDate> orderDates,
             List<BrickOwlBatchResponse> orderResponses,
             List<BrickOwlBatchResponse> itemResponses
@@ -99,24 +104,17 @@ class BrickOwlOrderSource implements ReconciliationOrderSource {
             var orderResponse = orderResponses.get(index);
             validateBatchResponse(orderResponse);
             var order = orderResponse.bodyAs(BrickOwlOrder.class);
-            result.add(ReconciliationOrder.builder()
-                    .source(ReconciliationSource.BRICK_OWL)
-                    .orderId(order.getOrderId())
-                    .orderDate(orderDates.get(order.getOrderId()))
-                    .buyer(order.getBuyerName())
-                    .buyerUsername(order.getCustomerUsername())
-                    .subTotal(ReconciliationAmount.normalize(order.getSubTotal()))
-                    .itemsSubTotal(ReconciliationAmount.normalize(sumItemBasePrices(itemResponses.get(index))))
-                    .build());
+            result.add(new SourcedBrickOwlOrder(
+                    order,
+                    items(itemResponses.get(index)),
+                    orderDates.get(order.getOrderId())
+            ));
         }
     }
 
-    private BigDecimal sumItemBasePrices(BrickOwlBatchResponse batchResponse) {
+    private List<BrickOwlOrderItem> items(BrickOwlBatchResponse batchResponse) {
         validateBatchResponse(batchResponse);
-        return batchResponse.bodyAs(new TypeReference<List<BrickOwlOrderItem>>() {}).stream()
-                .filter(item -> item.getBasePrice() != null && item.getOrderedQuantity() != null)
-                .map(item -> item.getBasePrice().multiply(item.getOrderedQuantity()))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        return batchResponse.bodyAs(new TypeReference<List<BrickOwlOrderItem>>() {});
     }
 
     private void validateBatchResponse(BrickOwlBatchResponse batchResponse) {

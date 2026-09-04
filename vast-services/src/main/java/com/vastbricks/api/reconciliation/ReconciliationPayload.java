@@ -1,6 +1,7 @@
 package com.vastbricks.api.reconciliation;
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.vastbricks.api.reconciliation.rule.ReconciliationFailure;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,7 +29,7 @@ final class ReconciliationPayload {
     public static final class ReconciliationOrderResult {
 
         @JsonUnwrapped
-        private final ReconciliationOrder order;
+        private final ReconciledOrder order;
 
         private final List<ReconciliationFailure> failures;
     }

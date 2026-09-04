@@ -1,9 +1,10 @@
-package com.vastbricks.api.reconciliation;
+package com.vastbricks.api.reconciliation.rule;
 
-import static com.vastbricks.api.reconciliation.ReconciliationOrderField.INVOICE_SUB_TOTAL;
-import static com.vastbricks.api.reconciliation.ReconciliationOrderField.ITEMS_SUB_TOTAL;
-import static com.vastbricks.api.reconciliation.ReconciliationOrderField.SUB_TOTAL;
+import static com.vastbricks.api.reconciliation.rule.ReconciliationOrderField.INVOICE_SUB_TOTAL;
+import static com.vastbricks.api.reconciliation.rule.ReconciliationOrderField.ITEMS_SUB_TOTAL;
+import static com.vastbricks.api.reconciliation.rule.ReconciliationOrderField.SUB_TOTAL;
 
+import com.vastbricks.api.reconciliation.ReconciledOrder;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -15,7 +16,7 @@ import org.springframework.stereotype.Component;
  * item prices. Orders placed before invoicing started are not invoiced at all, so the rule does not apply to them.
  */
 @Component
-class InvoiceSubTotalMatchesOrderRule implements ReconciliationRule {
+class RuleInvoiceSubTotalMatchesOrder implements Rule {
 
     /** First day orders are invoiced. Earlier orders legitimately have no accounting invoice. */
     private static final LocalDate INVOICED_FROM = LocalDate.of(2026, 9, 1);
@@ -25,7 +26,7 @@ class InvoiceSubTotalMatchesOrderRule implements ReconciliationRule {
     private static final String INVOICE_ITEMS_SUB_TOTAL_MISMATCH = "invoice-items-sub-total-mismatch";
 
     @Override
-    public List<ReconciliationFailure> evaluate(ReconciliationOrder order) {
+    public List<ReconciliationFailure> evaluate(ReconciledOrder order) {
         if (order.getOrderDate() == null || order.getOrderDate().isBefore(INVOICED_FROM)) {
             return List.of();
         }

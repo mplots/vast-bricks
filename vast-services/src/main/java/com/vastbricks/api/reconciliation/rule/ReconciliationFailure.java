@@ -1,4 +1,4 @@
-package com.vastbricks.api.reconciliation;
+package com.vastbricks.api.reconciliation.rule;
 
 import java.util.List;
 import lombok.AllArgsConstructor;

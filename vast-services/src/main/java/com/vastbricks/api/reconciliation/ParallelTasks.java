@@ -12,11 +12,11 @@ import java.util.function.Supplier;
  * caller can start every independent call before joining the first result. The returned supplier joins that task and
  * rethrows its runtime failure unwrapped.
  */
-final class ParallelTasks implements AutoCloseable {
+public final class ParallelTasks implements AutoCloseable {
 
     private final ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
 
-    <T> Supplier<T> start(Supplier<T> task) {
+    public <T> Supplier<T> start(Supplier<T> task) {
         var future = CompletableFuture.supplyAsync(SettingsProfileContext.propagate(task), executor);
         return () -> await(future);
     }
