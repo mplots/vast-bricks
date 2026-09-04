@@ -21,7 +21,8 @@ enum ReconciliationOrderField {
     SUB_TOTAL("subTotal"),
     ITEMS_SUB_TOTAL("itemsSubTotal"),
     GRAND_TOTAL("grandTotal"),
-    INVOICE_SUB_TOTAL("invoiceSubTotal");
+    INVOICE_SUB_TOTAL("invoiceSubTotal"),
+    PAID_AMOUNT("paidAmount");
 
     @JsonValue
     private final String name;

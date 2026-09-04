@@ -64,8 +64,10 @@
   "reconciliation-field-itemsSubTotal": "Items sub-total",
   "reconciliation-field-grandTotal": "Grand total",
   "reconciliation-field-invoiceSubTotal": "Invoice sub-total",
+  "reconciliation-field-paidAmount": "Paid amount",
   "reconciliation-failure-sub-total-mismatch": "Sub-total {subTotal} does not match the items sub-total {itemsSubTotal}.",
   "reconciliation-failure-invoice-sub-total-mismatch": "Invoice sub-total {invoiceSubTotal} does not match the order sub-total {subTotal}.",
   "reconciliation-failure-invoice-items-sub-total-mismatch": "Invoice sub-total {invoiceSubTotal} does not match the items sub-total {itemsSubTotal}.",
+  "reconciliation-failure-paid-amount-mismatch": "Paid amount {paidAmount} does not match the grand total {grandTotal}.",
   "reconciliation-failure-amount-missing": "Missing: {fields}."
 }

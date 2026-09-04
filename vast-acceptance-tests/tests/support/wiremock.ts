@@ -3,10 +3,11 @@ import type { APIRequestContext, TestInfo } from '@playwright/test';
 export type WireMockMode = 'parallel' | 'serial';
 export type WireMockMethod = 'ANY' | 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
-type WireMockValueMatcher = {
+export type WireMockValueMatcher = {
   equalTo?: string;
   contains?: string;
   matches?: string;
+  absent?: boolean;
 };
 
 type WireMockBodyPattern = {

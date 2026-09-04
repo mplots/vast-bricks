@@ -37,4 +37,10 @@ public class ReconciledOrder {
 
     /** Sub-total of the accounting invoice for this order, or {@code null} when no invoice was found. */
     private BigDecimal invoiceSubTotal;
+
+    /**
+     * What the payment provider reports it took for this order, before its own fees, or {@code null} when no payment
+     * was matched to the order.
+     */
+    private BigDecimal paidAmount;
 }

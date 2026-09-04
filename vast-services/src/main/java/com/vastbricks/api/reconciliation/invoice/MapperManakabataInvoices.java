@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 /**
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Component;
  * is parsed here rather than in the source.
  */
 @Component
+@Order(2)
 class MapperManakabataInvoices implements DetailMapper<InvoiceIndex200ResponseDataInner> {
 
     private static final Pattern INVOICE_NOTE = Pattern.compile(

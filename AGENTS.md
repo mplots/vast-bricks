@@ -164,9 +164,10 @@ here as they are provided; do not invent unspecified behavior prematurely.
   from the BrickStore XML export and BrickOwl orders from the BrickOwl API for
   the selected month. Each collected order carries its marketplace source
   (`BrickLink` or `BrickOwl`), order ID, order date, buyer, buyer username,
-  payment method, sub-total, items sub-total, grand total, and accounting invoice
-  sub-total, together with its rule failures. Add further fields and providers
-  incrementally as their processing requirements are supplied.
+  payment method, sub-total, items sub-total, grand total, accounting invoice
+  sub-total, and paid amount, together with its rule failures. Add further
+  fields and providers incrementally as their processing requirements are
+  supplied.
 - The grand total is the order total in the store's base currency with shipping
   and additional charges included: BrickLink's `BASEGRANDTOTAL` and BrickOwl's
   `base_order_total`. No rule compares it yet.
@@ -185,6 +186,68 @@ here as they are provided; do not invent unspecified behavior prematurely.
   never match on a marketplace's wording. Adding a provider name is a change to
   `ReconciliationPaymentMethod`, which the category packages see alongside
   `ReconciliationAmount`.
+- Payments are collected from Stripe and from PayPal alongside the marketplace
+  orders: Stripe's balance transactions and PayPal's transaction search, each for
+  the month. Both providers date their transactions in UTC, so the month is asked
+  for as a UTC window from the first day at 00:00:00 to the last day at 23:59:59,
+  both ends included. Stripe's cursor paging is followed 100 transactions at a
+  time and PayPal's page numbering 500 at a time. The window belongs to the
+  source, the only class given the month; the paging belongs to the client, being
+  each provider's own protocol.
+- Only a transaction that is a buyer paying for an order is mapped onto one:
+  Stripe's `charge` and `payment` types, and PayPal's `T0006` event code. Both
+  providers report the marketplaces' seller fees, currency conversions, refunds
+  and, for PayPal, bank withdrawals in the same list; those are sourced and left
+  unmapped, because a source decides nothing and what a transaction means is a
+  mapping decision. Refunds are not netted against a payment until requirements
+  for them are supplied.
+- The paid amount is what the payment provider took for the order, gross of its
+  own fees: Stripe's balance transaction `amount` in minor units divided by 100,
+  and PayPal's `transaction_amount`, both normalized like every other collected
+  amount. The provider's fee and net are not collected.
+- What a payment names differs by provider and by marketplace, so each pairing
+  is matched on what it actually carries. A Stripe payment carries a description:
+  BrickOwl words it as `Brick Owl Order #1630980` and matches that order ID,
+  BrickLink words it as `Payment for BrickLink from MrIntellectual` and matches
+  the buyer username. A PayPal payment carries what the marketplace labelled it
+  with: BrickOwl puts its bare order number in `invoice_id` and matches that
+  order ID, and BrickLink puts its own checkout id there instead, which names no
+  order and cannot be joined to one.
+- A PayPal BrickLink payment is therefore matched by the buyer, tried first: the
+  marketplace order carries the buyer's real name, which is the name a payment is
+  made under, and every name the payment gives — PayPal's payer name and its
+  shipping recipient, which often disagree — counts as a match. Where no name
+  matches, because the two systems spell one person differently often enough, the
+  order is looked for by what it came to on the day it was placed. That key is
+  weak, so it counts only when it names exactly one order.
+- A name the month collected several orders for is ambiguous rather than unknown,
+  so the weaker key does not decide it either: all those orders stay unpaid. A
+  guessed payment would read exactly like a reconciled one. The first payment
+  matched to an order wins, as the first invoice does.
+- Names are compared trimmed, with inner runs of whitespace collapsed, and
+  ignoring case, because the systems spell one person's name with different
+  casing and spacing. No closer approximation is attempted: a rule that guesses
+  at spelling would attach payments the screen could not be trusted on.
+- The PayPal mappers consider only orders the marketplace says were paid through
+  PayPal, because a weak key would otherwise attach a payment to an order settled
+  another way. The Stripe mappers need no such guard: they match an order ID or a
+  username the payment states outright.
+- The amount-and-day fallback compares the payment against the order's grand
+  total, which is in the store's base currency, while the payment is in the
+  currency it was taken in. The collected order carries no currency, so the two
+  are compared as numbers. That is correct while both are the same currency and
+  is worth revisiting when a payment in another currency has to reconcile.
+- Because a BrickLink payment is matched on the buyer, its mapper reads fields
+  another detail mapper merged. Detail mappers therefore declare their bean order
+  explicitly rather than relying on scan order, and the payment mappers declare a
+  later one than the BrickLink username mapper.
+- A buyer, a buyer username, and an amount on a day are not the
+  `<source>/<orderId>` key the collected list is indexed by, so
+  `ReconciledOrders` answers each separately, scanning rather than indexing
+  because those fields are merged after the order was collected. How an order is
+  matched across systems stays in `ReconciledOrders` instead of moving into a
+  mapper, which is why the root's API widened by those methods rather than by
+  exposing the collected list.
 - Accounting invoices are collected from Manakabata alongside the marketplace
   orders. The invoice list endpoint accepts no filter beyond the page size, so
   the whole list is requested as one page and searched; an invoice is matched to
@@ -255,14 +318,14 @@ here as they are provided; do not invent unspecified behavior prematurely.
   reconciliation screen.
 - A source, its carrier type, and its mappers live in a subpackage named after
   the reconciliation category they serve: `reconciliation.order`,
-  `reconciliation.invoice`, and later `payment`, `shipping`, and the store
-  synchronization one. Category, not provider: a category is the vocabulary the
-  requirements use, a provider's transport knowledge already lives in its
-  `com.vastbricks.api.client.<provider>` package, and the categories stay a
-  bounded set as providers are added. The accounting category's package is named
-  `invoice` after what it collects; it is a subpackage of `reconciliation` and
-  unrelated to the sibling `com.vastbricks.api.invoice` feature that creates
-  invoices.
+  `reconciliation.invoice`, `reconciliation.payment`, and later `shipping` and
+  the store synchronization one. Category, not provider: a category is the
+  vocabulary the requirements use, a provider's transport knowledge already
+  lives in its `com.vastbricks.api.client.<provider>` package, and the
+  categories stay a bounded set as providers are added. The accounting
+  category's package is named `invoice` after what it collects; it is a
+  subpackage of `reconciliation` and unrelated to the sibling
+  `com.vastbricks.api.invoice` feature that creates invoices.
 - Every rule lives in `reconciliation.rule`, together with the rule boundary,
   the failure, its level, and the order field enum. Rules are not grouped by category: a
   rule reasons across categories, as the invoice rule does when it compares an
@@ -270,7 +333,9 @@ here as they are provided; do not invent unspecified behavior prematurely.
 - The feature root keeps the stage boundaries, the reconciled order model, the
   orchestrator, and the HTTP edge. It declares a small API and nothing more: the
   category packages see `Source`, `Mapper`, `OrderMapper`, `DetailMapper`,
-  `ReconciledOrder`, `ReconciledOrders.find`, `Marketplace`,
+  `ReconciledOrder`, `ReconciledOrders.find`,
+  `ReconciledOrders.findByBuyerUsername`, `ReconciledOrders.findByBuyer`,
+  `ReconciledOrders.findByGrandTotalOn`, `Marketplace`,
   `ReconciliationAmount`, `ReconciliationPaymentMethod`, and `ParallelTasks`; the rule package exposes `Rule`
   and `ReconciliationFailure` back to the root, which the orchestrator and the
   payload need. Everything else stays package-private: the orchestrator,
@@ -289,7 +354,10 @@ here as they are provided; do not invent unspecified behavior prematurely.
   `RuleSubTotalMatchesItems`. A source's carrier type is
   `Sourced<Provider><Thing>`, such as `SourcedBrickOwlOrder`; a source that
   assembles nothing declares the provider's own model as its class instead of
-  wrapping it in a carrier that adds no field. Everything stays package-private
+  wrapping it in a carrier that adds no field, as the payment sources declare
+  `com.stripe.model.BalanceTransaction` and `PayPalTransaction`. A second source
+  over the same model is what would make a carrier necessary, since exactly one
+  source may return a given class. Everything stays package-private
   unless code outside the package uses it.
 
 ### Reconciliation rules
@@ -324,7 +392,8 @@ here as they are provided; do not invent unspecified behavior prematurely.
   untouched. Rules compare normalized amounts exactly and must not define their
   own tolerances.
 - The orders table shows `Actions`, source, order ID, order date, buyer, payment
-  method, and grand total, newest order first as the API returns them. The
+  method, grand total, and paid amount, newest order first as the API returns
+  them. The
   actions cell leads with a dot colored by the loudest level among the order's
   failures, or `success` green when it has none to show; the dot's level is named
   in its tooltip, so color alone never carries it. Rows are not tinted, which
@@ -356,8 +425,16 @@ here as they are provided; do not invent unspecified behavior prematurely.
     order's sub-total and its items sub-total. Invoicing started on 2026-09-01,
     so the rule applies only to orders placed on or after that date; the cut-off
     is hardcoded. An order on or after it with no invoice fails.
-  - Both rules report every failure at `info`. No rule has been specified at
-    another level yet.
+  - An order paid through a payment provider must have been paid its grand
+    total. The rule applies only to orders paid through a provider payments are
+    collected from, currently Stripe and PayPal: an order paid another way has
+    nothing to compare against yet, and reporting it as unpaid would say more
+    about the migration than about the order. An order the rule applies to with
+    no collected payment fails, because within a collected provider no matched
+    payment means the money was not found rather than that the order was free.
+  - The amount rules report every failure at `info`. The paid-amount rule
+    reports both of its failures at `error`: money that was not found, or that
+    does not add up, is something to fix.
 
 ### Data-source boundaries and current clients
 
@@ -382,7 +459,19 @@ here as they are provided; do not invent unspecified behavior prematurely.
   - a BrickOwl source that fetches the order list and its detail batches, with a
     mapper that produces the marketplace order. Its batches stay in one source
     because they need the order ids the list returned.
-- Current payment client implementations are Stripe and PayPal.
+- Stripe and PayPal are both migrated into `vast-services`, each as a client
+  with a payment source and one detail mapper per marketplace, since the two
+  marketplaces label a payment differently. Every provider's base URL and
+  credentials are settings-backed, so the sandbox is another base URL rather
+  than another flag, and a provider client is built per request so a request's
+  own settings profile is honored.
+- Stripe is migrated on its own SDK, whose client accepts a base URL. PayPal's
+  SDK addresses its two hosts through a `SANDBOX`/`PRODUCTION` enum and accepts
+  no other base URL, which leaves it untestable against a mocked provider, so
+  the PayPal client is written on `RestClient` like the marketplace clients: a
+  client-credentials token request and the transaction search.
+- The legacy accounting screen keeps its own Stripe and PayPal code in
+  `vb-portal-api` until that screen is retired.
 - The current shipping client implementation is Mans Pasts.
 - The current accounting client implementation is Manakabata, migrated into
   `vast-services`: an invoice source fetches the invoice list and a detail

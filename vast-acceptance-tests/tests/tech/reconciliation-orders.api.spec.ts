@@ -4,6 +4,22 @@ import { wireMockMode } from '../support/wiremock';
 
 test.describe.configure({ mode: wireMockMode() });
 
+const brickLinkPayPalOrdersXml = (orders: Array<{ orderId: string; buyer: string; total: string }>) =>
+  `<?xml version="1.0" encoding="UTF-8"?><ORDERS>${orders
+    .map(
+      (order) => `
+  <ORDER>
+    <ORDERID>${order.orderId}</ORDERID>
+    <ORDERDATE>8/30/2026</ORDERDATE>
+    <BUYER>${order.buyer}</BUYER>
+    <ORDERTOTAL>${order.total}</ORDERTOTAL>
+    <BASEGRANDTOTAL>${order.total}</BASEGRANDTOTAL>
+    <PAYMENTTYPE>PayPal (Onsite)</PAYMENTTYPE>
+    <ITEM><ITEMID>3001</ITEMID><PRICE>${order.total}</PRICE><QTY>1</QTY></ITEM>
+  </ORDER>`
+    )
+    .join('')}</ORDERS>`;
+
 test('lists BrickLink reconciliation orders for the selected month', async ({
   request,
   settings,
@@ -78,6 +94,7 @@ test('lists BrickLink reconciliation orders for the selected month', async ({
         itemsSubTotal: 3,
         grandTotal: null,
         invoiceSubTotal: null,
+        paidAmount: null,
         failures: [],
       },
       {
@@ -91,7 +108,9 @@ test('lists BrickLink reconciliation orders for the selected month', async ({
         itemsSubTotal: 0.43,
         grandTotal: 3.44,
         invoiceSubTotal: null,
-        failures: [],
+        paidAmount: null,
+        // Paid through Stripe, but no Stripe payment names this order.
+        failures: [{ code: 'amount-missing', level: 'error', fields: ['paidAmount'] }],
       },
     ],
   });
@@ -152,6 +171,7 @@ test('lists BrickOwl reconciliation orders for the selected month', async ({
         itemsSubTotal: 6,
         grandTotal: null,
         invoiceSubTotal: null,
+        paidAmount: null,
         failures: [],
       },
       {
@@ -165,7 +185,9 @@ test('lists BrickOwl reconciliation orders for the selected month', async ({
         itemsSubTotal: 2.7,
         grandTotal: 5.2,
         invoiceSubTotal: null,
-        failures: [],
+        paidAmount: null,
+        // Paid through PayPal, but no PayPal payment names this order.
+        failures: [{ code: 'amount-missing', level: 'error', fields: ['paidAmount'] }],
       },
     ],
   });
@@ -203,6 +225,7 @@ test('lists BrickOwl reconciliation orders that span several batch requests', as
     itemsSubTotal: 1,
     grandTotal: null,
     invoiceSubTotal: null,
+    paidAmount: null,
     failures: [],
   });
   expect(body.orders[59].orderId).toBe('bulk-order-60');
@@ -267,6 +290,455 @@ test('returns no reconciliation orders when no provider reports orders', async (
     selectedMonth: '2026-08',
     orders: [],
   });
+});
+
+test('reports what Stripe was paid for a BrickOwl order named in the payment description', async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: '2026-08',
+    brickOwl: [
+      {
+        orderId: 'test-order-0810',
+        orderDate: '1786320000',
+        view: {
+          buyer_name: 'Test Buyer Alpha',
+          payment_method_type: 'stripe',
+          sub_total: '5.20',
+          base_order_total: '5.20',
+        },
+        items: [{ base_price: '5.20', ordered_quantity: '1' }],
+      },
+    ],
+    stripe: [{ description: 'Brick Owl Order test-order-0810', amount: 520 }],
+  });
+
+  const response = await request.get('/api/private/reconciliation/orders?month=2026-08');
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  expect(body.orders[0].paidAmount).toBe(5.2);
+  expect(body.orders[0].failures).toEqual([]);
+});
+
+test('reports what Stripe was paid for a BrickLink order by the buyer username in the payment description', async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: '2026-08',
+    brickLink: {
+      fullNameOrdersXml: `<?xml version="1.0" encoding="UTF-8"?>
+<ORDERS>
+  <ORDER>
+    <ORDERID>32456563</ORDERID>
+    <ORDERDATE>8/30/2026</ORDERDATE>
+    <BUYER>some buyer</BUYER>
+    <ORDERTOTAL>3.44</ORDERTOTAL>
+    <BASEGRANDTOTAL>3.44</BASEGRANDTOTAL>
+    <PAYMENTTYPE>Credit/Debit (Powered by Stripe)</PAYMENTTYPE>
+    <ITEM>
+      <ITEMID>3001</ITEMID>
+      <PRICE>3.4400</PRICE>
+      <QTY>1</QTY>
+    </ITEM>
+  </ORDER>
+</ORDERS>`,
+      usernameOrdersXml: `<?xml version="1.0" encoding="UTF-8"?>
+<ORDERS>
+  <ORDER>
+    <ORDERID>32456563</ORDERID>
+    <BUYER>some-buyer-username</BUYER>
+  </ORDER>
+</ORDERS>`,
+    },
+    stripe: [{ description: 'Payment for BrickLink from some-buyer-username', amount: 344, type: 'payment' }],
+  });
+
+  const response = await request.get('/api/private/reconciliation/orders?month=2026-08');
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  expect(body.orders[0].paidAmount).toBe(3.44);
+  expect(body.orders[0].failures).toEqual([]);
+});
+
+test('reports no paid amount when several BrickLink orders share the buyer the payment names', async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: '2026-08',
+    brickLink: {
+      fullNameOrdersXml: `<?xml version="1.0" encoding="UTF-8"?>
+<ORDERS>
+  <ORDER>
+    <ORDERID>32456563</ORDERID>
+    <ORDERDATE>8/30/2026</ORDERDATE>
+    <BUYER>some buyer</BUYER>
+  </ORDER>
+  <ORDER>
+    <ORDERID>32456564</ORDERID>
+    <ORDERDATE>8/31/2026</ORDERDATE>
+    <BUYER>some buyer</BUYER>
+  </ORDER>
+</ORDERS>`,
+      usernameOrdersXml: `<?xml version="1.0" encoding="UTF-8"?>
+<ORDERS>
+  <ORDER>
+    <ORDERID>32456563</ORDERID>
+    <BUYER>some-buyer-username</BUYER>
+  </ORDER>
+  <ORDER>
+    <ORDERID>32456564</ORDERID>
+    <BUYER>some-buyer-username</BUYER>
+  </ORDER>
+</ORDERS>`,
+    },
+    stripe: [{ description: 'Payment for BrickLink from some-buyer-username', amount: 344, type: 'payment' }],
+  });
+
+  const response = await request.get('/api/private/reconciliation/orders?month=2026-08');
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  expect(body.orders.map((order: { paidAmount: number | null }) => order.paidAmount)).toEqual([null, null]);
+});
+
+test('reports no paid amount from Stripe fee and refund transactions that name an order', async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: '2026-08',
+    brickOwl: [
+      {
+        orderId: 'test-order-0810',
+        orderDate: '1786320000',
+        view: { buyer_name: 'Test Buyer Alpha', base_order_total: '5.20' },
+      },
+    ],
+    stripe: [
+      { description: 'Brick Owl Order test-order-0810', amount: -30, type: 'stripe_fee' },
+      { description: 'REFUND FOR CHARGE (Brick Owl Order test-order-0810)', amount: -520, type: 'refund' },
+    ],
+  });
+
+  const response = await request.get('/api/private/reconciliation/orders?month=2026-08');
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  expect(body.orders[0].paidAmount).toBeNull();
+});
+
+test('reports no paid amount when no Stripe payment names the order', async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: '2026-08',
+    brickOwl: [
+      {
+        orderId: 'test-order-0810',
+        orderDate: '1786320000',
+        view: { buyer_name: 'Test Buyer Alpha', base_order_total: '5.20' },
+      },
+    ],
+    stripe: [{ description: 'Brick Owl Order some-other-order', amount: 520 }],
+  });
+
+  const response = await request.get('/api/private/reconciliation/orders?month=2026-08');
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  expect(body.orders[0].paidAmount).toBeNull();
+});
+
+test('collects Stripe payments that span several pages', async ({ request, settings }, testInfo) => {
+  const wireMock = await mockReconciliationOrders(settings, request, testInfo, {
+    month: '2026-08',
+    brickOwl: [
+      { orderId: 'owl-order-1', orderDate: '1786320000', view: { buyer_name: 'First Buyer' } },
+      { orderId: 'owl-order-2', orderDate: '1786320000', view: { buyer_name: 'Second Buyer' } },
+    ],
+    stripePages: [
+      [{ description: 'Brick Owl Order owl-order-1', amount: 100 }],
+      [{ description: 'Brick Owl Order owl-order-2', amount: 250 }],
+    ],
+  });
+
+  const response = await request.get('/api/private/reconciliation/orders?month=2026-08');
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  const paidByOrder = Object.fromEntries(
+    body.orders.map((order: { orderId: string; paidAmount: number | null }) => [order.orderId, order.paidAmount])
+  );
+  expect(paidByOrder).toEqual({ 'owl-order-1': 1, 'owl-order-2': 2.5 });
+
+  const balanceTransactionRequests = await wireMock.findMethodHostRequests('GET', '/v1/balance_transactions');
+  expect(balanceTransactionRequests).toHaveLength(2);
+});
+
+test('reports a bad gateway when Stripe fails', async ({ request, settings }, testInfo) => {
+  const wireMock = await mockReconciliationOrders(settings, request, testInfo, { month: '2026-08' });
+  await wireMock.addMethodHostMapping('GET', '/v1/balance_transactions', {
+    response: { status: 500, json: { error: { message: 'Stripe is unavailable' } } },
+  });
+
+  const response = await request.get('/api/private/reconciliation/orders?month=2026-08');
+
+  expect(response.status(), await response.text()).toBe(502);
+});
+
+test('reports what PayPal was paid for a BrickOwl order it labelled with the order number', async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: '2026-08',
+    brickOwl: [
+      {
+        orderId: '7578233',
+        orderDate: '1786320000',
+        view: {
+          buyer_name: 'Jonathan Pithioud',
+          payment_method_type: 'paypal',
+          sub_total: '7.69',
+          base_order_total: '7.69',
+        },
+        items: [{ base_price: '7.69', ordered_quantity: '1' }],
+      },
+    ],
+    payPal: [{ invoiceId: '7578233', payerName: 'Jonathan Pithioud', amount: '7.69' }],
+  });
+
+  const response = await request.get('/api/private/reconciliation/orders?month=2026-08');
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  expect(body.orders[0].paidAmount).toBe(7.69);
+  expect(body.orders[0].failures).toEqual([]);
+});
+
+test('reports what PayPal was paid for a BrickLink order by the buyer the payment names', async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: '2026-08',
+    brickLink: {
+      fullNameOrdersXml: brickLinkPayPalOrdersXml([
+        { orderId: '32456563', buyer: 'Riku Watanabe', total: '11.39' },
+      ]),
+      usernameOrdersXml: `<?xml version="1.0" encoding="UTF-8"?><ORDERS/>`,
+    },
+    // The payment spells the buyer with different casing and spacing than the order does.
+    payPal: [{ payerName: 'riku  WATANABE', amount: '11.39' }],
+  });
+
+  const response = await request.get('/api/private/reconciliation/orders?month=2026-08');
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  expect(body.orders[0].paidAmount).toBe(11.39);
+  expect(body.orders[0].failures).toEqual([]);
+});
+
+test('reports what PayPal was paid for a BrickLink order by the shipping name when the payer is named otherwise', async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: '2026-08',
+    brickLink: {
+      fullNameOrdersXml: brickLinkPayPalOrdersXml([
+        { orderId: '32456563', buyer: 'Andris Konuss', total: '5.89' },
+      ]),
+      usernameOrdersXml: `<?xml version="1.0" encoding="UTF-8"?><ORDERS/>`,
+    },
+    payPal: [{ payerName: 'Someone Else', shippingName: 'Andris Konuss', amount: '5.89' }],
+  });
+
+  const response = await request.get('/api/private/reconciliation/orders?month=2026-08');
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  expect(body.orders[0].paidAmount).toBe(5.89);
+});
+
+test('falls back to the amount and day when no name matches a BrickLink order', async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: '2026-08',
+    brickLink: {
+      fullNameOrdersXml: brickLinkPayPalOrdersXml([
+        { orderId: '32456563', buyer: 'Tom Copin', total: '23.06' },
+      ]),
+      usernameOrdersXml: `<?xml version="1.0" encoding="UTF-8"?><ORDERS/>`,
+    },
+    // 'Tom Com' is how PayPal spells this buyer; it matches no order, so the amount and the day decide.
+    payPal: [{ payerName: 'Tom Com', amount: '23.06', initiatedAt: '2026-08-30T05:24:15Z' }],
+  });
+
+  const response = await request.get('/api/private/reconciliation/orders?month=2026-08');
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  expect(body.orders[0].paidAmount).toBe(23.06);
+});
+
+test('reports no paid amount when the amount and day match several BrickLink orders', async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: '2026-08',
+    brickLink: {
+      fullNameOrdersXml: brickLinkPayPalOrdersXml([
+        { orderId: '32456563', buyer: 'First Buyer', total: '23.06' },
+        { orderId: '32456564', buyer: 'Second Buyer', total: '23.06' },
+      ]),
+      usernameOrdersXml: `<?xml version="1.0" encoding="UTF-8"?><ORDERS/>`,
+    },
+    payPal: [{ payerName: 'Nobody Known', amount: '23.06', initiatedAt: '2026-08-30T05:24:15Z' }],
+  });
+
+  const response = await request.get('/api/private/reconciliation/orders?month=2026-08');
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  expect(body.orders.map((order: { paidAmount: number | null }) => order.paidAmount)).toEqual([null, null]);
+});
+
+test('reports no paid amount when several BrickLink orders name the buyer the payment names', async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: '2026-08',
+    brickLink: {
+      fullNameOrdersXml: brickLinkPayPalOrdersXml([
+        { orderId: '32456563', buyer: 'Maksims Brezgins', total: '38.80' },
+        { orderId: '32456564', buyer: 'Maksims Brezgins', total: '5.06' },
+      ]),
+      usernameOrdersXml: `<?xml version="1.0" encoding="UTF-8"?><ORDERS/>`,
+    },
+    // The name is ambiguous rather than unknown, so the amount must not quietly decide it instead.
+    payPal: [{ payerName: 'Maksims Brezgins', amount: '38.80', initiatedAt: '2026-08-30T05:24:15Z' }],
+  });
+
+  const response = await request.get('/api/private/reconciliation/orders?month=2026-08');
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  expect(body.orders.map((order: { paidAmount: number | null }) => order.paidAmount)).toEqual([null, null]);
+});
+
+test('reports no paid amount from a PayPal fee, refund or withdrawal that names the buyer', async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: '2026-08',
+    brickLink: {
+      fullNameOrdersXml: brickLinkPayPalOrdersXml([
+        { orderId: '32456563', buyer: 'Eden Lister', total: '11.78' },
+      ]),
+      usernameOrdersXml: `<?xml version="1.0" encoding="UTF-8"?><ORDERS/>`,
+    },
+    payPal: [
+      { payerName: 'Eden Lister', amount: '11.78', eventCode: 'T0113' },
+      { payerName: 'Eden Lister', amount: '11.78', eventCode: 'T0007' },
+      { payerName: 'Eden Lister', amount: '11.78', eventCode: 'T0200' },
+    ],
+  });
+
+  const response = await request.get('/api/private/reconciliation/orders?month=2026-08');
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  expect(body.orders[0].paidAmount).toBeNull();
+});
+
+test('does not attach a PayPal payment to an order settled another way', async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: '2026-08',
+    brickLink: {
+      fullNameOrdersXml: `<?xml version="1.0" encoding="UTF-8"?>
+<ORDERS>
+  <ORDER>
+    <ORDERID>32456563</ORDERID>
+    <ORDERDATE>8/30/2026</ORDERDATE>
+    <BUYER>Bank Payer</BUYER>
+    <ORDERTOTAL>7.00</ORDERTOTAL>
+    <BASEGRANDTOTAL>7.00</BASEGRANDTOTAL>
+    <PAYMENTTYPE>Bank Transfer</PAYMENTTYPE>
+    <ITEM><ITEMID>3001</ITEMID><PRICE>7.0000</PRICE><QTY>1</QTY></ITEM>
+  </ORDER>
+</ORDERS>`,
+      usernameOrdersXml: `<?xml version="1.0" encoding="UTF-8"?><ORDERS/>`,
+    },
+    payPal: [{ payerName: 'Bank Payer', amount: '7.00' }],
+  });
+
+  const response = await request.get('/api/private/reconciliation/orders?month=2026-08');
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  expect(body.orders[0].paidAmount).toBeNull();
+  expect(body.orders[0].failures).toEqual([]);
+});
+
+test('collects PayPal payments that span several pages', async ({ request, settings }, testInfo) => {
+  const wireMock = await mockReconciliationOrders(settings, request, testInfo, {
+    month: '2026-08',
+    brickOwl: [
+      {
+        orderId: '7578233',
+        orderDate: '1786320000',
+        view: { buyer_name: 'First Buyer', payment_method_type: 'paypal' },
+      },
+      {
+        orderId: '5120724',
+        orderDate: '1786320000',
+        view: { buyer_name: 'Second Buyer', payment_method_type: 'paypal' },
+      },
+    ],
+    payPalPages: [
+      [{ invoiceId: '7578233', amount: '7.69' }],
+      [{ invoiceId: '5120724', amount: '7.71' }],
+    ],
+  });
+
+  const response = await request.get('/api/private/reconciliation/orders?month=2026-08');
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  const paidByOrder = Object.fromEntries(
+    body.orders.map((order: { orderId: string; paidAmount: number | null }) => [order.orderId, order.paidAmount])
+  );
+  expect(paidByOrder).toEqual({ '7578233': 7.69, '5120724': 7.71 });
+
+  const transactionRequests = await wireMock.findMethodHostRequests('GET', '/v1/reporting/transactions');
+  expect(transactionRequests).toHaveLength(2);
+});
+
+test('reports a bad gateway when PayPal fails', async ({ request, settings }, testInfo) => {
+  const wireMock = await mockReconciliationOrders(settings, request, testInfo, { month: '2026-08' });
+  await wireMock.addMethodHostMapping('GET', '/v1/reporting/transactions', {
+    response: { status: 500, json: { message: 'PayPal is unavailable' } },
+  });
+
+  const response = await request.get('/api/private/reconciliation/orders?month=2026-08');
+
+  expect(response.status(), await response.text()).toBe(502);
 });
 
 test('rejects an invalid reconciliation month', async ({ request }) => {

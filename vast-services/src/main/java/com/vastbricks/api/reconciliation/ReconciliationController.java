@@ -3,6 +3,8 @@ package com.vastbricks.api.reconciliation;
 import com.vastbricks.api.client.brickowl.BrickOwlClientException;
 import com.vastbricks.api.client.brickstore.BrickStoreClientException;
 import com.vastbricks.api.client.manakabata.ManakabataClientException;
+import com.vastbricks.api.client.paypal.PayPalClientException;
+import com.vastbricks.api.client.stripe.StripeClientException;
 import com.vastbricks.api.reconciliation.ReconciliationPayload.ReconciliationOrdersResponse;
 import java.time.YearMonth;
 import java.time.format.DateTimeParseException;
@@ -36,7 +38,9 @@ class ReconciliationController {
     @ExceptionHandler({
             BrickStoreClientException.class,
             BrickOwlClientException.class,
-            ManakabataClientException.class
+            ManakabataClientException.class,
+            PayPalClientException.class,
+            StripeClientException.class
     })
     @ResponseStatus(HttpStatus.BAD_GATEWAY)
     String handleDataSourceException(RuntimeException exception) {

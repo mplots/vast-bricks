@@ -23,6 +23,8 @@ export interface ReconciliationOrder {
   /** Order total in the store's base currency, shipping and additional charges included. */
   grandTotal: number | null;
   invoiceSubTotal: number | null;
+  /** What the payment provider took for the order, before its own fees. */
+  paidAmount: number | null;
   failures: ReconciliationFailure[];
 }
 

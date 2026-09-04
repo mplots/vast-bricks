@@ -46,13 +46,14 @@ const orderFields = [
   'subTotal',
   'itemsSubTotal',
   'grandTotal',
-  'invoiceSubTotal'
+  'invoiceSubTotal',
+  'paidAmount'
 ] as const;
-const amountFields: string[] = ['subTotal', 'itemsSubTotal', 'grandTotal', 'invoiceSubTotal'];
+const amountFields: string[] = ['subTotal', 'itemsSubTotal', 'grandTotal', 'invoiceSubTotal', 'paidAmount'];
 const dateFields: string[] = ['orderDate'];
 
 // Fields shown as table columns; the detail view shows all of them.
-const columnFields: string[] = ['source', 'orderId', 'orderDate', 'buyer', 'paymentMethod', 'grandTotal'];
+const columnFields: string[] = ['source', 'orderId', 'orderDate', 'buyer', 'paymentMethod', 'grandTotal', 'paidAmount'];
 
 const formatAmount = (value?: number | null) => {
   if (value === null || value === undefined || Number.isNaN(value)) {
