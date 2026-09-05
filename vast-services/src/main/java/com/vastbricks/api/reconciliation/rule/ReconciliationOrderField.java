@@ -19,6 +19,7 @@ enum ReconciliationOrderField {
     BUYER_USERNAME("buyerUsername"),
     PAYMENT_METHOD("paymentMethod"),
     TAX_TYPE("taxType"),
+    FACILITATOR_TAX("facilitatorTax"),
     SUB_TOTAL("subTotal"),
     ITEMS_SUB_TOTAL("itemsSubTotal"),
     GRAND_TOTAL("grandTotal"),

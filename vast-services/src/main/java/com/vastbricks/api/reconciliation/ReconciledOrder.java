@@ -33,6 +33,12 @@ public class ReconciledOrder {
     /** How the order is treated for tax, derived from what the marketplace reported. */
     private OrderTaxType taxType;
 
+    /**
+     * What the marketplace collected on the order as tax facilitator, under its own registration, or {@code null}
+     * when it collected none.
+     */
+    private BigDecimal facilitatorTax;
+
     private BigDecimal subTotal;
     private BigDecimal itemsSubTotal;
 

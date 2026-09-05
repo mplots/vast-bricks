@@ -54,18 +54,20 @@ const orderFields = [
   'buyerUsername',
   'paymentMethod',
   'taxType',
+  'facilitatorTax',
   'subTotal',
   'itemsSubTotal',
   'grandTotal',
   'invoiceSubTotal',
   'paidAmount'
 ] as const;
-const amountFields: string[] = ['subTotal', 'itemsSubTotal', 'grandTotal', 'invoiceSubTotal', 'paidAmount'];
+const amountFields: string[] = ['facilitatorTax', 'subTotal', 'itemsSubTotal', 'grandTotal', 'invoiceSubTotal', 'paidAmount'];
 const dateFields: string[] = ['orderDate'];
 
 // Fields shown as table columns; the detail view shows all of them.
-// The tax type is absent: it rides in the actions cell as an icon rather than spending a column on a word.
-const columnFields: string[] = ['source', 'orderId', 'orderDate', 'buyer', 'paymentMethod', 'grandTotal', 'paidAmount'];
+// The tax type is absent: it rides in the actions cell as an icon rather than spending a column on a word. The
+// facilitator tax is here all the same, being an amount to account for rather than a classification.
+const columnFields: string[] = ['source', 'orderId', 'orderDate', 'buyer', 'paymentMethod', 'grandTotal', 'facilitatorTax', 'paidAmount'];
 
 const formatAmount = (value?: number | null) => {
   if (value === null || value === undefined || Number.isNaN(value)) {

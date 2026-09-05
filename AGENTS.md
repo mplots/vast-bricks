@@ -168,8 +168,9 @@ here as they are provided; do not invent unspecified behavior prematurely.
   from the BrickStore XML export and BrickOwl orders from the BrickOwl API for
   the selected month. Each collected order carries its marketplace source
   (`BrickLink` or `BrickOwl`), order ID, order date, buyer, buyer username,
-  payment method, tax type, sub-total, items sub-total, grand total, accounting
-  invoice sub-total, and paid amount, together with its rule failures. Add further
+  payment method, tax type, facilitator tax, sub-total, items sub-total, grand
+  total, accounting invoice sub-total, and paid amount, together with its rule
+  failures. Add further
   fields and providers incrementally as their processing requirements are
   supplied.
 - The grand total is the order total in the store's base currency with shipping
@@ -195,6 +196,12 @@ here as they are provided; do not invent unspecified behavior prematurely.
   here; see "Order tax type feature requirements". The mapping stage derives it
   once from the marketplace order, as it normalizes amounts and payment methods
   there.
+- The facilitator tax is what the marketplace collected on the order under its
+  own tax registration. It belongs to the same shared `tax` feature as the tax
+  type, is derived in the mapping stage beside it, and is normalized like every
+  other collected amount. It is shown as its own column, unlike the tax type,
+  because it is an amount to be accounted for rather than a classification an
+  icon can carry. No rule compares it yet.
 - Payments are collected from Stripe and from PayPal alongside the marketplace
   orders: Stripe's balance transactions and PayPal's transaction search, each for
   the month. Both providers date their transactions in UTC, so the month is asked
@@ -673,11 +680,13 @@ is accounted for. It is a property of the order rather than of any one screen,
 so it is a shared feature in `com.vastbricks.api.tax` and not part of
 reconciliation: the reconciliation screen is its first caller, not its owner.
 
-- The public API is two types: `OrderTaxType`, the vocabulary, and
-  `OrderTaxTypes`, which derives it from a marketplace's own order. A caller
-  passes the marketplace order it already holds and gets the shared type back.
-- Adding a marketplace is one more `OrderTaxTypes.of` method. Callers do not
-  change, because they already speak `OrderTaxType`.
+- The public API is three types: `OrderTaxType`, the vocabulary; `OrderTaxTypes`,
+  which derives it from a marketplace's own order; and `FacilitatorTaxes`, which
+  derives what the marketplace collected as tax facilitator from the same order.
+  A caller passes the marketplace order it already holds and gets the shared
+  type or the amount back.
+- Adding a marketplace is one more `OrderTaxTypes.of` and `FacilitatorTaxes.of`
+  method. Callers do not change, because they already speak `OrderTaxType`.
 - The four types are `domestic` (sold within Latvia with Latvian VAT charged),
   `european-union` (sold into another member state with VAT charged), `export`
   (sold outside the EU with no tax charged), and `export-taxable` (sold outside
@@ -704,9 +713,18 @@ reconciliation: the reconciliation screen is its first caller, not its owner.
   neither as `export`. The export writes both of those as `0.00` rather than
   omitting them, so it is a charge of zero, not a missing field, that says no tax
   was taken; an order with no `VATCHARGES` element at all is untyped.
+- The facilitator tax is the tax charged under the marketplace's own
+  registration rather than the store's, so only an `export-taxable` order
+  carries one: the type decides whether there is an amount at all. BrickOwl
+  states it as `tax_amount`. BrickLink splits it between `ORDERSALESTAX` and
+  `ORDERVAT`, one per jurisdiction it charges under, so its facilitator tax is
+  their sum. An order of any other type has no facilitator tax rather than a
+  zero, because nothing collected under a facilitator's registration is a
+  different fact from a facilitator collecting nothing.
 - The feature has no endpoint of its own, so the classification is a logic test
   addressing it through the test-only `/api/test/order-tax-type/<marketplace>`
-  controller. One mapping per marketplace takes exactly the fields that
+  controller, and the facilitator tax through
+  `/api/test/facilitator-tax/<marketplace>` beside it. One mapping per marketplace takes exactly the fields that
   marketplace states, and a parameter left out is a field it did not report, so
   a scenario is one marketplace's tax fields and the type they come to. It is
   not tested through the reconciliation order scenarios: those cover that the

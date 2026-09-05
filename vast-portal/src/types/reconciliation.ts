@@ -22,6 +22,8 @@ export interface ReconciliationOrder {
   paymentMethod: string | null;
   /** How the order is treated for tax, derived from what the marketplace reported. */
   taxType: OrderTaxType | null;
+  /** What the marketplace collected on the order as tax facilitator, or `null` when it collected none. */
+  facilitatorTax: number | null;
   subTotal: number | null;
   itemsSubTotal: number | null;
   /** Order total in the store's base currency, shipping and additional charges included. */

@@ -6,6 +6,7 @@ import com.vastbricks.api.reconciliation.OrderMapper;
 import com.vastbricks.api.reconciliation.ReconciledOrder;
 import com.vastbricks.api.reconciliation.ReconciliationAmount;
 import com.vastbricks.api.reconciliation.ReconciliationPaymentMethod;
+import com.vastbricks.api.tax.FacilitatorTaxes;
 import com.vastbricks.api.tax.OrderTaxTypes;
 import java.math.BigDecimal;
 import java.util.List;
@@ -35,6 +36,7 @@ class MapperBrickLinkOrders implements OrderMapper<BrickStoreOrder> {
                 .buyer(order.getBuyer())
                 .paymentMethod(ReconciliationPaymentMethod.normalize(order.getPaymentType()))
                 .taxType(OrderTaxTypes.of(order))
+                .facilitatorTax(ReconciliationAmount.normalize(FacilitatorTaxes.of(order)))
                 .subTotal(ReconciliationAmount.normalize(order.getTotal()))
                 .itemsSubTotal(ReconciliationAmount.normalize(sumItemPrices(order)))
                 .grandTotal(ReconciliationAmount.normalize(order.getBaseGrandTotal()))
