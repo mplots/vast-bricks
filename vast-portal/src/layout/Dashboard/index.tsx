@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useMatches } from 'react-router-dom';
 
 // material-ui
 import useMediaQuery from '@mui/material/useMediaQuery';
@@ -21,6 +21,7 @@ import { handlerDrawerOpen, useGetMenuMaster } from 'api/menu';
 import { DRAWER_WIDTH, MenuOrientation } from 'config';
 import useConfig from 'hooks/useConfig';
 import AuthGuard from 'utils/route-guard/AuthGuard';
+import type { PageLayout } from 'types/page';
 
 // ==============================|| MAIN LAYOUT ||============================== //
 
@@ -32,6 +33,9 @@ export default function MainLayout() {
   const { container, miniDrawer, menuOrientation } = useConfig();
 
   const isHorizontal = menuOrientation === MenuOrientation.HORIZONTAL && !downLG;
+
+  // What the page being rendered asked of the layout, taken from its route rather than guessed from the path.
+  const page = useMatches().reduce<PageLayout>((choices, match) => ({ ...choices, ...(match.handle as PageLayout) }), {});
 
   // set media wise responsive drawer
   useEffect(() => {
@@ -52,7 +56,7 @@ export default function MainLayout() {
         <Box component="main" sx={{ width: `calc(100% - ${DRAWER_WIDTH}px)`, flexGrow: 1, p: { xs: 1, sm: 3 } }}>
           <Toolbar sx={{ mt: isHorizontal ? 8 : 'inherit', mb: isHorizontal ? 2 : 'inherit' }} />
           <Container
-            maxWidth={container && !downXL ? 'xl' : false}
+            maxWidth={container && !downXL && !page.fullWidth ? 'xl' : false}
             sx={{
               ...(container && !downXL && { px: { xs: 0, sm: 3 } }),
               position: 'relative',
@@ -61,7 +65,7 @@ export default function MainLayout() {
               flexDirection: 'column'
             }}
           >
-            <Breadcrumbs />
+            <Breadcrumbs title={page.heading !== false} />
             <Outlet />
             <Footer />
           </Container>

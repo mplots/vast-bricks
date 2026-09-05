@@ -446,6 +446,11 @@ here as they are provided; do not invent unspecified behavior prematurely.
   screen read, and `Filters`, which decides which orders are on screen.
   `Highlights` currently holds the level coloring switches alone. `Filters` heads
   its facets and carries the control that clears them.
+- The orders take the whole width available rather than the centred container a
+  narrower page reads better in, and the breadcrumb trail names the screen
+  without the heading that would repeat it. Both are the route's own choice,
+  declared in its `handle` as a `PageLayout` and read once by the dashboard
+  layout, so a page states what it needs instead of the layout knowing pages.
 - Each facet is a headed group of checkboxes with the count of orders answering
   each value. Ticking several values of one group widens that group and ticking
   across groups narrows, and a group's counts are of the orders the other groups

@@ -5,6 +5,7 @@ import { Navigate } from 'react-router-dom';
 import Loadable from 'components/Loadable';
 import { APP_DEFAULT_PATH, SimpleLayoutType } from 'config';
 import DashboardLayout from 'layout/Dashboard';
+import type { PageLayout } from 'types/page';
 import PagesLayout from 'layout/Pages';
 import SimpleLayout from 'layout/Simple';
 
@@ -55,7 +56,9 @@ const MainRoutes = {
         },
         {
           path: 'reconciliation',
-          element: <ReconciliationPage />
+          element: <ReconciliationPage />,
+          // A month of orders is a wide table beside a filter panel, and the trail already names the page.
+          handle: { fullWidth: true, heading: false } satisfies PageLayout
         }
       ]
     },
