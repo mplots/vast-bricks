@@ -95,7 +95,7 @@ test('lists BrickLink reconciliation orders for the selected month', async ({
         grandTotal: null,
         invoiceSubTotal: null,
         paidAmount: null,
-        failures: [],
+        failures: [{ code: 'amount-missing', level: 'error', fields: ['paidAmount'] }],
       },
       {
         source: 'BrickLink',
@@ -172,7 +172,7 @@ test('lists BrickOwl reconciliation orders for the selected month', async ({
         grandTotal: null,
         invoiceSubTotal: null,
         paidAmount: null,
-        failures: [],
+        failures: [{ code: 'amount-missing', level: 'error', fields: ['paidAmount'] }],
       },
       {
         source: 'BrickOwl',
@@ -226,7 +226,7 @@ test('lists BrickOwl reconciliation orders that span several batch requests', as
     grandTotal: null,
     invoiceSubTotal: null,
     paidAmount: null,
-    failures: [],
+        failures: [{ code: 'amount-missing', level: 'error', fields: ['paidAmount'] }],
   });
   expect(body.orders[59].orderId).toBe('bulk-order-60');
 
@@ -750,7 +750,7 @@ test('does not attach a PayPal payment to an order settled another way', async (
   expect(response.status(), await response.text()).toBe(200);
   const body = await response.json();
   expect(body.orders[0].paidAmount).toBeNull();
-  expect(body.orders[0].failures).toEqual([]);
+  expect(body.orders[0].failures).toEqual([{ code: 'amount-missing', level: 'error', fields: ['paidAmount'] }]);
 });
 
 test('collects PayPal payments that span several pages', async ({ request, settings }, testInfo) => {

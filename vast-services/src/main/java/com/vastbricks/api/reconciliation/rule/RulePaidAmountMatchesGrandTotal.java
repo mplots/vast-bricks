@@ -11,11 +11,10 @@ import org.springframework.stereotype.Component;
 /**
  * An order paid through a payment provider must have been paid its grand total. The rule applies only to orders paid
  * through a provider payments are collected from: an order paid another way has nothing to compare against yet, and
- * reporting it as unpaid would say more about the migration than about the order.
+ * holding it to an amount nobody collected would say more about the migration than about the order.
  *
- * <p>An order the rule applies to with no collected payment fails: within a collected provider, no payment matched
- * means the money was not found, not that the order was free. A missing grand total is reported by the rule that
- * collected it, so it is not repeated here.
+ * <p>Only the comparison is made here. A missing paid amount is reported by the rule that requires one, and a missing
+ * grand total by the rule that collected it, so neither is repeated here.
  */
 @Component
 class RulePaidAmountMatchesGrandTotal implements Rule {
@@ -23,7 +22,6 @@ class RulePaidAmountMatchesGrandTotal implements Rule {
     /** The payment providers payments are collected from, as the mapping unified their names. */
     private static final Set<String> COLLECTED_PROVIDERS = Set.of("Stripe", "PayPal");
 
-    private static final String AMOUNT_MISSING = "amount-missing";
     private static final String PAID_AMOUNT_MISMATCH = "paid-amount-mismatch";
 
     @Override
@@ -34,16 +32,8 @@ class RulePaidAmountMatchesGrandTotal implements Rule {
         }
 
         var paidAmount = order.getPaidAmount();
-        if (paidAmount == null) {
-            return List.of(new ReconciliationFailure(
-                    AMOUNT_MISSING,
-                    ReconciliationFailureLevel.ERROR,
-                    List.of(PAID_AMOUNT)
-            ));
-        }
-
         var grandTotal = order.getGrandTotal();
-        if (grandTotal != null && paidAmount.compareTo(grandTotal) != 0) {
+        if (paidAmount != null && grandTotal != null && paidAmount.compareTo(grandTotal) != 0) {
             return List.of(new ReconciliationFailure(
                     PAID_AMOUNT_MISMATCH,
                     ReconciliationFailureLevel.ERROR,

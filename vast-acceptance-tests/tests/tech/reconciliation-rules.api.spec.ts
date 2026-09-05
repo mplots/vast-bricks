@@ -44,8 +44,9 @@ test('fails an order whose sub-total does not match its items sub-total', async 
   expect(response.status(), await response.text()).toBe(200);
   const body = await response.json();
   expect(body.orders.map((order: { orderId: string }) => order.orderId)).toEqual(['32456563', '32456564']);
-  expect(body.orders[0].failures).toEqual([]);
+  expect(body.orders[0].failures).toEqual([{ code: 'amount-missing', level: 'error', fields: ['paidAmount'] }]);
   expect(body.orders[1].failures).toEqual([
+    { code: 'amount-missing', level: 'error', fields: ['paidAmount'] },
     { code: 'sub-total-mismatch', level: 'info', fields: ['subTotal', 'itemsSubTotal'] },
   ]);
 });
@@ -74,8 +75,14 @@ test('fails an order that is missing an amount the rule needs', async ({
 
   expect(response.status(), await response.text()).toBe(200);
   const body = await response.json();
-  expect(body.orders[0].failures).toEqual([{ code: 'amount-missing', level: 'info', fields: ['itemsSubTotal'] }]);
-  expect(body.orders[1].failures).toEqual([{ code: 'amount-missing', level: 'info', fields: ['subTotal'] }]);
+  expect(body.orders[0].failures).toEqual([
+    { code: 'amount-missing', level: 'error', fields: ['paidAmount'] },
+    { code: 'amount-missing', level: 'info', fields: ['itemsSubTotal'] },
+  ]);
+  expect(body.orders[1].failures).toEqual([
+    { code: 'amount-missing', level: 'error', fields: ['paidAmount'] },
+    { code: 'amount-missing', level: 'info', fields: ['subTotal'] },
+  ]);
 });
 
 test('reconciles amounts that differ only below the cent', async ({ request, settings }, testInfo) => {
@@ -97,7 +104,7 @@ test('reconciles amounts that differ only below the cent', async ({ request, set
   expect(response.status(), await response.text()).toBe(200);
   const body = await response.json();
   expect(body.orders[0].itemsSubTotal).toBe(0.43);
-  expect(body.orders[0].failures).toEqual([]);
+  expect(body.orders[0].failures).toEqual([{ code: 'amount-missing', level: 'error', fields: ['paidAmount'] }]);
 });
 
 test('reconciles an order whose accounting invoice sub-total matches its amounts', async ({
@@ -118,7 +125,7 @@ test('reconciles an order whose accounting invoice sub-total matches its amounts
   expect(response.status(), await response.text()).toBe(200);
   const body = await response.json();
   expect(body.orders[0].invoiceSubTotal).toBe(5);
-  expect(body.orders[0].failures).toEqual([]);
+  expect(body.orders[0].failures).toEqual([{ code: 'amount-missing', level: 'error', fields: ['paidAmount'] }]);
 });
 
 test('fails an order whose accounting invoice sub-total does not match its amounts', async ({
@@ -142,6 +149,7 @@ test('fails an order whose accounting invoice sub-total does not match its amoun
   expect(body.orders[0].failures).toEqual([
     { code: 'invoice-sub-total-mismatch', level: 'info', fields: ['invoiceSubTotal', 'subTotal'] },
     { code: 'invoice-items-sub-total-mismatch', level: 'info', fields: ['invoiceSubTotal', 'itemsSubTotal'] },
+    { code: 'amount-missing', level: 'error', fields: ['paidAmount'] },
   ]);
 });
 
@@ -160,7 +168,10 @@ test('fails an order that has no accounting invoice', async ({ request, settings
   expect(response.status(), await response.text()).toBe(200);
   const body = await response.json();
   expect(body.orders[0].invoiceSubTotal).toBeNull();
-  expect(body.orders[0].failures).toEqual([{ code: 'amount-missing', level: 'info', fields: ['invoiceSubTotal'] }]);
+  expect(body.orders[0].failures).toEqual([
+    { code: 'amount-missing', level: 'info', fields: ['invoiceSubTotal'] },
+    { code: 'amount-missing', level: 'error', fields: ['paidAmount'] },
+  ]);
 });
 
 test('does not require an accounting invoice for an order placed before invoicing started', async ({
@@ -180,7 +191,7 @@ test('does not require an accounting invoice for an order placed before invoicin
   expect(response.status(), await response.text()).toBe(200);
   const body = await response.json();
   expect(body.orders[0].invoiceSubTotal).toBeNull();
-  expect(body.orders[0].failures).toEqual([]);
+  expect(body.orders[0].failures).toEqual([{ code: 'amount-missing', level: 'error', fields: ['paidAmount'] }]);
 });
 
 test('reconciles an order invoiced under the legacy invoice note format', async ({
@@ -201,7 +212,7 @@ test('reconciles an order invoiced under the legacy invoice note format', async 
   expect(response.status(), await response.text()).toBe(200);
   const body = await response.json();
   expect(body.orders[0].invoiceSubTotal).toBe(5);
-  expect(body.orders[0].failures).toEqual([]);
+  expect(body.orders[0].failures).toEqual([{ code: 'amount-missing', level: 'error', fields: ['paidAmount'] }]);
 });
 
 test('fails a Stripe-paid order that was paid another amount than its grand total', async ({
@@ -262,7 +273,7 @@ test('fails a Stripe-paid order no payment was collected for', async ({ request,
   expect(body.orders[0].failures).toEqual([{ code: 'amount-missing', level: 'error', fields: ['paidAmount'] }]);
 });
 
-test('does not judge the paid amount of an order paid outside the collected providers', async ({
+test('fails an order paid outside the collected providers that no payment was collected for', async ({
   request,
   settings,
 }, testInfo) => {
@@ -274,7 +285,7 @@ test('does not judge the paid amount of an order paid outside the collected prov
         orderDate: '1786320000',
         view: {
           buyer_name: 'some buyer',
-          // No payments are collected for a bank transfer, so there is nothing to hold this order against.
+          // No payments are collected for a bank transfer, so nothing can show this order was ever paid.
           payment_method_type: 'bank_transfer',
           sub_total: '5.20',
           base_order_total: '5.20',
@@ -289,5 +300,5 @@ test('does not judge the paid amount of an order paid outside the collected prov
   expect(response.status(), await response.text()).toBe(200);
   const body = await response.json();
   expect(body.orders[0].paidAmount).toBeNull();
-  expect(body.orders[0].failures).toEqual([]);
+  expect(body.orders[0].failures).toEqual([{ code: 'amount-missing', level: 'error', fields: ['paidAmount'] }]);
 });
