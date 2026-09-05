@@ -1,5 +1,6 @@
 package com.vastbricks.api.reconciliation;
 
+import com.vastbricks.api.tax.OrderTaxType;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import lombok.Builder;
@@ -28,6 +29,9 @@ public class ReconciledOrder {
      * provider is known for.
      */
     private String paymentMethod;
+
+    /** How the order is treated for tax, derived from what the marketplace reported. */
+    private OrderTaxType taxType;
 
     private BigDecimal subTotal;
     private BigDecimal itemsSubTotal;

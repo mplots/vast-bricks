@@ -57,6 +57,8 @@ test('lists BrickLink reconciliation orders for the selected month', async ({
     <BASECURRENCYCODE>EUR</BASECURRENCYCODE>
     <BASEGRANDTOTAL>3.435</BASEGRANDTOTAL>
     <PAYMENTTYPE>Credit/Debit (Powered by Stripe)</PAYMENTTYPE>
+    <LOCATION>Latvia, Riga</LOCATION>
+    <VATCHARGES>0.07</VATCHARGES>
     <ITEM>
       <ITEMID>3001</ITEMID>
       <PRICE>0.1000</PRICE>
@@ -110,6 +112,7 @@ test('lists BrickLink reconciliation orders for the selected month', async ({
         buyer: 'another buyer',
         buyerUsername: 'another-buyer-username',
         paymentMethod: 'Bank Transfer',
+        taxType: null,
         subTotal: 3,
         itemsSubTotal: 3,
         grandTotal: null,
@@ -124,6 +127,7 @@ test('lists BrickLink reconciliation orders for the selected month', async ({
         buyer: 'some buyer',
         buyerUsername: 'some-buyer-username',
         paymentMethod: 'Stripe',
+        taxType: 'domestic',
         subTotal: 0.43,
         itemsSubTotal: 0.43,
         grandTotal: 3.44,
@@ -152,6 +156,9 @@ test('lists BrickOwl reconciliation orders for the selected month', async ({
           sub_total: '2.70',
           payment_method_type: 'paypal',
           base_order_total: '5.20',
+          billing_country_code: 'LV',
+          tax_scheme_id: '1',
+          tax_rate: '21',
         },
         items: [
           { base_price: '1.20', ordered_quantity: '2' },
@@ -187,6 +194,7 @@ test('lists BrickOwl reconciliation orders for the selected month', async ({
         buyer: 'Test Buyer Beta',
         buyerUsername: 'test_beta',
         paymentMethod: null,
+        taxType: null,
         subTotal: 6,
         itemsSubTotal: 6,
         grandTotal: null,
@@ -201,6 +209,7 @@ test('lists BrickOwl reconciliation orders for the selected month', async ({
         buyer: 'Test Buyer Alpha',
         buyerUsername: 'test_alpha',
         paymentMethod: 'PayPal',
+        taxType: 'domestic',
         subTotal: 2.7,
         itemsSubTotal: 2.7,
         grandTotal: 5.2,
@@ -241,6 +250,7 @@ test('lists BrickOwl reconciliation orders that span several batch requests', as
     buyer: 'Bulk Buyer 1',
     buyerUsername: 'bulk_1',
     paymentMethod: null,
+    taxType: null,
     subTotal: 1,
     itemsSubTotal: 1,
     grandTotal: null,
