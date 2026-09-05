@@ -1,3 +1,5 @@
+import type { OrderTaxType } from 'types/tax';
+
 /** How prominently a failure is shown; `silent` failures are not shown at all. */
 export type ReconciliationFailureLevel = 'silent' | 'info' | 'warning' | 'error';
 
@@ -18,6 +20,8 @@ export interface ReconciliationOrder {
   buyerUsername: string | null;
   /** How the order was paid, in the provider's own wording. */
   paymentMethod: string | null;
+  /** How the order is treated for tax, derived from what the marketplace reported. */
+  taxType: OrderTaxType | null;
   subTotal: number | null;
   itemsSubTotal: number | null;
   /** Order total in the store's base currency, shipping and additional charges included. */

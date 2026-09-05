@@ -150,6 +150,9 @@ here as they are provided; do not invent unspecified behavior prematurely.
   green, so every row states its verdict. A dot in the actions column said the
   same thing first and proved too quiet to find a failed order by while scanning
   a month, so the row carries the verdict alone now.
+- A failure level is two separate controls, and they must not be confused for one
+  another: coloring decides how the rows on screen read, and filtering decides
+  which rows are there. Both exist, in different places.
 - Selecting an order shows all available details, including why its
   reconciliation failed.
 - The first iteration is read-only.
@@ -405,7 +408,79 @@ here as they are provided; do not invent unspecified behavior prematurely.
   own tolerances.
 - The orders table shows `Actions`, source, order ID, order date, buyer, payment
   method, grand total, and paid amount, newest order first as the API returns
-  them. The row is tinted by the loudest level among the order's failures, or
+  them.
+- The tax type spends no column of its own. It rides in the actions cell as a
+  small icon beside the invoice button: the Latvian flag for `domestic`, the
+  European flag for `european-union`, the world for `export`, and the world
+  marked with a percent for `export-taxable`. An order the marketplace said too
+  little to type carries no icon. The icon names its type in a tooltip and in
+  its accessible label, so it never says it by shape alone, and the detail view
+  still shows the type as a word.
+- The screen is laid out the way a shop lays out its results: one panel down the
+  left side and the orders beside it. The panel is modelled on the template's own
+  product filter drawer — persistent where there is room for it and a temporary
+  overlay where there is not — and a button in the header opens and closes it. It
+  sticks below the header card, so a long month scrolls past it rather than away
+  from it.
+- A header card runs above both the panel and the orders, holding what is being
+  read and how much of it: the switch that opens the panel and the month on the
+  left, then how many of the collected orders are shown and the button that
+  collects that month again on the right. The three cards stay three cards, each
+  with its own edges.
+- The header card sticks under the app header, and the panel and the table's own
+  head come to rest under it in turn, so what is being read and what the columns
+  are never scroll away from the rows. The header's height is measured rather
+  than assumed, because it wraps its controls onto another line on a narrow
+  screen, and the two below it follow that measurement.
+- Both buttons are their icon alone — the panel switch as the call to action, the
+  refresh outlined beside the count — so each says what it is in its tooltip and
+  in its accessible label rather than in a word beside it.
+- Choosing a month collects it. The orders are what the screen is for, and a
+  second click to see them said nothing the choice had not. A month input reports
+  every keystroke of its year, so only a whole `YYYY-MM` is asked for.
+- The button collects the month already on screen again, because the providers
+  keep moving. Collecting queries every one of them, so it says it is working and
+  refuses a second click until it is done.
+- The panel holds two sections, because they are two different acts and neither
+  is worth a panel of its own: `Highlights`, which decides how the orders on
+  screen read, and `Filters`, which decides which orders are on screen.
+  `Highlights` currently holds the level coloring switches alone. `Filters` heads
+  its facets and carries the control that clears them.
+- Each facet is a headed group of checkboxes with the count of orders answering
+  each value. Ticking several values of one group widens that group and ticking
+  across groups narrows, and a group's counts are of the orders the other groups
+  already let through, so a count states what ticking it would leave. A value
+  nothing is left of is shown at nought and cannot be ticked.
+- Every value the month collected keeps its box for as long as that month is on
+  screen. A group that shed options as you narrowed would move under the pointer
+  that was narrowing it.
+- Nothing is filtered out until it is asked for, and collecting another month
+  clears the filters: another month is another set of orders, and a filter that
+  fitted the last one may hide all of it.
+- A facet the whole month answers the same way narrows nothing and is not
+  offered. Orders that answered a facet with nothing are one option of it, so
+  they stay reachable rather than being dropped by a facet they cannot answer.
+- The current facets are the reconciliation level, the tax type and the payment
+  method. Adding a filter is adding a facet to the screen's list: it states how
+  an order answers it and how that answer reads, and the options, their counts
+  and the narrowing follow. `FilterFacets` is the shared panel body and knows
+  nothing about orders.
+- A month whose filters let nothing through says so in its own words rather than
+  reading as a month that collected nothing, and offers to clear them.
+- The table scrolls with the page and never on its own, and its head sticks under
+  the header card so it stays over the rows while a long month is read. That means
+  nothing between the table and the page may clip: a scrolling ancestor would
+  catch the head and hold it inside the card. It also means the columns fit the
+  width they are given rather than being held open, so head cells wrap instead of
+  forcing the table wider than the screen.
+- Two things fight the sticky head, and both are handled on the table itself
+  rather than in the theme every other table shares. The theme gives every head
+  cell but the last `position: relative`, to hang the column divider off, which
+  beats the `stickyHeader` prop's own `sticky`; the table asks for it again where
+  it out-specifies the theme. And the head stops under the app header rather than
+  at nought, with its own background and bottom border, which the head row would
+  otherwise keep behind it.
+- The row is tinted by the loudest level among the order's failures, or
   `success` green when it has none to show, in the palette's `lighter` shade so
   the cells stay readable over it. The row names that level in its accessible
   label, so color alone never carries it. Hover deepens that same color rather
@@ -422,15 +497,15 @@ here as they are provided; do not invent unspecified behavior prematurely.
   its order's row above green, is not counted, and is not listed in the detail
   view. It exists so a rule can report a reason without asking anyone to act on
   it.
-- The order counts above the table are one chip per level, loudest first,
-  counting the orders that level is the loudest one of, with a `reconciled` chip
-  for the orders that have nothing to show. A level no order is at has nothing to
-  count and no chip.
-- Each of those chips is also the switch for its level's row tint: filled tints
-  those rows, outlined leaves them plain. Errors and warnings are tinted by
-  default, being the rows the screen is opened to find. The chips never hide a
-  row — every collected order stays in the table whatever is toggled, so a count
-  above the table always matches what is under it.
+- The reconciliation level is one of the filter facets: one option per level,
+  loudest first, counting the orders that level is the loudest one of, with a
+  `reconciled` option for the orders that have nothing to show.
+- It is also the coloring control, which is a different thing in a different
+  section: one chip per level among the orders on screen, under `Highlights`,
+  filled where that level's rows are tinted and outlined where they are not.
+  Errors and warnings are tinted by default, being the rows the screen is opened
+  to find. The chips never hide a row — that is what `Filters` is for — so a
+  count on a chip always matches what is under it.
 - Dates are shown as `dd.mm.yyyy`, as the accounting and archive screens show
   them. The API carries them as ISO days.
 - Reconciliation screen text is translated through `vast-portal`'s `en.json` and
@@ -604,7 +679,10 @@ reconciliation: the reconciliation screen is its first caller, not its owner.
   the EU but taxed all the same, normally by the marketplace).
 - The type carries no display text, as a reconciliation failure carries none.
   The API returns the code and `vast-portal` words it through the
-  `order-tax-type-<code>` messages in `en.json` and `lv.json`.
+  `order-tax-type-<code>` messages in `en.json` and `lv.json`. The portal's own
+  vocabulary lives in `types/tax.ts` and its icon in the shared
+  `OrderTaxTypeIcon` component, so a screen that shows a tax type neither
+  redeclares it nor draws it again.
 - The conditions overlap, so the checks are ordered and the first match wins: a
   Latvian order and a marketplace-taxed export both carry a tax scheme, and an
   untaxed export is an EU order whose rate happens to be zero. An order that
