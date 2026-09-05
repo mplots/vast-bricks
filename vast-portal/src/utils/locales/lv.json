@@ -49,6 +49,8 @@
   "reconciliation-month": "Pasūtījumu mēnesis",
   "reconciliation-month-previous": "Iepriekšējais mēnesis",
   "reconciliation-month-next": "Nākamais mēnesis",
+  "reconciliation-year-previous": "Iepriekšējais gads",
+  "reconciliation-year-next": "Nākamais gads",
   "reconciliation-refresh": "Atsvaidzināt",
   "reconciliation-refreshing": "Ievāc datus…",
   "reconciliation-level-error": "Kļūda",

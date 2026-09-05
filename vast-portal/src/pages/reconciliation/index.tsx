@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 
 import { emphasize, styled } from '@mui/material/styles';
 import Alert from '@mui/material/Alert';
@@ -22,7 +22,6 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
@@ -36,6 +35,8 @@ import hasTextSelection from 'utils/textSelection';
 import IconButton from 'components/@extended/IconButton';
 import FilterFacets, { type FilterFacet, type FilterSelection } from 'components/FilterFacets';
 import MainCard from 'components/MainCard';
+import MonthPicker from 'sections/reconciliation/MonthPicker';
+import { currentMonth, monthDate, monthOf } from 'sections/reconciliation/month';
 import OrderTaxTypeIcon from 'components/OrderTaxTypeIcon';
 import ReconciliationFilterDrawer, { STICKY_TOP } from 'sections/reconciliation/ReconciliationFilterDrawer';
 import toolButtonSx from 'sections/reconciliation/toolButton';
@@ -142,11 +143,6 @@ const unstated = '\u0000unstated';
 // Each marketplace keeps its own chip color, as the accounting screen colors it.
 const sourceColor = (source: string): ChipProps['color'] => (source === 'BrickOwl' ? 'secondary' : 'primary');
 
-const currentMonth = () => {
-  const date = new Date();
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-};
-
 const orderKey = (order: ReconciliationOrder) => `${order.source}-${order.orderId}`;
 
 /**
@@ -232,22 +228,21 @@ export default function ReconciliationPage() {
   }, []);
 
   const handleMonthChange = (month: string) => {
-    setSelectedMonth(month);
-    // A month input reports every keystroke of the year, so only a whole month is worth asking the providers for.
-    if (!/^\d{4}-\d{2}$/.test(month) || month === requestedMonth) {
+    if (month === requestedMonth) {
       return;
     }
     // Another month is another set of orders, and a filter that fitted the last one may hide all of it.
     setSelection({});
+    setSelectedMonth(month);
     setRequestedMonth(month);
   };
 
   // The screen is read a month at a time, so the neighbouring months are a click rather than a trip to the picker.
   // Ahead of this month there is nothing to collect, so the step forward stops there.
   const stepMonth = (months: number) => {
-    const [year, month] = selectedMonth.split('-').map(Number);
-    const stepped = new Date(year, month - 1 + months);
-    handleMonthChange(`${stepped.getFullYear()}-${String(stepped.getMonth() + 1).padStart(2, '0')}`);
+    const stepped = monthDate(selectedMonth);
+    stepped.setMonth(stepped.getMonth() + months);
+    handleMonthChange(monthOf(stepped));
   };
 
   const handleGenerateInvoice = async (order: ReconciliationOrder) => {
@@ -420,7 +415,7 @@ export default function ReconciliationPage() {
     });
 
   // The month being read is the table's title, walked by the arrows either side of it and picked outright by the
-  // field itself, which is the native month control wearing the title's type rather than a form field of its own.
+  // title itself, which opens a picker of its own rather than the browser's.
   const monthTitle = (
     <Stack component="span" direction="row" useFlexGap sx={{ gap: 1.5, alignItems: 'center' }}>
       {/* Only while the panel is away, and at the end of the bar the panel comes back to: open, the panel is its own
@@ -450,48 +445,7 @@ export default function ReconciliationPage() {
             <ArrowLeft2 size={16} />
           </IconButton>
         </Tooltip>
-        <TextField
-          variant="standard"
-          hiddenLabel
-          name="month"
-          type="month"
-          value={selectedMonth}
-          onChange={(event) => handleMonthChange(event.target.value)}
-          aria-label={intl.formatMessage({ id: 'reconciliation-month' })}
-          slotProps={{
-            input: { disableUnderline: true },
-            htmlInput: {
-              pattern: '[0-9]{4}-[0-9]{2}',
-              max: currentMonth(),
-              // A month input only opens its picker from the little calendar mark at its end, which is a small thing
-              // to hit for the control the whole screen is steered by. Clicking the field anywhere asks for the
-              // picker instead. Where the browser has no month picker, `showPicker` is absent and the field is typed.
-              onClick: (event: MouseEvent<HTMLInputElement>) => event.currentTarget.showPicker?.()
-            }
-          }}
-          sx={{
-            borderRadius: 1,
-            // The month is one thing in hand, not three: the browser lights up whichever part the caret is in, which
-            // reads as a word of the title being picked out rather than the title being what is being changed. The
-            // whole field lights instead, which is also what the whole field being clickable deserves.
-            '&:focus-within': { bgcolor: 'secondary.lighter' },
-            '& input': {
-              typography: 'h5',
-              py: 0,
-              px: 0.75,
-              cursor: 'pointer',
-              // Clicking anywhere in the field opens the picker now, so the little calendar mark that used to be the
-              // only way into it is gone, and with it the room it took at the field's right that nothing matched at
-              // the left.
-              '&::-webkit-calendar-picker-indicator': { display: 'none' },
-              '&::-webkit-datetime-edit-month-field:focus, &::-webkit-datetime-edit-year-field:focus': {
-                backgroundColor: 'transparent',
-                color: 'inherit',
-                outline: 'none'
-              }
-            }
-          }}
-        />
+        <MonthPicker value={selectedMonth} max={currentMonth()} onChange={handleMonthChange} />
         <Tooltip title={intl.formatMessage({ id: 'reconciliation-month-next' })} arrow>
           <span>
             <IconButton

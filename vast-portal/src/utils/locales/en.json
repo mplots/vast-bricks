@@ -49,6 +49,8 @@
   "reconciliation-month": "Order month",
   "reconciliation-month-previous": "Previous month",
   "reconciliation-month-next": "Next month",
+  "reconciliation-year-previous": "Previous year",
+  "reconciliation-year-next": "Next year",
   "reconciliation-refresh": "Refresh",
   "reconciliation-refreshing": "Collecting…",
   "reconciliation-level-error": "Error",
