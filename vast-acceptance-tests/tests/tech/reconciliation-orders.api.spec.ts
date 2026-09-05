@@ -364,6 +364,36 @@ test('reports what Stripe was paid for a BrickLink order by the buyer username i
   expect(body.orders[0].failures).toEqual([]);
 });
 
+test('tells one buyer\'s BrickLink orders apart by what the Stripe payment took', async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: '2026-08',
+    brickLink: {
+      fullNameOrdersXml: brickLinkPayPalOrdersXml([
+        { orderId: '32456563', buyer: 'some buyer', total: '38.80' },
+        { orderId: '32456564', buyer: 'some buyer', total: '3.44' },
+      ]),
+      usernameOrdersXml: `<?xml version="1.0" encoding="UTF-8"?>
+<ORDERS>
+  <ORDER><ORDERID>32456563</ORDERID><BUYER>some-buyer-username</BUYER></ORDER>
+  <ORDER><ORDERID>32456564</ORDERID><BUYER>some-buyer-username</BUYER></ORDER>
+</ORDERS>`,
+    },
+    stripe: [{ description: 'Payment for BrickLink from some-buyer-username', amount: 344, type: 'payment' }],
+  });
+
+  const response = await request.get('/api/private/reconciliation/orders?month=2026-08');
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  const paid = Object.fromEntries(
+    body.orders.map((order: { orderId: string; paidAmount: number | null }) => [order.orderId, order.paidAmount])
+  );
+  expect(paid).toEqual({ '32456563': null, '32456564': 3.44 });
+});
+
 test('reports no paid amount when several BrickLink orders share the buyer the payment names', async ({
   request,
   settings,
@@ -614,7 +644,7 @@ test('reports no paid amount when the amount and day match several BrickLink ord
   expect(body.orders.map((order: { paidAmount: number | null }) => order.paidAmount)).toEqual([null, null]);
 });
 
-test('reports no paid amount when several BrickLink orders name the buyer the payment names', async ({
+test('tells one buyer\'s BrickLink orders apart by what the payment took', async ({
   request,
   settings,
 }, testInfo) => {
@@ -627,7 +657,34 @@ test('reports no paid amount when several BrickLink orders name the buyer the pa
       ]),
       usernameOrdersXml: `<?xml version="1.0" encoding="UTF-8"?><ORDERS/>`,
     },
-    // The name is ambiguous rather than unknown, so the amount must not quietly decide it instead.
+    // The buyer is known and ordered twice, so what the payment took says which of the two it settled.
+    payPal: [{ payerName: 'Maksims Brezgins', amount: '38.80', initiatedAt: '2026-08-30T05:24:15Z' }],
+  });
+
+  const response = await request.get('/api/private/reconciliation/orders?month=2026-08');
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  const paid = Object.fromEntries(
+    body.orders.map((order: { orderId: string; paidAmount: number | null }) => [order.orderId, order.paidAmount])
+  );
+  expect(paid).toEqual({ '32456563': 38.8, '32456564': null });
+});
+
+test('reports no paid amount when one buyer\'s BrickLink orders came to the same amount', async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: '2026-08',
+    brickLink: {
+      fullNameOrdersXml: brickLinkPayPalOrdersXml([
+        { orderId: '32456563', buyer: 'Maksims Brezgins', total: '38.80' },
+        { orderId: '32456564', buyer: 'Maksims Brezgins', total: '38.80' },
+      ]),
+      usernameOrdersXml: `<?xml version="1.0" encoding="UTF-8"?><ORDERS/>`,
+    },
+    // Neither the name nor the amount tells these two apart, and a guessed payment reads like a reconciled one.
     payPal: [{ payerName: 'Maksims Brezgins', amount: '38.80', initiatedAt: '2026-08-30T05:24:15Z' }],
   });
 

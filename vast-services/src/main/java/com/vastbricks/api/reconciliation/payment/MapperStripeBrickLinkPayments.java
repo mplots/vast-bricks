@@ -48,12 +48,12 @@ class MapperStripeBrickLinkPayments implements DetailMapper<BalanceTransaction> 
             if (username == null) {
                 continue;
             }
-            var matched = orders.findByBuyerUsername(Marketplace.BRICK_LINK, username);
-            if (matched.size() != 1) {
-                continue;
-            }
-            var order = matched.getFirst();
-            if (paid.add(order)) {
+            // A buyer who ordered more than once this month is told apart by what the payment took.
+            var order = PaymentMatch.oneOf(
+                    orders.findByBuyerUsername(Marketplace.BRICK_LINK, username),
+                    StripePayments.paidAmount(transaction)
+            );
+            if (order != null && paid.add(order)) {
                 order.setPaidAmount(StripePayments.paidAmount(transaction));
             }
         }

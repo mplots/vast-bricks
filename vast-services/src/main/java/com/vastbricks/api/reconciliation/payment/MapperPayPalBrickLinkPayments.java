@@ -23,8 +23,11 @@ import org.springframework.stereotype.Component;
  * weak, so it only counts when it finds exactly one order, and this mapper considers only orders BrickLink says were
  * paid through PayPal so a payment cannot be attached to an order settled another way.
  *
- * <p>A name, or an amount and day, that several of the month's orders share leaves all of them unpaid: a guessed
- * payment would read exactly like a reconciled one.
+ * <p>A buyer who ordered several times in the month is told apart by what the payment took: the payment states its
+ * amount and each order states what it came to, so within one buyer's own orders that is an exact key rather than a
+ * guess. Only orders of one buyer that came to the same amount stay ambiguous, and those, like a name or an
+ * amount-and-day several orders share, leave all of them unpaid: a guessed payment would read exactly like a
+ * reconciled one.
  */
 @Component
 @Order(6)
@@ -52,20 +55,22 @@ class MapperPayPalBrickLinkPayments implements DetailMapper<PayPalTransaction> {
 
     /** The one order this payment settled, or {@code null} when no key names exactly one. */
     private ReconciledOrder matchedOrder(PayPalTransaction transaction, ReconciledOrders orders) {
+        var paidAmount = PayPalPayments.paidAmount(transaction);
+
         for (var buyerName : PayPalPayments.buyerNames(transaction)) {
             var named = payPalOrders(orders.findByBuyer(Marketplace.BRICK_LINK, buyerName));
             if (named.size() == 1) {
                 return named.getFirst();
             }
             if (!named.isEmpty()) {
-                // The name is ambiguous rather than unknown, so a weaker key must not decide it either.
-                return null;
+                // The buyer is known, so the amount settles which of their orders it was, or nothing does.
+                return PaymentMatch.oneOf(named, paidAmount);
             }
         }
 
         var sameValue = payPalOrders(orders.findByGrandTotalOn(
                 Marketplace.BRICK_LINK,
-                PayPalPayments.paidAmount(transaction),
+                paidAmount,
                 PayPalPayments.paymentDate(transaction)
         ));
         return sameValue.size() == 1 ? sameValue.getFirst() : null;

@@ -220,10 +220,17 @@ here as they are provided; do not invent unspecified behavior prematurely.
   matches, because the two systems spell one person differently often enough, the
   order is looked for by what it came to on the day it was placed. That key is
   weak, so it counts only when it names exactly one order.
-- A name the month collected several orders for is ambiguous rather than unknown,
-  so the weaker key does not decide it either: all those orders stay unpaid. A
-  guessed payment would read exactly like a reconciled one. The first payment
-  matched to an order wins, as the first invoice does.
+- A buyer key the month collected several orders for is narrowed by what the
+  payment took: the payment states its amount and each order states its grand
+  total, so within one buyer's own orders the amount is an exact key rather than
+  a guess. Exactly one order of that buyer coming to that amount is the order the
+  payment settled. This is the same rule for both payment providers matching a
+  BrickLink order on a buyer, so it is stated once in `PaymentMatch`.
+- Where the amount settles nothing — several of that buyer's orders came to it,
+  none did, or they carry no grand total to compare — every one of them stays
+  unpaid, and the weaker amount-and-day key does not decide it either. A guessed
+  payment would read exactly like a reconciled one. The first payment matched to
+  an order wins, as the first invoice does.
 - Names are compared trimmed, with inner runs of whitespace collapsed, and
   ignoring case, because the systems spell one person's name with different
   casing and spacing. No closer approximation is attempted: a rule that guesses
