@@ -27,6 +27,7 @@ import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { ArrowLeft2, ArrowRight2, FilterSearch, ReceiptAdd, Refresh } from 'iconsax-reactjs';
 import { useIntl } from 'react-intl';
+import { useSearchParams } from 'react-router-dom';
 
 // The invoice endpoint lives under the accounting namespace and is shared with the accounting screen.
 import { generateInvoice } from 'api/accounting';
@@ -143,6 +144,15 @@ const unstated = '\u0000unstated';
 // Each marketplace keeps its own chip color, as the accounting screen colors it.
 const sourceColor = (source: string): ChipProps['color'] => (source === 'BrickOwl' ? 'secondary' : 'primary');
 
+/**
+ * The month an address is asking for. One that names no month, or names something that is not a month or has not
+ * happened, is read as this one.
+ */
+const monthIn = (params: URLSearchParams) => {
+  const asked = params.get('month');
+  return asked && /^\d{4}-\d{2}$/.test(asked) && asked <= currentMonth() ? asked : currentMonth();
+};
+
 const orderKey = (order: ReconciliationOrder) => `${order.source}-${order.orderId}`;
 
 /**
@@ -186,9 +196,11 @@ const Main = styled('main', { shouldForwardProp: (prop: string) => prop !== 'ope
 
 export default function ReconciliationPage() {
   const intl = useIntl();
-  const initialMonth = currentMonth();
-  const [selectedMonth, setSelectedMonth] = useState(initialMonth);
-  const [requestedMonth, setRequestedMonth] = useState(initialMonth);
+  // The month being read is where the screen is rather than something it merely remembers, so it is kept in the
+  // address. A reload, a bookmark, or the browser's own Back arrow then all land on the month they left. An address
+  // that names no month, or names one that is not a month or has not happened, is read as this one.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const selectedMonth = monthIn(searchParams);
   const [selectedOrder, setSelectedOrder] = useState<ReconciliationOrder | null>(null);
   const [selectedFailure, setSelectedFailure] = useState<string | null>(null);
   const [generatingOrder, setGeneratingOrder] = useState<string | null>(null);
@@ -213,7 +225,7 @@ export default function ReconciliationPage() {
     reconciliationOrdersLoading,
     reconciliationOrdersRefreshing,
     reloadReconciliationOrders
-  } = useGetReconciliationOrders(requestedMonth);
+  } = useGetReconciliationOrders(selectedMonth);
 
   useEffect(() => {
     const cardTop = cardTopRef.current;
@@ -227,23 +239,40 @@ export default function ReconciliationPage() {
     return () => observer.disconnect();
   }, []);
 
-  const handleMonthChange = (month: string) => {
-    if (month === requestedMonth) {
+  // Another month is another set of orders, and a filter that fitted the last one may hide all of it. The month can
+  // change by the browser's Back arrow as much as by the picker, so the filters are cleared wherever it lands rather
+  // than only where it is picked.
+  const filteredMonth = useRef(selectedMonth);
+  useEffect(() => {
+    if (filteredMonth.current === selectedMonth) {
       return;
     }
-    // Another month is another set of orders, and a filter that fitted the last one may hide all of it.
+    filteredMonth.current = selectedMonth;
     setSelection({});
-    setSelectedMonth(month);
-    setRequestedMonth(month);
-  };
+  }, [selectedMonth]);
+
+  /**
+   * Moves to the month `next` names, working from the month the address holds at the time rather than the one this
+   * render read: a second click of an arrow has to step off the month the first one moved to, not from the same place
+   * twice.
+   */
+  const goToMonth = (next: (from: string) => string) =>
+    setSearchParams((current) => {
+      const params = new URLSearchParams(current);
+      params.set('month', next(monthIn(params)));
+      return params;
+    });
+
+  const handleMonthChange = (month: string) => goToMonth(() => month);
 
   // The screen is read a month at a time, so the neighbouring months are a click rather than a trip to the picker.
   // Ahead of this month there is nothing to collect, so the step forward stops there.
-  const stepMonth = (months: number) => {
-    const stepped = monthDate(selectedMonth);
-    stepped.setMonth(stepped.getMonth() + months);
-    handleMonthChange(monthOf(stepped));
-  };
+  const stepMonth = (months: number) =>
+    goToMonth((from) => {
+      const stepped = monthDate(from);
+      stepped.setMonth(stepped.getMonth() + months);
+      return monthOf(stepped);
+    });
 
   const handleGenerateInvoice = async (order: ReconciliationOrder) => {
     setGeneratingOrder(orderKey(order));
@@ -484,7 +513,7 @@ export default function ReconciliationPage() {
         <IconButton
           variant="light"
           color="secondary"
-          disabled={!requestedMonth || reconciliationOrdersRefreshing}
+          disabled={reconciliationOrdersRefreshing}
           aria-label={intl.formatMessage({ id: 'reconciliation-refresh' })}
           onClick={() => reloadReconciliationOrders()}
           sx={toolButtonSx}
