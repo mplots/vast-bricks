@@ -3,6 +3,7 @@ package com.vastbricks.api.client.brickstore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlFactory;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.vastbricks.api.client.HttpExchangeCapture;
 import com.vastbricks.api.tor.TorRestClientFactory;
 import com.vastbricks.api.tor.TorRestClientOptions;
 import java.io.IOException;
@@ -33,8 +34,10 @@ public class BrickStoreClient {
     private static final String SESSION_TOKEN_HEADER = "x-bl-session-token";
     private static final String SESSION_PATH = "/api/v1/actions/verify-and-create-session";
     private static final String ORDER_EXPORT_PATH = "/orderExcelFinal.asp";
+    private static final String PROVIDER = "BrickLink";
 
     private final BrickStoreSettings settings;
+    private final HttpExchangeCapture capture;
     private final RestClient simpleRestClient;
     private final RestClient torRestClient;
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -44,18 +47,39 @@ public class BrickStoreClient {
     private volatile String sessionToken;
     private volatile String sessionClientToken;
 
-    BrickStoreClient(BrickStoreSettings settings, TorRestClientFactory torRestClientFactory) {
+    BrickStoreClient(
+            BrickStoreSettings settings,
+            TorRestClientFactory torRestClientFactory,
+            HttpExchangeCapture capture
+    ) {
         this.settings = settings;
-        this.simpleRestClient = RestClient.builder().build();
+        this.capture = capture;
+        this.simpleRestClient = RestClient.builder()
+                .requestInterceptor(HttpExchangeCapture.interceptor())
+                .build();
+        // The Tor client is built by its own feature, so the capture is added to the client it handed back. It lands
+        // after Tor's retry interceptor, so a request Tor retries is recorded once per attempt, as it was made.
         this.torRestClient = torRestClientFactory.create(TorRestClientOptions.builder()
-                .retryStatus(org.springframework.http.HttpStatus.METHOD_NOT_ALLOWED)
-                .retryStatus(org.springframework.http.HttpStatus.FORBIDDEN)
-                .build());
+                        .retryStatus(org.springframework.http.HttpStatus.METHOD_NOT_ALLOWED)
+                        .retryStatus(org.springframework.http.HttpStatus.FORBIDDEN)
+                        .build())
+                .mutate()
+                .requestInterceptor(HttpExchangeCapture.interceptor())
+                .build();
     }
 
+    /**
+     * The month's orders. One recorded operation covers more than one request: the session this export needs is
+     * created first when none is cached, and an expired one is created again and the export retried.
+     */
     public List<BrickStoreOrder> listOrders(BrickStoreOrderExportRequest request) {
         validateOrderListRequest(request);
-        return parseOrderExport(exportOrders(request));
+        // The configured token is sent in the session request body; the session token it buys is masked once issued.
+        return capture.record(
+                PROVIDER,
+                List.of(configuredClientToken()),
+                () -> parseOrderExport(exportOrders(request))
+        );
     }
 
     public byte[] exportOrders(BrickStoreOrderExportRequest request) {
@@ -79,6 +103,8 @@ public class BrickStoreClient {
         var clientToken = configuredClientToken();
         var current = sessionToken;
         if (current != null && clientToken.equals(sessionClientToken)) {
+            // A live session token is a credential of its own, so a capture never carries one, cached or fresh.
+            HttpExchangeCapture.mask(current);
             return current;
         }
 
@@ -87,6 +113,7 @@ public class BrickStoreClient {
                 sessionToken = createSessionToken(clientToken);
                 sessionClientToken = clientToken;
             }
+            HttpExchangeCapture.mask(sessionToken);
             return sessionToken;
         }
     }

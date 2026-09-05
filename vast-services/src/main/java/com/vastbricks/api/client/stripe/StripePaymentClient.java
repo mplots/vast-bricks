@@ -4,7 +4,9 @@ import com.stripe.StripeClient;
 import com.stripe.exception.StripeException;
 import com.stripe.model.BalanceTransaction;
 import com.stripe.model.StripeCollection;
+import com.stripe.net.HttpURLConnectionClient;
 import com.stripe.param.BalanceTransactionListParams;
+import com.vastbricks.api.client.HttpExchangeCapture;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +24,8 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class StripePaymentClient {
 
+    private static final String PROVIDER = "Stripe";
+
     private static final long PAGE_SIZE = 100L;
 
     /**
@@ -31,9 +35,21 @@ public class StripePaymentClient {
     private static final int MAX_PAGES = 100;
 
     private final StripeSettings settings;
+    private final HttpExchangeCapture capture;
 
-    /** Every balance transaction created in the period, both ends included. */
+    /**
+     * Every balance transaction created in the period, both ends included. One recorded operation covers one request
+     * per page of Stripe's cursor paging, reported by the SDK transport rather than by a request interceptor.
+     */
     public List<BalanceTransaction> listBalanceTransactions(Instant createdFrom, Instant createdTo) {
+        return capture.record(
+                PROVIDER,
+                List.of(secretKey()),
+                () -> collectBalanceTransactions(createdFrom, createdTo)
+        );
+    }
+
+    private List<BalanceTransaction> collectBalanceTransactions(Instant createdFrom, Instant createdTo) {
         var stripeClient = stripeClient();
         var transactions = new ArrayList<BalanceTransaction>();
         String startingAfter = null;
@@ -90,6 +106,7 @@ public class StripePaymentClient {
         return StripeClient.builder()
                 .setApiKey(secretKey())
                 .setApiBase(baseUrl())
+                .setHttpClient(new RecordingHttpClient(new HttpURLConnectionClient()))
                 .build();
     }
 

@@ -1,5 +1,6 @@
 package com.vastbricks.api.reconciliation;
 
+import com.vastbricks.api.debug.DebugContext;
 import com.vastbricks.api.settings.SettingsProfileContext;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -17,7 +18,10 @@ public final class ParallelTasks implements AutoCloseable {
     private final ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
 
     public <T> Supplier<T> start(Supplier<T> task) {
-        var future = CompletableFuture.supplyAsync(SettingsProfileContext.propagate(task), executor);
+        // Both request contexts cross the thread boundary: the settings profile so the task resolves the same
+        // overrides, and the debug user so a provider call it makes is recorded under whoever asked for it.
+        var carried = SettingsProfileContext.propagate(DebugContext.propagate(task));
+        var future = CompletableFuture.supplyAsync(carried, executor);
         return () -> await(future);
     }
 

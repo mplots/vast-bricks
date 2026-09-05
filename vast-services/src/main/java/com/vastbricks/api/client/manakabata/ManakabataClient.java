@@ -1,5 +1,6 @@
 package com.vastbricks.api.client.manakabata;
 
+import com.vastbricks.api.client.HttpExchangeCapture;
 import com.vastbricks.api.client.manakabata.api.ClientsApi;
 import com.vastbricks.api.client.manakabata.api.InvoicesApi;
 import com.vastbricks.api.client.manakabata.model.ClientIndex200Response;
@@ -31,14 +32,21 @@ import org.springframework.web.client.RestClientResponseException;
 @RequiredArgsConstructor
 public class ManakabataClient {
 
+    private static final String PROVIDER = "Manakabata";
+
     private static final int INVOICES_PER_PAGE = 1000;
     private static final int CLIENTS_PER_PAGE = 1000;
     private static final int MESSAGE_BODY_LIMIT = 1000;
 
     private final ManakabataSettings settings;
+    private final HttpExchangeCapture capture;
 
     /** The invoice list accepts no filter beyond the page size, so a list longer than one page is rejected. */
     public List<InvoiceIndex200ResponseDataInner> listInvoices() {
+        return capture.record(PROVIDER, List.of(apiToken()), this::collectInvoices);
+    }
+
+    private List<InvoiceIndex200ResponseDataInner> collectInvoices() {
         var response = call(() -> new InvoicesApi(apiClient()).invoiceIndex(INVOICES_PER_PAGE));
         if (response == null || response.getData() == null) {
             throw new ManakabataClientException("Manakabata invoice list response is empty");
@@ -125,16 +133,21 @@ public class ManakabataClient {
      * credentials of their own and the token is added here as a default header.
      */
     private ApiClient apiClient() {
-        return new ApiClient()
+        // The generated invoker takes a RestClient, which is where the capture is installed for the generated calls.
+        return new ApiClient(capturing(ApiClient.buildRestClientBuilder()).build())
                 .setBasePath(baseUrl())
                 .addDefaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiToken());
     }
 
     private RestClient restClient() {
-        return ApiClient.buildRestClientBuilder()
+        return capturing(ApiClient.buildRestClientBuilder())
                 .baseUrl(baseUrl())
                 .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiToken())
                 .build();
+    }
+
+    private RestClient.Builder capturing(RestClient.Builder builder) {
+        return builder.requestInterceptor(HttpExchangeCapture.interceptor());
     }
 
     private String baseUrl() {

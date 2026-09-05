@@ -2,12 +2,12 @@ package com.vastbricks.api.client.paypal;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.vastbricks.api.client.HttpExchangeCapture;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
@@ -26,7 +26,6 @@ import org.springframework.web.client.RestClientException;
  * provider. The sandbox is simply another base URL here.
  */
 @Component
-@RequiredArgsConstructor
 public class PayPalClient {
 
     private static final int PAGE_SIZE = 500;
@@ -34,18 +33,41 @@ public class PayPalClient {
     /** Pages requested at most, so a provider that keeps reporting more pages fails instead of looping forever. */
     private static final int MAX_PAGES = 100;
 
+    private static final String PROVIDER = "PayPal";
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().registerModule(new JavaTimeModule());
 
     private final PayPalSettings settings;
-    private final RestClient restClient = RestClient.builder()
-            .requestFactory(new SimpleClientHttpRequestFactory())
-            .messageConverters(converters -> converters.addFirst(
-                    new MappingJackson2HttpMessageConverter(OBJECT_MAPPER)
-            ))
-            .build();
+    private final HttpExchangeCapture capture;
+    private final RestClient restClient;
 
-    /** Every transaction PayPal reports for the period, both ends included. */
+    PayPalClient(PayPalSettings settings, HttpExchangeCapture capture) {
+        this.settings = settings;
+        this.capture = capture;
+        this.restClient = RestClient.builder()
+                .requestFactory(new SimpleClientHttpRequestFactory())
+                .messageConverters(converters -> converters.addFirst(
+                        new MappingJackson2HttpMessageConverter(OBJECT_MAPPER)
+                ))
+                .requestInterceptor(HttpExchangeCapture.interceptor())
+                .build();
+    }
+
+    /**
+     * Every transaction PayPal reports for the period, both ends included. One recorded operation covers the
+     * client-credentials token request and one search request per page PayPal reports.
+     */
     public List<PayPalTransaction> listTransactions(Instant from, Instant to) {
+        return capture.record(
+                PROVIDER,
+                List.of(
+                        required("PayPal client id", settings.getClientId()),
+                        required("PayPal client secret", settings.getClientSecret())
+                ),
+                () -> collectTransactions(from, to)
+        );
+    }
+
+    private List<PayPalTransaction> collectTransactions(Instant from, Instant to) {
         var accessToken = accessToken();
         var transactions = new ArrayList<PayPalTransaction>();
 
@@ -114,6 +136,8 @@ public class PayPalClient {
         if (response == null || response.getAccessToken() == null || response.getAccessToken().isBlank()) {
             throw new PayPalClientException("PayPal returned no access token");
         }
+        // The token is a credential of its own, and the response that issued it has already been recorded.
+        HttpExchangeCapture.mask(response.getAccessToken());
         return response.getAccessToken();
     }
 

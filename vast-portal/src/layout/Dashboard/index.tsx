@@ -3,13 +3,13 @@ import { Outlet } from 'react-router-dom';
 
 // material-ui
 import useMediaQuery from '@mui/material/useMediaQuery';
-import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
-import Link from '@mui/material/Link';
 import Toolbar from '@mui/material/Toolbar';
 import Box from '@mui/material/Box';
 
 // project-imports
+import DebugDock from './DebugDock';
+import DebugTrigger from './DebugDock/DebugTrigger';
 import Drawer from './Drawer';
 import Header from './Header';
 import Footer from './Footer';
@@ -22,17 +22,7 @@ import { DRAWER_WIDTH, MenuOrientation } from 'config';
 import useConfig from 'hooks/useConfig';
 import AuthGuard from 'utils/route-guard/AuthGuard';
 
-// assets
-import { ShoppingCart } from 'iconsax-reactjs';
-
 // ==============================|| MAIN LAYOUT ||============================== //
-
-let value: string = window.location.search;
-const params = new URLSearchParams(value);
-const ispValue = params.get('isp');
-const ispValueAvailable = ispValue !== null && parseInt(ispValue) === 1;
-
-const url = ispValueAvailable ? 'https://1.envato.market/OrJ5nn' : 'https://1.envato.market/zNkqj6';
 
 export default function MainLayout() {
   const { menuMasterLoading } = useGetMenuMaster();
@@ -75,17 +65,10 @@ export default function MainLayout() {
             <Outlet />
             <Footer />
           </Container>
-          <Link style={{ textDecoration: 'none' }} href={url} target="_blank">
-            <Button
-              variant="contained"
-              color="error"
-              startIcon={<ShoppingCart />}
-              sx={{ zIndex: 1199, position: 'fixed', bottom: 50, right: 30 }}
-            >
-              Buy Now
-            </Button>
-          </Link>
+          <DebugTrigger />
         </Box>
+
+        <DebugDock />
       </Box>
     </AuthGuard>
   );

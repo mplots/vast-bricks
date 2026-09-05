@@ -16,6 +16,12 @@ const brickOwlMaxBatchRequests = 50;
 export type BrickLinkOrdersMock = {
   fullNameOrdersXml: string;
   usernameOrdersXml: string;
+  /**
+   * Credentials this scenario alone uses. The client caches its session keyed by the configured token, so a scenario
+   * that needs the session request to be made rather than reused has to ask under a token no other scenario used.
+   */
+  clientToken?: string;
+  sessionToken?: string;
 };
 
 export type BrickOwlOrderMock = {
@@ -97,9 +103,9 @@ export async function mockReconciliationOrders(
 async function mockBrickLink(wireMock: WireMockApi, settings: SettingsOverrides, orders?: BrickLinkOrdersMock) {
   await settings.set('VAST_BRICKSTORE_BASE_URL', wireMock.baseUrl);
   await settings.set('VAST_BRICKSTORE_SESSION_BASE_URL', wireMock.baseUrl);
-  await settings.setSecret('VAST_BRICKSTORE_TOKEN', 'bricklink-client-token');
+  await settings.setSecret('VAST_BRICKSTORE_TOKEN', orders?.clientToken ?? 'bricklink-client-token');
   await wireMock.addMethodHostMapping('POST', '/api/v1/actions/verify-and-create-session', {
-    response: { json: { sessionToken: 'bricklink-session-token' } }
+    response: { json: { sessionToken: orders?.sessionToken ?? 'bricklink-session-token' } }
   });
   await addBrickLinkOrdersMapping(wireMock, 'useRealName=y', orders?.fullNameOrdersXml ?? emptyOrdersXml);
   await addBrickLinkOrdersMapping(wireMock, 'useRealName=n', orders?.usernameOrdersXml ?? emptyOrdersXml);
