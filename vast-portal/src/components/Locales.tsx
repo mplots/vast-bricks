@@ -2,6 +2,9 @@ import { ReactNode, useEffect, useState } from 'react';
 
 // third-party
 import { IntlProvider, MessageFormatElement } from 'react-intl';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { enUS, lv } from 'date-fns/locale';
 
 // project-imports
 import useConfig from 'hooks/useConfig';
@@ -19,6 +22,10 @@ const loadLocaleData = (locale: I18n) => {
       return import('utils/locales/en.json');
   }
 };
+
+// The month and day names a picker writes are the app's own words in another form, so they answer to the same
+// setting the messages do rather than to whatever the browser happens to be set to.
+const dateLocales = { en: enUS, lv };
 
 interface Props {
   children: ReactNode;
@@ -41,7 +48,9 @@ export default function Locales({ children }: Props) {
     <>
       {messages && (
         <IntlProvider locale={i18n} defaultLocale="en" messages={messages}>
-          {children}
+          <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={dateLocales[i18n]}>
+            {children}
+          </LocalizationProvider>
         </IntlProvider>
       )}
     </>
