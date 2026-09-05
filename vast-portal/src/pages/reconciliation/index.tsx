@@ -32,6 +32,7 @@ import { useIntl } from 'react-intl';
 import { generateInvoice } from 'api/accounting';
 import { useGetReconciliationOrders } from 'api/reconciliation';
 import Dot from 'components/@extended/Dot';
+import hasTextSelection from 'utils/textSelection';
 import MainCard from 'components/MainCard';
 import type { ReconciliationFailure, ReconciliationFailureLevel, ReconciliationOrder } from 'types/reconciliation';
 
@@ -244,7 +245,13 @@ export default function ReconciliationPage() {
                 </TableHead>
                 <TableBody>
                   {reconciliationOrders.orders.map((order) => (
-                    <TableRow hover key={orderKey(order)} onClick={() => openOrder(order)} sx={{ cursor: 'pointer' }}>
+                    <TableRow
+                      hover
+                      key={orderKey(order)}
+                      // Not when the click merely ended a text selection: copying a cell must not open the detail.
+                      onClick={() => !hasTextSelection() && openOrder(order)}
+                      sx={{ cursor: 'pointer' }}
+                    >
                       {/* The row opens the detail dialog, so the action cell must not bubble its click. */}
                       <TableCell sx={{ width: 84, whiteSpace: 'nowrap' }} onClick={(event) => event.stopPropagation()}>
                         <Stack direction="row" spacing={0.75} alignItems="center">
