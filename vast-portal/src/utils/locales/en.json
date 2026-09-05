@@ -34,6 +34,7 @@
   "reconciliation-title": "Reconciliation",
   "reconciliation-month": "Order month",
   "reconciliation-show-orders": "Show orders",
+  "reconciliation-showing-orders": "Collecting…",
   "reconciliation-order-count": "{count, plural, one {# order} other {# orders}}",
   "reconciliation-error-count": "{count} with errors",
   "reconciliation-warning-count": "{count} with warnings",

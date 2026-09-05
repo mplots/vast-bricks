@@ -34,6 +34,7 @@
   "reconciliation-title": "Saskaņošana",
   "reconciliation-month": "Pasūtījumu mēnesis",
   "reconciliation-show-orders": "Rādīt pasūtījumus",
+  "reconciliation-showing-orders": "Ievāc datus…",
   "reconciliation-order-count": "{count, plural, zero {# pasūtījumu} one {# pasūtījums} other {# pasūtījumi}}",
   "reconciliation-error-count": "{count} ar kļūdām",
   "reconciliation-warning-count": "{count} ar brīdinājumiem",

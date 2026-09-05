@@ -130,8 +130,13 @@ export default function ReconciliationPage() {
   const [generationMessage, setGenerationMessage] = useState<string | null>(null);
   // Errors and warnings by default: those are the rows the screen is opened to find.
   const [tintedLevels, setTintedLevels] = useState<FilterLevel[]>(['error', 'warning']);
-  const { reconciliationOrders, reconciliationOrdersError, reconciliationOrdersLoading, reloadReconciliationOrders } =
-    useGetReconciliationOrders(requestedMonth);
+  const {
+    reconciliationOrders,
+    reconciliationOrdersError,
+    reconciliationOrdersLoading,
+    reconciliationOrdersRefreshing,
+    reloadReconciliationOrders
+  } = useGetReconciliationOrders(requestedMonth);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -228,8 +233,16 @@ export default function ReconciliationPage() {
             onChange={(event) => setSelectedMonth(event.target.value)}
             slotProps={{ inputLabel: { shrink: true }, htmlInput: { pattern: '[0-9]{4}-[0-9]{2}' } }}
           />
-          <Button type="submit" variant="contained" size="large" disabled={!selectedMonth}>
-            {intl.formatMessage({ id: 'reconciliation-show-orders' })}
+          {/* Collecting the orders queries every provider, so the button says it is working and refuses a second click
+              until it is done. A reload of the month already shown leaves the table up, and this is all that marks it. */}
+          <Button
+            type="submit"
+            variant="contained"
+            size="large"
+            disabled={!selectedMonth || reconciliationOrdersRefreshing}
+            startIcon={reconciliationOrdersRefreshing ? <CircularProgress size={18} color="inherit" /> : null}
+          >
+            {intl.formatMessage({ id: reconciliationOrdersRefreshing ? 'reconciliation-showing-orders' : 'reconciliation-show-orders' })}
           </Button>
           {reconciliationOrders && (
             <Stack direction="row" spacing={1} sx={{ alignSelf: { sm: 'center' }, ml: { sm: 'auto !important' } }}>

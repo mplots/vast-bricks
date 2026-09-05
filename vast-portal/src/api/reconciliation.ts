@@ -14,7 +14,7 @@ export function useGetReconciliationOrders(month: string) {
     return `${endpoint}?${searchParams.toString()}`;
   }, [month]);
 
-  const { data, error, isLoading, mutate } = useSWR<ReconciliationOrdersPage>(requestKey, fetcher, {
+  const { data, error, isLoading, isValidating, mutate } = useSWR<ReconciliationOrdersPage>(requestKey, fetcher, {
     revalidateIfStale: false,
     revalidateOnFocus: false,
     revalidateOnReconnect: false
@@ -25,8 +25,11 @@ export function useGetReconciliationOrders(month: string) {
       reconciliationOrders: data,
       reconciliationOrdersError: error,
       reconciliationOrdersLoading: isLoading,
+      // True for a reload of the month already shown as well, which `isLoading` is not: it stays false while the
+      // orders on screen are being collected again.
+      reconciliationOrdersRefreshing: isValidating,
       reloadReconciliationOrders: mutate
     }),
-    [data, error, isLoading, mutate]
+    [data, error, isLoading, isValidating, mutate]
   );
 }
