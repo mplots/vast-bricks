@@ -359,7 +359,7 @@ here as they are provided; do not invent unspecified behavior prematurely.
   `ReconciledOrders`, and `SourcedData` for what the sourcing stage handed the
   mappers. An implementation is prefixed by its stage and named after what it
   handles: `SourceBrickLinkOrders`, `MapperBrickLinkOrders`,
-  `RuleSubTotalMatchesItems`. A source's carrier type is
+  `RulePaidAmountMatchesGrandTotal`. A source's carrier type is
   `Sourced<Provider><Thing>`, such as `SourcedBrickOwlOrder`; a source that
   assembles nothing declares the provider's own model as its class instead of
   wrapping it in a carrier that adds no field, as the payment sources declare
@@ -379,8 +379,7 @@ here as they are provided; do not invent unspecified behavior prematurely.
   rule may report different codes.
 - A failure's level is how loudly it asks to be dealt with: `silent`, `info`,
   `warning`, or `error`. It belongs to the failure, not to the rule, so one rule
-  may report different levels. Every current rule reports `info`, the level a
-  failure gets when its rule states none.
+  may report different levels. A failure whose rule states no level gets `info`.
 - A failure must not carry display text. The backend returns no user-facing
   strings for reconciliation. All wording lives in the `vast-portal` translation
   catalogs, keyed by failure code, and is interpolated with the field values the

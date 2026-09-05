@@ -20,6 +20,26 @@ const brickLinkPayPalOrdersXml = (orders: Array<{ orderId: string; buyer: string
     )
     .join('')}</ORDERS>`;
 
+const brickLinkOrderXml = (
+  orderId: string,
+  orderTotal: string,
+  items: Array<[string, string]>,
+  orderDate = '8/30/2026'
+) => `
+  <ORDER>
+    <ORDERID>${orderId}</ORDERID>
+    <ORDERDATE>${orderDate}</ORDERDATE>
+    <BUYER>some buyer</BUYER>
+    <ORDERTOTAL>${orderTotal}</ORDERTOTAL>
+    <BASECURRENCYCODE>EUR</BASECURRENCYCODE>
+    ${items.map(([price, quantity]) => `<ITEM><PRICE>${price}</PRICE><QTY>${quantity}</QTY></ITEM>`).join('\n    ')}
+  </ORDER>`;
+
+const brickLinkOrdersXml = (...orders: string[]) =>
+  `<?xml version="1.0" encoding="UTF-8"?><ORDERS>${orders.join('')}</ORDERS>`;
+
+const emptyOrdersXml = brickLinkOrdersXml();
+
 test('lists BrickLink reconciliation orders for the selected month', async ({
   request,
   settings,
@@ -226,7 +246,7 @@ test('lists BrickOwl reconciliation orders that span several batch requests', as
     grandTotal: null,
     invoiceSubTotal: null,
     paidAmount: null,
-        failures: [{ code: 'amount-missing', level: 'error', fields: ['paidAmount'] }],
+    failures: [{ code: 'amount-missing', level: 'error', fields: ['paidAmount'] }],
   });
   expect(body.orders[59].orderId).toBe('bulk-order-60');
 
@@ -808,4 +828,62 @@ test('requires a reconciliation month', async ({ request }) => {
   const response = await request.get('/api/private/reconciliation/orders');
 
   expect(response.status(), await response.text()).toBe(400);
+});
+
+test('sums item prices to the cent the order is reported in', async ({ request, settings }, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: '2026-08',
+    brickLink: {
+      fullNameOrdersXml: brickLinkOrdersXml(
+        brickLinkOrderXml('32456566', '0.43', [
+          ['0.1013', '2'],
+          ['0.2299', '1'],
+        ])
+      ),
+      usernameOrdersXml: emptyOrdersXml,
+    },
+  });
+
+  const response = await request.get('/api/private/reconciliation/orders?month=2026-08');
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  expect(body.orders[0].itemsSubTotal).toBe(0.43);
+});
+
+test('collects the accounting invoice sub-total onto the order it notes', async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: '2026-09',
+    brickLink: {
+      fullNameOrdersXml: brickLinkOrdersXml(brickLinkOrderXml('32466549', '5.00', [['2.5000', '2']], '9/1/2026')),
+      usernameOrdersXml: emptyOrdersXml,
+    },
+    manakabata: [{ invoiceNote: 'bricklink:32466549', subtotal: '5.00' }],
+  });
+
+  const response = await request.get('/api/private/reconciliation/orders?month=2026-09');
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  expect(body.orders[0].invoiceSubTotal).toBe(5);
+});
+
+test('collects an accounting invoice noted in the legacy format', async ({ request, settings }, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: '2026-09',
+    brickLink: {
+      fullNameOrdersXml: brickLinkOrdersXml(brickLinkOrderXml('32466553', '5.00', [['2.5000', '2']], '9/1/2026')),
+      usernameOrdersXml: emptyOrdersXml,
+    },
+    manakabata: [{ invoiceNote: 'BrickLink order 32466553', subtotal: '5.00' }],
+  });
+
+  const response = await request.get('/api/private/reconciliation/orders?month=2026-09');
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  expect(body.orders[0].invoiceSubTotal).toBe(5);
 });
