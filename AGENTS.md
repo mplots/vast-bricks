@@ -910,6 +910,15 @@ supplied and do not invent unspecified amounts.
   on port 6363, so the portal runs against the same backend a deployment
   serves. Start `vast-api` alongside it; the acceptance runtime is for tests,
   not for the portal.
+- The managed `vast-portal` on port 3100 therefore sits in front of production
+  data. Never sign in to it, drive it with browser automation, or click anything
+  in it: its screens act on real marketplace orders and can generate real
+  invoices, and its credentials are the deployment's own. Agents must not enter
+  credentials there under any circumstances, and a running portal on 3100 is not
+  a place to verify a change.
+- To check a portal change visually, ask the developer for a screenshot of their
+  own session, or reproduce the layout in a throwaway page under the scratchpad
+  and check the behaviour there. Neither route touches production.
 - `./vast ps` is the shortcut for `./vast services list`.
 - Runtime process state and logs belong under the ignored `.vast` directory.
   Service stop operations must affect only processes recorded and verified as
