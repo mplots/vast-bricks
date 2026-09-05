@@ -53,6 +53,7 @@
   "reconciliation-actions": "Darbības",
   "reconciliation-generate-invoice": "Izveidot rēķinu",
   "reconciliation-generate-invoice-for": "Izveidot rēķinu {source} pasūtījumam {orderId}",
+  "reconciliation-order-row": "{source} pasūtījums {orderId}: {level}",
   "reconciliation-invoice-generated": "Izveidots Manakabata rēķins {invoiceNumber} pircējam {name}.",
   "reconciliation-invoice-error": "Neizdevās izveidot rēķinu.",
   "reconciliation-field-source": "Avots",

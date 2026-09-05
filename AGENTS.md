@@ -145,11 +145,11 @@ here as they are provided; do not invent unspecified behavior prematurely.
 - The purpose of the screen is to identify discrepancies for an order across
   the systems involved in commerce, payment, shipping, accounting, and store
   synchronization.
-- An order whose reconciliation fails is marked by a dot in the actions column,
-  colored by the loudest level among its failures, and the row is tinted that
-  same color. An order with nothing to show gets a green dot, so every row states
-  its verdict in the same place. The dot alone proved too quiet to find a failed
-  order by while scanning a month, which is why the row carries the verdict too.
+- An order whose reconciliation fails is marked by tinting its row the color of
+  the loudest level among its failures; an order with nothing to show is tinted
+  green, so every row states its verdict. A dot in the actions column said the
+  same thing first and proved too quiet to find a failed order by while scanning
+  a month, so the row carries the verdict alone now.
 - Selecting an order shows all available details, including why its
   reconciliation failed.
 - The first iteration is read-only.
@@ -400,14 +400,13 @@ here as they are provided; do not invent unspecified behavior prematurely.
   own tolerances.
 - The orders table shows `Actions`, source, order ID, order date, buyer, payment
   method, grand total, and paid amount, newest order first as the API returns
-  them. The
-  actions cell leads with a dot colored by the loudest level among the order's
-  failures, or `success` green when it has none to show; the dot's level is named
-  in its tooltip, so color alone never carries it. The row is tinted the same
-  level color, in the palette's `lighter` shade so the cells stay readable over
-  it. Hover deepens that same color rather than stepping to the next one on the
-  ramp, which would swamp the text, and rather than the table's default grey,
-  which would lose the level exactly while the row is being pointed at.
+  them. The row is tinted by the loudest level among the order's failures, or
+  `success` green when it has none to show, in the palette's `lighter` shade so
+  the cells stay readable over it. The row names that level in its accessible
+  label, so color alone never carries it. Hover deepens that same color rather
+  than stepping to the next one on the ramp, which would swamp the text, and
+  rather than the table's default grey, which would lose the level exactly while
+  the row is being pointed at.
 - The source chip is colored per marketplace, not by failure level: BrickLink
   `primary` and BrickOwl `secondary`, as the accounting screen colors them.
 - Selecting any order opens a read-only detail view listing every collected field
@@ -415,7 +414,7 @@ here as they are provided; do not invent unspecified behavior prematurely.
   failed rule highlights the fields that rule used, in that failure's level
   color.
 - A `silent` failure is not represented in the screen at all: it does not raise
-  its order's dot above green, is not counted, and is not listed in the detail
+  its order's row above green, is not counted, and is not listed in the detail
   view. It exists so a rule can report a reason without asking anyone to act on
   it.
 - The order counts above the table are one chip per level, loudest first,

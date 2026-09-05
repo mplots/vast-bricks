@@ -53,6 +53,7 @@
   "reconciliation-actions": "Actions",
   "reconciliation-generate-invoice": "Generate invoice",
   "reconciliation-generate-invoice-for": "Generate invoice for {source} order {orderId}",
+  "reconciliation-order-row": "{source} order {orderId}: {level}",
   "reconciliation-invoice-generated": "Created Manakabata invoice {invoiceNumber} for {name}.",
   "reconciliation-invoice-error": "Failed to generate invoice.",
   "reconciliation-field-source": "Source",

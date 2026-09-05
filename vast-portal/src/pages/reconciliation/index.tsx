@@ -32,7 +32,6 @@ import { useIntl } from 'react-intl';
 // The invoice endpoint lives under the accounting namespace and is shared with the accounting screen.
 import { generateInvoice } from 'api/accounting';
 import { useGetReconciliationOrders } from 'api/reconciliation';
-import Dot from 'components/@extended/Dot';
 import hasTextSelection from 'utils/textSelection';
 import MainCard from 'components/MainCard';
 import type { ReconciliationFailure, ReconciliationFailureLevel, ReconciliationOrder } from 'types/reconciliation';
@@ -194,8 +193,14 @@ export default function ReconciliationPage() {
 
   const levelLabel = (level: ReconciliationFailureLevel) => intl.formatMessage({ id: `reconciliation-level-${level}` });
 
-  // The dot in the action cell states the order's loudest level, and reads as reconciled when it has none.
-  const dotLabel = (level: ShownLevel | null) => (level ? levelLabel(level) : intl.formatMessage({ id: 'reconciliation-level-none' }));
+  // An order's loudest level, worded, and reading as reconciled when it has none.
+  const levelName = (level: ShownLevel | null) => (level ? levelLabel(level) : intl.formatMessage({ id: 'reconciliation-level-none' }));
+
+  const rowLabel = (order: ReconciliationOrder) =>
+    intl.formatMessage(
+      { id: 'reconciliation-order-row' },
+      { source: order.source, orderId: order.orderId, level: levelName(orderLevel(order)) }
+    );
 
   // One chip per level, loudest first, counting the orders that level is the loudest one of. A level no order is at
   // has nothing to toggle, so its chip is left out.
@@ -283,7 +288,7 @@ export default function ReconciliationPage() {
               <Table stickyHeader size="small" aria-label={intl.formatMessage({ id: 'reconciliation-orders-table' })}>
                 <TableHead>
                   <TableRow>
-                    <TableCell sx={{ width: 84 }}>{intl.formatMessage({ id: 'reconciliation-actions' })}</TableCell>
+                    <TableCell sx={{ width: 64 }}>{intl.formatMessage({ id: 'reconciliation-actions' })}</TableCell>
                     {columnFields.map((field) => (
                       <TableCell key={field} align={amountFields.includes(field) ? 'right' : 'left'}>
                         {fieldLabel(field)}
@@ -298,11 +303,14 @@ export default function ReconciliationPage() {
                       <TableRow
                         hover
                         key={orderKey(order)}
+                        // The tint states the level by colour alone, so the row names it for a reader that cannot see
+                        // the colour. The dot that used to name it is gone: the tint says the same thing louder.
+                        aria-label={rowLabel(order)}
                         // Not when the click merely ended a text selection: copying a cell must not open the detail.
                         onClick={() => !hasTextSelection() && openOrder(order)}
                         sx={(theme) => ({
                           cursor: 'pointer',
-                          // The row itself carries the verdict: a dot alone was too quiet to find a bad order by.
+                          // The row itself carries the verdict, which is why the dot that once did is gone.
                           // Hover deepens that same colour rather than jumping to the next step of the ramp, which
                           // would swamp the text; `emphasize` darkens a light tint and lightens a dark one, so it
                           // reads the same way in both themes. It has to out-specify MUI's own
@@ -314,14 +322,8 @@ export default function ReconciliationPage() {
                         })}
                       >
                         {/* The row opens the detail dialog, so the action cell must not bubble its click. */}
-                        <TableCell sx={{ width: 84, whiteSpace: 'nowrap' }} onClick={(event) => event.stopPropagation()}>
+                        <TableCell sx={{ width: 64, whiteSpace: 'nowrap' }} onClick={(event) => event.stopPropagation()}>
                           <Stack direction="row" spacing={0.75} alignItems="center">
-                            {/* The level is named as well as colored, so the dot does not carry it by color alone. */}
-                            <Tooltip title={dotLabel(orderLevel(order))} arrow>
-                              <Box component="span" role="img" aria-label={dotLabel(orderLevel(order))} sx={{ display: 'flex' }}>
-                                <Dot size={8} color={orderLevel(order) ?? 'success'} />
-                              </Box>
-                            </Tooltip>
                             <Tooltip title={intl.formatMessage({ id: 'reconciliation-generate-invoice' })} arrow>
                               <span>
                                 <IconButton
