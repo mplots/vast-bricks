@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from 'react';
 
 import { emphasize, styled } from '@mui/material/styles';
 import Alert from '@mui/material/Alert';
@@ -26,7 +26,7 @@ import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { FilterSearch, ReceiptAdd, Refresh } from 'iconsax-reactjs';
+import { ArrowLeft2, ArrowRight2, FilterSearch, ReceiptAdd, Refresh } from 'iconsax-reactjs';
 import { useIntl } from 'react-intl';
 
 // The invoice endpoint lives under the accounting namespace and is shared with the accounting screen.
@@ -37,9 +37,9 @@ import IconButton from 'components/@extended/IconButton';
 import FilterFacets, { type FilterFacet, type FilterSelection } from 'components/FilterFacets';
 import MainCard from 'components/MainCard';
 import OrderTaxTypeIcon from 'components/OrderTaxTypeIcon';
-import ReconciliationFilterDrawer from 'sections/reconciliation/ReconciliationFilterDrawer';
+import ReconciliationFilterDrawer, { STICKY_TOP } from 'sections/reconciliation/ReconciliationFilterDrawer';
+import toolButtonSx from 'sections/reconciliation/toolButton';
 import useConfig from 'hooks/useConfig';
-import { HEADER_HEIGHT } from 'config';
 import type { ReconciliationFailure, ReconciliationFailureLevel, ReconciliationOrder } from 'types/reconciliation';
 import { orderTaxTypes, type OrderTaxType } from 'types/tax';
 
@@ -149,6 +149,16 @@ const currentMonth = () => {
 
 const orderKey = (order: ReconciliationOrder) => `${order.source}-${order.orderId}`;
 
+/**
+ * The height of the table card's title bar. It sticks under the app header and the table's head stops under it in
+ * turn, so the two of them need to agree on a number. It is kept to a single row — the month, how much of it is on
+ * screen, and the buttons — which is what lets that number be stated rather than measured.
+ */
+const TITLE_HEIGHT = 68;
+
+/** The corner MainCard rounds itself to, which anything painting its own ground at the card's edge has to match. */
+const CARD_RADIUS = 12;
+
 /** The results beside the filter panel, sliding over where the panel was when it is closed. */
 const Main = styled('main', { shouldForwardProp: (prop: string) => prop !== 'open' && prop !== 'container' })<{
   open: boolean;
@@ -194,11 +204,12 @@ export default function ReconciliationPage() {
   // warnings are coloured by default, being the rows the screen is opened to find.
   const [tintedLevels, setTintedLevels] = useState<FilterLevel[]>(['error', 'warning']);
   const { container } = useConfig();
-  // The header card sticks under the app header, and the table's own head and the panel stop under it in turn. Its
-  // height is measured rather than assumed: it wraps its controls onto another line on a narrow screen.
-  const headerRef = useRef<HTMLDivElement>(null);
-  const [headerBottom, setHeaderBottom] = useState(HEADER_HEIGHT);
   const downLG = useMediaQuery((theme) => theme.breakpoints.down('lg'));
+  // At rest the title bar is the card's rounded top and must round with it; stuck, the card's top is gone and a
+  // rounded bar leaves two wedges at its corners for the rows behind to show through. Which of the two it is, is the
+  // one thing about this screen that cannot be said in CSS, so a mark at the card's top says it.
+  const cardTopRef = useRef<HTMLDivElement>(null);
+  const [stuck, setStuck] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(!downLG);
   const {
     reconciliationOrders,
@@ -209,12 +220,14 @@ export default function ReconciliationPage() {
   } = useGetReconciliationOrders(requestedMonth);
 
   useEffect(() => {
-    const header = headerRef.current;
-    if (!header) {
+    const cardTop = cardTopRef.current;
+    if (!cardTop) {
       return;
     }
-    const observer = new ResizeObserver(() => setHeaderBottom(HEADER_HEIGHT + header.offsetHeight));
-    observer.observe(header);
+    const observer = new IntersectionObserver(([entry]) => setStuck(!entry.isIntersecting), {
+      rootMargin: `-${STICKY_TOP}px 0px 0px 0px`
+    });
+    observer.observe(cardTop);
     return () => observer.disconnect();
   }, []);
 
@@ -227,6 +240,14 @@ export default function ReconciliationPage() {
     // Another month is another set of orders, and a filter that fitted the last one may hide all of it.
     setSelection({});
     setRequestedMonth(month);
+  };
+
+  // The screen is read a month at a time, so the neighbouring months are a click rather than a trip to the picker.
+  // Ahead of this month there is nothing to collect, so the step forward stops there.
+  const stepMonth = (months: number) => {
+    const [year, month] = selectedMonth.split('-').map(Number);
+    const stepped = new Date(year, month - 1 + months);
+    handleMonthChange(`${stepped.getFullYear()}-${String(stepped.getMonth() + 1).padStart(2, '0')}`);
   };
 
   const handleGenerateInvoice = async (order: ReconciliationOrder) => {
@@ -398,67 +419,132 @@ export default function ReconciliationPage() {
       };
     });
 
+  // The month being read is the table's title, walked by the arrows either side of it and picked outright by the
+  // field itself, which is the native month control wearing the title's type rather than a form field of its own.
+  const monthTitle = (
+    <Stack component="span" direction="row" useFlexGap sx={{ gap: 1.5, alignItems: 'center' }}>
+      {/* Only while the panel is away, and at the end of the bar the panel comes back to: open, the panel is its own
+          close button, and a button here that turned it off would be a second answer to a question it already
+          answers. */}
+      {!filtersOpen && (
+        <Tooltip title={intl.formatMessage({ id: 'reconciliation-filters' })} arrow>
+          <IconButton
+            variant="light"
+            color="secondary"
+            aria-label={intl.formatMessage({ id: 'reconciliation-filters' })}
+            onClick={() => setFiltersOpen(true)}
+            sx={toolButtonSx}
+          >
+            <FilterSearch size={18} />
+          </IconButton>
+        </Tooltip>
+      )}
+      <Stack component="span" direction="row" useFlexGap sx={{ gap: 0.5, alignItems: 'center' }}>
+        <Tooltip title={intl.formatMessage({ id: 'reconciliation-month-previous' })} arrow>
+          <IconButton
+            size="small"
+            color="secondary"
+            aria-label={intl.formatMessage({ id: 'reconciliation-month-previous' })}
+            onClick={() => stepMonth(-1)}
+          >
+            <ArrowLeft2 size={16} />
+          </IconButton>
+        </Tooltip>
+        <TextField
+          variant="standard"
+          hiddenLabel
+          name="month"
+          type="month"
+          value={selectedMonth}
+          onChange={(event) => handleMonthChange(event.target.value)}
+          aria-label={intl.formatMessage({ id: 'reconciliation-month' })}
+          slotProps={{
+            input: { disableUnderline: true },
+            htmlInput: {
+              pattern: '[0-9]{4}-[0-9]{2}',
+              max: currentMonth(),
+              // A month input only opens its picker from the little calendar mark at its end, which is a small thing
+              // to hit for the control the whole screen is steered by. Clicking the field anywhere asks for the
+              // picker instead. Where the browser has no month picker, `showPicker` is absent and the field is typed.
+              onClick: (event: MouseEvent<HTMLInputElement>) => event.currentTarget.showPicker?.()
+            }
+          }}
+          sx={{
+            borderRadius: 1,
+            // The month is one thing in hand, not three: the browser lights up whichever part the caret is in, which
+            // reads as a word of the title being picked out rather than the title being what is being changed. The
+            // whole field lights instead, which is also what the whole field being clickable deserves.
+            '&:focus-within': { bgcolor: 'secondary.lighter' },
+            '& input': {
+              typography: 'h5',
+              py: 0,
+              px: 0.75,
+              cursor: 'pointer',
+              // Clicking anywhere in the field opens the picker now, so the little calendar mark that used to be the
+              // only way into it is gone, and with it the room it took at the field's right that nothing matched at
+              // the left.
+              '&::-webkit-calendar-picker-indicator': { display: 'none' },
+              '&::-webkit-datetime-edit-month-field:focus, &::-webkit-datetime-edit-year-field:focus': {
+                backgroundColor: 'transparent',
+                color: 'inherit',
+                outline: 'none'
+              }
+            }
+          }}
+        />
+        <Tooltip title={intl.formatMessage({ id: 'reconciliation-month-next' })} arrow>
+          <span>
+            <IconButton
+              size="small"
+              color="secondary"
+              // Nothing has happened yet in a month that has not started.
+              disabled={selectedMonth >= currentMonth()}
+              aria-label={intl.formatMessage({ id: 'reconciliation-month-next' })}
+              onClick={() => stepMonth(1)}
+            >
+              <ArrowRight2 size={16} />
+            </IconButton>
+          </span>
+        </Tooltip>
+      </Stack>
+      {/* Level with the month rather than under it, and only once a month has been collected: until then there is
+          nothing to have shown a part of. It is the first thing a narrow screen gives up, the month and the buttons
+          being the two the bar is for. */}
+      {reconciliationOrders && (
+        <Typography component="span" variant="body2" color="text.secondary" sx={{ display: { xs: 'none', sm: 'block' } }}>
+          {intl.formatMessage({ id: 'reconciliation-filter-showing' }, { shown: shownOrders.length, total: collectedOrders.length })}
+        </Typography>
+      )}
+    </Stack>
+  );
+
+  // The providers keep moving, so the month already on screen is worth asking for again. Collecting queries every one
+  // of them, so the button says it is working and refuses a second click until it is done. It is its icon alone, so it
+  // says what it is in its tooltip and its label.
+  const monthActions = (
+    <Tooltip
+      title={intl.formatMessage({ id: reconciliationOrdersRefreshing ? 'reconciliation-refreshing' : 'reconciliation-refresh' })}
+      arrow
+    >
+      <span>
+        <IconButton
+          variant="light"
+          color="secondary"
+          disabled={!requestedMonth || reconciliationOrdersRefreshing}
+          aria-label={intl.formatMessage({ id: 'reconciliation-refresh' })}
+          onClick={() => reloadReconciliationOrders()}
+          sx={toolButtonSx}
+        >
+          {reconciliationOrdersRefreshing ? <CircularProgress size={18} color="inherit" /> : <Refresh size={18} />}
+        </IconButton>
+      </span>
+    </Tooltip>
+  );
+
   return (
     <Stack>
-      {/* The header over both: what month is being read, whether it is being read again, and how much of it is on
-          screen. It runs the width of the panel and the table and keeps its own card, as they keep theirs. */}
-      <MainCard
-        ref={headerRef}
-        content={false}
-        // Above the panel's own sticky edge and the table's sticky head, both of which stop underneath it.
-        sx={{ position: 'sticky', top: HEADER_HEIGHT, zIndex: 3 }}
-      >
-        <Stack direction={{ xs: 'column', sm: 'row' }} useFlexGap sx={{ p: 2, gap: 2, flexWrap: 'wrap', alignItems: { sm: 'center' } }}>
-          {/* Both controls are their icon alone, so each says what it is in its tooltip and its label. */}
-          <Tooltip title={intl.formatMessage({ id: 'reconciliation-filters' })} arrow>
-            <IconButton
-              variant="contained"
-              color="primary"
-              aria-label={intl.formatMessage({ id: 'reconciliation-filters' })}
-              aria-pressed={filtersOpen}
-              onClick={() => setFiltersOpen((shown) => !shown)}
-            >
-              <FilterSearch size={18} />
-            </IconButton>
-          </Tooltip>
-          {/* Choosing a month collects it: the orders are what the screen is for, and a second click to see them
-              said nothing the choice had not. */}
-          <TextField
-            label={intl.formatMessage({ id: 'reconciliation-month' })}
-            name="month"
-            type="month"
-            size="small"
-            value={selectedMonth}
-            onChange={(event) => handleMonthChange(event.target.value)}
-            slotProps={{ inputLabel: { shrink: true }, htmlInput: { pattern: '[0-9]{4}-[0-9]{2}' } }}
-          />
-          <Typography variant="body2" color="text.secondary" sx={{ ml: { sm: 'auto' } }}>
-            {intl.formatMessage({ id: 'reconciliation-filter-showing' }, { shown: shownOrders.length, total: collectedOrders.length })}
-          </Typography>
-          {/* The providers keep moving, so the month already on screen is worth asking for again. Collecting queries
-              every one of them, so the button says it is working and refuses a second click until it is done. */}
-          <Tooltip
-            title={intl.formatMessage({ id: reconciliationOrdersRefreshing ? 'reconciliation-refreshing' : 'reconciliation-refresh' })}
-            arrow
-          >
-            <span>
-              <IconButton
-                variant="outlined"
-                color="secondary"
-                disabled={!requestedMonth || reconciliationOrdersRefreshing}
-                aria-label={intl.formatMessage({ id: 'reconciliation-refresh' })}
-                onClick={() => reloadReconciliationOrders()}
-              >
-                {reconciliationOrdersRefreshing ? <CircularProgress size={18} color="inherit" /> : <Refresh size={18} />}
-              </IconButton>
-            </span>
-          </Tooltip>
-        </Stack>
-      </MainCard>
-
       <Box sx={{ display: 'flex' }}>
         <ReconciliationFilterDrawer
-          stickyTop={headerBottom + 20}
           open={filtersOpen}
           onClose={() => setFiltersOpen(false)}
           filtered={isFiltered}
@@ -485,23 +571,93 @@ export default function ReconciliationPage() {
 
         <Main open={filtersOpen} container={container}>
           <Stack spacing={2} sx={{ mt: 2.5 }}>
-            {reconciliationOrdersLoading && <Skeleton variant="rounded" height={320} />}
-
-            {reconciliationOrdersError && (
-              <Alert severity="error">{reconciliationOrdersError.message || intl.formatMessage({ id: 'reconciliation-load-error' })}</Alert>
-            )}
-
             {generationError && <Alert severity="error">{generationError}</Alert>}
             {generationMessage && <Alert severity="success">{generationMessage}</Alert>}
 
-            {!reconciliationOrdersLoading && !reconciliationOrdersError && reconciliationOrders && (
-              <MainCard
-                content={false}
+            {/* The month is what the table is of, so it is the table's own title rather than a bar of its own above
+                it. The count beside it and the buttons at its end are what the same one-line bar has room for, and
+                the bar stays under the app header so the month can still be changed from the foot of a long one. */}
+            <MainCard
+              content={false}
+              title={monthTitle}
+              secondary={monthActions}
+              // The bar draws its own bottom edge, the card's divider being a sibling that would scroll out from
+              // under it.
+              divider={false}
+              sx={{
                 // The table scrolls with the page, so nothing between it and the page may clip: a scrolling ancestor
                 // would catch the sticky head and hold it inside the card instead of under the app header.
-                sx={{ overflow: 'visible' }}
-              >
-                {shownOrders.length ? (
+                overflow: 'visible',
+                // A month long enough to scroll is a month whose picker must still be reachable at the bottom of it,
+                // so the bar sticks under the app header and the table's head stops under the bar.
+                '& .MuiCardHeader-root': {
+                  position: 'sticky',
+                  // The same rest the panel beside it comes to, so the two stop level rather than one under the other.
+                  top: STICKY_TOP,
+                  zIndex: 3,
+                  height: TITLE_HEIGHT,
+                  py: 0,
+                  // A ground of its own, so the rows travel under it rather than through it. It is the card's rounded
+                  // top and rounds with it, as the panel beside it rounds: the two stop level and must stop alike.
+                  bgcolor: 'background.paper',
+                  borderTopLeftRadius: 'inherit',
+                  borderTopRightRadius: 'inherit',
+                  // Once the card's top has gone, what lies behind the corners those curves cut away is a row, which
+                  // shows through as a notch of its colour. So while the bar is stuck its ground is laid in two: the
+                  // page's own colour square to the corners, and the paper rounded over it. The paper goes behind the
+                  // bar's text and in front of its ground, which is what the negative layer is for. At rest neither is
+                  // wanted — behind those corners is the card's own paper, and page colour there greys them.
+                  ...(stuck && {
+                    bgcolor: 'background.default',
+                    borderTopLeftRadius: 0,
+                    borderTopRightRadius: 0,
+                    '&::before': {
+                      content: '""',
+                      position: 'absolute',
+                      inset: 0,
+                      zIndex: -1,
+                      bgcolor: 'background.paper',
+                      borderTopLeftRadius: CARD_RADIUS,
+                      borderTopRightRadius: CARD_RADIUS
+                    },
+                    // The app header is translucent and blurs whatever passes behind it, which for a table is a smear
+                    // of rows rather than nothing at all. The bar carries a plain ground of the page's own colour up
+                    // into that band and leaves the blur nothing to find. Measured from the bar rather than from the
+                    // top of the screen, so it covers the band whatever height the app header turns out to be, and
+                    // only while the bar is stuck, when there is nothing above the card left to cover up.
+                    '&::after': {
+                      content: '""',
+                      position: 'absolute',
+                      insetInline: 0,
+                      bottom: '100%',
+                      height: STICKY_TOP,
+                      bgcolor: 'background.default'
+                    }
+                  }),
+                  borderBottom: (theme) => `1px solid ${theme.palette.divider}`
+                },
+                // The card cannot clip what overflows it, the sticky head being the reason, so the last row rounds
+                // its own outer corners rather than filling the card's.
+                '& tbody .MuiTableRow-root:last-of-type .MuiTableCell-root': {
+                  '&:first-of-type': { borderBottomLeftRadius: CARD_RADIUS },
+                  '&:last-of-type': { borderBottomRightRadius: CARD_RADIUS }
+                }
+              }}
+            >
+              <Box ref={cardTopRef} sx={{ position: 'absolute', top: 0, left: 0, width: '1px', height: '1px' }} />
+
+              {reconciliationOrdersLoading && <Skeleton variant="rounded" height={320} sx={{ m: 2.5 }} />}
+
+              {reconciliationOrdersError && (
+                <Alert severity="error" sx={{ m: 2.5 }}>
+                  {reconciliationOrdersError.message || intl.formatMessage({ id: 'reconciliation-load-error' })}
+                </Alert>
+              )}
+
+              {!reconciliationOrdersLoading &&
+                !reconciliationOrdersError &&
+                reconciliationOrders &&
+                (shownOrders.length ? (
                   <TableContainer sx={{ overflow: 'visible' }}>
                     <Table
                       stickyHeader
@@ -515,7 +671,7 @@ export default function ReconciliationPage() {
                         // The page is what scrolls, so the head stops under the app header rather than at nought, and
                         // it needs its own ground and its own edge: the row it sits in keeps both behind it.
                         '& .MuiTableCell-stickyHeader': {
-                          top: headerBottom,
+                          top: STICKY_TOP + TITLE_HEIGHT,
                           bgcolor: 'secondary.lighter',
                           borderBottom: (theme) => `2px solid ${theme.palette.divider}`
                         }
@@ -628,9 +784,8 @@ export default function ReconciliationPage() {
                       </Button>
                     )}
                   </Box>
-                )}
-              </MainCard>
-            )}
+                ))}
+            </MainCard>
           </Stack>
         </Main>
       </Box>
