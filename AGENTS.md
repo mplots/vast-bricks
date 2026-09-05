@@ -146,9 +146,10 @@ here as they are provided; do not invent unspecified behavior prematurely.
   the systems involved in commerce, payment, shipping, accounting, and store
   synchronization.
 - An order whose reconciliation fails is marked by a dot in the actions column,
-  colored by the loudest level among its failures. An order with nothing to show
-  gets a green dot, so every row states its verdict in the same place. The row
-  itself is not tinted.
+  colored by the loudest level among its failures, and the row is tinted that
+  same color. An order with nothing to show gets a green dot, so every row states
+  its verdict in the same place. The dot alone proved too quiet to find a failed
+  order by while scanning a month, which is why the row carries the verdict too.
 - Selecting an order shows all available details, including why its
   reconciliation failed.
 - The first iteration is read-only.
@@ -403,8 +404,11 @@ here as they are provided; do not invent unspecified behavior prematurely.
   them. The
   actions cell leads with a dot colored by the loudest level among the order's
   failures, or `success` green when it has none to show; the dot's level is named
-  in its tooltip, so color alone never carries it. Rows are not tinted, which
-  leaves each cell free to color what it shows.
+  in its tooltip, so color alone never carries it. The row is tinted the same
+  level color, in the palette's `lighter` shade so the cells stay readable over
+  it. Hover deepens that same color rather than stepping to the next one on the
+  ramp, which would swamp the text, and rather than the table's default grey,
+  which would lose the level exactly while the row is being pointed at.
 - The source chip is colored per marketplace, not by failure level: BrickLink
   `primary` and BrickOwl `secondary`, as the accounting screen colors them.
 - Selecting any order opens a read-only detail view listing every collected field
@@ -416,7 +420,14 @@ here as they are provided; do not invent unspecified behavior prematurely.
   view. It exists so a rule can report a reason without asking anyone to act on
   it.
 - The order counts above the table are one chip per level, loudest first,
-  counting the orders that level is the loudest one of.
+  counting the orders that level is the loudest one of, with a `reconciled` chip
+  for the orders that have nothing to show. A level no order is at has nothing to
+  count and no chip.
+- Each of those chips is also the switch for its level's row tint: filled tints
+  those rows, outlined leaves them plain. Errors and warnings are tinted by
+  default, being the rows the screen is opened to find. The chips never hide a
+  row — every collected order stays in the table whatever is toggled, so a count
+  above the table always matches what is under it.
 - Dates are shown as `dd.mm.yyyy`, as the accounting and archive screens show
   them. The API carries them as ISO days.
 - Reconciliation screen text is translated through `vast-portal`'s `en.json` and

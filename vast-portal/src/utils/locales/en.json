@@ -69,5 +69,6 @@
   "reconciliation-failure-invoice-sub-total-mismatch": "Invoice sub-total {invoiceSubTotal} does not match the order sub-total {subTotal}.",
   "reconciliation-failure-invoice-items-sub-total-mismatch": "Invoice sub-total {invoiceSubTotal} does not match the items sub-total {itemsSubTotal}.",
   "reconciliation-failure-paid-amount-mismatch": "Paid amount {paidAmount} does not match the grand total {grandTotal}.",
-  "reconciliation-failure-amount-missing": "Missing: {fields}."
+  "reconciliation-failure-amount-missing": "Missing: {fields}.",
+  "reconciliation-none-count": "{count} reconciled"
 }

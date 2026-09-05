@@ -1,5 +1,6 @@
 import { FormEvent, useState } from 'react';
 
+import { emphasize } from '@mui/material/styles';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -98,6 +99,15 @@ const orderLevel = (order: ReconciliationOrder): ShownLevel | null =>
 
 const failureKey = (failure: ReconciliationFailure) => `${failure.code}-${failure.fields.join('-')}`;
 
+/** What the level filter can show or hide: a failure level, or an order with nothing to show. */
+type FilterLevel = ShownLevel | 'none';
+
+// Loudest first, which is the order the chips read in and the order that matters when scanning.
+const filterLevels: FilterLevel[] = ['error', 'warning', 'info', 'none'];
+
+/** The chip colour and the row tint for a level; a reconciled order reads green, as its dot always has. */
+const levelColor = (level: FilterLevel) => (level === 'none' ? 'success' : level);
+
 // Each marketplace keeps its own chip color, as the accounting screen colors it.
 const sourceColor = (source: string): ChipProps['color'] => (source === 'BrickOwl' ? 'secondary' : 'primary');
 
@@ -118,6 +128,8 @@ export default function ReconciliationPage() {
   const [generatingOrder, setGeneratingOrder] = useState<string | null>(null);
   const [generationError, setGenerationError] = useState<string | null>(null);
   const [generationMessage, setGenerationMessage] = useState<string | null>(null);
+  // Errors and warnings by default: those are the rows the screen is opened to find.
+  const [tintedLevels, setTintedLevels] = useState<FilterLevel[]>(['error', 'warning']);
   const { reconciliationOrders, reconciliationOrdersError, reconciliationOrdersLoading } = useGetReconciliationOrders(requestedMonth);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -173,11 +185,23 @@ export default function ReconciliationPage() {
   // The dot in the action cell states the order's loudest level, and reads as reconciled when it has none.
   const dotLabel = (level: ShownLevel | null) => (level ? levelLabel(level) : intl.formatMessage({ id: 'reconciliation-level-none' }));
 
-  // One chip per level, loudest first, counting the orders that level is the loudest one of.
-  const levelCounts = [...shownLevels]
-    .reverse()
-    .map((level) => ({ level, count: reconciliationOrders?.orders.filter((order) => orderLevel(order) === level).length ?? 0 }))
+  // One chip per level, loudest first, counting the orders that level is the loudest one of. A level no order is at
+  // has nothing to toggle, so its chip is left out.
+  const levelCounts = filterLevels
+    .map((level) => ({
+      level,
+      count: reconciliationOrders?.orders.filter((order) => (orderLevel(order) ?? 'none') === level).length ?? 0
+    }))
     .filter(({ count }) => count > 0);
+
+  // Every order stays in the table; a level's chip decides whether its rows are tinted, not whether they are there.
+  const isLevelTinted = (level: FilterLevel) => tintedLevels.includes(level);
+
+  const toggleLevel = (level: FilterLevel) =>
+    setTintedLevels((current) => (current.includes(level) ? current.filter((tinted) => tinted !== level) : [...current, level]));
+
+  /** The row's background colour, or null when its level is toggled off. */
+  const rowTint = (level: FilterLevel) => (isLevelTinted(level) ? levelColor(level) : null);
 
   return (
     <Stack spacing={3}>
@@ -206,12 +230,16 @@ export default function ReconciliationPage() {
                 label={intl.formatMessage({ id: 'reconciliation-order-count' }, { count: reconciliationOrders.orders.length })}
                 variant="outlined"
               />
+              {/* Each count is also the switch for its level: filled tints those rows, outlined leaves them plain. */}
               {levelCounts.map(({ level, count }) => (
                 <Chip
                   key={level}
+                  clickable
                   label={intl.formatMessage({ id: `reconciliation-${level}-count` }, { count })}
-                  color={level}
-                  variant="outlined"
+                  color={levelColor(level)}
+                  variant={isLevelTinted(level) ? 'filled' : 'outlined'}
+                  onClick={() => toggleLevel(level)}
+                  aria-pressed={isLevelTinted(level)}
                 />
               ))}
             </Stack>
@@ -244,60 +272,74 @@ export default function ReconciliationPage() {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {reconciliationOrders.orders.map((order) => (
-                    <TableRow
-                      hover
-                      key={orderKey(order)}
-                      // Not when the click merely ended a text selection: copying a cell must not open the detail.
-                      onClick={() => !hasTextSelection() && openOrder(order)}
-                      sx={{ cursor: 'pointer' }}
-                    >
-                      {/* The row opens the detail dialog, so the action cell must not bubble its click. */}
-                      <TableCell sx={{ width: 84, whiteSpace: 'nowrap' }} onClick={(event) => event.stopPropagation()}>
-                        <Stack direction="row" spacing={0.75} alignItems="center">
-                          {/* The level is named as well as colored, so the dot does not carry it by color alone. */}
-                          <Tooltip title={dotLabel(orderLevel(order))} arrow>
-                            <Box component="span" role="img" aria-label={dotLabel(orderLevel(order))} sx={{ display: 'flex' }}>
-                              <Dot size={8} color={orderLevel(order) ?? 'success'} />
-                            </Box>
-                          </Tooltip>
-                          <Tooltip title={intl.formatMessage({ id: 'reconciliation-generate-invoice' })} arrow>
-                            <span>
-                              <IconButton
-                                size="small"
-                                color="primary"
-                                disabled={generatingOrder === orderKey(order)}
-                                aria-label={intl.formatMessage(
-                                  { id: 'reconciliation-generate-invoice-for' },
-                                  { source: order.source, orderId: order.orderId }
-                                )}
-                                onClick={() => handleGenerateInvoice(order)}
-                              >
-                                {generatingOrder === orderKey(order) ? (
-                                  <CircularProgress size={18} color="inherit" />
-                                ) : (
-                                  <ReceiptAdd size={20} color="currentColor" />
-                                )}
-                              </IconButton>
-                            </span>
-                          </Tooltip>
-                        </Stack>
-                      </TableCell>
-                      {columnFields.map((field) => (
-                        <TableCell
-                          key={field}
-                          align={amountFields.includes(field) ? 'right' : 'left'}
-                          sx={dateFields.includes(field) ? { whiteSpace: 'nowrap' } : undefined}
-                        >
-                          {field === 'source' ? (
-                            <Chip label={order.source} size="small" color={sourceColor(order.source)} variant="outlined" />
-                          ) : (
-                            formatFieldValue(order, field)
-                          )}
+                  {reconciliationOrders.orders.map((order) => {
+                    const tint = rowTint(orderLevel(order) ?? 'none');
+                    return (
+                      <TableRow
+                        hover
+                        key={orderKey(order)}
+                        // Not when the click merely ended a text selection: copying a cell must not open the detail.
+                        onClick={() => !hasTextSelection() && openOrder(order)}
+                        sx={(theme) => ({
+                          cursor: 'pointer',
+                          // The row itself carries the verdict: a dot alone was too quiet to find a bad order by.
+                          // Hover deepens that same colour rather than jumping to the next step of the ramp, which
+                          // would swamp the text; `emphasize` darkens a light tint and lightens a dark one, so it
+                          // reads the same way in both themes. It has to out-specify MUI's own
+                          // `.MuiTableRow-hover:hover`, which would otherwise grey the row and lose the level.
+                          ...(tint && {
+                            bgcolor: theme.palette[tint].lighter,
+                            '&&.MuiTableRow-hover:hover': { bgcolor: emphasize(theme.palette[tint].lighter, 0.08) }
+                          })
+                        })}
+                      >
+                        {/* The row opens the detail dialog, so the action cell must not bubble its click. */}
+                        <TableCell sx={{ width: 84, whiteSpace: 'nowrap' }} onClick={(event) => event.stopPropagation()}>
+                          <Stack direction="row" spacing={0.75} alignItems="center">
+                            {/* The level is named as well as colored, so the dot does not carry it by color alone. */}
+                            <Tooltip title={dotLabel(orderLevel(order))} arrow>
+                              <Box component="span" role="img" aria-label={dotLabel(orderLevel(order))} sx={{ display: 'flex' }}>
+                                <Dot size={8} color={orderLevel(order) ?? 'success'} />
+                              </Box>
+                            </Tooltip>
+                            <Tooltip title={intl.formatMessage({ id: 'reconciliation-generate-invoice' })} arrow>
+                              <span>
+                                <IconButton
+                                  size="small"
+                                  color="primary"
+                                  disabled={generatingOrder === orderKey(order)}
+                                  aria-label={intl.formatMessage(
+                                    { id: 'reconciliation-generate-invoice-for' },
+                                    { source: order.source, orderId: order.orderId }
+                                  )}
+                                  onClick={() => handleGenerateInvoice(order)}
+                                >
+                                  {generatingOrder === orderKey(order) ? (
+                                    <CircularProgress size={18} color="inherit" />
+                                  ) : (
+                                    <ReceiptAdd size={20} color="currentColor" />
+                                  )}
+                                </IconButton>
+                              </span>
+                            </Tooltip>
+                          </Stack>
                         </TableCell>
-                      ))}
-                    </TableRow>
-                  ))}
+                        {columnFields.map((field) => (
+                          <TableCell
+                            key={field}
+                            align={amountFields.includes(field) ? 'right' : 'left'}
+                            sx={dateFields.includes(field) ? { whiteSpace: 'nowrap' } : undefined}
+                          >
+                            {field === 'source' ? (
+                              <Chip label={order.source} size="small" color={sourceColor(order.source)} variant="outlined" />
+                            ) : (
+                              formatFieldValue(order, field)
+                            )}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    );
+                  })}
                 </TableBody>
               </Table>
             </TableContainer>

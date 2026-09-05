@@ -69,5 +69,6 @@
   "reconciliation-failure-invoice-sub-total-mismatch": "Rēķina starpsumma {invoiceSubTotal} neatbilst pasūtījuma starpsummai {subTotal}.",
   "reconciliation-failure-invoice-items-sub-total-mismatch": "Rēķina starpsumma {invoiceSubTotal} neatbilst preču starpsummai {itemsSubTotal}.",
   "reconciliation-failure-paid-amount-mismatch": "Apmaksātā summa {paidAmount} neatbilst kopsummai {grandTotal}.",
-  "reconciliation-failure-amount-missing": "Trūkst datu: {fields}."
+  "reconciliation-failure-amount-missing": "Trūkst datu: {fields}.",
+  "reconciliation-none-count": "{count} saskaņoti"
 }
