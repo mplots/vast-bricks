@@ -130,10 +130,17 @@ export default function ReconciliationPage() {
   const [generationMessage, setGenerationMessage] = useState<string | null>(null);
   // Errors and warnings by default: those are the rows the screen is opened to find.
   const [tintedLevels, setTintedLevels] = useState<FilterLevel[]>(['error', 'warning']);
-  const { reconciliationOrders, reconciliationOrdersError, reconciliationOrdersLoading } = useGetReconciliationOrders(requestedMonth);
+  const { reconciliationOrders, reconciliationOrdersError, reconciliationOrdersLoading, reloadReconciliationOrders } =
+    useGetReconciliationOrders(requestedMonth);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    // Asking for the month already shown asks for it again: the orders are reconciled against providers that keep
+    // moving, so the button collects them anew rather than showing what the last click found.
+    if (selectedMonth === requestedMonth) {
+      reloadReconciliationOrders();
+      return;
+    }
     setRequestedMonth(selectedMonth);
   };
 
