@@ -73,8 +73,15 @@ export default function ThemeCustomization({ children }: ThemeCustomizationProps
     [themeDirection, theme, themeTypography, themeCustomShadows]
   );
 
-  const themes: Theme = createTheme(themeOptions);
-  themes.components = componentsOverride(themes);
+  // Building the theme is a deep merge of every component override the app has, and the object it returns is what
+  // the whole MUI tree reads its styling from: a new one re-renders and re-styles every component on screen. Both
+  // are therefore done only when the options they are built from actually change, rather than on every render of
+  // this component — which is every time anything in the config changes, the language among it.
+  const themes: Theme = useMemo<Theme>(() => {
+    const built = createTheme(themeOptions);
+    built.components = componentsOverride(built);
+    return built;
+  }, [themeOptions]);
 
   return (
     <StyledEngineProvider injectFirst>
