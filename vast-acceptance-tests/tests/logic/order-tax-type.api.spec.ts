@@ -15,10 +15,10 @@ const taxTypeOf = async (request: APIRequestContext, marketplace: string, fields
 const brickOwl = (request: APIRequestContext, fields: TaxFields) => taxTypeOf(request, 'brickowl', fields);
 const brickLink = (request: APIRequestContext, fields: TaxFields) => taxTypeOf(request, 'bricklink', fields);
 
-test('types a BrickOwl order taxed under a scheme and billed in Latvia as domestic', async ({ request }) => {
-  await expect(brickOwl(request, { billingCountryCode: 'LV', taxSchemeId: '1', taxRate: '21' })).resolves.toBe(
-    'domestic'
-  );
+test('types a BrickOwl order taxed at a rate under no scheme and billed in Latvia as domestic', async ({
+  request,
+}) => {
+  await expect(brickOwl(request, { billingCountryCode: 'LV', taxRate: '21' })).resolves.toBe('domestic');
 });
 
 test('types a BrickOwl order taxed at a rate under no scheme as European Union', async ({ request }) => {
@@ -29,8 +29,15 @@ test('types a BrickOwl order at a zero rate under no scheme as export', async ({
   await expect(brickOwl(request, { billingCountryCode: 'US', taxRate: '0' })).resolves.toBe('export');
 });
 
-test('types a BrickOwl order taxed under a scheme but billed outside Latvia as export taxable', async ({ request }) => {
+test('types a BrickOwl order taxed under a scheme as export taxable', async ({ request }) => {
   await expect(brickOwl(request, { billingCountryCode: 'GB', taxSchemeId: '2', taxRate: '20' })).resolves.toBe(
+    'export-taxable'
+  );
+});
+
+// The scheme is the marketplace's own, so where it billed says nothing about the store's VAT.
+test('types a BrickOwl order taxed under a scheme but billed in Latvia as export taxable', async ({ request }) => {
+  await expect(brickOwl(request, { billingCountryCode: 'LV', taxSchemeId: '1', taxRate: '21' })).resolves.toBe(
     'export-taxable'
   );
 });

@@ -14,10 +14,9 @@ import java.util.Locale;
  * Derives an order's {@link OrderTaxType} from what its marketplace reported. Each marketplace states the same fact
  * with its own fields, so there is one method per marketplace order and one shared vocabulary out.
  *
- * <p>The checks are ordered, first match winning, because the conditions overlap: a Latvian order and an order the
- * marketplace taxed outside the EU both carry a tax scheme, and an untaxed export is an EU order whose rate happens
- * to be zero. Ordering them is what tells the four types apart. An order stating none of it is left with no type
- * rather than guessed at.
+ * <p>The checks are ordered, first match winning, because the conditions overlap: an untaxed export is an EU order
+ * whose rate happens to be zero, and a domestic order is an EU order that happens to be billed at home. Ordering
+ * them is what tells the four types apart. An order stating none of it is left with no type rather than guessed at.
  */
 public final class OrderTaxTypes {
 
@@ -27,7 +26,11 @@ public final class OrderTaxTypes {
     private OrderTaxTypes() {
     }
 
-    /** BrickOwl states the tax scheme it charged under, the rate, and the country it billed. */
+    /**
+     * BrickOwl states the tax scheme it charged under, the rate, and the country it billed. A named scheme is always
+     * one of the marketplace's own registrations, charged on a sale outside the EU; VAT the store charges under its
+     * own registration, at home or elsewhere in the EU, is reported as a bare rate under no scheme at all.
+     */
     public static OrderTaxType of(BrickOwlOrder order) {
         if (order == null) {
             return null;
@@ -35,12 +38,15 @@ public final class OrderTaxTypes {
         var taxed = order.getTaxSchemeId() != null && !order.getTaxSchemeId().isBlank();
         var rate = order.getTaxRate();
         if (taxed && rate != null) {
-            return DOMESTIC_COUNTRY_CODE.equalsIgnoreCase(order.getBillingCountryCode()) ? DOMESTIC : EXPORT_TAXABLE;
+            return EXPORT_TAXABLE;
         }
         if (taxed || rate == null) {
             return null;
         }
-        return isZero(rate) ? EXPORT : EUROPEAN_UNION;
+        if (isZero(rate)) {
+            return EXPORT;
+        }
+        return DOMESTIC_COUNTRY_CODE.equalsIgnoreCase(order.getBillingCountryCode()) ? DOMESTIC : EUROPEAN_UNION;
     }
 
     /**
