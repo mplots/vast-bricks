@@ -29,9 +29,11 @@ class MapperBrickLinkOrders implements OrderMapper<BrickStoreOrder> {
     }
 
     private ReconciledOrder toReconciledOrder(BrickStoreOrder order) {
+        var orderId = order.getOrderId() == null ? null : order.getOrderId().toString();
         return ReconciledOrder.builder()
                 .source(Marketplace.BRICK_LINK)
-                .orderId(order.getOrderId() == null ? null : order.getOrderId().toString())
+                .orderId(orderId)
+                .orderUrl(OrderLinks.brickLink(orderId))
                 .orderDate(order.getOrderDate())
                 .buyer(order.getBuyer())
                 .paymentMethod(ReconciliationPaymentMethod.normalize(order.getPaymentType()))

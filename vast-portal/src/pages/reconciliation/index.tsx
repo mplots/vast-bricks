@@ -341,10 +341,16 @@ export default function ReconciliationPage() {
     return order.taxType ? intl.formatMessage({ id: `order-tax-type-${order.taxType}` }) : '—';
   };
 
-  // The payment method names the payment, so it carries the link to where the provider shows it rather than
-  // spending a column on one, and says where it goes in its accessible label. Every other field, and a method no
-  // payment was matched for, stays the plain value it is.
+  // Two fields name something the provider also shows: the order id names the order and the payment method names
+  // the payment. Each carries the link to it rather than spending a column on one, and each says where it goes in
+  // its accessible label. Every other field, and one with nothing collected to link to, stays the plain value it is.
   const fieldLink = (order: ReconciliationOrder, field: string) => {
+    if (field === 'orderId') {
+      return {
+        url: order.orderUrl,
+        label: intl.formatMessage({ id: 'reconciliation-order-link' }, { source: order.source })
+      };
+    }
     if (field === 'paymentMethod') {
       return {
         url: order.paymentUrl,

@@ -108,6 +108,7 @@ test('lists BrickLink reconciliation orders for the selected month', async ({
       {
         source: 'BrickLink',
         orderId: '32456564',
+        orderUrl: 'https://www.bricklink.com/orderDetail.asp?ID=32456564&viewChk=Y&viewWeight=Y&viewRemain=Y',
         orderDate: '2026-08-31',
         buyer: 'another buyer',
         buyerUsername: 'another-buyer-username',
@@ -127,6 +128,7 @@ test('lists BrickLink reconciliation orders for the selected month', async ({
       {
         source: 'BrickLink',
         orderId: '32456563',
+        orderUrl: 'https://www.bricklink.com/orderDetail.asp?ID=32456563&viewChk=Y&viewWeight=Y&viewRemain=Y',
         orderDate: '2026-08-30',
         buyer: 'some buyer',
         buyerUsername: 'some-buyer-username',
@@ -198,6 +200,7 @@ test('lists BrickOwl reconciliation orders for the selected month', async ({
       {
         source: 'BrickOwl',
         orderId: 'test-order-0811',
+        orderUrl: 'https://www.brickowl.com/mystore/orders/history/test-order-0811',
         orderDate: '2026-08-11',
         buyer: 'Test Buyer Beta',
         buyerUsername: 'test_beta',
@@ -217,6 +220,7 @@ test('lists BrickOwl reconciliation orders for the selected month', async ({
       {
         source: 'BrickOwl',
         orderId: 'test-order-0810',
+        orderUrl: 'https://www.brickowl.com/mystore/orders/history/test-order-0810',
         orderDate: '2026-08-10',
         buyer: 'Test Buyer Alpha',
         buyerUsername: 'test_alpha',
@@ -322,6 +326,7 @@ test('lists BrickOwl reconciliation orders that span several batch requests', as
   expect(body.orders[0]).toEqual({
     source: 'BrickOwl',
     orderId: 'bulk-order-1',
+    orderUrl: 'https://www.brickowl.com/mystore/orders/history/bulk-order-1',
     orderDate: '2026-08-10',
     buyer: 'Bulk Buyer 1',
     buyerUsername: 'bulk_1',
@@ -740,6 +745,35 @@ test('reports the facilitator tax PayPal shows a BrickOwl order was taken', asyn
   expect(body.orders[0].facilitatorTax).toBe(1.97);
   expect(body.orders[0].paidFacilitatorTax).toBe(1.97);
   expect(body.orders[0].failures).toEqual([]);
+});
+
+test('links each order to where its own marketplace shows it', async ({ request, settings }, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: '2026-08',
+    brickLink: {
+      fullNameOrdersXml: brickLinkOrdersXml(brickLinkOrderXml('32509898', '5.00', [['2.5000', '2']], '8/30/2026')),
+      usernameOrdersXml: emptyOrdersXml,
+    },
+    brickOwl: [
+      {
+        orderId: '1449775',
+        orderDate: '1786320000',
+        view: { buyer_name: 'some buyer', sub_total: '5.20', base_order_total: '5.20' },
+        items: [{ base_price: '5.20', ordered_quantity: '1' }],
+      },
+    ],
+  });
+
+  const response = await request.get('/api/private/reconciliation/orders?month=2026-08');
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  expect(
+    body.orders.map((order: { orderId: string; orderUrl: string }) => [order.orderId, order.orderUrl])
+  ).toEqual([
+    ['32509898', 'https://www.bricklink.com/orderDetail.asp?ID=32509898&viewChk=Y&viewWeight=Y&viewRemain=Y'],
+    ['1449775', 'https://www.brickowl.com/mystore/orders/history/1449775'],
+  ]);
 });
 
 test('links a Stripe-paid order to the payment in the Stripe dashboard', async ({

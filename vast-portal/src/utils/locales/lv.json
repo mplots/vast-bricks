@@ -85,6 +85,7 @@
   "reconciliation-field-targetInvoice": "Mērķa rēķins",
   "reconciliation-field-paidAmount": "Apmaksātā summa",
   "reconciliation-field-paidFacilitatorTax": "Samaksātais starpnieka nodoklis",
+  "reconciliation-order-link": "Atvērt šo pasūtījumu {source}",
   "reconciliation-payment-link": "Atvērt šo maksājumu {paymentMethod}",
   "order-tax-type-domestic": "Iekšzeme (Latvija)",
   "order-tax-type-european-union": "Eiropas Savienība",

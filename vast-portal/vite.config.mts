@@ -50,6 +50,16 @@ export default defineConfig(({ mode }) => {
       ]
     },
     base: API_URL,
+    // The pickers keep their localization in a context that both the provider and the calendars close over, so the
+    // whole family has to be pre-bundled in one pass. Discovering one of these on demand re-optimizes mid-session and
+    // leaves the page holding two copies of that context, which reads as a missing LocalizationProvider.
+    optimizeDeps: {
+      include: [
+        '@mui/x-date-pickers/AdapterDateFns',
+        '@mui/x-date-pickers/LocalizationProvider',
+        '@mui/x-date-pickers/MonthCalendar'
+      ]
+    },
     plugins: [react(), tsconfigPaths()]
   };
 });

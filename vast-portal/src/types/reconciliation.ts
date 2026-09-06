@@ -15,6 +15,8 @@ export interface ReconciliationFailure {
 export interface ReconciliationOrder {
   source: string;
   orderId: string;
+  /** Where the marketplace shows the order, or `null` when it was collected without an id to address. */
+  orderUrl: string | null;
   orderDate: string | null;
   buyer: string;
   buyerUsername: string | null;
