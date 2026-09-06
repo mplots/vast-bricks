@@ -203,6 +203,10 @@ class BricklinkShippingRequestService {
     }
 
     private Tariff.Mode shippingMode(Order order) {
+        var method = order.getData().getShipping().getMethod();
+        if (StringUtils.containsIgnoreCase(method, "Traceable")) {
+            return Tariff.Mode.TRACEABLE;
+        }
         var etc2 = order.getData().getCost() != null ? order.getData().getCost().getEtc2() : null;
         return etc2 != null && etc2.compareTo(BigDecimal.ZERO) > 0
                 ? Tariff.Mode.TRACEABLE
