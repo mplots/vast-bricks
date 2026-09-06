@@ -629,10 +629,25 @@ here as they are provided; do not invent unspecified behavior prematurely.
 - A field's label is its own name without the source, everywhere it is named.
   The detail view and the picker head their groups with the source, and a column
   heading carries nothing but the field's own name: a source in the heading
-  reads as part of the column's name rather than as the account behind it. Two
-  shown columns of different sources may therefore be headed alike — the two
-  refunds are — and which is which is read from the order they were arranged
-  in and from the detail view.
+  reads as part of the column's name rather than as the account behind it.
+- The table's head is two rows. The upper one is set lighter than the headings
+  under it: the theme's own bold uppercase belongs to the columns, and a group
+  names where a heading came from rather than what it is, so it is the quieter
+  of the two. It is kept to one line: a name broken in two reads as two names
+  and leaves the row a height the columns below it no longer stick under, so a
+  run's columns widen to hold its name instead.
+- The upper row names the account a run of columns came from, spanning it, so
+  two columns headed alike — the two refunds are — are told apart by what
+  stands over them. A run is columns of one source that are next to each other:
+  the table is arranged so its amounts read as the sums they make, which is not
+  the order the sources come in, so a source split apart by a column of another
+  is named twice rather than spanning the column between them.
+- A run draws its edge down the whole table, head and body alike, so a group
+  reads down the table and not only across its head. The edge is the divider's
+  own colour and not a colour per source. Colour in this table already means two
+  things — how an order reconciled, which tints the row and is what a reader
+  is looking for, and which marketplace an order came from, colouring its chip
+  — and a third would compete with the tint it ran through.
 - The detail view titles each source's fields and rules them off with a divider,
   the way a card titles what it holds. A heading alone left the groups to be
   noticed rather than seen, and which account stated a value is the whole reason

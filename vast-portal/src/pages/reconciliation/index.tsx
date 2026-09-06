@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 
-import { emphasize, styled } from '@mui/material/styles';
+import { emphasize, styled, type Theme } from '@mui/material/styles';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -218,6 +218,38 @@ const orderKey = (order: ReconciliationOrder) => `${order.order.source}-${order.
  * screen, and the buttons — which is what lets that number be stated rather than measured.
  */
 const TITLE_HEIGHT = 68;
+
+/**
+ * The height of the head's first row, which names the account each run of columns came from. It is stated rather
+ * than measured because the row below it sticks under it: a row that stopped at a height read back after the fact
+ * would land over the groups on the first scroll of the page.
+ */
+const GROUP_HEIGHT = 33;
+
+/**
+ * The edge between one run of columns and the next, drawn the full height of the table so a group reads down it and
+ * not only across its head. It is the divider's own colour rather than a colour per source: the rows are already
+ * tinted by how an order reconciled, which is the thing being looked for, and a second colour running through them
+ * would compete with it.
+ */
+const bandEdge = { borderInlineStart: (theme: Theme) => `1px solid ${theme.palette.divider}` };
+
+/**
+ * How a group's name is set against the column headings under it. The theme heads a table in bold uppercase, and a
+ * group saying its name that way says it as loudly as the columns it stands over — but it is the quieter of the two,
+ * naming where the headings came from rather than what they are. So it is set lighter, in the secondary colour and
+ * in its own case, and the headings stay the loudest thing in the head.
+ *
+ * <p>It is also kept to one line. A name is not always as wide as the run it spans — a run of one narrow column
+ * least of all — and a name broken across two lines reads as two names and leaves the row a different height than
+ * the one the columns below it stick under. The run's own columns widen to hold it instead.
+ */
+const groupTitleSx = {
+  textTransform: 'none',
+  fontWeight: 400,
+  color: 'text.secondary',
+  whiteSpace: 'nowrap'
+} as const;
 
 /** The corner MainCard rounds itself to, which anything painting its own ground at the card's edge has to match. */
 const CARD_RADIUS = 12;
@@ -449,6 +481,31 @@ export default function ReconciliationPage() {
   // whatever it is, nobody stated it to this screen, and it is better grouped with the derived than dropped.
   const fieldSource = (field: string): ReconciliationFieldSource =>
     reconciliationOrders?.fields.find((declared) => declared.name === field)?.source ?? 'calculated';
+
+  /**
+   * The shown columns in runs of one source. A source split apart by a column of another is two runs rather than
+   * one: columns that are not next to each other are not a band, and a heading spanning them would claim the column
+   * between them. The table is arranged so its amounts read as the sums they make, which is not the order the
+   * sources come in, so a source standing in two places is ordinary rather than exceptional.
+   */
+  const columnRuns = (): { source: ReconciliationFieldSource; fields: string[] }[] => {
+    const built: { source: ReconciliationFieldSource; fields: string[] }[] = [];
+    shownColumns.forEach((field) => {
+      const last = built.at(-1);
+      const source = fieldSource(field);
+      if (last?.source === source) {
+        last.fields.push(field);
+      } else {
+        built.push({ source, fields: [field] });
+      }
+    });
+    return built;
+  };
+
+  const runs = columnRuns();
+
+  /** The columns a band starts at, which are the ones that draw its edge. The table's first column starts none. */
+  const bandStarts = new Set(runs.slice(1).map((run) => run.fields[0]));
 
   // The detail view reads the fields grouped by the account that stated them, in the order the API declares the
   // sources it actually reported: what the marketplace said and what the gateway said are two claims about one
@@ -895,14 +952,36 @@ export default function ReconciliationPage() {
                         '& .MuiTableCell-stickyHeader:not(:last-of-type)': { position: 'sticky' },
                         // The page is what scrolls, so the head stops under the app header rather than at nought, and
                         // it needs its own ground and its own edge: the row it sits in keeps both behind it.
+                        // The head is two rows now, so each stops at its own height: the groups under the title bar
+                        // and the columns under the groups. The bottom edge belongs to the row the body meets.
                         '& .MuiTableCell-stickyHeader': {
-                          top: STICKY_TOP + TITLE_HEIGHT,
+                          top: STICKY_TOP + TITLE_HEIGHT + GROUP_HEIGHT,
                           bgcolor: 'secondary.lighter',
                           borderBottom: (theme) => `2px solid ${theme.palette.divider}`
+                        },
+                        '& .MuiTableRow-root:first-of-type .MuiTableCell-stickyHeader': {
+                          top: STICKY_TOP + TITLE_HEIGHT,
+                          height: GROUP_HEIGHT,
+                          borderBottom: 'none'
                         }
                       }}
                     >
                       <TableHead>
+                        {/* Which account each run of columns came from, said once over the run rather than in every
+                            heading under it. Two columns of one source that a reader has not put next to each other
+                            are two runs, so a source may be named more than once. */}
+                        <TableRow>
+                          <TableCell sx={{ width: 92 }} />
+                          {runs.map((run, index) => (
+                            <TableCell
+                              key={`${run.source}-${run.fields[0]}`}
+                              colSpan={run.fields.length}
+                              sx={{ ...groupTitleSx, ...(index > 0 && bandEdge) }}
+                            >
+                              {sourceLabel(run.source)}
+                            </TableCell>
+                          ))}
+                        </TableRow>
                         <TableRow>
                           <TableCell sx={{ width: 92 }}>{intl.formatMessage({ id: 'reconciliation-actions' })}</TableCell>
                           {shownColumns.map((field) => {
@@ -914,7 +993,7 @@ export default function ReconciliationPage() {
                                 // The heading is what a column is moved by, dragged or with the arrow keys, so it
                                 // says so rather than reading as a word that happens to answer the keyboard.
                                 aria-label={intl.formatMessage({ id: 'reconciliation-column-move' }, { column: fieldLabel(field) })}
-                                sx={sx}
+                                sx={{ ...(bandStarts.has(field) && bandEdge), ...sx }}
                                 {...dragging}
                               >
                                 {fieldLabel(field)}
@@ -992,7 +1071,10 @@ export default function ReconciliationPage() {
                                 <TableCell
                                   key={field}
                                   align={amountFields.includes(field) ? 'right' : 'left'}
-                                  sx={dateFields.includes(field) ? { whiteSpace: 'nowrap' } : undefined}
+                                  sx={{
+                                    ...(bandStarts.has(field) && bandEdge),
+                                    ...(dateFields.includes(field) && { whiteSpace: 'nowrap' })
+                                  }}
                                 >
                                   {field === 'order.source' ? (
                                     <Chip
