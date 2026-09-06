@@ -212,7 +212,8 @@ test('lists BrickOwl reconciliation orders for the selected month', async ({
         buyer: 'Test Buyer Alpha',
         buyerUsername: 'test_alpha',
         paymentMethod: 'PayPal',
-        taxType: 'domestic',
+        // BrickOwl names a tax scheme only for a registration of its own, so a scheme with a rate is a taxed export.
+        taxType: 'export-taxable',
         facilitatorTax: null,
         subTotal: 2.7,
         itemsSubTotal: 2.7,

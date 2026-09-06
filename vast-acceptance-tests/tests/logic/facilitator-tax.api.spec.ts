@@ -23,7 +23,7 @@ test('takes the tax BrickOwl charged on an export it taxed as the facilitator ta
 
 test('leaves a BrickOwl order taxed at home without a facilitator tax', async ({ request }) => {
   await expect(
-    brickOwl(request, { billingCountryCode: 'LV', taxSchemeId: '1', taxRate: '21', taxAmount: '2.10' })
+    brickOwl(request, { billingCountryCode: 'LV', taxRate: '21', taxAmount: '2.10' })
   ).resolves.toBeNull();
 });
 
