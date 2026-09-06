@@ -55,6 +55,11 @@ final class PayPalPayments {
         return salesTax == null ? null : ReconciliationAmount.normalize(salesTax.getValue());
     }
 
+    /** The payment this transaction is, as PayPal's own transaction views address one. */
+    static String paymentReference(PayPalTransaction transaction) {
+        return transaction.getTransactionInfo().getTransactionId();
+    }
+
     /** The day PayPal took the payment, in the UTC it reports the transaction in. */
     static LocalDate paymentDate(PayPalTransaction transaction) {
         var initiated = transaction.getTransactionInfo().getTransactionInitiationDate();

@@ -1,6 +1,7 @@
 package com.vastbricks.api.reconciliation.payment;
 
 import com.stripe.model.BalanceTransaction;
+import com.stripe.model.Charge;
 import com.vastbricks.api.reconciliation.ReconciliationAmount;
 import java.math.BigDecimal;
 import java.util.Set;
@@ -61,6 +62,18 @@ final class StripePayments {
                 .map(fee -> BigDecimal.valueOf(fee.getAmount()))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         return ReconciliationAmount.normalize(total.movePointLeft(2));
+    }
+
+    /**
+     * The payment this transaction settled, as Stripe's dashboard addresses one, or {@code null} when the
+     * transaction names none. A charge made through a payment intent is addressed by that intent; one made without
+     * is addressed by the charge itself, which is all the older payments have.
+     */
+    static String paymentReference(BalanceTransaction transaction) {
+        if (transaction.getSourceObject() instanceof Charge charge && charge.getPaymentIntent() != null) {
+            return charge.getPaymentIntent();
+        }
+        return transaction.getSource();
     }
 
     /** The transaction's description, or {@code null} when it carries none to match an order on. */

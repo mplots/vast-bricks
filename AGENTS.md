@@ -170,7 +170,8 @@ here as they are provided; do not invent unspecified behavior prematurely.
   (`BrickLink` or `BrickOwl`), order ID, order date, buyer, buyer username,
   payment method, tax type, facilitator tax, sub-total, items sub-total, grand
   total, accounting invoice sub-total, paid amount, paid facilitator tax, and
-  target invoice, together with its rule failures. Add further
+  target invoice, together with its rule failures and the link to its payment,
+  exposed beside the field it rides on. Add further
   fields and providers incrementally as their processing requirements are
   supplied.
 - The grand total is the order total in the store's base currency with shipping
@@ -214,6 +215,23 @@ here as they are provided; do not invent unspecified behavior prematurely.
   separately. PayPal states it as the transaction's `sales_tax_amount`. A
   payment that states neither took no facilitator tax, which is a different
   fact from taking zero, so the field is left absent rather than zeroed.
+- The payment link is where the provider shows the payment that was matched to
+  the order, collected beside the paid amount by the same mappers. Stripe
+  addresses a payment by the payment intent behind the charge, so the balance
+  transaction list expands its charge rather than fetching one per payment, and
+  falls back to the charge itself for a payment made without an intent. Stripe
+  also needs the account the payment was taken under, which a balance
+  transaction does not name; it is configured as `VAST_STRIPE_ACCOUNT_ID` and,
+  unset, leaves Stripe-paid orders without a link rather than with one that
+  lands wherever the reader is signed in. PayPal addresses a transaction by id
+  alone. The address is built in the backend, where the provider reference and
+  the account setting are: a link is not wording, so this does not put
+  user-facing text there.
+- The link spends no column of its own. It rides on the payment method, which
+  names what it opens, in the table and in the detail view alike, and says where
+  it goes in its accessible label. An order no payment was matched to shows the
+  method as the plain word it was. The row opens the detail dialog, so the link
+  stops its click from reaching the row.
 - A rule compares the two once a payment has been matched to the order: what the
   marketplace reported collecting must be what the payment shows it took, and a
   disagreement is an `error`, being tax one side or the other will report

@@ -5,6 +5,7 @@ import type { WireMockValueMatcher } from './wiremock';
 import { WireMockApi } from './wiremock';
 
 const stripeSecretKey = 'test-stripe-secret-key';
+const stripeAccountId = 'acct_test-stripe-account';
 const payPalClientId = 'test-paypal-client-id';
 const payPalClientSecret = 'test-paypal-client-secret';
 const payPalBasicAuth = Buffer.from(`${payPalClientId}:${payPalClientSecret}`).toString('base64');
@@ -41,6 +42,8 @@ export type StripeTransactionMock = {
   type?: string;
   /** Application fee the marketplace deducted, in minor units. This is what it took as tax facilitator. */
   applicationFee?: number;
+  /** Payment intent of the charge behind the transaction, which is what a payment link addresses. */
+  paymentIntent?: string | null;
 };
 
 export type PayPalTransactionMock = {
@@ -203,12 +206,16 @@ async function mockManakabata(wireMock: WireMockApi, settings: SettingsOverrides
 
 async function mockStripe(wireMock: WireMockApi, settings: SettingsOverrides, pages: StripeTransactionMock[][]) {
   await settings.set('VAST_STRIPE_BASE_URL', wireMock.baseUrl);
+  await settings.set('VAST_STRIPE_ACCOUNT_ID', stripeAccountId);
   await settings.setSecret('VAST_STRIPE_SECRET_KEY', stripeSecretKey);
 
   let transactionNumber = 0;
   let startingAfter: WireMockValueMatcher = { absent: true };
   for (const [pageIndex, page] of pages.entries()) {
-    const transactions = page.map((transaction) => ({ ...transaction, id: `txn_${++transactionNumber}` }));
+    const transactions = page.map((transaction) => {
+      const number = ++transactionNumber;
+      return { ...transaction, id: `txn_${number}`, charge: `test-charge-${number}` };
+    });
     await wireMock.addMethodHostMapping('GET', '/v1/balance_transactions', {
       // The key is asserted so a client that sends none misses the stub instead of passing unauthenticated.
       request: {
@@ -230,11 +237,14 @@ async function mockStripe(wireMock: WireMockApi, settings: SettingsOverrides, pa
   }
 }
 
-function stripeBalanceTransaction(transaction: StripeTransactionMock & { id: string }) {
+function stripeBalanceTransaction(transaction: StripeTransactionMock & { id: string; charge: string }) {
   const type = transaction.type ?? 'charge';
+  const paymentIntent = transaction.paymentIntent === undefined ? `pi_${transaction.charge}` : transaction.paymentIntent;
   return {
     id: transaction.id,
     object: 'balance_transaction',
+    // The client asks for the charge to be expanded, so it arrives as the object rather than as its id.
+    source: { id: `ch_${transaction.charge}`, object: 'charge', payment_intent: paymentIntent },
     type,
     reporting_category: type,
     status: 'available',

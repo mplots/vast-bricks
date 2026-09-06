@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Set;
+import lombok.RequiredArgsConstructor;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -30,8 +31,11 @@ import org.springframework.stereotype.Component;
  * reconciled one.
  */
 @Component
+@RequiredArgsConstructor
 @Order(6)
 class MapperPayPalBrickLinkPayments implements DetailMapper<PayPalTransaction> {
+
+    private final PaymentLinks paymentLinks;
 
     @Override
     public Class<PayPalTransaction> type() {
@@ -50,6 +54,7 @@ class MapperPayPalBrickLinkPayments implements DetailMapper<PayPalTransaction> {
             if (order != null && paid.add(order)) {
                 order.setPaidAmount(PayPalPayments.paidAmount(transaction));
                 order.setPaidFacilitatorTax(PayPalPayments.facilitatorTax(transaction));
+                order.setPaymentUrl(paymentLinks.payPal(PayPalPayments.paymentReference(transaction)));
             }
         }
     }

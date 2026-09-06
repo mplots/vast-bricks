@@ -85,6 +85,7 @@
   "reconciliation-field-targetInvoice": "Target invoice",
   "reconciliation-field-paidAmount": "Paid amount",
   "reconciliation-field-paidFacilitatorTax": "Paid facilitator tax",
+  "reconciliation-payment-link": "Open this payment in {paymentMethod}",
   "order-tax-type-domestic": "Domestic (Latvia)",
   "order-tax-type-european-union": "European Union",
   "order-tax-type-export": "Export",

@@ -120,6 +120,7 @@ test('lists BrickLink reconciliation orders for the selected month', async ({
         invoiceSubTotal: null,
         paidAmount: null,
         paidFacilitatorTax: null,
+        paymentUrl: null,
         targetInvoice: null,
         failures: [{ code: 'amount-missing', level: 'error', fields: ['paidAmount'] }],
       },
@@ -138,6 +139,7 @@ test('lists BrickLink reconciliation orders for the selected month', async ({
         invoiceSubTotal: null,
         paidAmount: null,
         paidFacilitatorTax: null,
+        paymentUrl: null,
         targetInvoice: 3.44,
         // Paid through Stripe, but no Stripe payment names this order.
         failures: [{ code: 'amount-missing', level: 'error', fields: ['paidAmount'] }],
@@ -208,6 +210,7 @@ test('lists BrickOwl reconciliation orders for the selected month', async ({
         invoiceSubTotal: null,
         paidAmount: null,
         paidFacilitatorTax: null,
+        paymentUrl: null,
         targetInvoice: null,
         failures: [{ code: 'amount-missing', level: 'error', fields: ['paidAmount'] }],
       },
@@ -227,6 +230,7 @@ test('lists BrickOwl reconciliation orders for the selected month', async ({
         invoiceSubTotal: null,
         paidAmount: null,
         paidFacilitatorTax: null,
+        paymentUrl: null,
         targetInvoice: 5.2,
         // Paid through PayPal, but no PayPal payment names this order.
         failures: [{ code: 'amount-missing', level: 'error', fields: ['paidAmount'] }],
@@ -330,6 +334,7 @@ test('lists BrickOwl reconciliation orders that span several batch requests', as
     invoiceSubTotal: null,
     paidAmount: null,
     paidFacilitatorTax: null,
+    paymentUrl: null,
     targetInvoice: null,
     failures: [{ code: 'amount-missing', level: 'error', fields: ['paidAmount'] }],
   });
@@ -735,6 +740,121 @@ test('reports the facilitator tax PayPal shows a BrickOwl order was taken', asyn
   expect(body.orders[0].facilitatorTax).toBe(1.97);
   expect(body.orders[0].paidFacilitatorTax).toBe(1.97);
   expect(body.orders[0].failures).toEqual([]);
+});
+
+test('links a Stripe-paid order to the payment in the Stripe dashboard', async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: '2026-08',
+    brickOwl: [
+      {
+        orderId: 'owl-order-0810',
+        orderDate: '1786320000',
+        view: {
+          buyer_name: 'some buyer',
+          payment_method_type: 'stripe',
+          sub_total: '5.20',
+          base_order_total: '5.20',
+        },
+        items: [{ base_price: '5.20', ordered_quantity: '1' }],
+      },
+    ],
+    stripe: [{ description: 'Brick Owl Order owl-order-0810', amount: 520, paymentIntent: 'pi_test-payment-0810' }],
+  });
+
+  const response = await request.get('/api/private/reconciliation/orders?month=2026-08');
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  expect(body.orders[0].paymentUrl).toBe(
+    'https://dashboard.stripe.com/acct_test-stripe-account/payments/pi_test-payment-0810'
+  );
+});
+
+test('links a Stripe-paid order to the charge when the payment was made without a payment intent', async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: '2026-08',
+    brickOwl: [
+      {
+        orderId: 'owl-order-0810',
+        orderDate: '1786320000',
+        view: {
+          buyer_name: 'some buyer',
+          payment_method_type: 'stripe',
+          sub_total: '5.20',
+          base_order_total: '5.20',
+        },
+        items: [{ base_price: '5.20', ordered_quantity: '1' }],
+      },
+    ],
+    stripe: [{ description: 'Brick Owl Order owl-order-0810', amount: 520, paymentIntent: null }],
+  });
+
+  const response = await request.get('/api/private/reconciliation/orders?month=2026-08');
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  expect(body.orders[0].paymentUrl).toBe(
+    'https://dashboard.stripe.com/acct_test-stripe-account/payments/ch_test-charge-1'
+  );
+});
+
+test('links a PayPal-paid order to the transaction in PayPal', async ({ request, settings }, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: '2026-08',
+    brickOwl: [
+      {
+        orderId: '7578233',
+        orderDate: '1786320000',
+        view: {
+          buyer_name: 'Jonathan Pithioud',
+          payment_method_type: 'paypal',
+          sub_total: '7.69',
+          base_order_total: '7.69',
+        },
+        items: [{ base_price: '7.69', ordered_quantity: '1' }],
+      },
+    ],
+    payPal: [{ invoiceId: '7578233', payerName: 'Jonathan Pithioud', amount: '7.69' }],
+  });
+
+  const response = await request.get('/api/private/reconciliation/orders?month=2026-08');
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  expect(body.orders[0].paymentUrl).toBe(
+    'https://www.paypal.com/unifiedtransactions/details/payment/test-paypal-transaction-1'
+  );
+});
+
+test('leaves an order no payment was matched to without a payment link', async ({ request, settings }, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: '2026-08',
+    brickOwl: [
+      {
+        orderId: 'owl-order-0810',
+        orderDate: '1786320000',
+        view: {
+          buyer_name: 'some buyer',
+          payment_method_type: 'stripe',
+          sub_total: '5.20',
+          base_order_total: '5.20',
+        },
+        items: [{ base_price: '5.20', ordered_quantity: '1' }],
+      },
+    ],
+  });
+
+  const response = await request.get('/api/private/reconciliation/orders?month=2026-08');
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  expect(body.orders[0].paymentUrl).toBeNull();
 });
 
 test('reports what PayPal was paid for a BrickOwl order it labelled with the order number', async ({

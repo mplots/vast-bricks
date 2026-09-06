@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Set;
+import lombok.RequiredArgsConstructor;
 import java.util.regex.Pattern;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -19,11 +20,14 @@ import org.springframework.stereotype.Component;
  * match, which is why it is parsed here rather than in the source.
  */
 @Component
+@RequiredArgsConstructor
 @Order(3)
 class MapperStripeBrickOwlPayments implements DetailMapper<BalanceTransaction> {
 
     /** The order number inside a longer description, as BrickOwl words it: {@code Brick Owl Order #1630980}. */
     private static final Pattern BRICK_OWL_ORDER = Pattern.compile("\\bBrick Owl Order\\s+#?(\\S+)\\b");
+
+    private final PaymentLinks paymentLinks;
 
     @Override
     public Class<BalanceTransaction> type() {
@@ -47,6 +51,7 @@ class MapperStripeBrickOwlPayments implements DetailMapper<BalanceTransaction> {
                 if (paid.add(order)) {
                     order.setPaidAmount(paidAmount);
                     order.setPaidFacilitatorTax(StripePayments.facilitatorTax(transaction));
+                    order.setPaymentUrl(paymentLinks.stripe(StripePayments.paymentReference(transaction)));
                 }
             }
         }

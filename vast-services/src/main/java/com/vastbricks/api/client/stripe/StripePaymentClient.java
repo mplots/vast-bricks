@@ -87,6 +87,9 @@ public class StripePaymentClient {
     private BalanceTransactionListParams params(Instant createdFrom, Instant createdTo, String startingAfter) {
         var params = BalanceTransactionListParams.builder()
                 .setLimit(PAGE_SIZE)
+                // The transaction names its charge by id alone, and the payment a caller has to link to is the
+                // charge's payment intent, so the charge is expanded here rather than fetched one by one later.
+                .addExpand("data.source")
                 .setCreated(BalanceTransactionListParams.Created.builder()
                         .setGte(createdFrom.getEpochSecond())
                         .setLte(createdTo.getEpochSecond())

@@ -33,6 +33,8 @@ export interface ReconciliationOrder {
   paidAmount: number | null;
   /** What the payment shows the marketplace took as tax facilitator, or `null` when it shows none. */
   paidFacilitatorTax: number | null;
+  /** Where the provider shows the matched payment, or `null` when there is no payment to link to. */
+  paymentUrl: string | null;
   /** What the accounting invoice has to come to: the grand total less the facilitator tax. */
   targetInvoice: number | null;
   failures: ReconciliationFailure[];

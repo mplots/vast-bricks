@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Set;
+import lombok.RequiredArgsConstructor;
 import java.util.regex.Pattern;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Component;
  * is not knowable from the description, and a guessed amount would read exactly like a reconciled one.
  */
 @Component
+@RequiredArgsConstructor
 @Order(4)
 class MapperStripeBrickLinkPayments implements DetailMapper<BalanceTransaction> {
 
@@ -30,6 +32,8 @@ class MapperStripeBrickLinkPayments implements DetailMapper<BalanceTransaction> 
             "^Payment for BrickLink from (.+)$",
             Pattern.CASE_INSENSITIVE
     );
+
+    private final PaymentLinks paymentLinks;
 
     @Override
     public Class<BalanceTransaction> type() {
@@ -56,6 +60,7 @@ class MapperStripeBrickLinkPayments implements DetailMapper<BalanceTransaction> 
             if (order != null && paid.add(order)) {
                 order.setPaidAmount(StripePayments.paidAmount(transaction));
                 order.setPaidFacilitatorTax(StripePayments.facilitatorTax(transaction));
+                order.setPaymentUrl(paymentLinks.stripe(StripePayments.paymentReference(transaction)));
             }
         }
     }

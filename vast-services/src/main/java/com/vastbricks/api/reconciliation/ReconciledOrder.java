@@ -64,6 +64,12 @@ public class ReconciledOrder {
     private BigDecimal paidFacilitatorTax;
 
     /**
+     * Where the payment provider shows the payment matched to this order, or {@code null} when there is no payment to
+     * show or it cannot be addressed. The screen links the payment method to it.
+     */
+    private String paymentUrl;
+
+    /**
      * What the accounting invoice for this order has to come to: the grand total less what the marketplace collected
      * as tax facilitator, because that tax was charged under the marketplace's registration and is not the store's to
      * invoice. It is derived rather than collected, so it is computed here instead of in each order mapper.

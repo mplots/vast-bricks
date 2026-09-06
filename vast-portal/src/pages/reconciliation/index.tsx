@@ -11,6 +11,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Divider from '@mui/material/Divider';
+import Link from '@mui/material/Link';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
@@ -338,6 +339,40 @@ export default function ReconciliationPage() {
       return formatFieldValue(order, field);
     }
     return order.taxType ? intl.formatMessage({ id: `order-tax-type-${order.taxType}` }) : '—';
+  };
+
+  // The payment method names the payment, so it carries the link to where the provider shows it rather than
+  // spending a column on one, and says where it goes in its accessible label. Every other field, and a method no
+  // payment was matched for, stays the plain value it is.
+  const fieldLink = (order: ReconciliationOrder, field: string) => {
+    if (field === 'paymentMethod') {
+      return {
+        url: order.paymentUrl,
+        label: intl.formatMessage({ id: 'reconciliation-payment-link' }, { paymentMethod: fieldValue(order, 'paymentMethod') })
+      };
+    }
+    return null;
+  };
+
+  const linkedFieldValue = (order: ReconciliationOrder, field: string) => {
+    const value = fieldValue(order, field);
+    const link = fieldLink(order, field);
+    if (!link?.url) {
+      return value;
+    }
+    return (
+      <Link
+        href={link.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        underline="hover"
+        aria-label={link.label}
+        // The row opens the detail dialog, so following the link must not open it as well.
+        onClick={(event) => event.stopPropagation()}
+      >
+        {value}
+      </Link>
+    );
   };
 
   const failureMessage = (order: ReconciliationOrder, failure: ReconciliationFailure) =>
@@ -771,7 +806,7 @@ export default function ReconciliationPage() {
                                   {field === 'source' ? (
                                     <Chip label={order.source} size="small" color={sourceColor(order.source)} variant="outlined" />
                                   ) : (
-                                    fieldValue(order, field)
+                                    linkedFieldValue(order, field)
                                   )}
                                 </TableCell>
                               ))}
@@ -823,7 +858,7 @@ export default function ReconciliationPage() {
                     }}
                   >
                     <Typography color="text.secondary">{fieldLabel(field)}</Typography>
-                    <Typography>{fieldValue(selectedOrder, field)}</Typography>
+                    <Typography>{linkedFieldValue(selectedOrder, field)}</Typography>
                   </Stack>
                 ))}
               </Stack>
