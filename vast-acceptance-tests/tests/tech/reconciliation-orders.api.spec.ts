@@ -734,7 +734,11 @@ test('reports the facilitator tax PayPal shows a BrickOwl order was taken', asyn
         items: [{ base_price: '7.69', ordered_quantity: '1' }],
       },
     ],
-    payPal: [{ invoiceId: '7578233', payerName: 'Jonathan Pithioud', amount: '9.66', salesTax: '1.97' }],
+    payPal: [
+      { transactionId: 'owl-payment', invoiceId: '7578233', payerName: 'Jonathan Pithioud', amount: '9.66' },
+      // What BrickOwl took back out of that payment under its own registration, as PayPal books it.
+      { eventCode: 'T0113', referenceId: 'owl-payment', amount: '-1.97' },
+    ],
   });
 
   const response = await request.get('/api/private/reconciliation/orders?month=2026-08');
@@ -742,6 +746,82 @@ test('reports the facilitator tax PayPal shows a BrickOwl order was taken', asyn
   expect(response.status(), await response.text()).toBe(200);
   const body = await response.json();
   expect(body.orders[0].taxType).toBe('export-taxable');
+  expect(body.orders[0].facilitatorTax).toBe(1.97);
+  expect(body.orders[0].paidFacilitatorTax).toBe(1.97);
+  expect(body.orders[0].failures).toEqual([]);
+});
+
+test('leaves a PayPal order no partner fee was raised against without a facilitator tax', async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: '2026-08',
+    brickOwl: [
+      {
+        orderId: '8779732',
+        orderDate: '1786320000',
+        view: {
+          buyer_name: 'Andris Konuss',
+          payment_method_type: 'paypal',
+          sub_total: '4.88',
+          base_order_total: '5.89',
+          billing_country_code: 'LV',
+          tax_rate: '21',
+        },
+        items: [{ base_price: '4.88', ordered_quantity: '1' }],
+      },
+    ],
+    // The payment carries the VAT the store charged itself, and the marketplace took none of it back.
+    payPal: [{ transactionId: 'owl-payment', invoiceId: '8779732', payerName: 'Andris Konuss', amount: '5.89' }],
+  });
+
+  const response = await request.get('/api/private/reconciliation/orders?month=2026-08');
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  expect(body.orders[0].taxType).toBe('domestic');
+  expect(body.orders[0].facilitatorTax).toBeNull();
+  expect(body.orders[0].paidFacilitatorTax).toBeNull();
+  expect(body.orders[0].failures).toEqual([]);
+});
+
+test('sums the partner fees PayPal raised against one BrickLink payment', async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: '2026-08',
+    brickLink: {
+      fullNameOrdersXml: `<?xml version="1.0" encoding="UTF-8"?>
+<ORDERS>
+  <ORDER>
+    <ORDERID>32456590</ORDERID>
+    <ORDERDATE>8/12/2026</ORDERDATE>
+    <BUYER>Eden Lister</BUYER>
+    <ORDERTOTAL>9.81</ORDERTOTAL>
+    <BASEGRANDTOTAL>11.78</BASEGRANDTOTAL>
+    <PAYMENTTYPE>PayPal (Onsite)</PAYMENTTYPE>
+    <LOCATION>United Kingdom, England</LOCATION>
+    <VATCHARGES>0.00</VATCHARGES>
+    <ORDERSALESTAX>1.10</ORDERSALESTAX>
+    <ORDERVAT>0.87</ORDERVAT>
+    <ITEM><ITEMID>3001</ITEMID><PRICE>9.8100</PRICE><QTY>1</QTY></ITEM>
+  </ORDER>
+</ORDERS>`,
+      usernameOrdersXml: emptyOrdersXml,
+    },
+    payPal: [
+      { transactionId: 'link-payment', payerName: 'Eden Lister', amount: '11.78' },
+      { eventCode: 'T0113', referenceId: 'link-payment', amount: '-1.10' },
+      { eventCode: 'T0113', referenceId: 'link-payment', amount: '-0.87' },
+    ],
+  });
+
+  const response = await request.get('/api/private/reconciliation/orders?month=2026-08');
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
   expect(body.orders[0].facilitatorTax).toBe(1.97);
   expect(body.orders[0].paidFacilitatorTax).toBe(1.97);
   expect(body.orders[0].failures).toEqual([]);

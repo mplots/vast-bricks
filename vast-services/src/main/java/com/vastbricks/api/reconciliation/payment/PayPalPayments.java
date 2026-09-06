@@ -10,8 +10,9 @@ import java.util.List;
 import java.util.function.Predicate;
 
 /**
- * What the PayPal payment mappers share: which transactions pay for an order, what one paid, what tax it took, and
- * who paid it.
+ * What the PayPal payment mappers share: which transactions pay for an order, what one paid, and who paid it. What
+ * the marketplace took back out of a payment as facilitator is not the payment's own to state, so it is read from the
+ * month's partner fees instead; see {@link PayPalPartnerFees}.
  */
 final class PayPalPayments {
 
@@ -43,16 +44,6 @@ final class PayPalPayments {
     static BigDecimal paidAmount(PayPalTransaction transaction) {
         var amount = transaction.getTransactionInfo().getTransactionAmount();
         return amount == null ? null : ReconciliationAmount.normalize(amount.getValue());
-    }
-
-    /**
-     * The tax the payment states, normalized like every other collected amount, or {@code null} when it states none.
-     * A marketplace collecting as tax facilitator reports what it charged here, so this is the payment's own account
-     * of what the marketplace took.
-     */
-    static BigDecimal facilitatorTax(PayPalTransaction transaction) {
-        var salesTax = transaction.getTransactionInfo().getSalesTaxAmount();
-        return salesTax == null ? null : ReconciliationAmount.normalize(salesTax.getValue());
     }
 
     /** The payment this transaction is, as PayPal's own transaction views address one. */

@@ -59,8 +59,10 @@ export type PayPalTransactionMock = {
   eventCode?: string;
   /** When PayPal took it, as an ISO instant. Its day is the one an amount-and-day match uses. */
   initiatedAt?: string;
-  /** Sales tax the payment reports. This is what the marketplace took as tax facilitator. */
-  salesTax?: string;
+  /** Transaction id PayPal gives this transaction, which a partner fee names to say what it was taken from. */
+  transactionId?: string;
+  /** Transaction this one was raised against; a partner fee names the payment the marketplace took it out of. */
+  referenceId?: string;
 };
 
 export type ManakabataInvoiceMock = {
@@ -303,15 +305,13 @@ function payPalTransaction(transaction: PayPalTransactionMock, transactionNumber
   const [givenName, ...surname] = (transaction.payerName ?? '').split(' ');
   return {
     transaction_info: {
-      transaction_id: `test-paypal-transaction-${transactionNumber}`,
+      transaction_id: transaction.transactionId ?? `test-paypal-transaction-${transactionNumber}`,
+      ...(transaction.referenceId === undefined ? {} : { paypal_reference_id: transaction.referenceId }),
       transaction_event_code: transaction.eventCode ?? 'T0006',
       transaction_initiation_date: transaction.initiatedAt ?? '2026-08-30T05:24:15Z',
       transaction_amount: { currency_code: 'EUR', value: transaction.amount },
       fee_amount: { currency_code: 'EUR', value: '-0.96' },
       transaction_status: 'S',
-      ...(transaction.salesTax === undefined
-        ? {}
-        : { sales_tax_amount: { currency_code: 'EUR', value: transaction.salesTax } }),
       invoice_id: transaction.invoiceId ?? null
     },
     payer_info: transaction.payerName

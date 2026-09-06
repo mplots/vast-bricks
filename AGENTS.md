@@ -212,9 +212,25 @@ here as they are provided; do not invent unspecified behavior prematurely.
   owes it under its own registration, deducts it again. Stripe's own processing
   fee sits in the same list as a `stripe_fee` and is not the marketplace's, so
   only the application fee entries are read, summed as Stripe lists each fee
-  separately. PayPal states it as the transaction's `sales_tax_amount`. A
-  payment that states neither took no facilitator tax, which is a different
-  fact from taking zero, so the field is left absent rather than zeroed.
+  separately. PayPal states it as a partner fee: a transaction of its own,
+  event code `T0113`, naming in `paypal_reference_id` the payment it was
+  deducted from. The payment's own `sales_tax_amount` is not it — that is the
+  tax the buyer paid, which a store charging under its own registration reports
+  there just as a facilitator does, so reading it as the facilitator's would
+  count every domestic and EU order's VAT as tax the marketplace took. Only the
+  taking back tells the two apart, and only a facilitator raises a fee for it.
+  A partner fee is a debit, stated negative, and fees naming one payment are
+  summed. A payment that states neither took no facilitator tax, which is a
+  different fact from taking zero, so the field is left absent rather than
+  zeroed.
+- PayPal counts a marketplace's own commission under the same event code as the
+  tax it took, so a partner fee is the facilitator tax only while the
+  marketplaces bill their selling fees separately, as both do today. A
+  commission bundled into one would make the two sides of the tax disagree,
+  which the reconciliation rule already reports.
+- A partner fee is balance-affecting, so it arrives with the payments already;
+  the mapping stage indexes the month's fees by the payment each names and no
+  source or client knows about them.
 - The order link is where the marketplace shows the order, derived in the
   mapping stage from the id the order was collected under: BrickLink's order
   detail view, asked to show the checklist, the weight and what remains as the

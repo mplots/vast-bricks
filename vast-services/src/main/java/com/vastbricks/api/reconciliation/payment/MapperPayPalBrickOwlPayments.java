@@ -32,6 +32,10 @@ class MapperPayPalBrickOwlPayments implements DetailMapper<PayPalTransaction> {
 
     @Override
     public void map(List<PayPalTransaction> sourced, ReconciledOrders orders) {
+        // What the marketplace took back out of each payment is stated by the month's own partner fees, not by the
+        // payment, so they are indexed once before the payments are walked.
+        var partnerFees = PayPalPartnerFees.of(sourced);
+
         // The first payment of an order wins: a later one does not overwrite what was already matched.
         Set<ReconciledOrder> paid = Collections.newSetFromMap(new IdentityHashMap<>());
         for (var transaction : sourced) {
@@ -46,7 +50,7 @@ class MapperPayPalBrickOwlPayments implements DetailMapper<PayPalTransaction> {
             for (var order : orders.find(Marketplace.BRICK_OWL, invoiceId)) {
                 if (PayPalPayments.PAID_THROUGH_PAYPAL.test(order) && paid.add(order)) {
                     order.setPaidAmount(paidAmount);
-                    order.setPaidFacilitatorTax(PayPalPayments.facilitatorTax(transaction));
+                    order.setPaidFacilitatorTax(partnerFees.takenFrom(transaction));
                     order.setPaymentUrl(paymentLinks.payPal(PayPalPayments.paymentReference(transaction)));
                 }
             }
