@@ -27,10 +27,8 @@ export interface ReconciliationOrder {
   /** What the marketplace collected on the order as tax facilitator, or `null` when it collected none. */
   facilitatorTax: number | null;
   subTotal: number | null;
-  itemsSubTotal: number | null;
   /** Order total in the store's base currency, shipping and additional charges included. */
   grandTotal: number | null;
-  invoiceSubTotal: number | null;
   /** What the payment provider took for the order, before its own fees. */
   paidAmount: number | null;
   /** What the payment shows the marketplace took as tax facilitator, or `null` when it shows none. */

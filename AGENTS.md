@@ -155,6 +155,28 @@ here as they are provided; do not invent unspecified behavior prematurely.
   which rows are there. Both exist, in different places.
 - Selecting an order shows all available details, including why its
   reconciliation failed.
+- The table's columns are chosen and ordered by the reader, from a panel down
+  the right of the table that stays shut until it is asked for. Every collected
+  order field can be a column; the screen opens with the subset it has always
+  shown. Columns are dragged into the order they are read in, and a hidden
+  column keeps its place in the panel so showing it again brings it back where
+  it was rather than at the end.
+- A column is also dragged by its own heading in the table, which is where a
+  reader's hand goes first: the panel chooses what is read, the headings arrange
+  what already is, and both settle the same order. The heading being dropped on
+  marks the edge the column would land against rather than the table reordering
+  itself under the pointer, a month being too many rows to shuffle at each
+  twitch of a drag. Dragging a heading is a shortcut, not the only way: the
+  panel's handles answer the arrow keys, so the order is reachable without a
+  mouse.
+- The chosen columns ride in the address, as the filters and the coloring do, so
+  a link hands the table over arranged as it was left. The address carries the
+  shown columns only, in the order they are read.
+- Remembering an arrangement is a separate act with a button of its own: the
+  panel's save button stores it in this browser, hidden columns and their places
+  included, and an address that names no columns falls back to what was saved.
+  Arranging the table never writes that store on its own, so a table pulled
+  apart to answer one question does not become the table the browser opens with.
 - The first iteration is read-only.
 - Only the failed state is currently required. Do not introduce additional
   reconciliation states until their requirements are provided.
@@ -168,9 +190,9 @@ here as they are provided; do not invent unspecified behavior prematurely.
   from the BrickStore XML export and BrickOwl orders from the BrickOwl API for
   the selected month. Each collected order carries its marketplace source
   (`BrickLink` or `BrickOwl`), order ID, order date, buyer, buyer username,
-  payment method, tax type, facilitator tax, sub-total, items sub-total, grand
-  total, accounting invoice sub-total, paid amount, paid facilitator tax, and
-  target invoice, together with its rule failures and the links to the order and
+  payment method, tax type, facilitator tax, sub-total, grand total, paid
+  amount, paid facilitator tax, and target invoice, together with its rule
+  failures and the links to the order and
   its payment, each exposed beside the field it rides on. Add further
   fields and providers incrementally as their processing requirements are
   supplied.
@@ -269,7 +291,8 @@ here as they are provided; do not invent unspecified behavior prematurely.
   fields of the same order rather than collected itself, so it is computed on
   `ReconciledOrder` instead of in each order mapper, and is exposed after the
   collected fields. It is shown as its own column, next to the two it is derived
-  from. No rule compares it against the invoice sub-total yet.
+  from. No rule compares it against anything yet: what the order was actually
+  invoiced for is not collected.
 - Payments are collected from Stripe and from PayPal alongside the marketplace
   orders: Stripe's balance transactions and PayPal's transaction search, each for
   the month. Both providers date their transactions in UTC, so the month is asked
@@ -343,7 +366,7 @@ here as they are provided; do not invent unspecified behavior prematurely.
   none did, or they carry no grand total to compare — every one of them stays
   unpaid, and the weaker amount-and-day key does not decide it either. A guessed
   payment would read exactly like a reconciled one. The first payment matched to
-  an order wins, as the first invoice does.
+  an order wins.
 - Names are compared trimmed, with inner runs of whitespace collapsed, and
   ignoring case, because the systems spell one person's name with different
   casing and spacing. No closer approximation is attempted: a rule that guesses
@@ -368,15 +391,6 @@ here as they are provided; do not invent unspecified behavior prematurely.
   matched across systems stays in `ReconciledOrders` instead of moving into a
   mapper, which is why the root's API widened by those methods rather than by
   exposing the collected list.
-- Accounting invoices are collected from Manakabata alongside the marketplace
-  orders. The invoice list endpoint accepts no filter beyond the page size, so
-  the whole list is requested as one page and searched; an invoice is matched to
-  an order by the compact invoice-note key `<source>:<orderId>`, for example
-  `bricklink:32466549`. Legacy notes such as `BrickLink order 32466549` remain
-  readable. A list longer than one page fails the request rather than
-  reconciling against truncated data. The note pattern and the marketplace label
-  it yields decide which order an invoice attaches to, so they belong to the
-  invoice mapper, not to the client or the source.
 - Data is requested from the providers on demand when the screen is opened.
 - Provider requests should run in parallel so far as their dependencies allow.
 - Potential performance problems from live, on-demand aggregation are accepted
@@ -446,18 +460,16 @@ here as they are provided; do not invent unspecified behavior prematurely.
   reconciliation screen.
 - A source, its carrier type, and its mappers live in a subpackage named after
   the reconciliation category they serve: `reconciliation.order`,
-  `reconciliation.invoice`, `reconciliation.payment`, and later `shipping` and
-  the store synchronization one. Category, not provider: a category is the
+  `reconciliation.payment`, and later `shipping` and the store synchronization
+  one. Category, not provider: a category is the
   vocabulary the requirements use, a provider's transport knowledge already
   lives in its `com.vastbricks.api.client.<provider>` package, and the
-  categories stay a bounded set as providers are added. The accounting
-  category's package is named `invoice` after what it collects; it is a
-  subpackage of `reconciliation` and unrelated to the sibling
-  `com.vastbricks.api.invoice` feature that creates invoices.
+  categories stay a bounded set as providers are added.
 - Every rule lives in `reconciliation.rule`, together with the rule boundary,
-  the failure, its level, and the order field enum. Rules are not grouped by category: a
-  rule reasons across categories, as the invoice rule does when it compares an
-  invoice amount with two order amounts, so any category would be arbitrary.
+  the failure, its level, and the order field enum. Rules are not grouped by
+  category: a rule reasons across categories, as the paid-amount rule does when
+  it compares a payment amount with an order amount, so any category would be
+  arbitrary.
 - The feature root keeps the stage boundaries, the reconciled order model, the
   orchestrator, and the HTTP edge. It declares a small API and nothing more: the
   category packages see `Source`, `Mapper`, `OrderMapper`, `DetailMapper`,
@@ -656,11 +668,6 @@ here as they are provided; do not invent unspecified behavior prematurely.
   until additional states are specified. A level is not a status: it grades a
   single failure, not the order.
 - Current rules:
-  - An order's sub-total must equal the sum of its item prices.
-  - An order must have an accounting invoice whose sub-total equals both the
-    order's sub-total and its items sub-total. Invoicing started on 2026-09-01,
-    so the rule applies only to orders placed on or after that date; the cut-off
-    is hardcoded. An order on or after it with no invoice fails.
   - An order paid through a payment provider must have been paid its grand
     total. The rule applies only to orders paid through a provider payments are
     collected from, currently Stripe and PayPal: an order paid another way has
@@ -668,9 +675,9 @@ here as they are provided; do not invent unspecified behavior prematurely.
     about the migration than about the order. An order the rule applies to with
     no collected payment fails, because within a collected provider no matched
     payment means the money was not found rather than that the order was free.
-  - The amount rules report every failure at `info`. The paid-amount rule
-    reports both of its failures at `error`: money that was not found, or that
-    does not add up, is something to fix.
+  - The facilitator-tax rule reports its failures at `info`. The paid-amount
+    rule reports both of its failures at `error`: money that was not found, or
+    that does not add up, is something to fix.
 
 ### Data-source boundaries and current clients
 
@@ -710,11 +717,11 @@ here as they are provided; do not invent unspecified behavior prematurely.
   `vb-portal-api` until that screen is retired.
 - The current shipping client implementation is Mans Pasts.
 - The current accounting client implementation is Manakabata, migrated into
-  `vast-services`: an invoice source fetches the invoice list and a detail
-  mapper merges each invoice onto its order, and the `invoice` feature creates
-  invoices for an order. A provider has one root client per feature, and a
-  client stays transport: what an invoice says is decided by the `invoice`
-  feature, not by `ManakabataClient`.
+  `vast-services`: the `invoice` feature creates invoices for an order.
+  Reconciliation does not collect them — nothing compares an order against what
+  it was invoiced for. A provider has one root client per feature, and a client
+  stays transport: what an invoice says is decided by the `invoice` feature, not
+  by `ManakabataClient`.
 - The current e-commerce store synchronization client implementation is
   BrickSync.
 - These are the implementations currently known, not an exhaustive or closed

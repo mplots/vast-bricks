@@ -2,13 +2,11 @@ package com.vastbricks.api.reconciliation.order;
 
 import com.vastbricks.api.reconciliation.ParallelTasks;
 import com.vastbricks.api.reconciliation.Source;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.vastbricks.api.client.brickowl.BrickOwlBatchRequest;
 import com.vastbricks.api.client.brickowl.BrickOwlBatchResponse;
 import com.vastbricks.api.client.brickowl.BrickOwlClient;
 import com.vastbricks.api.client.brickowl.BrickOwlClientException;
 import com.vastbricks.api.client.brickowl.BrickOwlOrder;
-import com.vastbricks.api.client.brickowl.BrickOwlOrderItem;
 import com.vastbricks.api.client.brickowl.BrickOwlOrderListItem;
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -22,16 +20,15 @@ import org.springframework.stereotype.Component;
 
 /**
  * Fetches the BrickOwl orders of the month. The list endpoint cannot be filtered and carries no amounts, so the month
- * is filtered client-side and each order's detail and items are requested in batches; every batch starts before the
- * first is joined. Pairing the batch responses back onto their requests is BrickOwl's batch protocol, so it happens
- * here rather than in the mapper.
+ * is filtered client-side and each order's detail is requested in batches; every batch starts before the first is
+ * joined. Pairing the batch responses back onto their requests is BrickOwl's batch protocol, so it happens here
+ * rather than in the mapper.
  */
 @Component
 @RequiredArgsConstructor
 class SourceBrickOwlOrders implements Source<SourcedBrickOwlOrder> {
 
     private static final String ORDER_ENDPOINT = "order/view";
-    private static final String ITEMS_ENDPOINT = "order/items";
 
     private final BrickOwlClient brickOwlClient;
 
@@ -55,15 +52,13 @@ class SourceBrickOwlOrders implements Source<SourcedBrickOwlOrder> {
 
         try (var tasks = new ParallelTasks()) {
             var orderBatches = new ArrayList<Supplier<List<BrickOwlBatchResponse>>>();
-            var itemBatches = new ArrayList<Supplier<List<BrickOwlBatchResponse>>>();
             for (var batchOrderIds : partition(orderIds)) {
-                orderBatches.add(tasks.start(() -> executeBatch(batchOrderIds, ORDER_ENDPOINT)));
-                itemBatches.add(tasks.start(() -> executeBatch(batchOrderIds, ITEMS_ENDPOINT)));
+                orderBatches.add(tasks.start(() -> executeBatch(batchOrderIds)));
             }
 
             var orders = new ArrayList<SourcedBrickOwlOrder>();
-            for (var index = 0; index < orderBatches.size(); index++) {
-                appendSourcedOrders(orders, orderDates, orderBatches.get(index).get(), itemBatches.get(index).get());
+            for (var orderBatch : orderBatches) {
+                appendSourcedOrders(orders, orderDates, orderBatch.get());
             }
             return List.copyOf(orders);
         }
@@ -84,9 +79,9 @@ class SourceBrickOwlOrders implements Source<SourcedBrickOwlOrder> {
         return batches;
     }
 
-    private List<BrickOwlBatchResponse> executeBatch(List<String> orderIds, String endpoint) {
+    private List<BrickOwlBatchResponse> executeBatch(List<String> orderIds) {
         var requests = orderIds.stream()
-                .map(orderId -> BrickOwlBatchRequest.get(endpoint, Map.of("order_id", orderId)))
+                .map(orderId -> BrickOwlBatchRequest.get(ORDER_ENDPOINT, Map.of("order_id", orderId)))
                 .toList();
         return brickOwlClient.executeBatch(requests);
     }
@@ -94,27 +89,13 @@ class SourceBrickOwlOrders implements Source<SourcedBrickOwlOrder> {
     private void appendSourcedOrders(
             List<SourcedBrickOwlOrder> result,
             Map<String, LocalDate> orderDates,
-            List<BrickOwlBatchResponse> orderResponses,
-            List<BrickOwlBatchResponse> itemResponses
+            List<BrickOwlBatchResponse> orderResponses
     ) {
-        if (orderResponses.size() != itemResponses.size()) {
-            throw new BrickOwlClientException("BrickOwl batch response count does not match the request count");
-        }
-        for (var index = 0; index < orderResponses.size(); index++) {
-            var orderResponse = orderResponses.get(index);
+        for (var orderResponse : orderResponses) {
             validateBatchResponse(orderResponse);
             var order = orderResponse.bodyAs(BrickOwlOrder.class);
-            result.add(new SourcedBrickOwlOrder(
-                    order,
-                    items(itemResponses.get(index)),
-                    orderDates.get(order.getOrderId())
-            ));
+            result.add(new SourcedBrickOwlOrder(order, orderDates.get(order.getOrderId())));
         }
-    }
-
-    private List<BrickOwlOrderItem> items(BrickOwlBatchResponse batchResponse) {
-        validateBatchResponse(batchResponse);
-        return batchResponse.bodyAs(new TypeReference<List<BrickOwlOrderItem>>() {});
     }
 
     private void validateBatchResponse(BrickOwlBatchResponse batchResponse) {

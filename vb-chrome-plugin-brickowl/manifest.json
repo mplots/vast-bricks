@@ -10,7 +10,10 @@
   ],
   "content_scripts": [
     {
-      "matches": ["https://www.brickowl.com/mystore/orders/history/*"],
+      "matches": [
+        "https://www.brickowl.com/mystore/orders/outstanding/*",
+        "https://www.brickowl.com/mystore/orders/history/*"
+      ],
       "js": ["content.js"],
       "run_at": "document_idle"
     }

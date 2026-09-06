@@ -8,7 +8,6 @@ import com.vastbricks.api.reconciliation.ReconciliationAmount;
 import com.vastbricks.api.reconciliation.ReconciliationPaymentMethod;
 import com.vastbricks.api.tax.FacilitatorTaxes;
 import com.vastbricks.api.tax.OrderTaxTypes;
-import java.math.BigDecimal;
 import java.util.List;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -40,18 +39,7 @@ class MapperBrickLinkOrders implements OrderMapper<BrickStoreOrder> {
                 .taxType(OrderTaxTypes.of(order))
                 .facilitatorTax(ReconciliationAmount.normalize(FacilitatorTaxes.of(order)))
                 .subTotal(ReconciliationAmount.normalize(order.getTotal()))
-                .itemsSubTotal(ReconciliationAmount.normalize(sumItemPrices(order)))
                 .grandTotal(ReconciliationAmount.normalize(order.getBaseGrandTotal()))
                 .build();
-    }
-
-    private BigDecimal sumItemPrices(BrickStoreOrder order) {
-        if (order.getItems() == null) {
-            return null;
-        }
-        return order.getItems().stream()
-                .filter(item -> item.getPrice() != null && item.getQuantity() != null)
-                .map(item -> item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }

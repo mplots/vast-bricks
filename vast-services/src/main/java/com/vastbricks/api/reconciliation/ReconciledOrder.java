@@ -47,13 +47,9 @@ public class ReconciledOrder {
     private BigDecimal facilitatorTax;
 
     private BigDecimal subTotal;
-    private BigDecimal itemsSubTotal;
 
     /** What the order came to in the store's base currency, shipping and additional charges included. */
     private BigDecimal grandTotal;
-
-    /** Sub-total of the accounting invoice for this order, or {@code null} when no invoice was found. */
-    private BigDecimal invoiceSubTotal;
 
     /**
      * What the payment provider reports it took for this order, before its own fees, or {@code null} when no payment

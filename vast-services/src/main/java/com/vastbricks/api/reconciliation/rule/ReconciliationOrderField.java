@@ -21,9 +21,7 @@ enum ReconciliationOrderField {
     TAX_TYPE("taxType"),
     FACILITATOR_TAX("facilitatorTax"),
     SUB_TOTAL("subTotal"),
-    ITEMS_SUB_TOTAL("itemsSubTotal"),
     GRAND_TOTAL("grandTotal"),
-    INVOICE_SUB_TOTAL("invoiceSubTotal"),
     PAID_AMOUNT("paidAmount"),
     PAID_FACILITATOR_TAX("paidFacilitatorTax"),
     TARGET_INVOICE("targetInvoice");

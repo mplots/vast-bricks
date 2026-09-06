@@ -26,7 +26,7 @@ import TableRow from '@mui/material/TableRow';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { ArrowLeft2, ArrowRight2, FilterSearch, ReceiptAdd, Refresh } from 'iconsax-reactjs';
+import { ArrowLeft2, ArrowRight2, FilterSearch, Kanban, ReceiptAdd, Refresh } from 'iconsax-reactjs';
 import { useIntl } from 'react-intl';
 import { useSearchParams } from 'react-router-dom';
 
@@ -35,65 +35,36 @@ import { generateInvoice } from 'api/accounting';
 import { useGetReconciliationOrders } from 'api/reconciliation';
 import hasTextSelection from 'utils/textSelection';
 import IconButton from 'components/@extended/IconButton';
+import ColumnPicker from 'components/ColumnPicker';
 import FilterFacets, { type FilterFacet, type FilterSelection } from 'components/FilterFacets';
 import MainCard from 'components/MainCard';
 import MonthPicker from 'sections/reconciliation/MonthPicker';
+import {
+  columnFields,
+  columnParam,
+  columnsIn,
+  defaultColumns,
+  defaultOrder,
+  fullOrder,
+  orderFields,
+  readStored,
+  storedColumnsKey,
+  type StoredColumns
+} from 'sections/reconciliation/columns';
 import { currentMonth, monthDate, monthOf } from 'sections/reconciliation/month';
 import OrderTaxTypeIcon from 'components/OrderTaxTypeIcon';
-import ReconciliationFilterDrawer, { STICKY_TOP } from 'sections/reconciliation/ReconciliationFilterDrawer';
+import ReconciliationColumnDrawer from 'sections/reconciliation/ReconciliationColumnDrawer';
+import ReconciliationFilterDrawer from 'sections/reconciliation/ReconciliationFilterDrawer';
+import { STICKY_TOP } from 'sections/reconciliation/SidePanel';
 import toolButtonSx from 'sections/reconciliation/toolButton';
+import useColumnDrag from 'hooks/useColumnDrag';
 import useConfig from 'hooks/useConfig';
+import useLocalStorage from 'hooks/useLocalStorage';
 import type { ReconciliationFailure, ReconciliationFailureLevel, ReconciliationOrder } from 'types/reconciliation';
 import { orderTaxTypes, type OrderTaxType } from 'types/tax';
 
-// Order property names, matching the backend ReconciliationOrderField enum.
-const orderFields = [
-  'source',
-  'orderId',
-  'orderDate',
-  'buyer',
-  'buyerUsername',
-  'paymentMethod',
-  'taxType',
-  'facilitatorTax',
-  'subTotal',
-  'itemsSubTotal',
-  'grandTotal',
-  'invoiceSubTotal',
-  'paidAmount',
-  'paidFacilitatorTax',
-  'targetInvoice'
-] as const;
-const amountFields: string[] = [
-  'facilitatorTax',
-  'subTotal',
-  'itemsSubTotal',
-  'grandTotal',
-  'invoiceSubTotal',
-  'paidAmount',
-  'paidFacilitatorTax',
-  'targetInvoice'
-];
+const amountFields: string[] = ['facilitatorTax', 'subTotal', 'grandTotal', 'paidAmount', 'paidFacilitatorTax', 'targetInvoice'];
 const dateFields: string[] = ['orderDate'];
-
-// Fields shown as table columns; the detail view shows all of them.
-// The tax type is absent: it rides in the actions cell as an icon rather than spending a column on a word. The
-// facilitator tax is here all the same, being an amount to account for rather than a classification, and the target
-// invoice follows the two it is derived from so the columns read as the subtraction they are. What the payment shows
-// the marketplace took follows what the payment paid, so the provider's two amounts read together rather than
-// interrupting that subtraction.
-const columnFields: string[] = [
-  'source',
-  'orderId',
-  'orderDate',
-  'buyer',
-  'paymentMethod',
-  'grandTotal',
-  'facilitatorTax',
-  'targetInvoice',
-  'paidAmount',
-  'paidFacilitatorTax'
-];
 
 const formatAmount = (value?: number | null) => {
   if (value === null || value === undefined || Number.isNaN(value)) {
@@ -228,9 +199,16 @@ const TITLE_HEIGHT = 68;
 /** The corner MainCard rounds itself to, which anything painting its own ground at the card's edge has to match. */
 const CARD_RADIUS = 12;
 
-/** The results beside the filter panel, sliding over where the panel was when it is closed. */
-const Main = styled('main', { shouldForwardProp: (prop: string) => prop !== 'open' && prop !== 'container' })<{
+/**
+ * The results between the two panels — the filters on one side, the columns on the other — sliding over where a
+ * panel was when it is closed.
+ */
+const Main = styled('main', {
+  shouldForwardProp: (prop: string) => prop !== 'open' && prop !== 'columns' && prop !== 'container'
+})<{
   open: boolean;
+  /** Whether the panel on the other side is open, which is the same question about the other margin. */
+  columns: boolean;
   container: boolean;
 }>(({ theme }) => ({
   flexGrow: 1,
@@ -239,8 +217,10 @@ const Main = styled('main', { shouldForwardProp: (prop: string) => prop !== 'ope
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.shorter
   }),
+  // A docked drawer holds its width whether it is open or shut, so the table slides over the shut one's place.
   marginLeft: -300,
-  [theme.breakpoints.down('lg')]: { paddingLeft: 0, marginLeft: 0 },
+  marginRight: -300,
+  [theme.breakpoints.down('lg')]: { paddingLeft: 0, marginLeft: 0, marginRight: 0 },
   variants: [
     { props: ({ container }) => container, style: { [theme.breakpoints.only('lg')]: { marginLeft: 0 } } },
     { props: ({ container, open }) => container && !open, style: { [theme.breakpoints.only('lg')]: { marginLeft: -260 } } },
@@ -252,6 +232,18 @@ const Main = styled('main', { shouldForwardProp: (prop: string) => prop !== 'ope
           duration: theme.transitions.duration.shorter
         }),
         marginLeft: 0
+      }
+    },
+    { props: ({ container }) => container, style: { [theme.breakpoints.only('lg')]: { marginRight: 0 } } },
+    { props: ({ container, columns }) => container && !columns, style: { [theme.breakpoints.only('lg')]: { marginRight: -260 } } },
+    {
+      props: ({ columns }) => columns,
+      style: {
+        transition: theme.transitions.create('margin', {
+          easing: theme.transitions.easing.easeOut,
+          duration: theme.transitions.duration.shorter
+        }),
+        marginRight: 0
       }
     }
   ]
@@ -281,6 +273,22 @@ export default function ReconciliationPage() {
   const cardTopRef = useRef<HTMLDivElement>(null);
   const [stuck, setStuck] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(!downLG);
+  // The columns are arranged now and then and read every day, so their panel stays shut until it is asked for.
+  const [columnsOpen, setColumnsOpen] = useState(false);
+  // Which columns are read is where the screen is as much as which orders are, so the address carries them too and a
+  // link hands the table over arranged as it was left. What this browser opens with is a separate question, asked of
+  // storage rather than of the address and answered only when the save button says so: an address that names columns
+  // is answering for the visit it opened, and one that names none falls back to what was saved here.
+  const [storedColumns, setStoredColumns] = useLocalStorage<StoredColumns>(storedColumnsKey, defaultColumns);
+  const remembered = readStored(storedColumns);
+  const shownColumns = columnsIn(searchParams) ?? remembered.shown;
+  // The address carries the shown columns alone — that is what a link is worth handing over — so where the hidden
+  // ones stand is the screen's own to hold until it is saved. It starts from what was saved, which is what brings a
+  // hidden column back where it was left rather than at the end of the list.
+  const [columnBase, setColumnBase] = useState<string[]>(remembered.order);
+  const columnOrder = fullOrder(shownColumns, columnBase);
+  // The columns are dragged by their own headings as well as from the panel; both settle the same order.
+  const columnDrag = useColumnDrag(shownColumns, (shown) => reorderShownColumns(shown));
   const {
     reconciliationOrders,
     reconciliationOrdersError,
@@ -318,6 +326,47 @@ export default function ReconciliationPage() {
       },
       { replace }
     );
+
+  /**
+   * Arranges the table: the address takes the shown columns in the order they are read, and the screen keeps the
+   * whole order behind them. Neither is remembered past this visit until the save button says to remember it.
+   */
+  const applyColumns = (order: string[], shown: string[]) => {
+    setColumnBase(order);
+    // Arranging the table is not a place to have been, no more than narrowing it is: Back is for the month.
+    updateParams((params) => params.set(columnParam, shown.join(',')), true);
+  };
+
+  /** Shows or hides one column, a shown one taking its place in the table's own order rather than at the end. */
+  const toggleColumn = (field: string) =>
+    applyColumns(
+      columnOrder,
+      shownColumns.includes(field)
+        ? shownColumns.filter((kept) => kept !== field)
+        : columnOrder.filter((kept) => kept === field || shownColumns.includes(kept))
+    );
+
+  /** Takes the whole order the picker settled on; the table reads the shown part of it. */
+  const reorderColumns = (order: string[]) =>
+    applyColumns(
+      order,
+      order.filter((field) => shownColumns.includes(field))
+    );
+
+  /**
+   * Takes an order of the shown columns alone, which is what dragging the table's own headings settles: the hidden
+   * ones are not there to be dragged, so they settle around what moved rather than being moved themselves.
+   */
+  const reorderShownColumns = (shown: string[]) => applyColumns(fullOrder(shown, columnOrder), shown);
+
+  const resetColumns = () => applyColumns(defaultOrder, columnFields);
+
+  const columnsChanged = shownColumns.join(',') !== columnFields.join(',') || columnOrder.join(',') !== defaultOrder.join(',');
+
+  /** Makes this arrangement the one this browser opens with, hidden columns and the places they hold included. */
+  const saveColumns = () => setStoredColumns({ order: columnOrder, shown: shownColumns });
+
+  const columnsSaved = shownColumns.join(',') === remembered.shown.join(',') && columnOrder.join(',') === remembered.order.join(',');
 
   /** Moves to the month `next` names. */
   const goToMonth = (next: (from: string) => string) => updateParams((params) => params.set('month', next(monthIn(params))));
@@ -627,23 +676,39 @@ export default function ReconciliationPage() {
   // of them, so the button says it is working and refuses a second click until it is done. It is its icon alone, so it
   // says what it is in its tooltip and its label.
   const monthActions = (
-    <Tooltip
-      title={intl.formatMessage({ id: reconciliationOrdersRefreshing ? 'reconciliation-refreshing' : 'reconciliation-refresh' })}
-      arrow
-    >
-      <span>
-        <IconButton
-          variant="light"
-          color="secondary"
-          disabled={reconciliationOrdersRefreshing}
-          aria-label={intl.formatMessage({ id: 'reconciliation-refresh' })}
-          onClick={() => reloadReconciliationOrders()}
-          sx={toolButtonSx}
-        >
-          {reconciliationOrdersRefreshing ? <CircularProgress size={18} color="inherit" /> : <Refresh size={18} />}
-        </IconButton>
-      </span>
-    </Tooltip>
+    <Stack direction="row" useFlexGap sx={{ gap: 0.5, alignItems: 'center' }}>
+      {/* Only while the panel is away, as the filter button is: open, the panel is its own close button. */}
+      {!columnsOpen && (
+        <Tooltip title={intl.formatMessage({ id: 'reconciliation-columns' })} arrow>
+          <IconButton
+            variant="light"
+            color="secondary"
+            aria-label={intl.formatMessage({ id: 'reconciliation-columns' })}
+            onClick={() => setColumnsOpen(true)}
+            sx={toolButtonSx}
+          >
+            <Kanban size={18} />
+          </IconButton>
+        </Tooltip>
+      )}
+      <Tooltip
+        title={intl.formatMessage({ id: reconciliationOrdersRefreshing ? 'reconciliation-refreshing' : 'reconciliation-refresh' })}
+        arrow
+      >
+        <span>
+          <IconButton
+            variant="light"
+            color="secondary"
+            disabled={reconciliationOrdersRefreshing}
+            aria-label={intl.formatMessage({ id: 'reconciliation-refresh' })}
+            onClick={() => reloadReconciliationOrders()}
+            sx={toolButtonSx}
+          >
+            {reconciliationOrdersRefreshing ? <CircularProgress size={18} color="inherit" /> : <Refresh size={18} />}
+          </IconButton>
+        </span>
+      </Tooltip>
+    </Stack>
   );
 
   return (
@@ -674,7 +739,7 @@ export default function ReconciliationPage() {
           <FilterFacets facets={filterFacets} selection={selection} onToggle={toggleFilter} />
         </ReconciliationFilterDrawer>
 
-        <Main open={filtersOpen} container={container}>
+        <Main open={filtersOpen} columns={columnsOpen} container={container}>
           <Stack spacing={2} sx={{ mt: 2.5 }}>
             {generationError && <Alert severity="error">{generationError}</Alert>}
             {generationMessage && <Alert severity="success">{generationMessage}</Alert>}
@@ -785,11 +850,14 @@ export default function ReconciliationPage() {
                       <TableHead>
                         <TableRow>
                           <TableCell sx={{ width: 92 }}>{intl.formatMessage({ id: 'reconciliation-actions' })}</TableCell>
-                          {columnFields.map((field) => (
-                            <TableCell key={field} align={amountFields.includes(field) ? 'right' : 'left'}>
-                              {fieldLabel(field)}
-                            </TableCell>
-                          ))}
+                          {shownColumns.map((field) => {
+                            const { sx, ...dragging } = columnDrag(field);
+                            return (
+                              <TableCell key={field} align={amountFields.includes(field) ? 'right' : 'left'} sx={sx} {...dragging}>
+                                {fieldLabel(field)}
+                              </TableCell>
+                            );
+                          })}
                         </TableRow>
                       </TableHead>
                       <TableBody>
@@ -857,7 +925,7 @@ export default function ReconciliationPage() {
                                   )}
                                 </Stack>
                               </TableCell>
-                              {columnFields.map((field) => (
+                              {shownColumns.map((field) => (
                                 <TableCell
                                   key={field}
                                   align={amountFields.includes(field) ? 'right' : 'left'}
@@ -893,6 +961,23 @@ export default function ReconciliationPage() {
             </MainCard>
           </Stack>
         </Main>
+
+        <ReconciliationColumnDrawer
+          open={columnsOpen}
+          onClose={() => setColumnsOpen(false)}
+          changed={columnsChanged}
+          onReset={resetColumns}
+          saved={columnsSaved}
+          onSave={saveColumns}
+        >
+          <ColumnPicker
+            columns={columnOrder.map((field) => ({ key: field, label: fieldLabel(field) }))}
+            shown={shownColumns}
+            onToggle={toggleColumn}
+            onReorder={reorderColumns}
+            handleLabel={(label) => intl.formatMessage({ id: 'reconciliation-column-move' }, { column: label })}
+          />
+        </ReconciliationColumnDrawer>
       </Box>
 
       <Dialog open={Boolean(selectedOrder)} onClose={closeOrder} fullWidth maxWidth="sm">
