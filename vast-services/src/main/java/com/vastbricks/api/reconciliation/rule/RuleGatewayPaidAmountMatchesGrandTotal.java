@@ -1,7 +1,7 @@
 package com.vastbricks.api.reconciliation.rule;
 
-import static com.vastbricks.api.reconciliation.rule.ReconciliationOrderField.GRAND_TOTAL;
-import static com.vastbricks.api.reconciliation.rule.ReconciliationOrderField.PAID_AMOUNT;
+import static com.vastbricks.api.reconciliation.ReconciliationOrderField.ORDER_GRAND_TOTAL;
+import static com.vastbricks.api.reconciliation.ReconciliationOrderField.GATEWAY_PAID_AMOUNT;
 
 import com.vastbricks.api.reconciliation.ReconciledOrder;
 import java.util.List;
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
  * grand total by the rule that collected it, so neither is repeated here.
  */
 @Component
-class RulePaidAmountMatchesGrandTotal implements Rule {
+class RuleGatewayPaidAmountMatchesGrandTotal implements Rule {
 
     /** The payment providers payments are collected from, as the mapping unified their names. */
     private static final Set<String> COLLECTED_PROVIDERS = Set.of("Stripe", "PayPal");
@@ -27,17 +27,17 @@ class RulePaidAmountMatchesGrandTotal implements Rule {
     @Override
     public List<ReconciliationFailure> evaluate(ReconciledOrder order) {
         // An immutable set rejects a null lookup, and an order may have been collected with no payment method.
-        if (order.getPaymentMethod() == null || !COLLECTED_PROVIDERS.contains(order.getPaymentMethod())) {
+        if (order.getOrder().getPaymentMethod() == null || !COLLECTED_PROVIDERS.contains(order.getOrder().getPaymentMethod())) {
             return List.of();
         }
 
-        var paidAmount = order.getPaidAmount();
-        var grandTotal = order.getGrandTotal();
+        var paidAmount = order.getGateway().getPaidAmount();
+        var grandTotal = order.getOrder().getGrandTotal();
         if (paidAmount != null && grandTotal != null && paidAmount.compareTo(grandTotal) != 0) {
             return List.of(new ReconciliationFailure(
                     PAID_AMOUNT_MISMATCH,
                     ReconciliationFailureLevel.ERROR,
-                    List.of(PAID_AMOUNT, GRAND_TOTAL)
+                    List.of(GATEWAY_PAID_AMOUNT, ORDER_GRAND_TOTAL)
             ));
         }
         return List.of();

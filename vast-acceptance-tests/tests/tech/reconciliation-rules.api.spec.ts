@@ -31,12 +31,12 @@ test("fails a Stripe-paid order that was paid another amount than its grand tota
 
   expect(response.status(), await response.text()).toBe(200);
   const body = await response.json();
-  expect(body.orders[0].paidAmount).toBe(5);
+  expect(body.orders[0].gateway.paidAmount).toBe(5);
   expect(body.orders[0].failures).toEqual([
     {
       code: "paid-amount-mismatch",
       level: "error",
-      fields: ["paidAmount", "grandTotal"],
+      fields: ["gateway.paidAmount", "order.grandTotal"],
     },
   ]);
 });
@@ -67,9 +67,9 @@ test("fails a Stripe-paid order no payment was collected for", async ({
 
   expect(response.status(), await response.text()).toBe(200);
   const body = await response.json();
-  expect(body.orders[0].paidAmount).toBeNull();
+  expect(body.orders[0].gateway.paidAmount).toBeNull();
   expect(body.orders[0].failures).toEqual([
-    { code: "amount-missing", level: "error", fields: ["paidAmount"] },
+    { code: "amount-missing", level: "error", fields: ["gateway.paidAmount"] },
   ]);
 });
 
@@ -100,9 +100,9 @@ test("fails an order paid outside the collected providers that no payment was co
 
   expect(response.status(), await response.text()).toBe(200);
   const body = await response.json();
-  expect(body.orders[0].paidAmount).toBeNull();
+  expect(body.orders[0].gateway.paidAmount).toBeNull();
   expect(body.orders[0].failures).toEqual([
-    { code: "amount-missing", level: "error", fields: ["paidAmount"] },
+    { code: "amount-missing", level: "error", fields: ["gateway.paidAmount"] },
   ]);
 });
 
@@ -142,13 +142,13 @@ test("fails an order the payment shows a different facilitator tax taken than th
 
   expect(response.status(), await response.text()).toBe(200);
   const body = await response.json();
-  expect(body.orders[0].facilitatorTax).toBe(1.09);
-  expect(body.orders[0].paidFacilitatorTax).toBe(0.95);
+  expect(body.orders[0].order.facilitatorTax).toBe(1.09);
+  expect(body.orders[0].gateway.facilitatorTax).toBe(0.95);
   expect(body.orders[0].failures).toEqual([
     {
       code: "facilitator-tax-mismatch",
       level: "error",
-      fields: ["facilitatorTax", "paidFacilitatorTax"],
+      fields: ["order.facilitatorTax", "gateway.facilitatorTax"],
     },
   ]);
 });
@@ -184,12 +184,122 @@ test("fails an order the marketplace reported facilitator tax for that the payme
 
   expect(response.status(), await response.text()).toBe(200);
   const body = await response.json();
-  expect(body.orders[0].paidFacilitatorTax).toBeNull();
+  expect(body.orders[0].gateway.facilitatorTax).toBeNull();
   expect(body.orders[0].failures).toEqual([
     {
       code: "facilitator-tax-mismatch",
       level: "error",
-      fields: ["facilitatorTax", "paidFacilitatorTax"],
+      fields: ["order.facilitatorTax", "gateway.facilitatorTax"],
     },
+  ]);
+});
+
+test("fails an order the payment shows a refund on that the marketplace reports none for", async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: "2026-08",
+    brickOwl: [
+      {
+        orderId: "owl-order-0810",
+        orderDate: "1786320000",
+        view: {
+          buyer_name: "some buyer",
+          payment_method_type: "stripe",
+          sub_total: "5.20",
+          base_order_total: "5.20",
+        },
+      },
+    ],
+    stripe: [
+      {
+        description: "Brick Owl Order owl-order-0810",
+        amount: 520,
+        amountRefunded: 200,
+      },
+    ],
+  });
+
+  const response = await request.get(
+    "/api/private/reconciliation/orders?month=2026-08",
+  );
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  // Nothing collects the marketplace's side of a refund yet, so every refunded order is reported as a disagreement.
+  // That is the point of the rule for now: it is the standing list of refunds no marketplace mapping accounts for.
+  expect(body.orders[0].order.refundedAmount).toBeNull();
+  expect(body.orders[0].gateway.refundedAmount).toBe(2);
+  expect(body.orders[0].failures).toEqual([
+    {
+      code: "refunded-amount-mismatch",
+      level: "error",
+      fields: ["order.refundedAmount", "gateway.refundedAmount"],
+    },
+  ]);
+});
+
+test("passes an order neither the payment nor the marketplace reports a refund on", async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: "2026-08",
+    brickOwl: [
+      {
+        orderId: "owl-order-0810",
+        orderDate: "1786320000",
+        view: {
+          buyer_name: "some buyer",
+          payment_method_type: "stripe",
+          sub_total: "5.20",
+          base_order_total: "5.20",
+        },
+      },
+    ],
+    stripe: [{ description: "Brick Owl Order owl-order-0810", amount: 520 }],
+  });
+
+  const response = await request.get(
+    "/api/private/reconciliation/orders?month=2026-08",
+  );
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  // Neither side reporting a refund is the two agreeing, which is what keeps the ordinary order silent.
+  expect(body.orders[0].failures).toEqual([]);
+});
+
+test("does not fail a refunded order no payment was matched to for the refund it cannot compare", async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: "2026-08",
+    brickOwl: [
+      {
+        orderId: "owl-order-0810",
+        orderDate: "1786320000",
+        view: {
+          buyer_name: "some buyer",
+          payment_method_type: "stripe",
+          sub_total: "5.20",
+          base_order_total: "5.20",
+        },
+      },
+    ],
+    stripe: [{ description: "Brick Owl Order some-other-order", amount: 520 }],
+  });
+
+  const response = await request.get(
+    "/api/private/reconciliation/orders?month=2026-08",
+  );
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  // The missing payment is reported once, by the rule that requires one, and not again as a refund disagreement.
+  expect(body.orders[0].failures).toEqual([
+    { code: "amount-missing", level: "error", fields: ["gateway.paidAmount"] },
   ]);
 });

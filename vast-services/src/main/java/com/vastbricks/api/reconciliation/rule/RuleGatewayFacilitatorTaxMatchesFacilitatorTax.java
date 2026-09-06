@@ -1,7 +1,7 @@
 package com.vastbricks.api.reconciliation.rule;
 
-import static com.vastbricks.api.reconciliation.rule.ReconciliationOrderField.FACILITATOR_TAX;
-import static com.vastbricks.api.reconciliation.rule.ReconciliationOrderField.PAID_FACILITATOR_TAX;
+import static com.vastbricks.api.reconciliation.ReconciliationOrderField.ORDER_FACILITATOR_TAX;
+import static com.vastbricks.api.reconciliation.ReconciliationOrderField.GATEWAY_FACILITATOR_TAX;
 
 import com.vastbricks.api.reconciliation.ReconciledOrder;
 import java.math.BigDecimal;
@@ -23,18 +23,18 @@ import org.springframework.stereotype.Component;
  * contradicts by naming one.
  */
 @Component
-class RulePaidFacilitatorTaxMatchesFacilitatorTax implements Rule {
+class RuleGatewayFacilitatorTaxMatchesFacilitatorTax implements Rule {
 
     private static final String FACILITATOR_TAX_MISMATCH = "facilitator-tax-mismatch";
 
     @Override
     public List<ReconciliationFailure> evaluate(ReconciledOrder order) {
-        if (order.getPaidAmount() == null) {
+        if (order.getGateway().getPaidAmount() == null) {
             return List.of();
         }
 
-        var reported = order.getFacilitatorTax();
-        var paid = order.getPaidFacilitatorTax();
+        var reported = order.getOrder().getFacilitatorTax();
+        var paid = order.getGateway().getFacilitatorTax();
         if (collectedNothing(reported) && collectedNothing(paid)) {
             return List.of();
         }
@@ -44,7 +44,7 @@ class RulePaidFacilitatorTaxMatchesFacilitatorTax implements Rule {
         return List.of(new ReconciliationFailure(
                 FACILITATOR_TAX_MISMATCH,
                 ReconciliationFailureLevel.ERROR,
-                List.of(FACILITATOR_TAX, PAID_FACILITATOR_TAX)
+                List.of(ORDER_FACILITATOR_TAX, GATEWAY_FACILITATOR_TAX)
         ));
     }
 

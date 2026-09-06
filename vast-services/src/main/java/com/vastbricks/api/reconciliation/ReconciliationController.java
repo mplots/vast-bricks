@@ -5,8 +5,11 @@ import com.vastbricks.api.client.brickstore.BrickStoreClientException;
 import com.vastbricks.api.client.manakabata.ManakabataClientException;
 import com.vastbricks.api.client.paypal.PayPalClientException;
 import com.vastbricks.api.client.stripe.StripeClientException;
+import com.vastbricks.api.reconciliation.ReconciliationPayload.ReconciliationFieldDescriptor;
 import com.vastbricks.api.reconciliation.ReconciliationPayload.ReconciliationOrdersResponse;
+import java.util.Arrays;
 import java.time.YearMonth;
+import java.util.List;
 import java.time.format.DateTimeParseException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,8 +36,16 @@ class ReconciliationController {
         var selectedMonth = parseMonth(month);
         return new ReconciliationOrdersResponse(
                 selectedMonth.toString(),
+                fieldRoster(),
                 reconciliationService.findOrders(selectedMonth)
         );
+    }
+
+    /** The field roster, which is the same for every month: the declared fields, in the order they are declared. */
+    private List<ReconciliationFieldDescriptor> fieldRoster() {
+        return Arrays.stream(ReconciliationOrderField.values())
+                .map(ReconciliationFieldDescriptor::of)
+                .toList();
     }
 
     @ExceptionHandler({

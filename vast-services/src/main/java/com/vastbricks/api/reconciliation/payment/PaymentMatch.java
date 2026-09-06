@@ -32,7 +32,7 @@ final class PaymentMatch {
     /** Whether the order came to exactly what the payment took. Amounts are normalized, so they compare exactly. */
     private static boolean cameTo(ReconciledOrder order, BigDecimal paidAmount) {
         return paidAmount != null
-                && order.getGrandTotal() != null
-                && order.getGrandTotal().compareTo(paidAmount) == 0;
+                && order.getOrder().getGrandTotal() != null
+                && order.getOrder().getGrandTotal().compareTo(paidAmount) == 0;
     }
 }

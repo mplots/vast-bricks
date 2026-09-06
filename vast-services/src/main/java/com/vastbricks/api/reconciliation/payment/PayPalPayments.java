@@ -30,7 +30,7 @@ final class PayPalPayments {
      * Orders the marketplace says were settled through PayPal. A PayPal payment can only belong to one of those, and
      * the weaker match keys would otherwise attach one to an order paid another way.
      */
-    static final Predicate<ReconciledOrder> PAID_THROUGH_PAYPAL = order -> PAYPAL.equals(order.getPaymentMethod());
+    static final Predicate<ReconciledOrder> PAID_THROUGH_PAYPAL = order -> PAYPAL.equals(order.getOrder().getPaymentMethod());
 
     private PayPalPayments() {
     }

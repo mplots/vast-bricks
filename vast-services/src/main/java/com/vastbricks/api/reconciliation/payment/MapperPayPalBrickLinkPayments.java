@@ -56,9 +56,9 @@ class MapperPayPalBrickLinkPayments implements DetailMapper<PayPalTransaction> {
             }
             var order = matchedOrder(transaction, orders);
             if (order != null && paid.add(order)) {
-                order.setPaidAmount(PayPalPayments.paidAmount(transaction));
-                order.setPaidFacilitatorTax(partnerFees.takenFrom(transaction));
-                order.setPaymentUrl(paymentLinks.payPal(PayPalPayments.paymentReference(transaction)));
+                order.getGateway().setPaidAmount(PayPalPayments.paidAmount(transaction));
+                order.getGateway().setFacilitatorTax(partnerFees.takenFrom(transaction));
+                order.getGateway().setPaymentUrl(paymentLinks.payPal(PayPalPayments.paymentReference(transaction)));
             }
         }
     }

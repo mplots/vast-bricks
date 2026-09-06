@@ -28,7 +28,10 @@ class ReconciliationService {
      * the mappers collected them in, because the sort is stable.
      */
     private static final Comparator<ReconciledOrder> NEWEST_FIRST =
-            Comparator.comparing(ReconciledOrder::getOrderDate, Comparator.nullsLast(Comparator.reverseOrder()));
+            Comparator.comparing(
+                    order -> order.getOrder().getOrderDate(),
+                    Comparator.nullsLast(Comparator.reverseOrder())
+            );
 
     private final Map<Class<?>, Source<?>> sources;
     private final List<OrderMapper<?>> orderMappers;

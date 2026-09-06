@@ -3,6 +3,7 @@ package com.vastbricks.api.reconciliation.order;
 import com.vastbricks.api.client.brickstore.BrickStoreOrder;
 import com.vastbricks.api.reconciliation.Marketplace;
 import com.vastbricks.api.reconciliation.OrderMapper;
+import com.vastbricks.api.reconciliation.OrderFields;
 import com.vastbricks.api.reconciliation.ReconciledOrder;
 import com.vastbricks.api.reconciliation.ReconciliationAmount;
 import com.vastbricks.api.reconciliation.ReconciliationPaymentMethod;
@@ -29,7 +30,7 @@ class MapperBrickLinkOrders implements OrderMapper<BrickStoreOrder> {
 
     private ReconciledOrder toReconciledOrder(BrickStoreOrder order) {
         var orderId = order.getOrderId() == null ? null : order.getOrderId().toString();
-        return ReconciledOrder.builder()
+        return ReconciledOrder.of(OrderFields.builder()
                 .source(Marketplace.BRICK_LINK)
                 .orderId(orderId)
                 .orderUrl(OrderLinks.brickLink(orderId))
@@ -40,6 +41,6 @@ class MapperBrickLinkOrders implements OrderMapper<BrickStoreOrder> {
                 .facilitatorTax(ReconciliationAmount.normalize(FacilitatorTaxes.of(order)))
                 .subTotal(ReconciliationAmount.normalize(order.getTotal()))
                 .grandTotal(ReconciliationAmount.normalize(order.getBaseGrandTotal()))
-                .build();
+                .build());
     }
 }

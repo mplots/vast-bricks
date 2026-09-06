@@ -75,6 +75,11 @@ export type StripeTransactionMock = {
   applicationFee?: number;
   /** Payment intent of the charge behind the transaction, which is what a payment link addresses. */
   paymentIntent?: string | null;
+  /**
+   * What the charge behind the transaction has been refunded to date, in minor units and positive, as Stripe keeps
+   * it on the charge itself rather than per refund. This is what a refunded order is read from.
+   */
+  amountRefunded?: number;
 };
 
 export type PayPalTransactionMock = {
@@ -325,6 +330,8 @@ function stripeBalanceTransaction(
       id: `ch_${transaction.charge}`,
       object: "charge",
       payment_intent: paymentIntent,
+      amount_refunded: transaction.amountRefunded ?? 0,
+      refunded: (transaction.amountRefunded ?? 0) > 0,
     },
     type,
     reporting_category: type,

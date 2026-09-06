@@ -190,12 +190,44 @@ here as they are provided; do not invent unspecified behavior prematurely.
   from the BrickStore XML export and BrickOwl orders from the BrickOwl API for
   the selected month. Each collected order carries its marketplace source
   (`BrickLink` or `BrickOwl`), order ID, order date, buyer, buyer username,
-  payment method, tax type, facilitator tax, sub-total, grand total, paid
-  amount, paid facilitator tax, and target invoice, together with its rule
-  failures and the links to the order and
-  its payment, each exposed beside the field it rides on. Add further
-  fields and providers incrementally as their processing requirements are
-  supplied.
+  payment method, tax type, facilitator tax, sub-total, grand total, refunded
+  amount, gateway paid amount, gateway facilitator tax, gateway refunded amount,
+  and target invoice, together with its rule failures and the links to the order
+  and its payment, each exposed beside the field it rides on. Add further fields
+  and providers incrementally as their processing requirements are supplied.
+- Every field belongs to one of four sources, and reconciliation is the business
+  of holding those accounts of one order against each other: `order` is what the
+  marketplace reported about the order itself, `gateway` what the payment
+  provider reports about the payment matched to it, `accounting` what the
+  accounting system holds for it, and `calculated` what is derived from the rest
+  rather than stated by anyone. Nothing is collected from the accounting system
+  yet.
+- The source is structural, not a naming convention. An order carries one group
+  per source — `order`, `gateway`, `calculated` — and a field is addressed
+  as `<source>.<field>`, the path it actually sits at. Do not prefix a field
+  name with its source: the path already says it, and a prefix says it twice
+  while stuttering on the fields that need it least (`orderOrderId`) and
+  confusing the ones that read as something else (`orderSource`). The older
+  `paid` prefix for gateway fields is likewise gone; it read as an amount paid,
+  so it could not word a gateway field that was not one.
+- Because the source is the path and not the name, two sources may state the
+  same field without either being renamed around the other:
+  `order.refundedAmount` and `gateway.refundedAmount` are one quantity claimed
+  twice, which is exactly what the rule comparing them is for. Reach for that
+  whenever a second source reports something the first already does, rather than
+  inventing a second name for it.
+- A source nothing is collected from yet carries no group. The accounting source
+  is declared and has none.
+- Each field declares its source on `ReconciliationOrderField`, and the orders
+  response reports the whole roster as `fields`, every field named by its path
+  and attributed to its source. It rides with the orders rather than in an
+  endpoint of its own, so a client can never show a month's orders against a
+  roster fetched before them. A client groups and labels from the roster instead
+  of keeping a list of sources of its own, and reads a value by walking the
+  path.
+- A failure cites field paths, and the portal words a failure by interpolating
+  them. An ICU argument name carries no dot, so the placeholder is the path with
+  its segments joined up: `order.refundedAmount` is `{orderRefundedAmount}`.
 - The grand total is the order total in the store's base currency with shipping
   and additional charges included: BrickLink's `BASEGRANDTOTAL` and BrickOwl's
   `base_order_total`. No rule compares it yet.
@@ -285,14 +317,25 @@ here as they are provided; do not invent unspecified behavior prematurely.
   no payment was matched to is left to the rule that requires one.
 - The target invoice is what the accounting invoice for the order has to come
   to: the grand total less the facilitator tax, because that tax was charged
-  under the marketplace's registration and is not the store's to invoice. An
-  order no facilitator collected on is targeted at its whole grand total, and
-  one with no grand total has no target at all. It is derived from two collected
+  under the marketplace's registration and is not the store's to invoice, and
+  less the gateway refunded amount, which the store no longer holds to invoice
+  for. The refund it subtracts is the provider's, not the marketplace's: what
+  may still be invoiced turns on money having actually gone back, and the
+  provider is the side that moved it, while the marketplace's own account of the
+  refund is collected to be compared against that one rather than calculated
+  from. An order no facilitator collected on is targeted at its whole grand
+  total, one
+  nothing was refunded on at the whole of what is left, and one with no grand
+  total has no target at all. A refund reaching past what was the store's to
+  invoice leaves nothing to invoice rather than a negative invoice: the two
+  subtractions do not come out of the same pocket, since the marketplace keeps
+  the facilitator tax it took whether or not the buyer was refunded, and no
+  invoice can be written for less than nothing. It is derived from collected
   fields of the same order rather than collected itself, so it is computed on
   `ReconciledOrder` instead of in each order mapper, and is exposed after the
-  collected fields. It is shown as its own column, next to the two it is derived
-  from. No rule compares it against anything yet: what the order was actually
-  invoiced for is not collected.
+  collected fields. It is shown as its own column, next to the ones it is
+  derived from. No rule compares it against anything yet: what the order was
+  actually invoiced for is not collected.
 - Payments are collected from Stripe and from PayPal alongside the marketplace
   orders: Stripe's balance transactions and PayPal's transaction search, each for
   the month. Both providers date their transactions in UTC, so the month is asked
@@ -335,12 +378,52 @@ here as they are provided; do not invent unspecified behavior prematurely.
   providers report the marketplaces' seller fees, currency conversions, refunds
   and, for PayPal, bank withdrawals in the same list; those are sourced and left
   unmapped, because a source decides nothing and what a transaction means is a
-  mapping decision. Refunds are not netted against a payment until requirements
-  for them are supplied.
+  mapping decision. A refund transaction is no exception: what came back out of
+  a payment is read from the payment itself, as the refunded amount below,
+  rather than by finding the refund transactions that reverse it.
 - The paid amount is what the payment provider took for the order, gross of its
   own fees: Stripe's balance transaction `amount` in minor units divided by 100,
   and PayPal's `transaction_amount`, both normalized like every other collected
-  amount. The provider's fee and net are not collected.
+  amount. The provider's fee and net are not collected. A refund does not reduce
+  it: the payment did take what it took, and what came back afterwards is the
+  refunded amount rather than a shortfall in what was paid.
+- The refunded amount is what the marketplace reports was refunded to the buyer
+  on the order, as a positive amount, or nothing where it reports none. Nothing
+  collects it yet, so it is absent on every order and the rule comparing the two
+  sides of a refund fails wherever the payment shows one. That is the intended
+  reading rather than a gap left open: the failure is the standing report of
+  which orders had money come back that no marketplace mapping accounts for.
+  BrickOwl states a refund total on the order that it can be collected from when
+  requirements for it are supplied; the BrickLink export names no refund at all,
+  so a refunded BrickLink order stays failed until its refund is collected from
+  somewhere that does.
+- The gateway refunded amount is what the provider shows has come back out of
+  the payment, as a positive amount, or nothing where it shows none. A partial
+  refund and a full one are the same field: how much of the payment was
+  returned. From Stripe it is the expanded charge's own `amount_refunded`, the
+  running total Stripe keeps on the charge, so one partial refund, several of
+  them and a full refund are all one figure that no refund transaction has to be
+  found for. It is what the payment has been refunded to date rather than what
+  was refunded inside the reconciled month, because it is read to say what the
+  order may still be invoiced for, and an order refunded in November is not
+  invoiceable in August either. Refund transactions of the month are
+  deliberately not summed instead: Stripe dates a refund at itself rather than
+  at the charge it reverses, so the refunds inside a month's window are neither
+  all of an order's refunds nor only its. Only Stripe collects it so far; PayPal
+  follows when requirements for it are supplied.
+- A rule holds the two accounts of the refund against each other once a payment
+  has been matched: what the marketplace reported refunding must be what the
+  payment shows came back, and a disagreement is an `error`, being an order one
+  side or the other will invoice wrongly. Neither side reporting a refund is the
+  two agreeing, which is what keeps the ordinary order silent; one side
+  reporting one where the other did not is a disagreement rather than missing
+  data. An order no payment was matched to is left to the rule that requires
+  one.
+- A refund does not return the provider's processing fee, and a marketplace does
+  not give back the facilitator tax it took just because the buyer was refunded
+  — it reverses its application fee separately, on its own Connect account,
+  where a balance transaction of the store's does not report it. So neither the
+  paid facilitator tax nor any fee is derived from a refund.
 - What a payment names differs by provider and by marketplace, so each pairing
   is matched on what it actually carries. A Stripe payment carries a description:
   BrickOwl words it as `Brick Owl Order #1630980` and matches that order ID,
@@ -531,10 +614,43 @@ here as they are provided; do not invent unspecified behavior prematurely.
   untouched. Rules compare normalized amounts exactly and must not define their
   own tolerances.
 - The orders table shows `Actions`, source, order ID, order date, buyer, payment
-  method, grand total, facilitator tax, target invoice, paid amount, and paid
-  facilitator tax, newest order first as the API returns them. The provider's
-  two amounts come last together, so they read as one account of the payment
-  rather than interrupting the subtraction the three before them state.
+  method, grand total, facilitator tax, refunded amount, gateway refunded
+  amount, target invoice, gateway paid amount, and gateway facilitator tax,
+  newest order first as the API returns them. The gateway's paid amount and
+  facilitator tax come last together, so they read as one account of the payment
+  rather than interrupting the subtraction before them. The gateway's refund is
+  part of that subtraction though most orders have none, because a target
+  invoice cut by a refund the reader cannot see reads as a wrong one.
+- The two refunds stand next to each other rather than each beside its own
+  source's amounts. They are the two accounts of one refund that a rule holds
+  against each other, so a disagreement between them is a thing to see at a
+  glance rather than a failure to go looking for; only the gateway's takes part
+  in the subtraction that follows.
+- A field's label is its own name without the source, everywhere it is named.
+  The detail view and the picker head their groups with the source, and a column
+  heading carries nothing but the field's own name: a source in the heading
+  reads as part of the column's name rather than as the account behind it. Two
+  shown columns of different sources may therefore be headed alike — the two
+  refunds are — and which is which is read from the order they were arranged
+  in and from the detail view.
+- The detail view titles each source's fields and rules them off with a divider,
+  the way a card titles what it holds. A heading alone left the groups to be
+  noticed rather than seen, and which account stated a value is the whole reason
+  the fields are grouped.
+- The column picker is grouped the same way: one titled group per source, its
+  columns indented under it, and a tick on the group itself that shows or hides
+  every field one source states. Part of a group shown reads as part-ticked. A
+  source's fields do not read as a group when each row merely repeats the
+  source's name beside its own.
+- Choosing the columns and arranging them are separate acts on separate
+  surfaces. The picker chooses which columns are read and never their order;
+  ordering is dragging the table's own headings, or moving a focused heading
+  with the arrow keys. They cannot be one surface: the picker groups by the
+  account that stated a field, while the table is arranged so its amounts read
+  as the sums they make, and a list trying to be both could only be one of them.
+- A heading is therefore the only place a column is moved from, so it answers
+  the keyboard as well as the mouse and says as much in its label. A column that
+  could only be moved with a mouse could not be moved by everyone.
 - The tax type spends no column of its own. It rides in the actions cell as a
   small icon beside the invoice button: the Latvian flag for `domestic`, the
   European flag for `european-union`, the world for `export`, and the world

@@ -4,39 +4,56 @@
  * both of those are text that has to be read back defensively, which is a thing to state once and in one place.
  */
 
-// Order property names, matching the backend ReconciliationOrderField enum.
+// Field paths, matching the backend ReconciliationOrderField enum: `<source>.<field>`, the path the value actually
+// sits at in an order. The source is the segment before the dot rather than a prefix on the name, which is what lets
+// two sources state one field — a facilitator tax, a refund — without either being renamed around the other.
+//
+// The list is kept here as well as reported by the API because it is the arrangement the screen opens with, and the
+// address is read back before any month has been fetched. What the API reports is what a field's source is; a field it
+// has gained since this list was written is still choosable, and lands last.
 export const orderFields = [
-  'source',
-  'orderId',
-  'orderDate',
-  'buyer',
-  'buyerUsername',
-  'paymentMethod',
-  'taxType',
-  'facilitatorTax',
-  'subTotal',
-  'grandTotal',
-  'paidAmount',
-  'paidFacilitatorTax',
-  'targetInvoice'
+  'order.source',
+  'order.orderId',
+  'order.orderDate',
+  'order.buyer',
+  'order.buyerUsername',
+  'order.paymentMethod',
+  'order.taxType',
+  'order.facilitatorTax',
+  'order.subTotal',
+  'order.grandTotal',
+  'order.refundedAmount',
+  'gateway.paidAmount',
+  'gateway.facilitatorTax',
+  'gateway.refundedAmount',
+  'calculated.targetInvoice'
 ] as const;
 // Fields shown as table columns; the detail view shows all of them.
 // The tax type is absent: it rides in the actions cell as an icon rather than spending a column on a word. The
 // facilitator tax is here all the same, being an amount to account for rather than a classification, and the target
-// invoice follows the two it is derived from so the columns read as the subtraction they are. What the payment shows
-// the marketplace took follows what the payment paid, so the provider's two amounts read together rather than
-// interrupting that subtraction.
+// invoice follows the amounts it is derived from so the columns read as the subtraction they are — the gateway's
+// refund among them, even though most orders have none, because a target invoice cut by a refund the reader cannot
+// see reads as a wrong one.
+//
+// The two refunds stand next to each other rather than each beside its own source's amounts. They are the two
+// accounts of one refund that a rule holds against each other, so a disagreement between them is a thing to see at a
+// glance instead of a failure to go looking for; only the gateway's takes part in the subtraction that follows.
+//
+// What the payment paid and what it shows the marketplace took come last together, so they read as one account of
+// the payment rather than interrupting that subtraction.
 export const columnFields: string[] = [
-  'source',
-  'orderId',
-  'orderDate',
-  'buyer',
-  'paymentMethod',
-  'grandTotal',
-  'facilitatorTax',
-  'targetInvoice',
-  'paidAmount',
-  'paidFacilitatorTax'
+  'order.source',
+  'order.orderId',
+  'order.orderDate',
+  'order.buyer',
+  'order.paymentMethod',
+  'order.grandTotal',
+  'order.facilitatorTax',
+  'order.refundedAmount',
+  'gateway.refundedAmount',
+  'calculated.targetInvoice',
+  'gateway.paidAmount',
+  'gateway.facilitatorTax'
 ];
 
 /** Every column the table can be asked to show: whatever the detail view can state, a column can state too. */

@@ -6,14 +6,18 @@ import com.vastbricks.api.reconciliation.ReconciliationAmount;
 import java.math.BigDecimal;
 import java.util.Set;
 
-/** What the Stripe payment mappers share: which transactions pay for an order, what one paid, and what tax it took. */
+/**
+ * What the Stripe payment mappers share: which transactions pay for an order, what one paid, what tax it took and
+ * what has since been refunded out of it.
+ */
 final class StripePayments {
 
     /**
      * Transaction types that are a buyer paying for an order. Stripe reports the same list with its own fees, the
-     * marketplace's application fees drawn as transactions of their own and its refunds; those say nothing about what
-     * an order was paid, so they are sourced and left unmapped until requirements for them are supplied. An
-     * application fee deducted from a payment is another matter: it belongs to that payment and is read below.
+     * marketplace's application fees drawn as transactions of their own and its refunds; none of those says what an
+     * order was paid, so they are sourced and left unmapped. An application fee deducted from a payment is another
+     * matter: it belongs to that payment and is read below, as is what the payment has since been refunded, which
+     * the paying transaction states for itself and no refund transaction has to be found for.
      */
     private static final Set<String> PAYMENT_TYPES = Set.of("charge", "payment");
 
@@ -62,6 +66,29 @@ final class StripePayments {
                 .map(fee -> BigDecimal.valueOf(fee.getAmount()))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         return ReconciliationAmount.normalize(total.movePointLeft(2));
+    }
+
+    /**
+     * What was refunded out of the payment, as a positive amount normalized like every other collected amount, or
+     * {@code null} when nothing was refunded. It is read from the charge's own running total, which Stripe keeps
+     * whole rather than per refund, so one partial refund, several of them and a full refund are all one figure.
+     *
+     * <p>That total is what the payment has been refunded to date, a refund made after the reconciled month
+     * included, because what the store may still invoice for is what the payment is worth now rather than what it
+     * was worth when it was taken.
+     *
+     * <p>The refund transactions of the month are deliberately not summed instead. Stripe dates a refund at itself
+     * rather than at the charge it reverses, so the refunds inside a month's window are neither all of an order's
+     * refunds nor only its; a refund for an older order arrives with no charge in the list to attach it to, and one
+     * made a month later never arrives at all.
+     */
+    static BigDecimal refundedAmount(BalanceTransaction transaction) {
+        if (!(transaction.getSourceObject() instanceof Charge charge)
+                || charge.getAmountRefunded() == null
+                || charge.getAmountRefunded() == 0L) {
+            return null;
+        }
+        return ReconciliationAmount.normalize(BigDecimal.valueOf(charge.getAmountRefunded()).movePointLeft(2));
     }
 
     /**

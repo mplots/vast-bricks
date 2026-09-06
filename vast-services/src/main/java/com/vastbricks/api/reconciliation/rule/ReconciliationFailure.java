@@ -2,6 +2,7 @@ package com.vastbricks.api.reconciliation.rule;
 
 import static com.vastbricks.api.reconciliation.rule.ReconciliationFailureLevel.INFO;
 
+import com.vastbricks.api.reconciliation.ReconciliationOrderField;
 import java.util.List;
 import lombok.Getter;
 

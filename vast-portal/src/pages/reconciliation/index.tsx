@@ -60,11 +60,34 @@ import toolButtonSx from 'sections/reconciliation/toolButton';
 import useColumnDrag from 'hooks/useColumnDrag';
 import useConfig from 'hooks/useConfig';
 import useLocalStorage from 'hooks/useLocalStorage';
-import type { ReconciliationFailure, ReconciliationFailureLevel, ReconciliationOrder } from 'types/reconciliation';
+import type {
+  ReconciliationFailure,
+  ReconciliationFailureLevel,
+  ReconciliationFieldSource,
+  ReconciliationOrder
+} from 'types/reconciliation';
 import { orderTaxTypes, type OrderTaxType } from 'types/tax';
 
-const amountFields: string[] = ['facilitatorTax', 'subTotal', 'grandTotal', 'paidAmount', 'paidFacilitatorTax', 'targetInvoice'];
-const dateFields: string[] = ['orderDate'];
+const amountFields: string[] = [
+  'order.facilitatorTax',
+  'order.subTotal',
+  'order.grandTotal',
+  'order.refundedAmount',
+  'gateway.paidAmount',
+  'gateway.facilitatorTax',
+  'gateway.refundedAmount',
+  'calculated.targetInvoice'
+];
+const dateFields: string[] = ['order.orderDate'];
+
+// A field path is not a name a message can interpolate — an ICU argument carries no dot — so a failure hands its
+// values over under the path's segments joined up: `order.refundedAmount` is `{orderRefundedAmount}`.
+const placeholderName = (field: string) => field.replace(/\.(.)/g, (ignored, first: string) => first.toUpperCase());
+
+// A field is addressed by the path it sits at, `<source>.<field>`, so reading one is walking that path. An unknown
+// path reads as nothing collected, which is what a field the API has gained since this screen was built would be.
+const valueAt = (order: ReconciliationOrder, path: string): unknown =>
+  path.split('.').reduce<unknown>((held, segment) => (held as Record<string, unknown>)?.[segment], order);
 
 const formatAmount = (value?: number | null) => {
   if (value === null || value === undefined || Number.isNaN(value)) {
@@ -85,7 +108,7 @@ const formatDate = (value?: string | null) => {
 };
 
 const formatFieldValue = (order: ReconciliationOrder, field: string) => {
-  const value = order[field as keyof ReconciliationOrder];
+  const value = valueAt(order, field);
   if (amountFields.includes(field)) {
     return formatAmount(value as number | null);
   }
@@ -187,7 +210,7 @@ const tintedIn = (params: URLSearchParams) => {
   return filterLevels.filter((level) => named.includes(level));
 };
 
-const orderKey = (order: ReconciliationOrder) => `${order.source}-${order.orderId}`;
+const orderKey = (order: ReconciliationOrder) => `${order.order.source}-${order.order.orderId}`;
 
 /**
  * The height of the table card's title bar. It sticks under the app header and the table's head stops under it in
@@ -346,11 +369,16 @@ export default function ReconciliationPage() {
         : columnOrder.filter((kept) => kept === field || shownColumns.includes(kept))
     );
 
-  /** Takes the whole order the picker settled on; the table reads the shown part of it. */
-  const reorderColumns = (order: string[]) =>
+  /**
+   * Shows or hides every column of one source at once. The shown columns keep the table's own order rather than
+   * arriving in the group's, so asking for everything a source says does not rearrange what was already read.
+   */
+  const toggleColumnGroup = (fields: string[], show: boolean) =>
     applyColumns(
-      order,
-      order.filter((field) => shownColumns.includes(field))
+      columnOrder,
+      show
+        ? columnOrder.filter((kept) => fields.includes(kept) || shownColumns.includes(kept))
+        : shownColumns.filter((kept) => !fields.includes(kept))
     );
 
   /**
@@ -387,7 +415,7 @@ export default function ReconciliationPage() {
     setGenerationError(null);
     setGenerationMessage(null);
     try {
-      const result = await generateInvoice(order.orderId, order.source);
+      const result = await generateInvoice(order.order.orderId, order.order.source);
       setGenerationMessage(
         intl.formatMessage({ id: 'reconciliation-invoice-generated' }, { invoiceNumber: result.invoiceNumber, name: result.name })
       );
@@ -410,31 +438,58 @@ export default function ReconciliationPage() {
     setSelectedFailure(null);
   };
 
-  const fieldLabel = (field: string) => intl.formatMessage({ id: `reconciliation-field-${field}` });
+  // A field's own name, without the source it sits under. Every place a field is named says the source some other
+  // way — the detail view and the picker head their groups with it — and a heading carrying it as well would read
+  // as part of the column's name rather than as the account behind it.
+  const fieldLabel = (field: string) => intl.formatMessage({ id: `reconciliation-field-${field.replace(/\./g, '-')}` });
+
+  const sourceLabel = (source: ReconciliationFieldSource) => intl.formatMessage({ id: `reconciliation-source-${source}` });
+
+  // Which account stated each field, as the API reports it. A field the API did not report is read as calculated:
+  // whatever it is, nobody stated it to this screen, and it is better grouped with the derived than dropped.
+  const fieldSource = (field: string): ReconciliationFieldSource =>
+    reconciliationOrders?.fields.find((declared) => declared.name === field)?.source ?? 'calculated';
+
+  // The detail view reads the fields grouped by the account that stated them, in the order the API declares the
+  // sources it actually reported: what the marketplace said and what the gateway said are two claims about one
+  // order, and a flat list of them reads as one claim with the sources shuffled into it.
+  const fieldGroups = (): { source: ReconciliationFieldSource; fields: string[] }[] => {
+    const groups: { source: ReconciliationFieldSource; fields: string[] }[] = [];
+    orderFields.forEach((field) => {
+      const source = fieldSource(field);
+      const group = groups.find((held) => held.source === source);
+      if (group) {
+        group.fields.push(field);
+      } else {
+        groups.push({ source, fields: [field] });
+      }
+    });
+    return groups;
+  };
 
   // The backend words nothing, so the tax type arrives as a code and is worded here, as a failure code is. Every
   // other field is already the value it reads as.
   const fieldValue = (order: ReconciliationOrder, field: string) => {
-    if (field !== 'taxType') {
+    if (field !== 'order.taxType') {
       return formatFieldValue(order, field);
     }
-    return order.taxType ? intl.formatMessage({ id: `order-tax-type-${order.taxType}` }) : '—';
+    return order.order.taxType ? intl.formatMessage({ id: `order-tax-type-${order.order.taxType}` }) : '—';
   };
 
   // Two fields name something the provider also shows: the order id names the order and the payment method names
   // the payment. Each carries the link to it rather than spending a column on one, and each says where it goes in
   // its accessible label. Every other field, and one with nothing collected to link to, stays the plain value it is.
   const fieldLink = (order: ReconciliationOrder, field: string) => {
-    if (field === 'orderId') {
+    if (field === 'order.orderId') {
       return {
-        url: order.orderUrl,
-        label: intl.formatMessage({ id: 'reconciliation-order-link' }, { source: order.source })
+        url: order.order.orderUrl,
+        label: intl.formatMessage({ id: 'reconciliation-order-link' }, { source: order.order.source })
       };
     }
-    if (field === 'paymentMethod') {
+    if (field === 'order.paymentMethod') {
       return {
-        url: order.paymentUrl,
-        label: intl.formatMessage({ id: 'reconciliation-payment-link' }, { paymentMethod: fieldValue(order, 'paymentMethod') })
+        url: order.gateway.paymentUrl,
+        label: intl.formatMessage({ id: 'reconciliation-payment-link' }, { paymentMethod: fieldValue(order, 'order.paymentMethod') })
       };
     }
     return null;
@@ -465,7 +520,7 @@ export default function ReconciliationPage() {
     intl.formatMessage(
       { id: `reconciliation-failure-${failure.code}` },
       {
-        ...Object.fromEntries(failure.fields.map((field) => [field, fieldValue(order, field)])),
+        ...Object.fromEntries(failure.fields.map((field) => [placeholderName(field), fieldValue(order, field)])),
         fields: failure.fields.map(fieldLabel).join(', ')
       }
     );
@@ -482,7 +537,7 @@ export default function ReconciliationPage() {
   const rowLabel = (order: ReconciliationOrder) =>
     intl.formatMessage(
       { id: 'reconciliation-order-row' },
-      { source: order.source, orderId: order.orderId, level: levelName(orderLevel(order)) }
+      { source: order.order.source, orderId: order.order.orderId, level: levelName(orderLevel(order)) }
     );
 
   const taxTypeName = (taxType: OrderTaxType) => intl.formatMessage({ id: `order-tax-type-${taxType}` });
@@ -491,7 +546,7 @@ export default function ReconciliationPage() {
   const facets: OrderFacet[] = [
     {
       key: 'source',
-      valueOf: (order) => order.source,
+      valueOf: (order) => order.order.source,
       // Each marketplace names itself, so its name is already the label.
       label: (value) => value,
       declared: marketplaces,
@@ -507,14 +562,14 @@ export default function ReconciliationPage() {
     },
     {
       key: 'taxType',
-      valueOf: (order) => order.taxType,
+      valueOf: (order) => order.order.taxType,
       label: (value) => taxTypeName(value as OrderTaxType),
       declared: orderTaxTypes,
       icon: (value) => <OrderTaxTypeIcon taxType={value as OrderTaxType} size={16} />
     },
     {
       key: 'paymentMethod',
-      valueOf: (order) => order.paymentMethod,
+      valueOf: (order) => order.order.paymentMethod,
       // Collected as the marketplace worded it, so the wording is already the label.
       label: (value) => value
     }
@@ -853,7 +908,15 @@ export default function ReconciliationPage() {
                           {shownColumns.map((field) => {
                             const { sx, ...dragging } = columnDrag(field);
                             return (
-                              <TableCell key={field} align={amountFields.includes(field) ? 'right' : 'left'} sx={sx} {...dragging}>
+                              <TableCell
+                                key={field}
+                                align={amountFields.includes(field) ? 'right' : 'left'}
+                                // The heading is what a column is moved by, dragged or with the arrow keys, so it
+                                // says so rather than reading as a word that happens to answer the keyboard.
+                                aria-label={intl.formatMessage({ id: 'reconciliation-column-move' }, { column: fieldLabel(field) })}
+                                sx={sx}
+                                {...dragging}
+                              >
                                 {fieldLabel(field)}
                               </TableCell>
                             );
@@ -897,7 +960,7 @@ export default function ReconciliationPage() {
                                         disabled={generatingOrder === orderKey(order)}
                                         aria-label={intl.formatMessage(
                                           { id: 'reconciliation-generate-invoice-for' },
-                                          { source: order.source, orderId: order.orderId }
+                                          { source: order.order.source, orderId: order.order.orderId }
                                         )}
                                         onClick={() => handleGenerateInvoice(order)}
                                       >
@@ -911,15 +974,15 @@ export default function ReconciliationPage() {
                                   </Tooltip>
                                   {/* The type is a mark here and a word in the detail view, so the icon never says it
                                 alone: its label is the same wording the detail view shows. */}
-                                  {order.taxType && (
-                                    <Tooltip title={taxTypeName(order.taxType)} arrow>
+                                  {order.order.taxType && (
+                                    <Tooltip title={taxTypeName(order.order.taxType)} arrow>
                                       <Box
                                         component="span"
                                         role="img"
-                                        aria-label={taxTypeName(order.taxType)}
+                                        aria-label={taxTypeName(order.order.taxType)}
                                         sx={{ display: 'inline-flex' }}
                                       >
-                                        <OrderTaxTypeIcon taxType={order.taxType} />
+                                        <OrderTaxTypeIcon taxType={order.order.taxType} />
                                       </Box>
                                     </Tooltip>
                                   )}
@@ -931,8 +994,13 @@ export default function ReconciliationPage() {
                                   align={amountFields.includes(field) ? 'right' : 'left'}
                                   sx={dateFields.includes(field) ? { whiteSpace: 'nowrap' } : undefined}
                                 >
-                                  {field === 'source' ? (
-                                    <Chip label={order.source} size="small" color={sourceColor(order.source)} variant="outlined" />
+                                  {field === 'order.source' ? (
+                                    <Chip
+                                      label={order.order.source}
+                                      size="small"
+                                      color={sourceColor(order.order.source)}
+                                      variant="outlined"
+                                    />
                                   ) : (
                                     linkedFieldValue(order, field)
                                   )}
@@ -971,11 +1039,15 @@ export default function ReconciliationPage() {
           onSave={saveColumns}
         >
           <ColumnPicker
-            columns={columnOrder.map((field) => ({ key: field, label: fieldLabel(field) }))}
+            groups={fieldGroups().map((group) => ({
+              key: group.source,
+              label: sourceLabel(group.source),
+              columns: group.fields.map((field) => ({ key: field, label: fieldLabel(field) }))
+            }))}
             shown={shownColumns}
             onToggle={toggleColumn}
-            onReorder={reorderColumns}
-            handleLabel={(label) => intl.formatMessage({ id: 'reconciliation-column-move' }, { column: label })}
+            onToggleGroup={toggleColumnGroup}
+            groupLabel={(label) => intl.formatMessage({ id: 'reconciliation-columns-group' }, { source: label })}
           />
         </ReconciliationColumnDrawer>
       </Box>
@@ -984,26 +1056,38 @@ export default function ReconciliationPage() {
         {selectedOrder && (
           <>
             <DialogTitle>
-              {intl.formatMessage({ id: 'reconciliation-detail-title' }, { source: selectedOrder.source, orderId: selectedOrder.orderId })}
+              {intl.formatMessage(
+                { id: 'reconciliation-detail-title' },
+                { source: selectedOrder.order.source, orderId: selectedOrder.order.orderId }
+              )}
             </DialogTitle>
             <DialogContent dividers>
-              <Stack spacing={0.5}>
-                {orderFields.map((field) => (
-                  <Stack
-                    key={field}
-                    direction="row"
-                    justifyContent="space-between"
-                    spacing={2}
-                    sx={{
-                      px: 1,
-                      py: 0.5,
-                      borderLeft: 3,
-                      borderColor: highlightedFields.includes(field) ? `${highlightLevel}.main` : 'transparent',
-                      bgcolor: highlightedFields.includes(field) ? `${highlightLevel}.lighter` : 'transparent'
-                    }}
-                  >
-                    <Typography color="text.secondary">{fieldLabel(field)}</Typography>
-                    <Typography>{linkedFieldValue(selectedOrder, field)}</Typography>
+              <Stack spacing={2.5}>
+                {fieldGroups().map((group) => (
+                  // Each account of the order is titled and ruled off, the way a card titles what it holds: a
+                  // heading alone left the groups to be noticed rather than seen, and which account stated a value
+                  // is the whole reason these are grouped at all.
+                  <Stack key={group.source} spacing={0.5}>
+                    <Typography variant="subtitle1">{sourceLabel(group.source)}</Typography>
+                    <Divider />
+                    {group.fields.map((field) => (
+                      <Stack
+                        key={field}
+                        direction="row"
+                        justifyContent="space-between"
+                        spacing={2}
+                        sx={{
+                          px: 1,
+                          py: 0.5,
+                          borderLeft: 3,
+                          borderColor: highlightedFields.includes(field) ? `${highlightLevel}.main` : 'transparent',
+                          bgcolor: highlightedFields.includes(field) ? `${highlightLevel}.lighter` : 'transparent'
+                        }}
+                      >
+                        <Typography color="text.secondary">{fieldLabel(field)}</Typography>
+                        <Typography>{linkedFieldValue(selectedOrder, field)}</Typography>
+                      </Stack>
+                    ))}
                   </Stack>
                 ))}
               </Stack>

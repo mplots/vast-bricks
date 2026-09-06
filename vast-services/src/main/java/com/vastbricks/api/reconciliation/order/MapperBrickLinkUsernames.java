@@ -21,7 +21,7 @@ class MapperBrickLinkUsernames implements DetailMapper<SourcedBrickLinkUsername>
     public void map(List<SourcedBrickLinkUsername> sourced, ReconciledOrders orders) {
         for (var username : sourced) {
             orders.find(Marketplace.BRICK_LINK, username.getOrderId())
-                    .forEach(order -> order.setBuyerUsername(username.getBuyerUsername()));
+                    .forEach(order -> order.getOrder().setBuyerUsername(username.getBuyerUsername()));
         }
     }
 }

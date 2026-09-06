@@ -6,6 +6,22 @@ import {
 } from "../support/reconciliation";
 import { WireMockApi, wireMockMode } from "../support/wiremock";
 
+/**
+ * As much of a reconciled order as the assertions read back. Its fields sit under the source that stated them, which
+ * is how the API exposes them, so a test naming `gateway.refundedAmount` is naming the account it means.
+ */
+type ReconciledOrderShape = {
+  order: {
+    source: string;
+    orderId: string;
+    grandTotal: number | null;
+    facilitatorTax: number | null;
+    refundedAmount: number | null;
+  };
+  gateway: { paidAmount: number | null; refundedAmount: number | null };
+  calculated: { targetInvoice: number | null };
+};
+
 /** The periods PayPal was searched for, in the order the client asked for them. */
 async function payPalSearchedPeriods(wireMock: WireMockApi) {
   const transactionRequests = await wireMock.findMethodHostRequests(
@@ -128,48 +144,74 @@ test("lists BrickLink reconciliation orders for the selected month", async ({
   expect(response.headers()["content-type"]).toContain("application/json");
   await expect(response.json()).resolves.toEqual({
     selectedMonth: "2026-08",
+    // The field roster rides with every month and is asserted on its own below.
+    fields: expect.any(Array),
     orders: [
       {
-        source: "BrickLink",
-        orderId: "32456564",
-        orderUrl:
-          "https://www.bricklink.com/orderDetail.asp?ID=32456564&viewChk=Y&viewWeight=Y&viewRemain=Y",
-        orderDate: "2026-08-31",
-        buyer: "another buyer",
-        buyerUsername: "another-buyer-username",
-        paymentMethod: "Bank Transfer",
-        taxType: null,
-        facilitatorTax: null,
-        subTotal: 3,
-        grandTotal: null,
-        paidAmount: null,
-        paidFacilitatorTax: null,
-        paymentUrl: null,
-        targetInvoice: null,
+        order: {
+          source: "BrickLink",
+          orderId: "32456564",
+          orderUrl:
+            "https://www.bricklink.com/orderDetail.asp?ID=32456564&viewChk=Y&viewWeight=Y&viewRemain=Y",
+          orderDate: "2026-08-31",
+          buyer: "another buyer",
+          buyerUsername: "another-buyer-username",
+          paymentMethod: "Bank Transfer",
+          taxType: null,
+          facilitatorTax: null,
+          subTotal: 3,
+          grandTotal: null,
+          refundedAmount: null,
+        },
+        gateway: {
+          paidAmount: null,
+          facilitatorTax: null,
+          refundedAmount: null,
+          paymentUrl: null,
+        },
+        calculated: {
+          targetInvoice: null,
+        },
         failures: [
-          { code: "amount-missing", level: "error", fields: ["paidAmount"] },
+          {
+            code: "amount-missing",
+            level: "error",
+            fields: ["gateway.paidAmount"],
+          },
         ],
       },
       {
-        source: "BrickLink",
-        orderId: "32456563",
-        orderUrl:
-          "https://www.bricklink.com/orderDetail.asp?ID=32456563&viewChk=Y&viewWeight=Y&viewRemain=Y",
-        orderDate: "2026-08-30",
-        buyer: "some buyer",
-        buyerUsername: "some-buyer-username",
-        paymentMethod: "Stripe",
-        taxType: "domestic",
-        facilitatorTax: null,
-        subTotal: 0.43,
-        grandTotal: 3.44,
-        paidAmount: null,
-        paidFacilitatorTax: null,
-        paymentUrl: null,
-        targetInvoice: 3.44,
+        order: {
+          source: "BrickLink",
+          orderId: "32456563",
+          orderUrl:
+            "https://www.bricklink.com/orderDetail.asp?ID=32456563&viewChk=Y&viewWeight=Y&viewRemain=Y",
+          orderDate: "2026-08-30",
+          buyer: "some buyer",
+          buyerUsername: "some-buyer-username",
+          paymentMethod: "Stripe",
+          taxType: "domestic",
+          facilitatorTax: null,
+          subTotal: 0.43,
+          grandTotal: 3.44,
+          refundedAmount: null,
+        },
+        gateway: {
+          paidAmount: null,
+          facilitatorTax: null,
+          refundedAmount: null,
+          paymentUrl: null,
+        },
+        calculated: {
+          targetInvoice: 3.44,
+        },
         // Paid through Stripe, but no Stripe payment names this order.
         failures: [
-          { code: "amount-missing", level: "error", fields: ["paidAmount"] },
+          {
+            code: "amount-missing",
+            level: "error",
+            fields: ["gateway.paidAmount"],
+          },
         ],
       },
     ],
@@ -226,49 +268,76 @@ test("lists BrickOwl reconciliation orders for the selected month", async ({
   expect(response.headers()["content-type"]).toContain("application/json");
   await expect(response.json()).resolves.toEqual({
     selectedMonth: "2026-08",
+    // The field roster rides with every month and is asserted on its own below.
+    fields: expect.any(Array),
     orders: [
       {
-        source: "BrickOwl",
-        orderId: "test-order-0811",
-        orderUrl:
-          "https://www.brickowl.com/mystore/orders/history/test-order-0811",
-        orderDate: "2026-08-11",
-        buyer: "Test Buyer Beta",
-        buyerUsername: "test_beta",
-        paymentMethod: null,
-        taxType: null,
-        facilitatorTax: null,
-        subTotal: 6,
-        grandTotal: null,
-        paidAmount: null,
-        paidFacilitatorTax: null,
-        paymentUrl: null,
-        targetInvoice: null,
+        order: {
+          source: "BrickOwl",
+          orderId: "test-order-0811",
+          orderUrl:
+            "https://www.brickowl.com/mystore/orders/history/test-order-0811",
+          orderDate: "2026-08-11",
+          buyer: "Test Buyer Beta",
+          buyerUsername: "test_beta",
+          paymentMethod: null,
+          taxType: null,
+          facilitatorTax: null,
+          subTotal: 6,
+          grandTotal: null,
+          refundedAmount: null,
+        },
+        gateway: {
+          paidAmount: null,
+          facilitatorTax: null,
+          refundedAmount: null,
+          paymentUrl: null,
+        },
+        calculated: {
+          targetInvoice: null,
+        },
         failures: [
-          { code: "amount-missing", level: "error", fields: ["paidAmount"] },
+          {
+            code: "amount-missing",
+            level: "error",
+            fields: ["gateway.paidAmount"],
+          },
         ],
       },
       {
-        source: "BrickOwl",
-        orderId: "test-order-0810",
-        orderUrl:
-          "https://www.brickowl.com/mystore/orders/history/test-order-0810",
-        orderDate: "2026-08-10",
-        buyer: "Test Buyer Alpha",
-        buyerUsername: "test_alpha",
-        paymentMethod: "PayPal",
-        // BrickOwl names a tax scheme only for a registration of its own, so a scheme with a rate is a taxed export.
-        taxType: "export-taxable",
-        facilitatorTax: null,
-        subTotal: 2.7,
-        grandTotal: 5.2,
-        paidAmount: null,
-        paidFacilitatorTax: null,
-        paymentUrl: null,
-        targetInvoice: 5.2,
+        order: {
+          source: "BrickOwl",
+          orderId: "test-order-0810",
+          orderUrl:
+            "https://www.brickowl.com/mystore/orders/history/test-order-0810",
+          orderDate: "2026-08-10",
+          buyer: "Test Buyer Alpha",
+          buyerUsername: "test_alpha",
+          paymentMethod: "PayPal",
+          // BrickOwl names a tax scheme only for a registration of its own, so a scheme with a rate is a taxed
+          // export.
+          taxType: "export-taxable",
+          facilitatorTax: null,
+          subTotal: 2.7,
+          grandTotal: 5.2,
+          refundedAmount: null,
+        },
+        gateway: {
+          paidAmount: null,
+          facilitatorTax: null,
+          refundedAmount: null,
+          paymentUrl: null,
+        },
+        calculated: {
+          targetInvoice: 5.2,
+        },
         // Paid through PayPal, but no PayPal payment names this order.
         failures: [
-          { code: "amount-missing", level: "error", fields: ["paidAmount"] },
+          {
+            code: "amount-missing",
+            level: "error",
+            fields: ["gateway.paidAmount"],
+          },
         ],
       },
     ],
@@ -323,19 +392,12 @@ test("targets the invoice at the grand total less what the marketplace collected
   expect(response.status(), await response.text()).toBe(200);
   const body = await response.json();
   expect(
-    body.orders.map(
-      (order: {
-        orderId: string;
-        grandTotal: number;
-        facilitatorTax: number;
-        targetInvoice: number;
-      }) => [
-        order.orderId,
-        order.grandTotal,
-        order.facilitatorTax,
-        order.targetInvoice,
-      ],
-    ),
+    body.orders.map((order: ReconciledOrderShape) => [
+      order.order.orderId,
+      order.order.grandTotal,
+      order.order.facilitatorTax,
+      order.calculated.targetInvoice,
+    ]),
   ).toEqual([
     ["32456580", 12.1, 1.1, 11],
     ["test-order-0812", 5.2, 0.9, 4.3],
@@ -372,26 +434,38 @@ test("lists BrickOwl reconciliation orders that span several batch requests", as
   const body = await response.json();
   expect(body.orders).toHaveLength(60);
   expect(body.orders[0]).toEqual({
-    source: "BrickOwl",
-    orderId: "bulk-order-1",
-    orderUrl: "https://www.brickowl.com/mystore/orders/history/bulk-order-1",
-    orderDate: "2026-08-10",
-    buyer: "Bulk Buyer 1",
-    buyerUsername: "bulk_1",
-    paymentMethod: null,
-    taxType: null,
-    facilitatorTax: null,
-    subTotal: 1,
-    grandTotal: null,
-    paidAmount: null,
-    paidFacilitatorTax: null,
-    paymentUrl: null,
-    targetInvoice: null,
+    order: {
+      source: "BrickOwl",
+      orderId: "bulk-order-1",
+      orderUrl: "https://www.brickowl.com/mystore/orders/history/bulk-order-1",
+      orderDate: "2026-08-10",
+      buyer: "Bulk Buyer 1",
+      buyerUsername: "bulk_1",
+      paymentMethod: null,
+      taxType: null,
+      facilitatorTax: null,
+      subTotal: 1,
+      grandTotal: null,
+      refundedAmount: null,
+    },
+    gateway: {
+      paidAmount: null,
+      facilitatorTax: null,
+      refundedAmount: null,
+      paymentUrl: null,
+    },
+    calculated: {
+      targetInvoice: null,
+    },
     failures: [
-      { code: "amount-missing", level: "error", fields: ["paidAmount"] },
+      {
+        code: "amount-missing",
+        level: "error",
+        fields: ["gateway.paidAmount"],
+      },
     ],
   });
-  expect(body.orders[59].orderId).toBe("bulk-order-60");
+  expect(body.orders[59].order.orderId).toBe("bulk-order-60");
 
   const batchRequests = await wireMock.findMethodHostRequests(
     "POST",
@@ -440,10 +514,12 @@ test("lists the reconciled orders of every provider newest first", async ({
   const body = await response.json();
   // The providers are collected one after another, so interleaved dates prove the whole list is sorted.
   expect(
-    body.orders.map((order: { orderId: string; orderDate: string }) => [
-      order.orderId,
-      order.orderDate,
-    ]),
+    body.orders.map(
+      (order: { order: { orderId: string; orderDate: string } }) => [
+        order.order.orderId,
+        order.order.orderDate,
+      ],
+    ),
   ).toEqual([
     ["32456575", "2026-08-25"],
     ["owl-order-0815", "2026-08-15"],
@@ -464,8 +540,51 @@ test("returns no reconciliation orders when no provider reports orders", async (
   expect(response.status(), await response.text()).toBe(200);
   await expect(response.json()).resolves.toEqual({
     selectedMonth: "2026-08",
+    // The field roster rides with every month and is asserted on its own below.
+    fields: expect.any(Array),
     orders: [],
   });
+});
+
+test("reports every order field with the source that stated it", async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: "2026-08",
+  });
+
+  const response = await request.get(
+    "/api/private/reconciliation/orders?month=2026-08",
+  );
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  // The roster is what lets a reader be told which account stated a field rather than infer it from the name, so it
+  // states every field in the order the orders expose them.
+  expect(body.fields).toEqual([
+    { name: "order.source", source: "order" },
+    { name: "order.orderId", source: "order" },
+    { name: "order.orderDate", source: "order" },
+    { name: "order.buyer", source: "order" },
+    { name: "order.buyerUsername", source: "order" },
+    { name: "order.paymentMethod", source: "order" },
+    { name: "order.taxType", source: "order" },
+    { name: "order.facilitatorTax", source: "order" },
+    { name: "order.subTotal", source: "order" },
+    { name: "order.grandTotal", source: "order" },
+    { name: "order.refundedAmount", source: "order" },
+    { name: "gateway.paidAmount", source: "gateway" },
+    { name: "gateway.facilitatorTax", source: "gateway" },
+    { name: "gateway.refundedAmount", source: "gateway" },
+    { name: "calculated.targetInvoice", source: "calculated" },
+  ]);
+  // A field sits at the path that names it, so the two accounts of one refund carry one name under two sources.
+  expect(
+    body.fields.filter((field: { name: string }) =>
+      field.name.endsWith(".refundedAmount"),
+    ),
+  ).toHaveLength(2);
 });
 
 test("reports what Stripe was paid for a BrickOwl order named in the payment description", async ({
@@ -495,7 +614,7 @@ test("reports what Stripe was paid for a BrickOwl order named in the payment des
 
   expect(response.status(), await response.text()).toBe(200);
   const body = await response.json();
-  expect(body.orders[0].paidAmount).toBe(5.2);
+  expect(body.orders[0].gateway.paidAmount).toBe(5.2);
   expect(body.orders[0].failures).toEqual([]);
 });
 
@@ -651,7 +770,7 @@ test("reports what Stripe was paid for a BrickLink order by the buyer username i
 
   expect(response.status(), await response.text()).toBe(200);
   const body = await response.json();
-  expect(body.orders[0].paidAmount).toBe(3.44);
+  expect(body.orders[0].gateway.paidAmount).toBe(3.44);
   expect(body.orders[0].failures).toEqual([]);
 });
 
@@ -688,9 +807,9 @@ test("tells one buyer's BrickLink orders apart by what the Stripe payment took",
   expect(response.status(), await response.text()).toBe(200);
   const body = await response.json();
   const paid = Object.fromEntries(
-    body.orders.map((order: { orderId: string; paidAmount: number | null }) => [
-      order.orderId,
-      order.paidAmount,
+    body.orders.map((order: ReconciledOrderShape) => [
+      order.order.orderId,
+      order.gateway.paidAmount,
     ]),
   );
   expect(paid).toEqual({ "32456563": null, "32456564": 3.44 });
@@ -744,7 +863,7 @@ test("reports no paid amount when several BrickLink orders share the buyer the p
   expect(response.status(), await response.text()).toBe(200);
   const body = await response.json();
   expect(
-    body.orders.map((order: { paidAmount: number | null }) => order.paidAmount),
+    body.orders.map((order: ReconciledOrderShape) => order.gateway.paidAmount),
   ).toEqual([null, null]);
 });
 
@@ -781,7 +900,179 @@ test("reports no paid amount from Stripe fee and refund transactions that name a
 
   expect(response.status(), await response.text()).toBe(200);
   const body = await response.json();
-  expect(body.orders[0].paidAmount).toBeNull();
+  expect(body.orders[0].gateway.paidAmount).toBeNull();
+});
+
+test("reduces the target invoice of a BrickOwl order by what Stripe shows was partly refunded", async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: "2026-08",
+    brickOwl: [
+      {
+        orderId: "test-order-0810",
+        orderDate: "1786320000",
+        view: {
+          buyer_name: "Test Buyer Alpha",
+          payment_method_type: "stripe",
+          sub_total: "5.20",
+          base_order_total: "5.20",
+        },
+      },
+    ],
+    // The charge keeps the running total of its refunds, so a partial refund is stated there and not per refund.
+    stripe: [
+      {
+        description: "Brick Owl Order test-order-0810",
+        amount: 520,
+        amountRefunded: 200,
+      },
+    ],
+  });
+
+  const response = await request.get(
+    "/api/private/reconciliation/orders?month=2026-08",
+  );
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  // The payment still took the whole grand total: what came back afterwards is not a shortfall in what was paid.
+  expect(body.orders[0].gateway.paidAmount).toBe(5.2);
+  expect(body.orders[0].gateway.refundedAmount).toBe(2);
+  expect(body.orders[0].calculated.targetInvoice).toBe(3.2);
+  // The marketplace's own side of the refund is not collected yet, so the rule comparing the two sides fails here.
+  expect(
+    body.orders[0].failures.map((failure: { code: string }) => failure.code),
+  ).toEqual(["refunded-amount-mismatch"]);
+});
+
+test("leaves nothing to invoice for a BrickLink order Stripe shows was refunded in full", async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: "2026-08",
+    brickLink: {
+      fullNameOrdersXml: brickLinkOrdersXml(`
+  <ORDER>
+    <ORDERID>14652734</ORDERID>
+    <BUYER>Bogdan Sowijak</BUYER>
+    <DATEORDERED>08/30/2026 10:00</DATEORDERED>
+    <ORDERTOTAL>19.63</ORDERTOTAL>
+    <BASECURRENCYCODE>EUR</BASECURRENCYCODE>
+    <BASEGRANDTOTAL>19.63</BASEGRANDTOTAL>
+    <PAYMENTTYPE>Credit/Debit (Powered by Stripe)</PAYMENTTYPE>
+    <LOCATION>Poland</LOCATION>
+    <VATCHARGES>0.00</VATCHARGES>
+    <ITEM>
+      <ITEMID>3001</ITEMID>
+      <PRICE>19.6300</PRICE>
+      <QTY>1</QTY>
+    </ITEM>
+  </ORDER>`),
+      usernameOrdersXml: brickLinkOrdersXml(`
+  <ORDER>
+    <ORDERID>14652734</ORDERID>
+    <BUYER>MrIntellectual</BUYER>
+  </ORDER>`),
+    },
+    stripe: [
+      {
+        description: "Payment for BrickLink from MrIntellectual",
+        amount: 1963,
+        amountRefunded: 1963,
+      },
+    ],
+  });
+
+  const response = await request.get(
+    "/api/private/reconciliation/orders?month=2026-08",
+  );
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  expect(body.orders[0].gateway.paidAmount).toBe(19.63);
+  expect(body.orders[0].gateway.refundedAmount).toBe(19.63);
+  expect(body.orders[0].calculated.targetInvoice).toBe(0);
+  expect(
+    body.orders[0].failures.map((failure: { code: string }) => failure.code),
+  ).toEqual(["refunded-amount-mismatch"]);
+});
+
+test("leaves nothing to invoice, rather than less than nothing, for a refunded order the marketplace taxed", async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: "2026-08",
+    brickOwl: [
+      {
+        orderId: "test-order-0810",
+        orderDate: "1786320000",
+        view: {
+          buyer_name: "Test Buyer Alpha",
+          payment_method_type: "stripe",
+          sub_total: "4.20",
+          base_order_total: "5.20",
+          tax_scheme_id: "gb-vat",
+          tax_rate: "20",
+          tax_amount: "1.00",
+        },
+      },
+    ],
+    // The marketplace keeps the tax it took whether or not the buyer was refunded, so the two subtractions
+    // together reach past the grand total.
+    stripe: [
+      {
+        description: "Brick Owl Order test-order-0810",
+        amount: 520,
+        applicationFee: 100,
+        amountRefunded: 520,
+      },
+    ],
+  });
+
+  const response = await request.get(
+    "/api/private/reconciliation/orders?month=2026-08",
+  );
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  expect(body.orders[0].order.facilitatorTax).toBe(1);
+  expect(body.orders[0].gateway.refundedAmount).toBe(5.2);
+  expect(body.orders[0].calculated.targetInvoice).toBe(0);
+});
+
+test("reports no refunded amount for a Stripe payment nothing was refunded out of", async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: "2026-08",
+    brickOwl: [
+      {
+        orderId: "test-order-0810",
+        orderDate: "1786320000",
+        view: {
+          buyer_name: "Test Buyer Alpha",
+          payment_method_type: "stripe",
+          sub_total: "5.20",
+          base_order_total: "5.20",
+        },
+      },
+    ],
+    stripe: [{ description: "Brick Owl Order test-order-0810", amount: 520 }],
+  });
+
+  const response = await request.get(
+    "/api/private/reconciliation/orders?month=2026-08",
+  );
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  expect(body.orders[0].gateway.refundedAmount).toBeNull();
+  expect(body.orders[0].calculated.targetInvoice).toBe(5.2);
 });
 
 test("reports no paid amount when no Stripe payment names the order", async ({
@@ -806,7 +1097,7 @@ test("reports no paid amount when no Stripe payment names the order", async ({
 
   expect(response.status(), await response.text()).toBe(200);
   const body = await response.json();
-  expect(body.orders[0].paidAmount).toBeNull();
+  expect(body.orders[0].gateway.paidAmount).toBeNull();
 });
 
 test("collects Stripe payments that span several pages", async ({
@@ -840,9 +1131,9 @@ test("collects Stripe payments that span several pages", async ({
   expect(response.status(), await response.text()).toBe(200);
   const body = await response.json();
   const paidByOrder = Object.fromEntries(
-    body.orders.map((order: { orderId: string; paidAmount: number | null }) => [
-      order.orderId,
-      order.paidAmount,
+    body.orders.map((order: ReconciledOrderShape) => [
+      order.order.orderId,
+      order.gateway.paidAmount,
     ]),
   );
   expect(paidByOrder).toEqual({ "owl-order-1": 1, "owl-order-2": 2.5 });
@@ -922,9 +1213,9 @@ test("reports the facilitator tax Stripe shows a BrickLink order was taken", asy
 
   expect(response.status(), await response.text()).toBe(200);
   const body = await response.json();
-  expect(body.orders[0].taxType).toBe("export-taxable");
-  expect(body.orders[0].facilitatorTax).toBe(2.61);
-  expect(body.orders[0].paidFacilitatorTax).toBe(2.61);
+  expect(body.orders[0].order.taxType).toBe("export-taxable");
+  expect(body.orders[0].order.facilitatorTax).toBe(2.61);
+  expect(body.orders[0].gateway.facilitatorTax).toBe(2.61);
   expect(body.orders[0].failures).toEqual([]);
 });
 
@@ -955,7 +1246,7 @@ test("reports no facilitator tax for a Stripe payment the marketplace took no ap
 
   expect(response.status(), await response.text()).toBe(200);
   const body = await response.json();
-  expect(body.orders[0].paidFacilitatorTax).toBeNull();
+  expect(body.orders[0].gateway.facilitatorTax).toBeNull();
   expect(body.orders[0].failures).toEqual([]);
 });
 
@@ -998,9 +1289,9 @@ test("reports the facilitator tax PayPal shows a BrickOwl order was taken", asyn
 
   expect(response.status(), await response.text()).toBe(200);
   const body = await response.json();
-  expect(body.orders[0].taxType).toBe("export-taxable");
-  expect(body.orders[0].facilitatorTax).toBe(1.97);
-  expect(body.orders[0].paidFacilitatorTax).toBe(1.97);
+  expect(body.orders[0].order.taxType).toBe("export-taxable");
+  expect(body.orders[0].order.facilitatorTax).toBe(1.97);
+  expect(body.orders[0].gateway.facilitatorTax).toBe(1.97);
   expect(body.orders[0].failures).toEqual([]);
 });
 
@@ -1041,9 +1332,9 @@ test("leaves a PayPal order no partner fee was raised against without a facilita
 
   expect(response.status(), await response.text()).toBe(200);
   const body = await response.json();
-  expect(body.orders[0].taxType).toBe("domestic");
-  expect(body.orders[0].facilitatorTax).toBeNull();
-  expect(body.orders[0].paidFacilitatorTax).toBeNull();
+  expect(body.orders[0].order.taxType).toBe("domestic");
+  expect(body.orders[0].order.facilitatorTax).toBeNull();
+  expect(body.orders[0].gateway.facilitatorTax).toBeNull();
   expect(body.orders[0].failures).toEqual([]);
 });
 
@@ -1089,8 +1380,8 @@ test("sums the partner fees PayPal raised against one BrickLink payment", async 
 
   expect(response.status(), await response.text()).toBe(200);
   const body = await response.json();
-  expect(body.orders[0].facilitatorTax).toBe(1.97);
-  expect(body.orders[0].paidFacilitatorTax).toBe(1.97);
+  expect(body.orders[0].order.facilitatorTax).toBe(1.97);
+  expect(body.orders[0].gateway.facilitatorTax).toBe(1.97);
   expect(body.orders[0].failures).toEqual([]);
 });
 
@@ -1126,10 +1417,12 @@ test("links each order to where its own marketplace shows it", async ({
   expect(response.status(), await response.text()).toBe(200);
   const body = await response.json();
   expect(
-    body.orders.map((order: { orderId: string; orderUrl: string }) => [
-      order.orderId,
-      order.orderUrl,
-    ]),
+    body.orders.map(
+      (order: { order: { orderId: string; orderUrl: string } }) => [
+        order.order.orderId,
+        order.order.orderUrl,
+      ],
+    ),
   ).toEqual([
     [
       "32509898",
@@ -1172,7 +1465,7 @@ test("links a Stripe-paid order to the payment in the Stripe dashboard", async (
 
   expect(response.status(), await response.text()).toBe(200);
   const body = await response.json();
-  expect(body.orders[0].paymentUrl).toBe(
+  expect(body.orders[0].gateway.paymentUrl).toBe(
     "https://dashboard.stripe.com/acct_test-stripe-account/payments/pi_test-payment-0810",
   );
 });
@@ -1210,7 +1503,7 @@ test("links a Stripe-paid order to the charge when the payment was made without 
 
   expect(response.status(), await response.text()).toBe(200);
   const body = await response.json();
-  expect(body.orders[0].paymentUrl).toBe(
+  expect(body.orders[0].gateway.paymentUrl).toBe(
     "https://dashboard.stripe.com/acct_test-stripe-account/payments/ch_test-charge-1",
   );
 });
@@ -1244,7 +1537,7 @@ test("links a PayPal-paid order to the transaction in PayPal", async ({
 
   expect(response.status(), await response.text()).toBe(200);
   const body = await response.json();
-  expect(body.orders[0].paymentUrl).toBe(
+  expect(body.orders[0].gateway.paymentUrl).toBe(
     "https://www.paypal.com/unifiedtransactions/details/payment/test-paypal-transaction-1",
   );
 });
@@ -1275,7 +1568,7 @@ test("leaves an order no payment was matched to without a payment link", async (
 
   expect(response.status(), await response.text()).toBe(200);
   const body = await response.json();
-  expect(body.orders[0].paymentUrl).toBeNull();
+  expect(body.orders[0].gateway.paymentUrl).toBeNull();
 });
 
 test("reports what PayPal was paid for a BrickOwl order it labelled with the order number", async ({
@@ -1307,7 +1600,7 @@ test("reports what PayPal was paid for a BrickOwl order it labelled with the ord
 
   expect(response.status(), await response.text()).toBe(200);
   const body = await response.json();
-  expect(body.orders[0].paidAmount).toBe(7.69);
+  expect(body.orders[0].gateway.paidAmount).toBe(7.69);
   expect(body.orders[0].failures).toEqual([]);
 });
 
@@ -1333,7 +1626,7 @@ test("reports what PayPal was paid for a BrickLink order by the buyer the paymen
 
   expect(response.status(), await response.text()).toBe(200);
   const body = await response.json();
-  expect(body.orders[0].paidAmount).toBe(11.39);
+  expect(body.orders[0].gateway.paidAmount).toBe(11.39);
   expect(body.orders[0].failures).toEqual([]);
 });
 
@@ -1364,7 +1657,7 @@ test("reports what PayPal was paid for a BrickLink order by the shipping name wh
 
   expect(response.status(), await response.text()).toBe(200);
   const body = await response.json();
-  expect(body.orders[0].paidAmount).toBe(5.89);
+  expect(body.orders[0].gateway.paidAmount).toBe(5.89);
 });
 
 test("falls back to the amount and day when no name matches a BrickLink order", async ({
@@ -1395,7 +1688,7 @@ test("falls back to the amount and day when no name matches a BrickLink order", 
 
   expect(response.status(), await response.text()).toBe(200);
   const body = await response.json();
-  expect(body.orders[0].paidAmount).toBe(23.06);
+  expect(body.orders[0].gateway.paidAmount).toBe(23.06);
 });
 
 test("reports no paid amount when the amount and day match several BrickLink orders", async ({
@@ -1427,7 +1720,7 @@ test("reports no paid amount when the amount and day match several BrickLink ord
   expect(response.status(), await response.text()).toBe(200);
   const body = await response.json();
   expect(
-    body.orders.map((order: { paidAmount: number | null }) => order.paidAmount),
+    body.orders.map((order: ReconciledOrderShape) => order.gateway.paidAmount),
   ).toEqual([null, null]);
 });
 
@@ -1461,9 +1754,9 @@ test("tells one buyer's BrickLink orders apart by what the payment took", async 
   expect(response.status(), await response.text()).toBe(200);
   const body = await response.json();
   const paid = Object.fromEntries(
-    body.orders.map((order: { orderId: string; paidAmount: number | null }) => [
-      order.orderId,
-      order.paidAmount,
+    body.orders.map((order: ReconciledOrderShape) => [
+      order.order.orderId,
+      order.gateway.paidAmount,
     ]),
   );
   expect(paid).toEqual({ "32456563": 38.8, "32456564": null });
@@ -1499,7 +1792,7 @@ test("reports no paid amount when one buyer's BrickLink orders came to the same 
   expect(response.status(), await response.text()).toBe(200);
   const body = await response.json();
   expect(
-    body.orders.map((order: { paidAmount: number | null }) => order.paidAmount),
+    body.orders.map((order: ReconciledOrderShape) => order.gateway.paidAmount),
   ).toEqual([null, null]);
 });
 
@@ -1528,7 +1821,7 @@ test("reports no paid amount from a PayPal fee, refund or withdrawal that names 
 
   expect(response.status(), await response.text()).toBe(200);
   const body = await response.json();
-  expect(body.orders[0].paidAmount).toBeNull();
+  expect(body.orders[0].gateway.paidAmount).toBeNull();
 });
 
 test("does not attach a PayPal payment to an order settled another way", async ({
@@ -1561,9 +1854,9 @@ test("does not attach a PayPal payment to an order settled another way", async (
 
   expect(response.status(), await response.text()).toBe(200);
   const body = await response.json();
-  expect(body.orders[0].paidAmount).toBeNull();
+  expect(body.orders[0].gateway.paidAmount).toBeNull();
   expect(body.orders[0].failures).toEqual([
-    { code: "amount-missing", level: "error", fields: ["paidAmount"] },
+    { code: "amount-missing", level: "error", fields: ["gateway.paidAmount"] },
   ]);
 });
 
@@ -1598,9 +1891,9 @@ test("collects PayPal payments that span several pages", async ({
   expect(response.status(), await response.text()).toBe(200);
   const body = await response.json();
   const paidByOrder = Object.fromEntries(
-    body.orders.map((order: { orderId: string; paidAmount: number | null }) => [
-      order.orderId,
-      order.paidAmount,
+    body.orders.map((order: ReconciledOrderShape) => [
+      order.order.orderId,
+      order.gateway.paidAmount,
     ]),
   );
   expect(paidByOrder).toEqual({ "7578233": 7.69, "5120724": 7.71 });

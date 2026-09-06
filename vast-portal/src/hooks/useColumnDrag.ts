@@ -1,4 +1,4 @@
-import { useRef, useState, type DragEvent } from 'react';
+import { useRef, useState, type DragEvent, type KeyboardEvent } from 'react';
 
 import type { SxProps, Theme } from '@mui/material/styles';
 
@@ -13,6 +13,9 @@ export interface ColumnDragProps {
   onDragLeave: () => void;
   onDrop: (event: DragEvent) => void;
   onDragEnd: () => void;
+  /** A heading is reached by keyboard as well, being the only place a column can be moved from. */
+  tabIndex: number;
+  onKeyDown: (event: KeyboardEvent) => void;
   sx: SxProps<Theme>;
 }
 
@@ -27,6 +30,11 @@ const dropped = (columns: string[], dragged: string, target: string, after: bool
  * Dragging a table's columns by their own headings, which is where a reader's hand goes first: the panel is for
  * choosing what is read, and this is for arranging what already is. The two settle the same order, so a column moved
  * here has moved in the panel too.
+ *
+ * <p>The arrow keys move a focused heading one place at a time, in the direction the app is read. A column that
+ * could only be moved with a mouse could not be moved by everyone, and this is the only place a column is moved
+ * from: the panel beside the table groups the columns by the account that stated them, which is not the order a
+ * table is arranged in.
  *
  * <p>The heading being dropped on draws the edge the column would land against rather than the table reordering
  * itself under the pointer: a month is hundreds of rows, and shuffling every one of them at each twitch of a drag
@@ -97,6 +105,24 @@ export default function useColumnDrag(columns: string[], onReorder: (columns: st
         rest();
       },
       onDragEnd: rest,
+      tabIndex: 0,
+      onKeyDown: (event) => {
+        const towards = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0;
+        if (!towards) {
+          return;
+        }
+        // A step is towards the end of the table rather than towards the right of the screen, so a heading moves
+        // where the arrow points whichever way the app is written.
+        const step = themeDirection === ThemeDirection.RTL ? -towards : towards;
+        const at = columns.indexOf(column);
+        const to = at + step;
+        if (at < 0 || to < 0 || to >= columns.length) {
+          return;
+        }
+        // The table scrolls sideways to the arrows otherwise, taking the heading out from under the hand moving it.
+        event.preventDefault();
+        onReorder(dropped(columns, column, columns[to], step > 0));
+      },
       sx: {
         cursor: 'grab',
         // A heading is words, and dragging words selects them; the drag is what this heading is for.

@@ -23,7 +23,7 @@ public final class ReconciledOrders {
 
     void add(ReconciledOrder order) {
         orders.add(order);
-        byKey.computeIfAbsent(key(order.getSource(), order.getOrderId()), ignored -> new ArrayList<>()).add(order);
+        byKey.computeIfAbsent(key(order.getOrder().getSource(), order.getOrder().getOrderId()), ignored -> new ArrayList<>()).add(order);
     }
 
     void addAll(Collection<ReconciledOrder> added) {
@@ -47,7 +47,7 @@ public final class ReconciledOrders {
      * the order was collected, so an index built when it was added would be stale.
      */
     public List<ReconciledOrder> findByBuyerUsername(String source, String username) {
-        return matching(source, username, ReconciledOrder::getBuyerUsername);
+        return matching(source, username, order -> order.getOrder().getBuyerUsername());
     }
 
     /**
@@ -55,7 +55,7 @@ public final class ReconciledOrders {
      * A payment usually names the buyer rather than the order, so the buyer's name is a match key of its own.
      */
     public List<ReconciledOrder> findByBuyer(String source, String buyer) {
-        return matching(source, buyer, ReconciledOrder::getBuyer);
+        return matching(source, buyer, order -> order.getOrder().getBuyer());
     }
 
     /**
@@ -68,10 +68,10 @@ public final class ReconciledOrders {
             return List.of();
         }
         return orders.stream()
-                .filter(order -> source.equals(order.getSource()))
-                .filter(order -> order.getGrandTotal() != null
-                        && order.getGrandTotal().compareTo(grandTotal) == 0)
-                .filter(order -> orderDate.equals(order.getOrderDate()))
+                .filter(order -> source.equals(order.getOrder().getSource()))
+                .filter(order -> order.getOrder().getGrandTotal() != null
+                        && order.getOrder().getGrandTotal().compareTo(grandTotal) == 0)
+                .filter(order -> orderDate.equals(order.getOrder().getOrderDate()))
                 .toList();
     }
 
@@ -89,7 +89,7 @@ public final class ReconciledOrders {
             return List.of();
         }
         return orders.stream()
-                .filter(order -> source.equals(order.getSource()))
+                .filter(order -> source.equals(order.getOrder().getSource()))
                 .filter(order -> matched.equals(comparable(collected.apply(order))))
                 .toList();
     }

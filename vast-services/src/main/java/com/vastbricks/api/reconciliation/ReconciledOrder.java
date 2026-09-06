@@ -1,88 +1,60 @@
 package com.vastbricks.api.reconciliation;
 
-import com.vastbricks.api.tax.OrderTaxType;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
 /**
- * One item of the reconciled order list. An order mapper builds it and a detail mapper fills further fields in, so
- * it is mutable for the length of the mapping stage; that stage is single-threaded and the rule stage only reads.
+ * One item of the reconciled order list: every account of one order, each under the source that stated it. An order
+ * mapper builds the marketplace's account and detail mappers fill the others in, so it is mutable for the length of
+ * the mapping stage; that stage is single-threaded and the rule stage only reads.
  *
- * <p>The field order is the order the API exposes the collected values in, because the result is serialized
- * unwrapped; a value derived from them is exposed after them.
+ * <p>The sources are groups rather than name prefixes, which is what lets two of them state the same field — a
+ * facilitator tax, a refund — without either having to be renamed around the other. A field is addressed as
+ * {@code <source>.<field>} throughout: that is how the roster names it, how a failure cites it, and how the screen
+ * asks for it as a column.
+ *
+ * <p>A source nothing is collected from yet has no group here. The accounting source is declared on
+ * {@link ReconciliationFieldSource} and will gain one when something collects it.
  */
 @Getter
-@Setter
-@Builder
+@JsonPropertyOrder({"order", "gateway", "calculated"})
 public class ReconciledOrder {
 
-    private String source;
-    private String orderId;
+    /** What the marketplace reported about the order itself, which the rest is reconciled against. */
+    private final OrderFields order;
+
+    /** What the payment provider reports about the payment matched to the order. */
+    private final GatewayFields gateway = new GatewayFields();
+
+    private ReconciledOrder(OrderFields order) {
+        this.order = order;
+    }
+
+    /** A reconciled order with the marketplace's account of it and nothing else collected yet. */
+    public static ReconciledOrder of(OrderFields order) {
+        return new ReconciledOrder(order);
+    }
 
     /**
-     * Where the marketplace shows this order, or {@code null} when it was collected without an id to address. The
-     * screen links the order id to it, as it links the payment method to the payment.
+     * What reconciliation derives from the accounts above. It is built on every read rather than held, so it always
+     * states what the current fields come to; that is also why it carries no setter.
      */
-    private String orderUrl;
-    private LocalDate orderDate;
-    private String buyer;
-    private String buyerUsername;
+    public CalculatedFields getCalculated() {
+        return new CalculatedFields(targetInvoice());
+    }
 
-    /**
-     * How the order was paid: one name per payment provider, or the marketplace's own wording for a method no
-     * provider is known for.
-     */
-    private String paymentMethod;
-
-    /** How the order is treated for tax, derived from what the marketplace reported. */
-    private OrderTaxType taxType;
-
-    /**
-     * What the marketplace collected on the order as tax facilitator, under its own registration, or {@code null}
-     * when it collected none.
-     */
-    private BigDecimal facilitatorTax;
-
-    private BigDecimal subTotal;
-
-    /** What the order came to in the store's base currency, shipping and additional charges included. */
-    private BigDecimal grandTotal;
-
-    /**
-     * What the payment provider reports it took for this order, before its own fees, or {@code null} when no payment
-     * was matched to the order.
-     */
-    private BigDecimal paidAmount;
-
-    /**
-     * What the payment provider reports the marketplace took out of the payment as tax facilitator, or {@code null}
-     * when the payment states none or no payment was matched to the order. It is the provider's own account of the
-     * same charge {@link #facilitatorTax} states from the marketplace's side, which is what makes the two
-     * comparable.
-     */
-    private BigDecimal paidFacilitatorTax;
-
-    /**
-     * Where the payment provider shows the payment matched to this order, or {@code null} when there is no payment to
-     * show or it cannot be addressed. The screen links the payment method to it.
-     */
-    private String paymentUrl;
-
-    /**
-     * What the accounting invoice for this order has to come to: the grand total less what the marketplace collected
-     * as tax facilitator, because that tax was charged under the marketplace's registration and is not the store's to
-     * invoice. It is derived rather than collected, so it is computed here instead of in each order mapper.
-     *
-     * <p>An order no facilitator collected on is invoiced for its whole grand total, and one with no grand total has
-     * no target to invoice for.
-     */
-    public BigDecimal getTargetInvoice() {
+    private BigDecimal targetInvoice() {
+        var grandTotal = order.getGrandTotal();
         if (grandTotal == null) {
             return null;
         }
-        return facilitatorTax == null ? grandTotal : grandTotal.subtract(facilitatorTax);
+        var facilitatorTax = order.getFacilitatorTax();
+        var target = facilitatorTax == null ? grandTotal : grandTotal.subtract(facilitatorTax);
+        var refunded = gateway.getRefundedAmount();
+        if (refunded == null) {
+            return target;
+        }
+        return target.subtract(refunded).max(BigDecimal.ZERO);
     }
 }
