@@ -169,8 +169,8 @@ here as they are provided; do not invent unspecified behavior prematurely.
   the selected month. Each collected order carries its marketplace source
   (`BrickLink` or `BrickOwl`), order ID, order date, buyer, buyer username,
   payment method, tax type, facilitator tax, sub-total, items sub-total, grand
-  total, accounting invoice sub-total, paid amount, and target invoice, together
-  with its rule failures. Add further
+  total, accounting invoice sub-total, paid amount, paid facilitator tax, and
+  target invoice, together with its rule failures. Add further
   fields and providers incrementally as their processing requirements are
   supplied.
 - The grand total is the order total in the store's base currency with shipping
@@ -201,7 +201,25 @@ here as they are provided; do not invent unspecified behavior prematurely.
   type, is derived in the mapping stage beside it, and is normalized like every
   other collected amount. It is shown as its own column, unlike the tax type,
   because it is an amount to be accounted for rather than a classification an
-  icon can carry. No rule compares it yet.
+  icon can carry.
+- The paid facilitator tax is what the payment provider shows the marketplace
+  took out of the payment as facilitator, and is collected beside the paid
+  amount by the same payment mappers, for every marketplace and provider
+  combination. Stripe states it as the application fee its `fee_details` list
+  under the marketplace's Connect application: the buyer pays the tax into the
+  store's own balance with the rest of the order, and the marketplace, which
+  owes it under its own registration, deducts it again. Stripe's own processing
+  fee sits in the same list as a `stripe_fee` and is not the marketplace's, so
+  only the application fee entries are read, summed as Stripe lists each fee
+  separately. PayPal states it as the transaction's `sales_tax_amount`. A
+  payment that states neither took no facilitator tax, which is a different
+  fact from taking zero, so the field is left absent rather than zeroed.
+- A rule compares the two once a payment has been matched to the order: what the
+  marketplace reported collecting must be what the payment shows it took, and a
+  disagreement is an `error`, being tax one side or the other will report
+  wrongly. Neither side collecting is the two agreeing; one side collecting
+  where the other did not is a disagreement rather than missing data. An order
+  no payment was matched to is left to the rule that requires one.
 - The target invoice is what the accounting invoice for the order has to come
   to: the grand total less the facilitator tax, because that tax was charged
   under the marketplace's registration and is not the store's to invoice. An
@@ -423,8 +441,10 @@ here as they are provided; do not invent unspecified behavior prematurely.
   untouched. Rules compare normalized amounts exactly and must not define their
   own tolerances.
 - The orders table shows `Actions`, source, order ID, order date, buyer, payment
-  method, grand total, and paid amount, newest order first as the API returns
-  them.
+  method, grand total, facilitator tax, target invoice, paid amount, and paid
+  facilitator tax, newest order first as the API returns them. The provider's
+  two amounts come last together, so they read as one account of the payment
+  rather than interrupting the subtraction the three before them state.
 - The tax type spends no column of its own. It rides in the actions cell as a
   small icon beside the invoice button: the Latvian flag for `domestic`, the
   European flag for `european-union`, the world for `export`, and the world

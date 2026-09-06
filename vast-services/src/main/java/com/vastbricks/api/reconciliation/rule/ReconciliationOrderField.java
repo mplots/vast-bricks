@@ -25,6 +25,7 @@ enum ReconciliationOrderField {
     GRAND_TOTAL("grandTotal"),
     INVOICE_SUB_TOTAL("invoiceSubTotal"),
     PAID_AMOUNT("paidAmount"),
+    PAID_FACILITATOR_TAX("paidFacilitatorTax"),
     TARGET_INVOICE("targetInvoice");
 
     @JsonValue

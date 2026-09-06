@@ -31,6 +31,8 @@ export interface ReconciliationOrder {
   invoiceSubTotal: number | null;
   /** What the payment provider took for the order, before its own fees. */
   paidAmount: number | null;
+  /** What the payment shows the marketplace took as tax facilitator, or `null` when it shows none. */
+  paidFacilitatorTax: number | null;
   /** What the accounting invoice has to come to: the grand total less the facilitator tax. */
   targetInvoice: number | null;
   failures: ReconciliationFailure[];

@@ -46,6 +46,7 @@ class MapperStripeBrickOwlPayments implements DetailMapper<BalanceTransaction> {
             for (var order : orders.find(Marketplace.BRICK_OWL, orderId)) {
                 if (paid.add(order)) {
                     order.setPaidAmount(paidAmount);
+                    order.setPaidFacilitatorTax(StripePayments.facilitatorTax(transaction));
                 }
             }
         }

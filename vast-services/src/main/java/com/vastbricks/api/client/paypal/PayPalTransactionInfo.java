@@ -17,6 +17,13 @@ public class PayPalTransactionInfo {
     @JsonProperty("transaction_initiation_date") private OffsetDateTime transactionInitiationDate;
     @JsonProperty("transaction_amount") private PayPalAmount transactionAmount;
     @JsonProperty("fee_amount") private PayPalAmount feeAmount;
+
+    /**
+     * The tax PayPal or the merchant reported on the transaction. A marketplace that collected tax as facilitator
+     * states it here, so it is what the payment says the marketplace took.
+     */
+    @JsonProperty("sales_tax_amount") private PayPalAmount salesTaxAmount;
+
     @JsonProperty("transaction_status") private String transactionStatus;
 
     /** What the marketplace asked the payment to be labelled with. BrickOwl puts its order number here. */

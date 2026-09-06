@@ -39,6 +39,8 @@ export type StripeTransactionMock = {
   amount: number;
   /** Balance transaction type; only `charge` and `payment` pay for an order. */
   type?: string;
+  /** Application fee the marketplace deducted, in minor units. This is what it took as tax facilitator. */
+  applicationFee?: number;
 };
 
 export type PayPalTransactionMock = {
@@ -54,6 +56,8 @@ export type PayPalTransactionMock = {
   eventCode?: string;
   /** When PayPal took it, as an ISO instant. Its day is the one an amount-and-day match uses. */
   initiatedAt?: string;
+  /** Sales tax the payment reports. This is what the marketplace took as tax facilitator. */
+  salesTax?: string;
 };
 
 export type ManakabataInvoiceMock = {
@@ -236,8 +240,20 @@ function stripeBalanceTransaction(transaction: StripeTransactionMock & { id: str
     status: 'available',
     currency: 'eur',
     amount: transaction.amount,
-    fee: 0,
-    net: transaction.amount,
+    fee: transaction.applicationFee ?? 0,
+    fee_details:
+      transaction.applicationFee === undefined
+        ? []
+        : [
+            {
+              amount: transaction.applicationFee,
+              application: 'ca_test-marketplace-connect-application',
+              currency: 'eur',
+              description: 'BrickLink Payment Connector application fee',
+              type: 'application_fee'
+            }
+          ],
+    net: transaction.amount - (transaction.applicationFee ?? 0),
     description: transaction.description
   };
 }
@@ -283,6 +299,9 @@ function payPalTransaction(transaction: PayPalTransactionMock, transactionNumber
       transaction_amount: { currency_code: 'EUR', value: transaction.amount },
       fee_amount: { currency_code: 'EUR', value: '-0.96' },
       transaction_status: 'S',
+      ...(transaction.salesTax === undefined
+        ? {}
+        : { sales_tax_amount: { currency_code: 'EUR', value: transaction.salesTax } }),
       invoice_id: transaction.invoiceId ?? null
     },
     payer_info: transaction.payerName

@@ -60,6 +60,7 @@ const orderFields = [
   'grandTotal',
   'invoiceSubTotal',
   'paidAmount',
+  'paidFacilitatorTax',
   'targetInvoice'
 ] as const;
 const amountFields: string[] = [
@@ -69,6 +70,7 @@ const amountFields: string[] = [
   'grandTotal',
   'invoiceSubTotal',
   'paidAmount',
+  'paidFacilitatorTax',
   'targetInvoice'
 ];
 const dateFields: string[] = ['orderDate'];
@@ -76,7 +78,9 @@ const dateFields: string[] = ['orderDate'];
 // Fields shown as table columns; the detail view shows all of them.
 // The tax type is absent: it rides in the actions cell as an icon rather than spending a column on a word. The
 // facilitator tax is here all the same, being an amount to account for rather than a classification, and the target
-// invoice follows the two it is derived from so the columns read as the subtraction they are.
+// invoice follows the two it is derived from so the columns read as the subtraction they are. What the payment shows
+// the marketplace took follows what the payment paid, so the provider's two amounts read together rather than
+// interrupting that subtraction.
 const columnFields: string[] = [
   'source',
   'orderId',
@@ -86,7 +90,8 @@ const columnFields: string[] = [
   'grandTotal',
   'facilitatorTax',
   'targetInvoice',
-  'paidAmount'
+  'paidAmount',
+  'paidFacilitatorTax'
 ];
 
 const formatAmount = (value?: number | null) => {

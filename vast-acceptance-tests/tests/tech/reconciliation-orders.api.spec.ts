@@ -119,6 +119,7 @@ test('lists BrickLink reconciliation orders for the selected month', async ({
         grandTotal: null,
         invoiceSubTotal: null,
         paidAmount: null,
+        paidFacilitatorTax: null,
         targetInvoice: null,
         failures: [{ code: 'amount-missing', level: 'error', fields: ['paidAmount'] }],
       },
@@ -136,6 +137,7 @@ test('lists BrickLink reconciliation orders for the selected month', async ({
         grandTotal: 3.44,
         invoiceSubTotal: null,
         paidAmount: null,
+        paidFacilitatorTax: null,
         targetInvoice: 3.44,
         // Paid through Stripe, but no Stripe payment names this order.
         failures: [{ code: 'amount-missing', level: 'error', fields: ['paidAmount'] }],
@@ -205,6 +207,7 @@ test('lists BrickOwl reconciliation orders for the selected month', async ({
         grandTotal: null,
         invoiceSubTotal: null,
         paidAmount: null,
+        paidFacilitatorTax: null,
         targetInvoice: null,
         failures: [{ code: 'amount-missing', level: 'error', fields: ['paidAmount'] }],
       },
@@ -223,6 +226,7 @@ test('lists BrickOwl reconciliation orders for the selected month', async ({
         grandTotal: 5.2,
         invoiceSubTotal: null,
         paidAmount: null,
+        paidFacilitatorTax: null,
         targetInvoice: 5.2,
         // Paid through PayPal, but no PayPal payment names this order.
         failures: [{ code: 'amount-missing', level: 'error', fields: ['paidAmount'] }],
@@ -325,6 +329,7 @@ test('lists BrickOwl reconciliation orders that span several batch requests', as
     grandTotal: null,
     invoiceSubTotal: null,
     paidAmount: null,
+    paidFacilitatorTax: null,
     targetInvoice: null,
     failures: [{ code: 'amount-missing', level: 'error', fields: ['paidAmount'] }],
   });
@@ -620,6 +625,116 @@ test('reports a bad gateway when Stripe fails', async ({ request, settings }, te
   const response = await request.get('/api/private/reconciliation/orders?month=2026-08');
 
   expect(response.status(), await response.text()).toBe(502);
+});
+
+test('reports the facilitator tax Stripe shows a BrickLink order was taken', async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: '2026-08',
+    brickLink: {
+      fullNameOrdersXml: brickLinkOrdersXml(`
+  <ORDER>
+    <ORDERID>32466549</ORDERID>
+    <ORDERDATE>8/30/2026</ORDERDATE>
+    <BUYER>some buyer</BUYER>
+    <ORDERTOTAL>26.08</ORDERTOTAL>
+    <BASECURRENCYCODE>EUR</BASECURRENCYCODE>
+    <BASEGRANDTOTAL>28.69</BASEGRANDTOTAL>
+    <PAYMENTTYPE>Credit/Debit (Powered by Stripe)</PAYMENTTYPE>
+    <LOCATION>Australia, New South Wales</LOCATION>
+    <VATCHARGES>0.00</VATCHARGES>
+    <ORDERSALESTAX>2.61</ORDERSALESTAX>
+    <ITEM>
+      <ITEMID>3001</ITEMID>
+      <PRICE>26.0800</PRICE>
+      <QTY>1</QTY>
+    </ITEM>
+  </ORDER>`),
+      usernameOrdersXml: brickLinkOrdersXml(`
+  <ORDER>
+    <ORDERID>32466549</ORDERID>
+    <BUYER>Zemeckis84</BUYER>
+  </ORDER>`),
+    },
+    // The marketplace takes the tax it collected back out of the payment as its application fee.
+    stripe: [{ description: 'Payment for BrickLink from Zemeckis84', amount: 2869, applicationFee: 261 }],
+  });
+
+  const response = await request.get('/api/private/reconciliation/orders?month=2026-08');
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  expect(body.orders[0].taxType).toBe('export-taxable');
+  expect(body.orders[0].facilitatorTax).toBe(2.61);
+  expect(body.orders[0].paidFacilitatorTax).toBe(2.61);
+  expect(body.orders[0].failures).toEqual([]);
+});
+
+test('reports no facilitator tax for a Stripe payment the marketplace took no application fee from', async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: '2026-08',
+    brickOwl: [
+      {
+        orderId: 'owl-order-0810',
+        orderDate: '1786320000',
+        view: {
+          buyer_name: 'some buyer',
+          payment_method_type: 'stripe',
+          sub_total: '5.20',
+          base_order_total: '5.20',
+        },
+        items: [{ base_price: '5.20', ordered_quantity: '1' }],
+      },
+    ],
+    stripe: [{ description: 'Brick Owl Order owl-order-0810', amount: 520 }],
+  });
+
+  const response = await request.get('/api/private/reconciliation/orders?month=2026-08');
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  expect(body.orders[0].paidFacilitatorTax).toBeNull();
+  expect(body.orders[0].failures).toEqual([]);
+});
+
+test('reports the facilitator tax PayPal shows a BrickOwl order was taken', async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: '2026-08',
+    brickOwl: [
+      {
+        orderId: '7578233',
+        orderDate: '1786320000',
+        view: {
+          buyer_name: 'Jonathan Pithioud',
+          payment_method_type: 'paypal',
+          sub_total: '7.69',
+          base_order_total: '9.66',
+          tax_scheme_id: 'gb-vat',
+          tax_rate: '20',
+          tax_amount: '1.97',
+        },
+        items: [{ base_price: '7.69', ordered_quantity: '1' }],
+      },
+    ],
+    payPal: [{ invoiceId: '7578233', payerName: 'Jonathan Pithioud', amount: '9.66', salesTax: '1.97' }],
+  });
+
+  const response = await request.get('/api/private/reconciliation/orders?month=2026-08');
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  expect(body.orders[0].taxType).toBe('export-taxable');
+  expect(body.orders[0].facilitatorTax).toBe(1.97);
+  expect(body.orders[0].paidFacilitatorTax).toBe(1.97);
+  expect(body.orders[0].failures).toEqual([]);
 });
 
 test('reports what PayPal was paid for a BrickOwl order it labelled with the order number', async ({

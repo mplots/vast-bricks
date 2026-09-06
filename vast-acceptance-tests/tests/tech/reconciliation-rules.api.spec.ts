@@ -91,3 +91,75 @@ test('fails an order paid outside the collected providers that no payment was co
   expect(body.orders[0].paidAmount).toBeNull();
   expect(body.orders[0].failures).toEqual([{ code: 'amount-missing', level: 'error', fields: ['paidAmount'] }]);
 });
+
+test('fails an order the payment shows a different facilitator tax taken than the marketplace reported', async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: '2026-08',
+    brickOwl: [
+      {
+        orderId: 'owl-order-0810',
+        orderDate: '1786320000',
+        view: {
+          buyer_name: 'some buyer',
+          payment_method_type: 'stripe',
+          sub_total: '5.20',
+          base_order_total: '6.29',
+          tax_scheme_id: 'au-gst',
+          tax_rate: '10',
+          tax_amount: '1.09',
+        },
+        items: [{ base_price: '5.20', ordered_quantity: '1' }],
+      },
+    ],
+    stripe: [{ description: 'Brick Owl Order owl-order-0810', amount: 629, applicationFee: 95 }],
+  });
+
+  const response = await request.get('/api/private/reconciliation/orders?month=2026-08');
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  expect(body.orders[0].facilitatorTax).toBe(1.09);
+  expect(body.orders[0].paidFacilitatorTax).toBe(0.95);
+  expect(body.orders[0].failures).toEqual([
+    { code: 'facilitator-tax-mismatch', level: 'error', fields: ['facilitatorTax', 'paidFacilitatorTax'] },
+  ]);
+});
+
+test('fails an order the marketplace reported facilitator tax for that the payment took none in', async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: '2026-08',
+    brickOwl: [
+      {
+        orderId: 'owl-order-0810',
+        orderDate: '1786320000',
+        view: {
+          buyer_name: 'some buyer',
+          payment_method_type: 'stripe',
+          sub_total: '5.20',
+          base_order_total: '6.29',
+          tax_scheme_id: 'au-gst',
+          tax_rate: '10',
+          tax_amount: '1.09',
+        },
+        items: [{ base_price: '5.20', ordered_quantity: '1' }],
+      },
+    ],
+    // The payment states no application fee at all, so it says the marketplace took nothing.
+    stripe: [{ description: 'Brick Owl Order owl-order-0810', amount: 629 }],
+  });
+
+  const response = await request.get('/api/private/reconciliation/orders?month=2026-08');
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  expect(body.orders[0].paidFacilitatorTax).toBeNull();
+  expect(body.orders[0].failures).toEqual([
+    { code: 'facilitator-tax-mismatch', level: 'error', fields: ['facilitatorTax', 'paidFacilitatorTax'] },
+  ]);
+});

@@ -55,6 +55,7 @@ class MapperStripeBrickLinkPayments implements DetailMapper<BalanceTransaction> 
             );
             if (order != null && paid.add(order)) {
                 order.setPaidAmount(StripePayments.paidAmount(transaction));
+                order.setPaidFacilitatorTax(StripePayments.facilitatorTax(transaction));
             }
         }
     }

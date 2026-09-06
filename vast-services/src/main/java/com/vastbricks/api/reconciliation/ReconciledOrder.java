@@ -56,6 +56,14 @@ public class ReconciledOrder {
     private BigDecimal paidAmount;
 
     /**
+     * What the payment provider reports the marketplace took out of the payment as tax facilitator, or {@code null}
+     * when the payment states none or no payment was matched to the order. It is the provider's own account of the
+     * same charge {@link #facilitatorTax} states from the marketplace's side, which is what makes the two
+     * comparable.
+     */
+    private BigDecimal paidFacilitatorTax;
+
+    /**
      * What the accounting invoice for this order has to come to: the grand total less what the marketplace collected
      * as tax facilitator, because that tax was charged under the marketplace's registration and is not the store's to
      * invoice. It is derived rather than collected, so it is computed here instead of in each order mapper.
