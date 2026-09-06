@@ -502,6 +502,25 @@ here as they are provided; do not invent unspecified behavior prematurely.
 - The button collects the month already on screen again, because the providers
   keep moving. Collecting queries every one of them, so it says it is working and
   refuses a second click until it is done.
+- What is being read is where the screen is rather than something it merely
+  remembers, so all of it rides in the address: the month, the filters narrowing
+  it, and the levels highlighted. A reload, a bookmark, a link handed to someone
+  else, or the browser's own Back arrow all land on the table they left. An
+  address that names no month, or names one that is not a month or has not
+  happened, is read as this month.
+- Each facet holds its selected values under the parameter it is named for, one
+  entry per value, so a marketplace's own wording needs no separator to be safe.
+  The option standing for an order that answered a facet with nothing is written
+  as the plain word `unstated`, and a collected value that reads that way takes a
+  `!` in front of it, so the two can never be mistaken for one another.
+- The highlighted levels ride in one comma-separated `highlight` parameter: a
+  level is the screen's own word rather than a marketplace's, and an address with
+  no `highlight` at all is the default of errors and warnings while an empty one
+  is nothing highlighted, which repeated entries could not say.
+- Stepping to another month carries the filters and the highlighting across
+  rather than starting over, the address being what holds all three. Narrowing or
+  highlighting rewrites the address rather than stacking an entry behind the Back
+  arrow for every box ticked; Back is for the month.
 - The panel holds two sections, because they are two different acts and neither
   is worth a panel of its own: `Highlights`, which decides how the orders on
   screen read, and `Filters`, which decides which orders are on screen.
@@ -520,17 +539,19 @@ here as they are provided; do not invent unspecified behavior prematurely.
 - Every value the month collected keeps its box for as long as that month is on
   screen. A group that shed options as you narrowed would move under the pointer
   that was narrowing it.
-- Nothing is filtered out until it is asked for, and collecting another month
-  clears the filters: another month is another set of orders, and a filter that
-  fitted the last one may hide all of it.
+- Nothing is filtered out until the address asks for it: a month is collected to
+  be looked at whole first.
 - A facet the whole month answers the same way narrows nothing and is not
   offered. Orders that answered a facet with nothing are one option of it, so
   they stay reachable rather than being dropped by a facet they cannot answer.
-- The current facets are the reconciliation level, the tax type and the payment
-  method. Adding a filter is adding a facet to the screen's list: it states how
-  an order answers it and how that answer reads, and the options, their counts
-  and the narrowing follow. `FilterFacets` is the shared panel body and knows
-  nothing about orders.
+- The current facets are the marketplace source, the reconciliation level, the
+  tax type and the payment method. Adding a filter is adding a facet to the
+  screen's list: it states how an order answers it and how that answer reads,
+  and the options, their counts and the narrowing follow. `FilterFacets` is the
+  shared panel body and knows nothing about orders.
+- The source facet lists the marketplaces an order can be collected from,
+  `BrickLink` and `BrickOwl`, coloured as the row's own source chip is so a box
+  and the chips it stands for read as the same marketplace.
 - A month whose filters let nothing through says so in its own words rather than
   reading as a month that collected nothing, and offers to clear them.
 - The table scrolls with the page and never on its own, and its head sticks under

@@ -35,6 +35,7 @@
   "reconciliation-highlights": "Highlights",
   "reconciliation-filters": "Filters",
   "reconciliation-filters-close": "Hide filters",
+  "reconciliation-filter-source": "Source",
   "reconciliation-filter-level": "Reconciliation",
   "reconciliation-filter-taxType": "Type",
   "reconciliation-filter-paymentMethod": "Payment method",

@@ -172,6 +172,9 @@ const unstated = '\u0000unstated';
 // Each marketplace keeps its own chip color, as the accounting screen colors it.
 const sourceColor = (source: string): ChipProps['color'] => (source === 'BrickOwl' ? 'secondary' : 'primary');
 
+/** The marketplaces orders are collected from, spelled as the backend labels them and listed as it names them. */
+const marketplaces = ['BrickLink', 'BrickOwl'] as const;
+
 /**
  * The month an address is asking for. One that names no month, or names something that is not a month or has not
  * happened, is read as this one.
@@ -179,6 +182,38 @@ const sourceColor = (source: string): ChipProps['color'] => (source === 'BrickOw
 const monthIn = (params: URLSearchParams) => {
   const asked = params.get('month');
   return asked && /^\d{4}-\d{2}$/.test(asked) && asked <= currentMonth() ? asked : currentMonth();
+};
+
+/**
+ * How a facet value is written in the address. Every value is written as it was collected but one: the unstated
+ * option carries a character no address can hold, so it is written as the plain word instead. A collected value that
+ * happens to read as that word takes a `!` in front of it, and one that already reads that way takes another, so no
+ * marketplace can word its way into the option that stands for having worded nothing.
+ */
+const writtenValue = (value: string) => (value === unstated ? 'unstated' : value.replace(/^(!*unstated)$/, '!$1'));
+
+const readValue = (written: string) => (written === 'unstated' ? unstated : written.replace(/^!(!*unstated)$/, '$1'));
+
+/**
+ * The parameter the coloured levels ride in, holding them as one comma-separated list rather than one entry each: a
+ * level is a word of this screen's own rather than a marketplace's, so the separator is safe here, and an empty list
+ * is how an address says that nothing is coloured — which repeated entries could not say at all.
+ */
+const highlightParam = 'highlight';
+
+/** Errors and warnings are coloured until an address says otherwise, being the rows the screen is opened to find. */
+const defaultTinted: FilterLevel[] = ['error', 'warning'];
+
+/** The levels an address colours: the default where it names none, and only what it names where it does. */
+const tintedIn = (params: URLSearchParams) => {
+  const asked = params.get(highlightParam);
+  if (asked === null) {
+    return defaultTinted;
+  }
+  const named = asked.split(',');
+  // Read back loudest first rather than in the order the address happens to list them, and anything that is not a
+  // level is not one.
+  return filterLevels.filter((level) => named.includes(level));
 };
 
 const orderKey = (order: ReconciliationOrder) => `${order.source}-${order.orderId}`;
@@ -224,21 +259,20 @@ const Main = styled('main', { shouldForwardProp: (prop: string) => prop !== 'ope
 
 export default function ReconciliationPage() {
   const intl = useIntl();
-  // The month being read is where the screen is rather than something it merely remembers, so it is kept in the
-  // address. A reload, a bookmark, or the browser's own Back arrow then all land on the month they left. An address
-  // that names no month, or names one that is not a month or has not happened, is read as this one.
+  // What is being read is where the screen is rather than something it merely remembers, so all of it is kept in the
+  // address: the month, the filters narrowing it, and the levels coloured. A reload, a bookmark, a link handed to
+  // someone else, or the browser's own Back arrow then all land on the table they left, and a step to another month
+  // is a step with the same narrowing and colouring rather than a fresh start. An address that names no month, or
+  // names one that is not a month or has not happened, is read as this one.
   const [searchParams, setSearchParams] = useSearchParams();
   const selectedMonth = monthIn(searchParams);
+  // Colouring is not filtering: this decides how the rows that are shown read, not which rows those are.
+  const tintedLevels = tintedIn(searchParams);
   const [selectedOrder, setSelectedOrder] = useState<ReconciliationOrder | null>(null);
   const [selectedFailure, setSelectedFailure] = useState<string | null>(null);
   const [generatingOrder, setGeneratingOrder] = useState<string | null>(null);
   const [generationError, setGenerationError] = useState<string | null>(null);
   const [generationMessage, setGenerationMessage] = useState<string | null>(null);
-  // Nothing is filtered out until it is asked for: the month is collected to be looked at whole first.
-  const [selection, setSelection] = useState<FilterSelection>({});
-  // Colouring is not filtering: this decides how the rows that are shown read, not which rows those are. Errors and
-  // warnings are coloured by default, being the rows the screen is opened to find.
-  const [tintedLevels, setTintedLevels] = useState<FilterLevel[]>(['error', 'warning']);
   const { container } = useConfig();
   const downLG = useMediaQuery((theme) => theme.breakpoints.down('lg'));
   // At rest the title bar is the card's rounded top and must round with it; stuck, the card's top is gone and a
@@ -267,29 +301,26 @@ export default function ReconciliationPage() {
     return () => observer.disconnect();
   }, []);
 
-  // Another month is another set of orders, and a filter that fitted the last one may hide all of it. The month can
-  // change by the browser's Back arrow as much as by the picker, so the filters are cleared wherever it lands rather
-  // than only where it is picked.
-  const filteredMonth = useRef(selectedMonth);
-  useEffect(() => {
-    if (filteredMonth.current === selectedMonth) {
-      return;
-    }
-    filteredMonth.current = selectedMonth;
-    setSelection({});
-  }, [selectedMonth]);
-
   /**
-   * Moves to the month `next` names, working from the month the address holds at the time rather than the one this
-   * render read: a second click of an arrow has to step off the month the first one moved to, not from the same place
-   * twice.
+   * Rewrites the address from the parameters it holds at the time rather than the ones this render read: a second
+   * click of an arrow has to step off the month the first one moved to, not from the same place twice, and a second
+   * tick has to work from the selection the first one made.
+   *
+   * <p>Whatever the change does not touch is carried across, which is what walks the filters and the colouring from
+   * one month to the next.
    */
-  const goToMonth = (next: (from: string) => string) =>
-    setSearchParams((current) => {
-      const params = new URLSearchParams(current);
-      params.set('month', next(monthIn(params)));
-      return params;
-    });
+  const updateParams = (change: (params: URLSearchParams) => void, replace = false) =>
+    setSearchParams(
+      (current) => {
+        const params = new URLSearchParams(current);
+        change(params);
+        return params;
+      },
+      { replace }
+    );
+
+  /** Moves to the month `next` names. */
+  const goToMonth = (next: (from: string) => string) => updateParams((params) => params.set('month', next(monthIn(params))));
 
   const handleMonthChange = (month: string) => goToMonth(() => month);
 
@@ -410,6 +441,15 @@ export default function ReconciliationPage() {
   // What the month's orders can be narrowed by. Adding a filter is adding an entry here.
   const facets: OrderFacet[] = [
     {
+      key: 'source',
+      valueOf: (order) => order.source,
+      // Each marketplace names itself, so its name is already the label.
+      label: (value) => value,
+      declared: marketplaces,
+      // Coloured as the row's own source chip is, so a box and the chips it stands for read as the same marketplace.
+      color: sourceColor
+    },
+    {
       key: 'level',
       valueOf: (order) => orderLevel(order) ?? 'none',
       label: (value) => levelName(value === 'none' ? null : (value as ShownLevel)),
@@ -430,6 +470,11 @@ export default function ReconciliationPage() {
       label: (value) => value
     }
   ];
+
+  // Each facet reads the parameter it is named for, so a filter added to the list above is carried by the address
+  // without a word of its own here. Nothing is filtered out until an address asks for it: the month is collected to
+  // be looked at whole first.
+  const selection: FilterSelection = Object.fromEntries(facets.map((facet) => [facet.key, searchParams.getAll(facet.key).map(readValue)]));
 
   const collectedOrders = reconciliationOrders?.orders ?? [];
 
@@ -496,20 +541,29 @@ export default function ReconciliationPage() {
 
   const isLevelTinted = (level: FilterLevel) => tintedLevels.includes(level);
 
+  // Narrowing or colouring the table is not a place to have been, so each rewrites the address rather than leaving an
+  // entry behind the Back arrow for every box ticked and every chip clicked. Back is for the month.
   const toggleLevel = (level: FilterLevel) =>
-    setTintedLevels((current) => (current.includes(level) ? current.filter((tinted) => tinted !== level) : [...current, level]));
+    updateParams((params) => {
+      const tinted = tintedIn(params);
+      const next = tinted.includes(level) ? tinted.filter((kept) => kept !== level) : [...tinted, level];
+      // Written loudest first, so the address reads the same however the chips were clicked to get there.
+      params.set(highlightParam, filterLevels.filter((kept) => next.includes(kept)).join(','));
+    }, true);
 
   /** The row's background colour, or null when its level is coloured off. */
   const rowTint = (level: FilterLevel) => (isLevelTinted(level) ? levelColor(level) : null);
 
   const toggleFilter = (facetKey: string, value: string) =>
-    setSelection((current) => {
-      const selected = current[facetKey] ?? [];
-      return {
-        ...current,
-        [facetKey]: selected.includes(value) ? selected.filter((kept) => kept !== value) : [...selected, value]
-      };
-    });
+    updateParams((params) => {
+      const written = writtenValue(value);
+      const selected = params.getAll(facetKey);
+      const next = selected.includes(written) ? selected.filter((kept) => kept !== written) : [...selected, written];
+      params.delete(facetKey);
+      next.forEach((kept) => params.append(facetKey, kept));
+    }, true);
+
+  const clearFilters = () => updateParams((params) => facets.forEach((facet) => params.delete(facet.key)), true);
 
   // The month being read is the table's title, walked by the arrows either side of it and picked outright by the
   // title itself, which opens a picker of its own rather than the browser's.
@@ -599,7 +653,7 @@ export default function ReconciliationPage() {
           open={filtersOpen}
           onClose={() => setFiltersOpen(false)}
           filtered={isFiltered}
-          onClear={() => setSelection({})}
+          onClear={clearFilters}
           highlights={
             <Stack direction="row" useFlexGap sx={{ gap: 0.75, flexWrap: 'wrap' }}>
               {levelCounts.map(({ level, count }) => (
@@ -830,7 +884,7 @@ export default function ReconciliationPage() {
                       {intl.formatMessage({ id: isFiltered ? 'reconciliation-filtered-empty' : 'reconciliation-empty' })}
                     </Typography>
                     {isFiltered && (
-                      <Button size="small" color="secondary" onClick={() => setSelection({})} sx={{ mt: 1 }}>
+                      <Button size="small" color="secondary" onClick={clearFilters} sx={{ mt: 1 }}>
                         {intl.formatMessage({ id: 'reconciliation-filter-clear' })}
                       </Button>
                     )}

@@ -35,6 +35,7 @@
   "reconciliation-highlights": "Izcēlumi",
   "reconciliation-filters": "Filtri",
   "reconciliation-filters-close": "Slēpt filtrus",
+  "reconciliation-filter-source": "Avots",
   "reconciliation-filter-level": "Saskaņošana",
   "reconciliation-filter-taxType": "Veids",
   "reconciliation-filter-paymentMethod": "Maksājuma veids",
