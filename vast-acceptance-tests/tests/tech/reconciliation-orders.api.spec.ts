@@ -119,6 +119,7 @@ test('lists BrickLink reconciliation orders for the selected month', async ({
         grandTotal: null,
         invoiceSubTotal: null,
         paidAmount: null,
+        targetInvoice: null,
         failures: [{ code: 'amount-missing', level: 'error', fields: ['paidAmount'] }],
       },
       {
@@ -135,6 +136,7 @@ test('lists BrickLink reconciliation orders for the selected month', async ({
         grandTotal: 3.44,
         invoiceSubTotal: null,
         paidAmount: null,
+        targetInvoice: 3.44,
         // Paid through Stripe, but no Stripe payment names this order.
         failures: [{ code: 'amount-missing', level: 'error', fields: ['paidAmount'] }],
       },
@@ -203,6 +205,7 @@ test('lists BrickOwl reconciliation orders for the selected month', async ({
         grandTotal: null,
         invoiceSubTotal: null,
         paidAmount: null,
+        targetInvoice: null,
         failures: [{ code: 'amount-missing', level: 'error', fields: ['paidAmount'] }],
       },
       {
@@ -220,11 +223,71 @@ test('lists BrickOwl reconciliation orders for the selected month', async ({
         grandTotal: 5.2,
         invoiceSubTotal: null,
         paidAmount: null,
+        targetInvoice: 5.2,
         // Paid through PayPal, but no PayPal payment names this order.
         failures: [{ code: 'amount-missing', level: 'error', fields: ['paidAmount'] }],
       },
     ],
   });
+});
+
+test('targets the invoice at the grand total less what the marketplace collected as tax facilitator', async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: '2026-08',
+    brickLink: {
+      fullNameOrdersXml: `<?xml version="1.0" encoding="UTF-8"?>
+<ORDERS>
+  <ORDER>
+    <ORDERID>32456580</ORDERID>
+    <ORDERDATE>8/30/2026</ORDERDATE>
+    <BUYER>export buyer</BUYER>
+    <ORDERTOTAL>11.00</ORDERTOTAL>
+    <BASEGRANDTOTAL>12.10</BASEGRANDTOTAL>
+    <LOCATION>United States, California</LOCATION>
+    <VATCHARGES>0.00</VATCHARGES>
+    <ORDERSALESTAX>1.10</ORDERSALESTAX>
+    <ORDERVAT>0.00</ORDERVAT>
+    <ITEM><ITEMID>3001</ITEMID><PRICE>11.0000</PRICE><QTY>1</QTY></ITEM>
+  </ORDER>
+</ORDERS>`,
+      usernameOrdersXml: `<?xml version="1.0" encoding="UTF-8"?><ORDERS/>`,
+    },
+    brickOwl: [
+      {
+        orderId: 'test-order-0812',
+        orderDate: '1786320000',
+        view: {
+          buyer_name: 'Export Buyer',
+          sub_total: '4.30',
+          base_order_total: '5.20',
+          billing_country_code: 'GB',
+          tax_scheme_id: '2',
+          tax_rate: '20',
+          tax_amount: '0.90',
+        },
+        items: [{ base_price: '4.30', ordered_quantity: '1' }],
+      },
+    ],
+  });
+
+  const response = await request.get('/api/private/reconciliation/orders?month=2026-08');
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  expect(
+    body.orders.map((order: { orderId: string; grandTotal: number; facilitatorTax: number; targetInvoice: number }) => [
+      order.orderId,
+      order.grandTotal,
+      order.facilitatorTax,
+      order.targetInvoice,
+    ])
+  ).toEqual([
+    ['32456580', 12.1, 1.1, 11],
+    ['test-order-0812', 5.2, 0.9, 4.3],
+  ]);
 });
 
 test('lists BrickOwl reconciliation orders that span several batch requests', async ({
@@ -262,6 +325,7 @@ test('lists BrickOwl reconciliation orders that span several batch requests', as
     grandTotal: null,
     invoiceSubTotal: null,
     paidAmount: null,
+    targetInvoice: null,
     failures: [{ code: 'amount-missing', level: 'error', fields: ['paidAmount'] }],
   });
   expect(body.orders[59].orderId).toBe('bulk-order-60');

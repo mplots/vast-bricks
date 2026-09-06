@@ -82,6 +82,7 @@
   "reconciliation-field-itemsSubTotal": "Items sub-total",
   "reconciliation-field-grandTotal": "Grand total",
   "reconciliation-field-invoiceSubTotal": "Invoice sub-total",
+  "reconciliation-field-targetInvoice": "Target invoice",
   "reconciliation-field-paidAmount": "Paid amount",
   "order-tax-type-domestic": "Domestic (Latvia)",
   "order-tax-type-european-union": "European Union",

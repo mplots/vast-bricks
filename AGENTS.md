@@ -169,8 +169,8 @@ here as they are provided; do not invent unspecified behavior prematurely.
   the selected month. Each collected order carries its marketplace source
   (`BrickLink` or `BrickOwl`), order ID, order date, buyer, buyer username,
   payment method, tax type, facilitator tax, sub-total, items sub-total, grand
-  total, accounting invoice sub-total, and paid amount, together with its rule
-  failures. Add further
+  total, accounting invoice sub-total, paid amount, and target invoice, together
+  with its rule failures. Add further
   fields and providers incrementally as their processing requirements are
   supplied.
 - The grand total is the order total in the store's base currency with shipping
@@ -202,6 +202,15 @@ here as they are provided; do not invent unspecified behavior prematurely.
   other collected amount. It is shown as its own column, unlike the tax type,
   because it is an amount to be accounted for rather than a classification an
   icon can carry. No rule compares it yet.
+- The target invoice is what the accounting invoice for the order has to come
+  to: the grand total less the facilitator tax, because that tax was charged
+  under the marketplace's registration and is not the store's to invoice. An
+  order no facilitator collected on is targeted at its whole grand total, and
+  one with no grand total has no target at all. It is derived from two collected
+  fields of the same order rather than collected itself, so it is computed on
+  `ReconciledOrder` instead of in each order mapper, and is exposed after the
+  collected fields. It is shown as its own column, next to the two it is derived
+  from. No rule compares it against the invoice sub-total yet.
 - Payments are collected from Stripe and from PayPal alongside the marketplace
   orders: Stripe's balance transactions and PayPal's transaction search, each for
   the month. Both providers date their transactions in UTC, so the month is asked

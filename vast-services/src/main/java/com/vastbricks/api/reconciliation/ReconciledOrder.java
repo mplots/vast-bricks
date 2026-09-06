@@ -11,7 +11,8 @@ import lombok.Setter;
  * One item of the reconciled order list. An order mapper builds it and a detail mapper fills further fields in, so
  * it is mutable for the length of the mapping stage; that stage is single-threaded and the rule stage only reads.
  *
- * <p>The field order is the order the API exposes them in, because the result is serialized unwrapped.
+ * <p>The field order is the order the API exposes the collected values in, because the result is serialized
+ * unwrapped; a value derived from them is exposed after them.
  */
 @Getter
 @Setter
@@ -53,4 +54,19 @@ public class ReconciledOrder {
      * was matched to the order.
      */
     private BigDecimal paidAmount;
+
+    /**
+     * What the accounting invoice for this order has to come to: the grand total less what the marketplace collected
+     * as tax facilitator, because that tax was charged under the marketplace's registration and is not the store's to
+     * invoice. It is derived rather than collected, so it is computed here instead of in each order mapper.
+     *
+     * <p>An order no facilitator collected on is invoiced for its whole grand total, and one with no grand total has
+     * no target to invoice for.
+     */
+    public BigDecimal getTargetInvoice() {
+        if (grandTotal == null) {
+            return null;
+        }
+        return facilitatorTax == null ? grandTotal : grandTotal.subtract(facilitatorTax);
+    }
 }
