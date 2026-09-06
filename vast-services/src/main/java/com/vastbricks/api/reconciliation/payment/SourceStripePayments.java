@@ -4,14 +4,14 @@ import com.stripe.model.BalanceTransaction;
 import com.vastbricks.api.client.stripe.StripePaymentClient;
 import com.vastbricks.api.reconciliation.Source;
 import java.time.YearMonth;
-import java.time.ZoneOffset;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 /**
- * Fetches the Stripe balance transactions of the month. Stripe dates transactions in UTC, so the month is asked for
- * as a UTC window; the client follows Stripe's paging, and nothing here filters or interprets what came back.
+ * Fetches the Stripe balance transactions of the month. The window asked for is {@link PaymentWindow}, which reaches
+ * past the month at both ends because Stripe dates a transaction at the capture of its charge rather than at the
+ * order; the client follows Stripe's paging, and nothing here filters or interprets what came back.
  *
  * <p>It declares Stripe's own model rather than a carrier, because it assembles nothing beyond the paging the client
  * already hides. A second source over balance transactions would have to introduce one, as exactly one source may
@@ -30,9 +30,7 @@ class SourceStripePayments implements Source<BalanceTransaction> {
 
     @Override
     public List<BalanceTransaction> fetch(YearMonth month) {
-        return stripePaymentClient.listBalanceTransactions(
-                month.atDay(1).atStartOfDay().toInstant(ZoneOffset.UTC),
-                month.atEndOfMonth().atTime(23, 59, 59).toInstant(ZoneOffset.UTC)
-        );
+        var window = PaymentWindow.of(month);
+        return stripePaymentClient.listBalanceTransactions(window.from(), window.to());
     }
 }

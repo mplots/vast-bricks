@@ -274,10 +274,39 @@ here as they are provided; do not invent unspecified behavior prematurely.
   orders: Stripe's balance transactions and PayPal's transaction search, each for
   the month. Both providers date their transactions in UTC, so the month is asked
   for as a UTC window from the first day at 00:00:00 to the last day at 23:59:59,
-  both ends included. Stripe's cursor paging is followed 100 transactions at a
-  time and PayPal's page numbering 500 at a time. The window belongs to the
-  source, the only class given the month; the paging belongs to the client, being
-  each provider's own protocol.
+  both ends included, padded by seven days at each end. Stripe's cursor paging is
+  followed 100 transactions at a time and PayPal's page numbering 500 at a time.
+  The window belongs to the source, the only class given the month; the paging
+  belongs to the client, being each provider's own protocol.
+- The window is padded because a payment is not dated where its order is. Stripe
+  dates a balance transaction at the capture of its charge, which a marketplace
+  may take days after the buyer authorized it, so an order of the last of the
+  month is commonly paid on the first of the next; the marketplaces date an order
+  in a zone of their own, which moves an order across midnight either way. An
+  exact month left such an order looking unpaid in its own month while its
+  payment was fetched in a month holding no order to attach it to. Seven days is
+  the longest Stripe leaves an authorization capturable, and both providers are
+  asked for the same window so they answer for one period. The pad costs nothing
+  but the fetching: a payment is matched to an order by what it names, never by
+  its date, so a transaction belonging to another month's order matches nothing
+  and is ignored.
+- PayPal searches no more than 31 days in one request, so its client covers a
+  longer window a segment at a time. The segments are consecutive and overlap
+  nowhere, because PayPal reports both ends of a range and a transaction reported
+  twice would be read as two payments. How far a request may reach is PayPal's
+  protocol, so the segmenting belongs to the client, next to its paging, and the
+  source states one window for both providers.
+- PayPal also refuses a range reaching into the future, which the padded window
+  does for the month being lived through, so its client searches no further than
+  a minute short of now. The minute is for clock skew, PayPal deciding what the
+  future is by a clock of its own; a payment taken inside it is collected by the
+  next run. A window lying wholly ahead of now is not asked for at all, so a
+  month that has not happened reconciles to no payments rather than to a failed
+  request. Stripe accepts a period reaching past now and is asked for the whole
+  window, so the current month is padded for it as any other month is.
+- PayPal reads a searched date to the second and rejects one carrying a
+  fraction, which is exactly what the clock closing a window at now reports, so
+  its client drops the fraction as it writes the request.
 - Only a transaction that is a buyer paying for an order is mapped onto one:
   Stripe's `charge` and `payment` types, and PayPal's `T0006` event code. Both
   providers report the marketplaces' seller fees, currency conversions, refunds
@@ -383,6 +412,14 @@ here as they are provided; do not invent unspecified behavior prematurely.
   raised. A source makes no reconciliation decision and normalizes nothing.
 - Every source runs in parallel, started before the first result is joined. The
   sourcing stage finishes before mapping begins.
+- A failing source is logged where it fails, at error, naming the source and the
+  month and carrying the exception it failed with, whose cause is the provider's
+  own account of what went wrong. It is logged there rather than only where the
+  request answers because the sources run beside each other: the request answers
+  with whichever failure is joined first, and a provider that failed alongside
+  that one would otherwise leave no trace at all. The request's own error log
+  line names the failure it answered with and no stack, that stack having been
+  logged already.
 - Mapping: a `Mapper<T>` turns what one source returned into the single
   reconciled order list. It never calls a client itself.
 - A source declares the class it returns and a mapper declares the class it
@@ -736,7 +773,8 @@ covers every provider call the backend makes rather than one screen's.
   token through `HttpExchangeCapture.mask` for exactly that reason.
 - One recorded operation is one client method, however many requests it takes. A BrickLink
   export records its session creation and its export, PayPal its token request and one
-  search per page, Stripe one request per page of its cursor paging.
+  search per page of each segment its window is searched in, Stripe one request per page
+  of its cursor paging.
 - Whose request a call belongs to travels on `DebugContext`, bound by an interceptor that
   runs after authentication has resolved the user. `ParallelTasks` propagates it alongside
   the settings profile, because a batch fetched on a virtual thread would otherwise record

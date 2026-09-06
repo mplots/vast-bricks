@@ -14,6 +14,32 @@ const payPalAccessToken = 'test-paypal-access-token';
 const emptyOrdersXml = '<?xml version="1.0" encoding="UTF-8"?><ORDERS/>';
 const brickOwlMaxBatchRequests = 50;
 
+/** Days the payment window reaches past the month at each end, as `PaymentWindow` pads it. */
+const paymentWindowPadDays = 7;
+
+/**
+ * The period the payment providers are asked for when a month is reconciled: the month, padded so a payment captured
+ * after the order's month is still collected. Tests assert the window the API actually asked for against this.
+ */
+export function paymentWindow(month: string) {
+  const [year, monthOfYear] = month.split('-').map(Number);
+  const from = new Date(Date.UTC(year, monthOfYear - 1, 1 - paymentWindowPadDays, 0, 0, 0));
+  const to = new Date(Date.UTC(year, monthOfYear, paymentWindowPadDays, 23, 59, 59));
+  return {
+    from,
+    to,
+    fromEpochSeconds: from.getTime() / 1000,
+    toEpochSeconds: to.getTime() / 1000,
+    fromIso: isoInstant(from),
+    toIso: isoInstant(to)
+  };
+}
+
+/** An instant as Java writes one: no fractional seconds, which is what the PayPal client sends. */
+function isoInstant(instant: Date): string {
+  return instant.toISOString().replace('.000Z', 'Z');
+}
+
 export type BrickLinkOrdersMock = {
   fullNameOrdersXml: string;
   usernameOrdersXml: string;
@@ -104,7 +130,7 @@ export async function mockReconciliationOrders(
   await mockBrickOwl(wireMock, settings, providers.brickOwl ?? [], providers.month);
   await mockManakabata(wireMock, settings, providers.manakabata ?? []);
   await mockStripe(wireMock, settings, providers.stripePages ?? [providers.stripe ?? []]);
-  await mockPayPal(wireMock, settings, providers.payPalPages ?? [providers.payPal ?? []]);
+  await mockPayPal(wireMock, settings, providers.payPalPages ?? [providers.payPal ?? []], providers.month);
 
   return wireMock;
 }
@@ -270,7 +296,12 @@ function stripeBalanceTransaction(transaction: StripeTransactionMock & { id: str
   };
 }
 
-async function mockPayPal(wireMock: WireMockApi, settings: SettingsOverrides, pages: PayPalTransactionMock[][]) {
+async function mockPayPal(
+  wireMock: WireMockApi,
+  settings: SettingsOverrides,
+  pages: PayPalTransactionMock[][],
+  month?: string
+) {
   await settings.set('VAST_PAYPAL_BASE_URL', wireMock.baseUrl);
   await settings.setSecret('VAST_PAYPAL_CLIENT_ID', payPalClientId);
   await settings.setSecret('VAST_PAYPAL_CLIENT_SECRET', payPalClientSecret);
@@ -281,12 +312,35 @@ async function mockPayPal(wireMock: WireMockApi, settings: SettingsOverrides, pa
     response: { json: { access_token: payPalAccessToken, token_type: 'Bearer', expires_in: 32400 } }
   });
 
+  // PayPal searches a limited range in one request, so the client asks for a padded month a segment at a time. The
+  // scenario's transactions answer the segment the window opens with; a later segment reports none rather than the
+  // same transactions again, which would read as a second payment of every order.
+  await wireMock.addMethodHostMapping('GET', '/v1/reporting/transactions', {
+    priority: 10,
+    request: { headers: { Authorization: { equalTo: `Bearer ${payPalAccessToken}` } } },
+    response: {
+      json: {
+        transaction_details: [],
+        account_number: 'test-paypal-account',
+        page: 1,
+        total_items: 0,
+        total_pages: 1
+      }
+    }
+  });
+
+  const firstSegment: WireMockValueMatcher | undefined =
+    month === undefined ? undefined : { equalTo: paymentWindow(month).fromIso };
+
   let transactionNumber = 0;
   for (const [pageIndex, page] of pages.entries()) {
     await wireMock.addMethodHostMapping('GET', '/v1/reporting/transactions', {
       request: {
         headers: { Authorization: { equalTo: `Bearer ${payPalAccessToken}` } },
-        queryParameters: { page: { equalTo: String(pageIndex + 1) } }
+        queryParameters: {
+          page: { equalTo: String(pageIndex + 1) },
+          ...(firstSegment === undefined ? {} : { start_date: firstSegment })
+        }
       },
       response: {
         json: {

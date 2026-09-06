@@ -9,6 +9,7 @@ import com.vastbricks.api.reconciliation.ReconciliationPayload.ReconciliationOrd
 import java.time.YearMonth;
 import java.time.format.DateTimeParseException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -22,6 +23,7 @@ import org.springframework.web.server.ResponseStatusException;
 @RestController
 @RequestMapping(value = "/api/private/reconciliation", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
+@Slf4j
 class ReconciliationController {
 
     private final ReconciliationService reconciliationService;
@@ -44,6 +46,9 @@ class ReconciliationController {
     })
     @ResponseStatus(HttpStatus.BAD_GATEWAY)
     String handleDataSourceException(RuntimeException exception) {
+        // What went wrong was logged with its stack where the source failed; this says which failure the request
+        // answered with, since several providers may have failed for one request.
+        log.error("Reconciliation failed: {}", exception.getMessage());
         return exception.getMessage();
     }
 

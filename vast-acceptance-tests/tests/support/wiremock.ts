@@ -41,6 +41,8 @@ type WireMockResponseOptions = Partial<WireMockResponse> & {
 };
 
 type WireMockHostMappingOptions = {
+  /** WireMock stub precedence, lowest number first. Left out, a stub takes WireMock's default of 5. */
+  priority?: number;
   request?: Omit<WireMockRequestPattern, 'method' | 'urlPath'>;
   response?: WireMockResponseOptions;
   metadata?: Record<string, unknown>;
@@ -131,6 +133,7 @@ export class WireMockApi {
 
   async addMethodHostMapping(method: WireMockMethod, urlPath: string, options: WireMockHostMappingOptions = {}) {
     await this.addMapping({
+      priority: options.priority,
       request: {
         ...this.forCurrentHost({
           ...options.request,

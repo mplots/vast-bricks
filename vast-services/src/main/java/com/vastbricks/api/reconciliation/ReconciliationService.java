@@ -9,6 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 /**
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
  * <p>A source and a mapper are joined by the class the source returns and the mapper reads. Neither names the other.
  */
 @Service
+@Slf4j
 class ReconciliationService {
 
     /**
@@ -54,7 +56,7 @@ class ReconciliationService {
         try (var tasks = new ParallelTasks()) {
             // Every source starts before the first result is joined, so no provider waits for another.
             var fetches = new LinkedHashMap<Class<?>, Supplier<? extends List<?>>>();
-            sources.forEach((type, source) -> fetches.put(type, tasks.start(() -> source.fetch(month))));
+            sources.forEach((type, source) -> fetches.put(type, tasks.start(() -> fetch(source, month))));
 
             var sourced = new LinkedHashMap<Class<?>, List<?>>();
             fetches.forEach((type, fetch) -> sourced.put(type, fetch.get()));
@@ -76,6 +78,20 @@ class ReconciliationService {
                 .sorted(NEWEST_FIRST)
                 .map(order -> new ReconciliationOrderResult(order, evaluate(order)))
                 .toList();
+    }
+
+    /**
+     * Fetches one provider, reporting a failure of its own before it travels. The sources run beside each other and
+     * the request answers with whichever failure is joined first, so a provider that failed alongside that one would
+     * otherwise leave no trace at all; this is also the only place that knows which source a failure came out of.
+     */
+    private List<?> fetch(Source<?> source, YearMonth month) {
+        try {
+            return source.fetch(month);
+        } catch (RuntimeException exception) {
+            log.error("Reconciliation source {} failed for {}", source.getClass().getSimpleName(), month, exception);
+            throw exception;
+        }
     }
 
     private <T> void collect(OrderMapper<T> mapper, SourcedData sourced, ReconciledOrders orders) {

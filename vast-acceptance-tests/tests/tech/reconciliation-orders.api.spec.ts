@@ -1,6 +1,15 @@
 import { expect, test } from '../support/api-test';
-import { BrickOwlOrderMock, mockReconciliationOrders } from '../support/reconciliation';
-import { wireMockMode } from '../support/wiremock';
+import { BrickOwlOrderMock, mockReconciliationOrders, paymentWindow } from '../support/reconciliation';
+import { WireMockApi, wireMockMode } from '../support/wiremock';
+
+/** The periods PayPal was searched for, in the order the client asked for them. */
+async function payPalSearchedPeriods(wireMock: WireMockApi) {
+  const transactionRequests = await wireMock.findMethodHostRequests('GET', '/v1/reporting/transactions');
+  return transactionRequests.map((transactionRequest) => {
+    const query = new URL(transactionRequest.url ?? '', 'http://paypal.test').searchParams;
+    return { from: query.get('start_date') ?? '', to: query.get('end_date') ?? '' };
+  });
+}
 
 test.describe.configure({ mode: wireMockMode() });
 
@@ -435,6 +444,79 @@ test('reports what Stripe was paid for a BrickOwl order named in the payment des
   const body = await response.json();
   expect(body.orders[0].paidAmount).toBe(5.2);
   expect(body.orders[0].failures).toEqual([]);
+});
+
+test('asks both payment providers for the days around the month, so a payment taken later is still collected', async ({
+  request,
+  settings,
+}, testInfo) => {
+  // A provider does not date a payment where the marketplace dates its order: Stripe dates a balance transaction at
+  // the capture of the charge, which can fall days after the buyer ordered, and the marketplaces date an order in a
+  // zone of their own. An order of the last of the month was therefore reported unpaid while its payment was
+  // collected in a month holding no order to attach it to. The month is one whose padded window has wholly passed,
+  // so the window is asked for as it stands.
+  const wireMock = await mockReconciliationOrders(settings, request, testInfo, { month: '2026-05' });
+
+  const response = await request.get('/api/private/reconciliation/orders?month=2026-05');
+
+  expect(response.status(), await response.text()).toBe(200);
+  const window = paymentWindow('2026-05');
+
+  const balanceTransactionRequests = await wireMock.findMethodHostRequests('GET', '/v1/balance_transactions');
+  expect(balanceTransactionRequests).toHaveLength(1);
+  const stripeQuery = new URL(balanceTransactionRequests[0].url ?? '', 'http://stripe.test').searchParams;
+  expect(stripeQuery.get('created[gte]')).toBe(String(window.fromEpochSeconds));
+  expect(stripeQuery.get('created[lte]')).toBe(String(window.toEpochSeconds));
+
+  // PayPal searches no more than 31 days at a time, so the same window arrives as consecutive segments that together
+  // cover it end to end and overlap nowhere, a transaction reported twice being a payment counted twice.
+  const searched = await payPalSearchedPeriods(wireMock);
+  expect(searched.length).toBeGreaterThan(1);
+  expect(searched[0].from).toBe(window.fromIso);
+  expect(searched[searched.length - 1].to).toBe(window.toIso);
+  searched.slice(1).forEach((segment, index) => {
+    expect(new Date(segment.from).getTime()).toBe(new Date(searched[index].to).getTime() + 1000);
+  });
+});
+
+test('searches PayPal no further than now, so the current month reconciles', async ({
+  request,
+  settings,
+}, testInfo) => {
+  // The days the window is padded by have not happened yet in the month being lived through, and PayPal refuses a
+  // range reaching into the future. Stripe accepts one, and is asked for the whole window.
+  const currentMonth = new Date().toISOString().slice(0, 7);
+  const wireMock = await mockReconciliationOrders(settings, request, testInfo, { month: currentMonth });
+
+  const response = await request.get(`/api/private/reconciliation/orders?month=${currentMonth}`);
+
+  expect(response.status(), await response.text()).toBe(200);
+  const window = paymentWindow(currentMonth);
+
+  const searched = await payPalSearchedPeriods(wireMock);
+  const searchedTo = new Date(searched[searched.length - 1].to).getTime();
+  expect(searched[0].from).toBe(window.fromIso);
+  expect(searchedTo).toBeLessThanOrEqual(Date.now());
+  expect(searchedTo).toBeLessThan(new Date(window.to).getTime());
+  // PayPal rejects a date carrying a fraction of a second, which the clock the window is closed at reports.
+  searched.forEach((segment) => {
+    expect(segment.from).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/);
+    expect(segment.to).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/);
+  });
+
+  const balanceTransactionRequests = await wireMock.findMethodHostRequests('GET', '/v1/balance_transactions');
+  const stripeQuery = new URL(balanceTransactionRequests[0].url ?? '', 'http://stripe.test').searchParams;
+  expect(stripeQuery.get('created[lte]')).toBe(String(window.toEpochSeconds));
+});
+
+test('asks PayPal nothing for a month that has not happened', async ({ request, settings }, testInfo) => {
+  const futureMonth = new Date(Date.UTC(new Date().getUTCFullYear() + 1, 0)).toISOString().slice(0, 7);
+  const wireMock = await mockReconciliationOrders(settings, request, testInfo, { month: futureMonth });
+
+  const response = await request.get(`/api/private/reconciliation/orders?month=${futureMonth}`);
+
+  expect(response.status(), await response.text()).toBe(200);
+  expect(await wireMock.findMethodHostRequests('GET', '/v1/reporting/transactions')).toHaveLength(0);
 });
 
 test('reports what Stripe was paid for a BrickLink order by the buyer username in the payment description', async ({
@@ -1232,8 +1314,9 @@ test('collects PayPal payments that span several pages', async ({ request, setti
   );
   expect(paidByOrder).toEqual({ '7578233': 7.69, '5120724': 7.71 });
 
+  // Two pages of the segment the window opens with, and one page of the segment that closes it.
   const transactionRequests = await wireMock.findMethodHostRequests('GET', '/v1/reporting/transactions');
-  expect(transactionRequests).toHaveLength(2);
+  expect(transactionRequests).toHaveLength(3);
 });
 
 test('reports a bad gateway when PayPal fails', async ({ request, settings }, testInfo) => {
