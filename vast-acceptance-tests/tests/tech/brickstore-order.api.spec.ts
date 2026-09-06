@@ -25,7 +25,7 @@ test('brickstore token endpoint stores an encrypted token used by raw order expo
     status: 'ok',
   });
 
-  const storedValue = await findSettingOverride(settings.profile, 'VAST_BRICKSTORE_TOKEN');
+  const storedValue = await findSettingOverride(settings.tenantId, 'VAST_BRICKSTORE_TOKEN');
   expect(storedValue).not.toBeNull();
   expect(storedValue).toMatch(/^v1:[^:]+:[^:]+$/);
   expect(storedValue).not.toContain('playwright-client-token');

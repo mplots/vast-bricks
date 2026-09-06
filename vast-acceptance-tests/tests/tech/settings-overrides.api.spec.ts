@@ -1,7 +1,7 @@
 import { expect, test } from '../support/api-test';
 import { findSettingOverride } from '../support/vast-db';
 
-test('settings profile overrides annotation defaults but not environment values', async ({
+test('tenant overrides annotation defaults but not environment values', async ({
   request,
   settings,
 }) => {
@@ -15,13 +15,13 @@ test('settings profile overrides annotation defaults but not environment values'
     secretValue: '',
   });
 
-  const profileValues = [
-    ['VAST_HEALTH_SETTING_VALUE', 'profile-health-value'],
-    ['VAST_HEALTH_SETTING_ENV_VALUE', 'profile-env-value'],
-    ['VAST_HEALTH_SETTING_DATABASE_ONLY_VALUE', 'profile-database-only-value'],
+  const tenantValues = [
+    ['VAST_HEALTH_SETTING_VALUE', 'tenant-health-value'],
+    ['VAST_HEALTH_SETTING_ENV_VALUE', 'tenant-env-value'],
+    ['VAST_HEALTH_SETTING_DATABASE_ONLY_VALUE', 'tenant-database-only-value'],
   ] as const;
 
-  for (const [settingKey, settingValue] of profileValues) {
+  for (const [settingKey, settingValue] of tenantValues) {
     await settings.set(settingKey, settingValue);
   }
 
@@ -29,53 +29,65 @@ test('settings profile overrides annotation defaults but not environment values'
   expect(overriddenResponse.ok()).toBe(true);
 
   await expect(overriddenResponse.json()).resolves.toEqual({
-    value: 'profile-health-value',
+    value: 'tenant-health-value',
     environmentValue: 'managed-health-env-value',
-    databaseOnlyValue: 'profile-database-only-value',
+    databaseOnlyValue: 'tenant-database-only-value',
     secretValue: '',
   });
 });
 
-test('default settings profile overrides annotation defaults but not environment values', async ({
-  requestWithoutSettingsProfile,
+/**
+ * The isolation guardrail. Nothing in the settings feature names a tenant - Hibernate's @TenantId puts it in the
+ * SQL - so this is what proves the filter is actually applied rather than assumed.
+ */
+test('a tenant reads its own overrides and never another tenant\'s', async ({
+  request,
   settings,
+  otherTenant,
 }) => {
-  const defaultValues = [
-    ['VAST_HEALTH_SETTING_VALUE', 'default-profile-health-value'],
-    ['VAST_HEALTH_SETTING_ENV_VALUE', 'default-profile-env-value'],
-    ['VAST_HEALTH_SETTING_DATABASE_ONLY_VALUE', 'default-profile-database-only-value'],
-  ] as const;
+  await settings.set('VAST_HEALTH_SETTING_VALUE', 'mine');
+  await settings.set('VAST_HEALTH_SETTING_DATABASE_ONLY_VALUE', 'mine-database-only');
 
-  for (const [settingKey, settingValue] of defaultValues) {
-    await settings.setDefault(settingKey, settingValue);
-  }
+  await otherTenant.set('VAST_HEALTH_SETTING_VALUE', 'theirs');
+  await otherTenant.set('VAST_HEALTH_SETTING_DATABASE_ONLY_VALUE', 'theirs-database-only');
 
-  const response = await requestWithoutSettingsProfile.get('/api/private/settings/health');
-  expect(response.ok()).toBe(true);
+  await expect((await request.get('/api/private/settings/health')).json()).resolves.toMatchObject({
+    value: 'mine',
+    databaseOnlyValue: 'mine-database-only',
+  });
 
-  await expect(response.json()).resolves.toEqual({
-    value: 'default-profile-health-value',
-    environmentValue: 'managed-health-env-value',
-    databaseOnlyValue: 'default-profile-database-only-value',
-    secretValue: '',
+  await expect((await otherTenant.request.get('/api/private/settings/health')).json()).resolves.toMatchObject({
+    value: 'theirs',
+    databaseOnlyValue: 'theirs-database-only',
   });
 });
 
-test('secret settings profile overrides are encrypted at rest and decrypted when read', async ({
+test('a setting only the other tenant configured is unset here, not inherited', async ({
+  request,
+  otherTenant,
+}) => {
+  await otherTenant.set('VAST_HEALTH_SETTING_DATABASE_ONLY_VALUE', 'theirs-only');
+
+  await expect((await request.get('/api/private/settings/health')).json()).resolves.toMatchObject({
+    databaseOnlyValue: '',
+  });
+});
+
+test('secret overrides are encrypted at rest and decrypted when read', async ({
   request,
   settings,
 }) => {
-  await settings.setSecret('VAST_HEALTH_SETTING_SECRET_VALUE', 'profile-secret-value');
+  await settings.setSecret('VAST_HEALTH_SETTING_SECRET_VALUE', 'tenant-secret-value');
 
-  const storedValue = await findSettingOverride(settings.profile, 'VAST_HEALTH_SETTING_SECRET_VALUE');
+  const storedValue = await findSettingOverride(settings.tenantId, 'VAST_HEALTH_SETTING_SECRET_VALUE');
   expect(storedValue).not.toBeNull();
   expect(storedValue).toMatch(/^v1:[^:]+:[^:]+$/);
-  expect(storedValue).not.toContain('profile-secret-value');
+  expect(storedValue).not.toContain('tenant-secret-value');
 
   const response = await request.get('/api/private/settings/health');
   expect(response.ok()).toBe(true);
 
   await expect(response.json()).resolves.toMatchObject({
-    secretValue: 'profile-secret-value',
+    secretValue: 'tenant-secret-value',
   });
 });

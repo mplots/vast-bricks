@@ -1,7 +1,7 @@
 package com.vastbricks.api.reconciliation;
 
 import com.vastbricks.api.debug.DebugContext;
-import com.vastbricks.api.settings.SettingsProfileContext;
+import com.vastbricks.api.tenancy.TenantContext;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutorService;
@@ -18,9 +18,10 @@ public final class ParallelTasks implements AutoCloseable {
     private final ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
 
     public <T> Supplier<T> start(Supplier<T> task) {
-        // Both request contexts cross the thread boundary: the settings profile so the task resolves the same
-        // overrides, and the debug user so a provider call it makes is recorded under whoever asked for it.
-        var carried = SettingsProfileContext.propagate(DebugContext.propagate(task));
+        // Both request contexts cross the thread boundary: the tenant so the task reads the same tenant's provider
+        // credentials, and the debug user so a provider call it makes is recorded under whoever asked for it. A task
+        // that lost the tenant reads no overrides at all, which fails loudly rather than reaching another store.
+        var carried = TenantContext.propagate(DebugContext.propagate(task));
         var future = CompletableFuture.supplyAsync(carried, executor);
         return () -> await(future);
     }

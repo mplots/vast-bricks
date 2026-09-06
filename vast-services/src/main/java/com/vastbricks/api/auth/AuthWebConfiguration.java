@@ -10,10 +10,13 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 class AuthWebConfiguration implements WebMvcConfigurer {
 
     private final AuthenticationInterceptor authenticationInterceptor;
+    private final PrivateApiInterceptor privateApiInterceptor;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(authenticationInterceptor)
-                .addPathPatterns("/api/private/**");
+        // Resolution runs first and everywhere, so a request that is not private still knows its tenant. Enforcement
+        // and the debug user binding both read what it left, so both sit after it.
+        registry.addInterceptor(authenticationInterceptor).order(0);
+        registry.addInterceptor(privateApiInterceptor).addPathPatterns("/api/private/**").order(1);
     }
 }

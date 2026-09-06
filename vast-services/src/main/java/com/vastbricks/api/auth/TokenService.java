@@ -13,6 +13,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -35,11 +37,12 @@ class TokenService {
         this.signingKey = secret.getBytes(StandardCharsets.UTF_8);
     }
 
-    String createToken(User user) {
+    String createToken(User user, Long tenantId) {
         Instant now = Instant.now();
         Map<String, Object> claims = new LinkedHashMap<>();
         claims.put("iss", "vastbricks-portal");
         claims.put("sub", user.getId().toString());
+        claims.put("tid", tenantId == null ? null : tenantId.toString());
         claims.put("email", user.getEmail());
         claims.put("name", user.getName());
         claims.put("role", user.getRole());
@@ -55,7 +58,7 @@ class TokenService {
         }
     }
 
-    Long verifyAndGetUserId(String token) {
+    Principal verifyAndGetPrincipal(String token) {
         try {
             String[] parts = token.split("\\.", -1);
             if (parts.length != 3 || !JWT_HEADER.equals(parts[0])) {
@@ -77,7 +80,11 @@ class TokenService {
                 throw new InvalidTokenException();
             }
 
-            return Long.valueOf(claims.get("sub").toString());
+            Object tenantId = claims.get("tid");
+            return new Principal(
+                    Long.valueOf(claims.get("sub").toString()),
+                    tenantId == null ? null : Long.valueOf(tenantId.toString())
+            );
         } catch (InvalidTokenException exception) {
             throw exception;
         } catch (Exception exception) {
@@ -100,5 +107,14 @@ class TokenService {
     }
 
     static class InvalidTokenException extends RuntimeException {
+    }
+
+    /** Who a token says is asking, and which tenant they selected when it was issued. */
+    @Getter
+    @AllArgsConstructor
+    static class Principal {
+
+        private final Long userId;
+        private final Long tenantId;
     }
 }

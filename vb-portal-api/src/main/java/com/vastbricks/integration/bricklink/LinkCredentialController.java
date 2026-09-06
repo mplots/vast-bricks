@@ -52,7 +52,7 @@ public class LinkCredentialController {
         @RequestHeader(value = API_KEY_HEADER, required = false) String apiKey,
         @Valid @RequestBody TokenRequest request) {
         requireApiKey(apiKey);
-        brickStoreTokenService.storeDefaultToken(request.getToken());
+        brickStoreTokenService.storeLegacyToken(request.getToken());
         return LinkCredentialResponse.from(
             service.store(LinkCredentialType.TOKEN, request.getToken())
         );

@@ -1,101 +1,121 @@
-import { APIRequestContext, expect, test as base } from '@playwright/test';
+import { APIRequestContext, expect, test as base, TestInfo } from '@playwright/test';
 
 import {
-  createVastUser,
+  deleteVastTenant,
   deleteVastUser,
   upsertSecretSettingOverride,
   upsertSettingOverride,
   vastTestPassword,
+  VastTenant,
   VastUser,
 } from './vast-db';
 
-const settingsProfileHeader = 'X-Vast-Settings-Profile';
-const defaultSettingsProfile = process.env.VAST_SETTINGS_DEFAULT_PROFILE ?? 'vast-playwright-default';
-
 export type SettingsOverrides = {
-  readonly profile: string;
+  /** The tenant these overrides belong to. */
+  readonly tenantId: number;
   set(settingKey: string, settingValue: string): Promise<void>;
   setSecret(settingKey: string, settingValue: string): Promise<void>;
-  setDefault(settingKey: string, settingValue: string): Promise<void>;
 };
 
 export type Authentication = {
   readonly user: VastUser;
+  readonly tenant: VastTenant;
   readonly serviceToken: string;
 };
+
+/** A login on a tenant of its own, for asserting that one tenant cannot see another's data. */
+export type OtherTenant = {
+  readonly tenant: VastTenant;
+  readonly request: APIRequestContext;
+  set(settingKey: string, settingValue: string): Promise<void>;
+};
+
+function tenantCodeFor(testInfo: TestInfo, suffix = ''): string {
+  return [
+    'playwright',
+    testInfo.project.name,
+    testInfo.parallelIndex,
+    testInfo.workerIndex,
+    testInfo.repeatEachIndex,
+    testInfo.retry,
+    Date.now(),
+    Math.random().toString(36).slice(2, 8),
+    suffix,
+    testInfo.titlePath.join('-'),
+  ]
+    .join('-')
+    .toLowerCase()
+    .replace(/[^a-z0-9_-]/g, '-')
+    .slice(0, 100);
+}
+
+type PlaywrightFixture = { request: { newContext(options: { baseURL?: string; extraHTTPHeaders?: Record<string, string> }): Promise<APIRequestContext> } };
+
+type Registration = { tenant: VastTenant; user: VastUser; serviceToken: string };
+
+/**
+ * Registers this scenario's own tenant and a user who may serve it. The tenant is what isolates the scenario, so
+ * every test gets one of its own and none of them can see another's rows - which is what lets them run in parallel.
+ */
+async function register(
+  playwright: PlaywrightFixture,
+  baseURL: string | undefined,
+  testInfo: TestInfo,
+  suffix = '',
+): Promise<Registration> {
+  const anonymous = await playwright.request.newContext({ baseURL });
+  try {
+    const response = await anonymous.post('/api/test/tenants', {
+      data: {
+        tenantCode: tenantCodeFor(testInfo, suffix),
+        email: `playwright-${suffix}-${testInfo.workerIndex}-${testInfo.parallelIndex}-${Date.now()}-${Math.random().toString(36).slice(2)}@example.test`,
+        password: vastTestPassword,
+        name: 'Playwright User',
+        role: 'user',
+      },
+    });
+    if (!response.ok()) {
+      throw new Error(`Tenant registration failed with HTTP ${response.status()}: ${await response.text()}`);
+    }
+    return (await response.json()) as Registration;
+  } finally {
+    await anonymous.dispose();
+  }
+}
 
 export const test = base.extend<{
   authentication: Authentication;
   settings: SettingsOverrides;
-  requestWithoutSettingsProfile: APIRequestContext;
+  otherTenant: OtherTenant;
   anonymousRequest: APIRequestContext;
 }>({
   authentication: async ({ baseURL, playwright }, use, testInfo) => {
-    const email = `playwright-${testInfo.workerIndex}-${testInfo.parallelIndex}-${Date.now()}-${Math.random().toString(36).slice(2)}@example.test`;
-    const user = await createVastUser(email);
-    const loginRequest = await playwright.request.newContext({ baseURL });
+    const { tenant, user, serviceToken } = await register(playwright, baseURL, testInfo);
 
     try {
-      const loginResponse = await loginRequest.post('/api/account/login', {
-        data: { email, password: vastTestPassword },
-      });
-      if (!loginResponse.ok()) {
-        throw new Error(`Test-user login failed with HTTP ${loginResponse.status()}.`);
-      }
-
-      const body = await loginResponse.json() as { serviceToken?: string };
-      if (!body.serviceToken) {
-        throw new Error('Test-user login did not return a service token.');
-      }
-
-      await use({ user, serviceToken: body.serviceToken });
+      await use({ user, tenant, serviceToken });
     } finally {
-      await loginRequest.dispose();
+      // Deleting the tenant cascades to everything it wrote, whatever tables those turn out to be.
       await deleteVastUser(user.id);
+      await deleteVastTenant(tenant.id);
     }
   },
 
-  settings: async ({}, use, testInfo) => {
-    const profile = [
-      'playwright',
-      testInfo.project.name,
-      testInfo.parallelIndex,
-      testInfo.workerIndex,
-      testInfo.repeatEachIndex,
-      testInfo.retry,
-      Date.now(),
-      testInfo.titlePath.join('-'),
-    ].join('-').replace(/[^A-Za-z0-9_-]/g, '-');
+  settings: async ({ authentication }, use) => {
+    const tenantId = authentication.tenant.id;
 
     await use({
-      profile,
+      tenantId,
       set: async (settingKey, settingValue) => {
-        await upsertSettingOverride(profile, settingKey, settingValue);
+        await upsertSettingOverride(tenantId, settingKey, settingValue);
       },
       setSecret: async (settingKey, settingValue) => {
-        await upsertSecretSettingOverride(profile, settingKey, settingValue);
-      },
-      setDefault: async (settingKey, settingValue) => {
-        await upsertSettingOverride(defaultSettingsProfile, settingKey, settingValue);
+        await upsertSecretSettingOverride(tenantId, settingKey, settingValue);
       },
     });
   },
 
-  request: async ({ authentication, baseURL, playwright, settings }, use) => {
-    const request = await playwright.request.newContext({
-      baseURL,
-      extraHTTPHeaders: {
-        Accept: 'application/json',
-        Authorization: `Bearer ${authentication.serviceToken}`,
-        [settingsProfileHeader]: settings.profile,
-      },
-    });
-
-    await use(request);
-    await request.dispose();
-  },
-
-  requestWithoutSettingsProfile: async ({ authentication, baseURL, playwright }, use) => {
+  request: async ({ authentication, baseURL, playwright }, use) => {
     const request = await playwright.request.newContext({
       baseURL,
       extraHTTPHeaders: {
@@ -106,6 +126,32 @@ export const test = base.extend<{
 
     await use(request);
     await request.dispose();
+  },
+
+  otherTenant: async ({ baseURL, playwright }, use, testInfo) => {
+    const { tenant, user, serviceToken } = await register(playwright, baseURL, testInfo, 'other');
+
+    const request = await playwright.request.newContext({
+      baseURL,
+      extraHTTPHeaders: {
+        Accept: 'application/json',
+        Authorization: `Bearer ${serviceToken}`,
+      },
+    });
+
+    try {
+      await use({
+        tenant,
+        request,
+        set: async (settingKey, settingValue) => {
+          await upsertSettingOverride(tenant.id, settingKey, settingValue);
+        },
+      });
+    } finally {
+      await request.dispose();
+      await deleteVastUser(user.id);
+      await deleteVastTenant(tenant.id);
+    }
   },
 
   anonymousRequest: async ({ baseURL, playwright }, use) => {

@@ -13,7 +13,19 @@ export type VastUser = {
   readonly role: string;
 };
 
-export async function createVastUser(email: string): Promise<VastUser> {
+export type VastTenant = {
+  readonly id: number;
+  readonly code: string;
+};
+
+/** Teardown only. Cascades to every tenant-owned row the scenario wrote, whatever tables those are. */
+export async function deleteVastTenant(id: number): Promise<void> {
+  await withDatabaseClient(async (client) => {
+    await client.query(`DELETE FROM ${vastTable('tenants')} WHERE id = $1`, [id]);
+  });
+}
+
+export async function createVastUser(email: string, tenantId: number): Promise<VastUser> {
   return withDatabaseClient(async (client) => {
     const result = await client.query<VastUser>(
       `
@@ -25,6 +37,10 @@ export async function createVastUser(email: string): Promise<VastUser> {
     );
 
     const user = result.rows[0]!;
+    await client.query(
+      `INSERT INTO ${vastTable('user_tenants')} (user_id, tenant_id) VALUES ($1, $2)`,
+      [user.id, tenantId],
+    );
     return { ...user, id: Number(user.id) };
   });
 }
@@ -35,41 +51,41 @@ export async function deleteVastUser(id: number): Promise<void> {
   });
 }
 
-export async function upsertSettingOverride(profile: string, settingKey: string, settingValue: string): Promise<void> {
+export async function upsertSettingOverride(tenantId: number, settingKey: string, settingValue: string): Promise<void> {
   await withDatabaseClient(async (client) => {
     await client.query(
       `
-        INSERT INTO ${settingsOverrideTable()} (profile, setting_key, setting_value)
+        INSERT INTO ${settingsOverrideTable()} (tenant_id, setting_key, setting_value)
         VALUES ($1, $2, $3)
-        ON CONFLICT (profile, setting_key)
+        ON CONFLICT (tenant_id, setting_key)
         DO UPDATE SET
           setting_value = EXCLUDED.setting_value,
           updated_at = now()
       `,
-      [profile, settingKey, settingValue],
+      [tenantId, settingKey, settingValue],
     );
   });
 }
 
 export async function upsertSecretSettingOverride(
-  profile: string,
+  tenantId: number,
   settingKey: string,
   settingValue: string,
 ): Promise<string> {
   const encryptedValue = encryptSettingValue(settingValue);
-  await upsertSettingOverride(profile, settingKey, encryptedValue);
+  await upsertSettingOverride(tenantId, settingKey, encryptedValue);
   return encryptedValue;
 }
 
-export async function findSettingOverride(profile: string, settingKey: string): Promise<string | null> {
+export async function findSettingOverride(tenantId: number, settingKey: string): Promise<string | null> {
   return withDatabaseClient(async (client) => {
     const result = await client.query<{ setting_value: string }>(
       `
         SELECT setting_value
         FROM ${settingsOverrideTable()}
-        WHERE profile = $1 AND setting_key = $2
+        WHERE tenant_id = $1 AND setting_key = $2
       `,
-      [profile, settingKey],
+      [tenantId, settingKey],
     );
 
     return result.rows[0]?.setting_value ?? null;

@@ -90,8 +90,11 @@ test("does not show one user the traffic of another", async ({
   expect((await reconcile(request)).status()).toBe(200);
   expect(await readExchanges(request)).not.toEqual([]);
 
+  // Same tenant on purpose: debug recording is scoped to the user who armed it, not to the tenant, and this
+  // scenario is about the second user seeing nothing rather than about tenant isolation.
   const onlooker = await createVastUser(
     `debug-onlooker-${testInfo.workerIndex}-${Date.now()}@example.test`,
+    settings.tenantId,
   );
   try {
     const login = await playwright.request.newContext({ baseURL });
