@@ -13,24 +13,24 @@ import { camt052, camt053, importDocument, testAccountIban } from '../support/ba
 const month = '2026-09';
 
 const paymentEntry = {
-  reference: '2026090501987313-1',
+  reference: '2026090500000001-1',
   amount: '5.07',
   direction: 'CRDT' as const,
   bookingDate: '2026-09-05',
-  counterpartyName: 'Gustavs Simansons',
-  counterpartyIban: 'LT623250063970381125',
-  remittance: 'Bricklink order.32505571',
+  counterpartyName: 'Grace Hopper',
+  counterpartyIban: 'LT121000011101001000',
+  remittance: 'Bricklink order.32100002',
   proprietaryCode: 'INB',
 };
 
 const postageEntry = {
-  reference: '2026090201898337-1',
+  reference: '2026090200000002-1',
   amount: '16.01',
   direction: 'DBIT' as const,
   bookingDate: '2026-09-02',
-  counterpartyName: 'LATVIJAS PASTS VAS',
-  counterpartyIban: 'LV49PARX0000828130015',
-  remittance: 'Rekins EXP2047790',
+  counterpartyName: 'TEST POST OFFICE VAS',
+  counterpartyIban: 'LV80TEST0000000000002',
+  remittance: 'Rekins EXP2000001',
   proprietaryCode: 'IZP',
 };
 
@@ -68,16 +68,16 @@ test('a camt.052 report imports its entries', async ({ request }) => {
     status: 'BOOK',
     proprietaryCode: 'IZP',
     domainCode: 'PMNT',
-    counterpartyName: 'LATVIJAS PASTS VAS',
-    counterpartyIban: 'LV49PARX0000828130015',
-    remittanceInformation: 'Rekins EXP2047790',
+    counterpartyName: 'TEST POST OFFICE VAS',
+    counterpartyIban: 'LV80TEST0000000000002',
+    remittanceInformation: 'Rekins EXP2000001',
     mapping: null,
   });
   expect(entries[1]).toMatchObject({
     entryReference: paymentEntry.reference,
     direction: 'CREDIT',
     amount: 5.07,
-    remittanceInformation: 'Bricklink order.32505571',
+    remittanceInformation: 'Bricklink order.32100002',
   });
 });
 
@@ -108,11 +108,11 @@ test('re-importing an overlapping range updates rather than duplicates', async (
 test('an import refreshes what the bank restated', async ({ request }) => {
   await importDocument(request, camt052({ entries: [{ ...postageEntry, remittance: 'Provisional' }] }));
 
-  await importDocument(request, camt052({ entries: [{ ...postageEntry, remittance: 'Rekins EXP2047790' }] }));
+  await importDocument(request, camt052({ entries: [{ ...postageEntry, remittance: 'Rekins EXP2000001' }] }));
 
   const entries = await entriesOf(request);
   expect(entries).toHaveLength(1);
-  expect(entries[0].remittanceInformation).toBe('Rekins EXP2047790');
+  expect(entries[0].remittanceInformation).toBe('Rekins EXP2000001');
 });
 
 test('a mapping written against an entry survives a re-import', async ({ request }) => {
@@ -120,23 +120,23 @@ test('a mapping written against an entry survives a re-import', async ({ request
   const [entry] = await entriesOf(request);
 
   const saved = await request.put(`/api/private/bank-statements/entries/${entry.id}/mapping`, {
-    data: { mapping: '32505571' },
+    data: { mapping: '32100002' },
   });
   expect(saved.status(), await saved.text()).toBe(200);
-  await expect(saved.json()).resolves.toMatchObject({ id: entry.id, mapping: '32505571' });
+  await expect(saved.json()).resolves.toMatchObject({ id: entry.id, mapping: '32100002' });
 
   await importDocument(request, camt052({ entries: [paymentEntry, postageEntry] }));
 
   const entries = await entriesOf(request);
   const remapped = entries.find((candidate) => candidate.id === entry.id);
-  expect(remapped.mapping).toBe('32505571');
+  expect(remapped.mapping).toBe('32100002');
 });
 
 test('an emptied mapping is erased rather than stored blank', async ({ request }) => {
   await importDocument(request, camt052({ entries: [paymentEntry] }));
   const [entry] = await entriesOf(request);
 
-  await request.put(`/api/private/bank-statements/entries/${entry.id}/mapping`, { data: { mapping: '32505571' } });
+  await request.put(`/api/private/bank-statements/entries/${entry.id}/mapping`, { data: { mapping: '32100002' } });
   const erased = await request.put(`/api/private/bank-statements/entries/${entry.id}/mapping`, {
     data: { mapping: '   ' },
   });

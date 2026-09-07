@@ -956,8 +956,8 @@ test("leaves nothing to invoice for a BrickLink order Stripe shows was refunded 
     brickLink: {
       fullNameOrdersXml: brickLinkOrdersXml(`
   <ORDER>
-    <ORDERID>14652734</ORDERID>
-    <BUYER>Bogdan Sowijak</BUYER>
+    <ORDERID>32100001</ORDERID>
+    <BUYER>Alan Turing</BUYER>
     <DATEORDERED>08/30/2026 10:00</DATEORDERED>
     <ORDERTOTAL>19.63</ORDERTOTAL>
     <BASECURRENCYCODE>EUR</BASECURRENCYCODE>
@@ -973,13 +973,13 @@ test("leaves nothing to invoice for a BrickLink order Stripe shows was refunded 
   </ORDER>`),
       usernameOrdersXml: brickLinkOrdersXml(`
   <ORDER>
-    <ORDERID>14652734</ORDERID>
-    <BUYER>MrIntellectual</BUYER>
+    <ORDERID>32100001</ORDERID>
+    <BUYER>alan-t</BUYER>
   </ORDER>`),
     },
     stripe: [
       {
-        description: "Payment for BrickLink from MrIntellectual",
+        description: "Payment for BrickLink from alan-t",
         amount: 1963,
         amountRefunded: 1963,
       },
@@ -1258,10 +1258,10 @@ test("reports the facilitator tax PayPal shows a BrickOwl order was taken", asyn
     month: "2026-08",
     brickOwl: [
       {
-        orderId: "7578233",
+        orderId: "7500001",
         orderDate: "1786320000",
         view: {
-          buyer_name: "Jonathan Pithioud",
+          buyer_name: "Edith Clarke",
           payment_method_type: "paypal",
           sub_total: "7.69",
           base_order_total: "9.66",
@@ -1274,8 +1274,8 @@ test("reports the facilitator tax PayPal shows a BrickOwl order was taken", asyn
     payPal: [
       {
         transactionId: "owl-payment",
-        invoiceId: "7578233",
-        payerName: "Jonathan Pithioud",
+        invoiceId: "7500001",
+        payerName: "Edith Clarke",
         amount: "9.66",
       },
       // What BrickOwl took back out of that payment under its own registration, as PayPal books it.
@@ -1306,7 +1306,7 @@ test("leaves a PayPal order no partner fee was raised against without a facilita
         orderId: "8779732",
         orderDate: "1786320000",
         view: {
-          buyer_name: "Andris Konuss",
+          buyer_name: "Hedy Lamarr",
           payment_method_type: "paypal",
           sub_total: "4.88",
           base_order_total: "5.89",
@@ -1320,7 +1320,7 @@ test("leaves a PayPal order no partner fee was raised against without a facilita
       {
         transactionId: "owl-payment",
         invoiceId: "8779732",
-        payerName: "Andris Konuss",
+        payerName: "Hedy Lamarr",
         amount: "5.89",
       },
     ],
@@ -1350,7 +1350,7 @@ test("sums the partner fees PayPal raised against one BrickLink payment", async 
   <ORDER>
     <ORDERID>32456590</ORDERID>
     <ORDERDATE>8/12/2026</ORDERDATE>
-    <BUYER>Eden Lister</BUYER>
+    <BUYER>Katherine Johnson</BUYER>
     <ORDERTOTAL>9.81</ORDERTOTAL>
     <BASEGRANDTOTAL>11.78</BASEGRANDTOTAL>
     <PAYMENTTYPE>PayPal (Onsite)</PAYMENTTYPE>
@@ -1366,7 +1366,7 @@ test("sums the partner fees PayPal raised against one BrickLink payment", async 
     payPal: [
       {
         transactionId: "link-payment",
-        payerName: "Eden Lister",
+        payerName: "Katherine Johnson",
         amount: "11.78",
       },
       { eventCode: "T0113", referenceId: "link-payment", amount: "-1.10" },
@@ -1516,10 +1516,10 @@ test("links a PayPal-paid order to the transaction in PayPal", async ({
     month: "2026-08",
     brickOwl: [
       {
-        orderId: "7578233",
+        orderId: "7500001",
         orderDate: "1786320000",
         view: {
-          buyer_name: "Jonathan Pithioud",
+          buyer_name: "Edith Clarke",
           payment_method_type: "paypal",
           sub_total: "7.69",
           base_order_total: "7.69",
@@ -1527,7 +1527,7 @@ test("links a PayPal-paid order to the transaction in PayPal", async ({
       },
     ],
     payPal: [
-      { invoiceId: "7578233", payerName: "Jonathan Pithioud", amount: "7.69" },
+      { invoiceId: "7500001", payerName: "Edith Clarke", amount: "7.69" },
     ],
   });
 
@@ -1579,10 +1579,10 @@ test("reports what PayPal was paid for a BrickOwl order it labelled with the ord
     month: "2026-08",
     brickOwl: [
       {
-        orderId: "7578233",
+        orderId: "7500001",
         orderDate: "1786320000",
         view: {
-          buyer_name: "Jonathan Pithioud",
+          buyer_name: "Edith Clarke",
           payment_method_type: "paypal",
           sub_total: "7.69",
           base_order_total: "7.69",
@@ -1590,7 +1590,7 @@ test("reports what PayPal was paid for a BrickOwl order it labelled with the ord
       },
     ],
     payPal: [
-      { invoiceId: "7578233", payerName: "Jonathan Pithioud", amount: "7.69" },
+      { invoiceId: "7500001", payerName: "Edith Clarke", amount: "7.69" },
     ],
   });
 
@@ -1612,7 +1612,7 @@ test("reports what PayPal was paid for a BrickLink order by the buyer the paymen
     month: "2026-08",
     brickLink: {
       fullNameOrdersXml: brickLinkPayPalOrdersXml([
-        { orderId: "32456563", buyer: "Riku Watanabe", total: "11.39" },
+        { orderId: "32456563", buyer: "Emmy Noether", total: "11.39" },
       ]),
       usernameOrdersXml: `<?xml version="1.0" encoding="UTF-8"?><ORDERS/>`,
     },
@@ -1638,14 +1638,14 @@ test("reports what PayPal was paid for a BrickLink order by the shipping name wh
     month: "2026-08",
     brickLink: {
       fullNameOrdersXml: brickLinkPayPalOrdersXml([
-        { orderId: "32456563", buyer: "Andris Konuss", total: "5.89" },
+        { orderId: "32456563", buyer: "Hedy Lamarr", total: "5.89" },
       ]),
       usernameOrdersXml: `<?xml version="1.0" encoding="UTF-8"?><ORDERS/>`,
     },
     payPal: [
       {
         payerName: "Someone Else",
-        shippingName: "Andris Konuss",
+        shippingName: "Hedy Lamarr",
         amount: "5.89",
       },
     ],
@@ -1668,14 +1668,14 @@ test("falls back to the amount and day when no name matches a BrickLink order", 
     month: "2026-08",
     brickLink: {
       fullNameOrdersXml: brickLinkPayPalOrdersXml([
-        { orderId: "32456563", buyer: "Tom Copin", total: "23.06" },
+        { orderId: "32456563", buyer: "Mary Jackson", total: "23.06" },
       ]),
       usernameOrdersXml: `<?xml version="1.0" encoding="UTF-8"?><ORDERS/>`,
     },
-    // 'Tom Com' is how PayPal spells this buyer; it matches no order, so the amount and the day decide.
+    // 'Mary Jacson' is how PayPal spells this buyer; it matches no order, so the amount and the day decide.
     payPal: [
       {
-        payerName: "Tom Com",
+        payerName: "Mary Jacson",
         amount: "23.06",
         initiatedAt: "2026-08-30T05:24:15Z",
       },
@@ -1732,15 +1732,15 @@ test("tells one buyer's BrickLink orders apart by what the payment took", async 
     month: "2026-08",
     brickLink: {
       fullNameOrdersXml: brickLinkPayPalOrdersXml([
-        { orderId: "32456563", buyer: "Maksims Brezgins", total: "38.80" },
-        { orderId: "32456564", buyer: "Maksims Brezgins", total: "5.06" },
+        { orderId: "32456563", buyer: "Rosalind Franklin", total: "38.80" },
+        { orderId: "32456564", buyer: "Rosalind Franklin", total: "5.06" },
       ]),
       usernameOrdersXml: `<?xml version="1.0" encoding="UTF-8"?><ORDERS/>`,
     },
     // The buyer is known and ordered twice, so what the payment took says which of the two it settled.
     payPal: [
       {
-        payerName: "Maksims Brezgins",
+        payerName: "Rosalind Franklin",
         amount: "38.80",
         initiatedAt: "2026-08-30T05:24:15Z",
       },
@@ -1770,15 +1770,15 @@ test("reports no paid amount when one buyer's BrickLink orders came to the same 
     month: "2026-08",
     brickLink: {
       fullNameOrdersXml: brickLinkPayPalOrdersXml([
-        { orderId: "32456563", buyer: "Maksims Brezgins", total: "38.80" },
-        { orderId: "32456564", buyer: "Maksims Brezgins", total: "38.80" },
+        { orderId: "32456563", buyer: "Rosalind Franklin", total: "38.80" },
+        { orderId: "32456564", buyer: "Rosalind Franklin", total: "38.80" },
       ]),
       usernameOrdersXml: `<?xml version="1.0" encoding="UTF-8"?><ORDERS/>`,
     },
     // Neither the name nor the amount tells these two apart, and a guessed payment reads like a reconciled one.
     payPal: [
       {
-        payerName: "Maksims Brezgins",
+        payerName: "Rosalind Franklin",
         amount: "38.80",
         initiatedAt: "2026-08-30T05:24:15Z",
       },
@@ -1804,14 +1804,14 @@ test("reports no paid amount from a PayPal fee, refund or withdrawal that names 
     month: "2026-08",
     brickLink: {
       fullNameOrdersXml: brickLinkPayPalOrdersXml([
-        { orderId: "32456563", buyer: "Eden Lister", total: "11.78" },
+        { orderId: "32456563", buyer: "Katherine Johnson", total: "11.78" },
       ]),
       usernameOrdersXml: `<?xml version="1.0" encoding="UTF-8"?><ORDERS/>`,
     },
     payPal: [
-      { payerName: "Eden Lister", amount: "11.78", eventCode: "T0113" },
-      { payerName: "Eden Lister", amount: "11.78", eventCode: "T0007" },
-      { payerName: "Eden Lister", amount: "11.78", eventCode: "T0200" },
+      { payerName: "Katherine Johnson", amount: "11.78", eventCode: "T0113" },
+      { payerName: "Katherine Johnson", amount: "11.78", eventCode: "T0007" },
+      { payerName: "Katherine Johnson", amount: "11.78", eventCode: "T0200" },
     ],
   });
 
@@ -1868,7 +1868,7 @@ test("collects PayPal payments that span several pages", async ({
     month: "2026-08",
     brickOwl: [
       {
-        orderId: "7578233",
+        orderId: "7500001",
         orderDate: "1786320000",
         view: { buyer_name: "First Buyer", payment_method_type: "paypal" },
       },
@@ -1879,7 +1879,7 @@ test("collects PayPal payments that span several pages", async ({
       },
     ],
     payPalPages: [
-      [{ invoiceId: "7578233", amount: "7.69" }],
+      [{ invoiceId: "7500001", amount: "7.69" }],
       [{ invoiceId: "5120724", amount: "7.71" }],
     ],
   });
@@ -1896,7 +1896,7 @@ test("collects PayPal payments that span several pages", async ({
       order.gateway.paidAmount,
     ]),
   );
-  expect(paidByOrder).toEqual({ "7578233": 7.69, "5120724": 7.71 });
+  expect(paidByOrder).toEqual({ "7500001": 7.69, "5120724": 7.71 });
 
   // Two pages of the segment the window opens with, and one page of the segment that closes it.
   const transactionRequests = await wireMock.findMethodHostRequests(

@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component;
 @Order(3)
 class MapperStripeBrickOwlPayments implements DetailMapper<BalanceTransaction> {
 
-    /** The order number inside a longer description, as BrickOwl words it: {@code Brick Owl Order #1630980}. */
+    /** The order number inside a longer description, as BrickOwl words it: {@code Brick Owl Order #1600001}. */
     private static final Pattern BRICK_OWL_ORDER = Pattern.compile("\\bBrick Owl Order\\s+#?(\\S+)\\b");
 
     private final PaymentLinks paymentLinks;

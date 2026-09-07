@@ -24,7 +24,7 @@ export type CamtDocumentOptions = {
   readonly entries: readonly CamtEntry[];
 };
 
-export const testAccountIban = 'LV29HABA0551064345221';
+export const testAccountIban = 'LV80BANK0000435195001';
 
 function entryXml(entry: CamtEntry): string {
   const currency = entry.currency ?? 'EUR';

@@ -27,7 +27,7 @@ import org.springframework.stereotype.Component;
 @Order(4)
 class MapperStripeBrickLinkPayments implements DetailMapper<BalanceTransaction> {
 
-    /** The buyer username, as BrickLink words it: {@code Payment for BrickLink from MrIntellectual}. */
+    /** The buyer username, as BrickLink words it: {@code Payment for BrickLink from alan-t}. */
     private static final Pattern BRICK_LINK_PAYMENT = Pattern.compile(
             "^Payment for BrickLink from (.+)$",
             Pattern.CASE_INSENSITIVE

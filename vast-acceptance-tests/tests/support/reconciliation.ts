@@ -64,7 +64,7 @@ export type BrickOwlOrderMock = {
 };
 
 export type StripeTransactionMock = {
-  /** Payment description, which is what an order is matched on: `Brick Owl Order 1630980`,
+  /** Payment description, which is what an order is matched on: `Brick Owl Order 1600001`,
    *  `Payment for BrickLink from some-username`. */
   description: string;
   /** Amount in minor units, as Stripe reports it. */

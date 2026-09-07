@@ -426,8 +426,8 @@ here as they are provided; do not invent unspecified behavior prematurely.
   paid facilitator tax nor any fee is derived from a refund.
 - What a payment names differs by provider and by marketplace, so each pairing
   is matched on what it actually carries. A Stripe payment carries a description:
-  BrickOwl words it as `Brick Owl Order #1630980` and matches that order ID,
-  BrickLink words it as `Payment for BrickLink from MrIntellectual` and matches
+  BrickOwl words it as `Brick Owl Order #1600001` and matches that order ID,
+  BrickLink words it as `Payment for BrickLink from alan-t` and matches
   the buyer username. A PayPal payment carries what the marketplace labelled it
   with: BrickOwl puts its bare order number in `invoice_id` and matches that
   order ID, and BrickLink puts its own checkout id there instead, which names no
@@ -1286,6 +1286,38 @@ a scoping rule for settings, and only incidentally one for tables.
 - Database credentials and connection settings may point both runtimes at the
   same PostgreSQL server/database, but new objects remain isolated in the new
   schema.
+
+## Real data
+
+Real provider data is how a requirement gets stated: a BrickLink export, a
+Stripe balance transaction, a camt statement, a PayPal search response pasted
+into the conversation is the clearest possible account of what a field actually
+looks like. Read it, and never commit it.
+
+- Real data posted in a conversation is a specification, not a fixture. Nothing
+  taken from it reaches a test, a fixture, a code comment, this file, or any
+  other committed file in the shape it arrived in.
+- Obfuscate every value that names a person, an account, or a real transaction
+  before writing it anywhere: buyer names and usernames, payer and recipient
+  names, emails, addresses, phone numbers, IBANs, bank entry references,
+  tracking numbers, marketplace order IDs, invoice numbers, provider
+  transaction and charge IDs, and any credential or token.
+- Obfuscation preserves the shape and keeps the fact under test. An IBAN stays
+  an IBAN, a BrickLink order ID stays eight digits, a camt reference keeps its
+  bank's own format. What changes is that the value names nobody: fictional
+  names, and identifiers plainly outside a real range.
+- Amounts, dates, currencies, country and tax fields carry the behavior a rule
+  is about and may be kept as posted, so long as nothing beside them identifies
+  whose order it was. Change an amount only when the scenario does not turn on
+  it.
+- Keep obfuscated names recognisably fictional and reuse the same cast across
+  scenarios rather than inventing a plausible new person each time. A test
+  buyer that reads like a real one invites the next reader to paste a real one
+  beside it.
+- This applies to code comments and to these requirements as much as to tests.
+  A comment quoting a provider's wording quotes it with an obfuscated value.
+- If a posted example is worth keeping for its format, keep one obfuscated
+  example of it, not the dump it came from.
 
 ## Testing strategy
 
