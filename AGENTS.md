@@ -940,6 +940,41 @@ covers every provider call the backend makes rather than one screen's.
   not open, and the toolbar states how many are stored and what they weigh, so Clear says
   what it would delete.
 
+## Bank statement feature requirements
+
+The bank is the one party to an order the backend cannot read live: no provider exposes
+the account, so a statement is uploaded instead. This is therefore the first stored
+business data in the rewrite, and everything about the feature follows from that.
+
+- Uploads are ISO 20022 **camt.052** account reports and **camt.053** statements. The two
+  differ only in their wrapper — `BkToCstmrAcctRpt/Rpt` against `BkToCstmrStmt/Stmt` — and
+  are the same shape from the account down, so one reader covers both. The flat CSV export
+  the same banks offer is not accepted: it states a counterparty as one pipe-joined string
+  and gives balance lines no reference at all, so there is nothing in it to upsert on.
+- Only booked entries are stored. A report's balances and transaction summary belong to the
+  moment it was pulled rather than to the entries, so re-importing a wider range would
+  rewrite them for no gain.
+- An entry is identified by its tenant, its account IBAN and the bank's own reference:
+  `AcctSvcrRef`, falling back to `NtryRef`. A bank that states neither leaves nothing stable
+  to key on, so the entry's own stated content is hashed instead, and repeats within one
+  document are numbered by the order it listed them.
+- **Importing is upserting.** The same document may be uploaded as often as it is exported,
+  and an overlapping range refreshes the entries it restates rather than duplicating them.
+  Nothing is ever deleted by an import: a range narrowing between exports is not the bank
+  withdrawing what it already booked.
+- `mapping` is the one column a person writes and the one an import never touches. It is
+  the manual last resort for tying an entry to an order when every automatic match has
+  failed, so an import that overwrote it would destroy the only thing on the row a human
+  put there. Nothing else on an entry is editable.
+- The document is posted as the request body under `application/xml`, not as a multipart
+  part. A multipart upload would need Spring's default one-megabyte part cap raised in both
+  launchers' configuration, and a busy month passes it; a raw body has no such cap. The
+  parser has DTDs and external entities off, this being the only place the rewrite reads a
+  file a person chose.
+- `bank_statement_entries` is tenant-owned in the full sense: a `@TenantId` field, a
+  `tenant_id` foreign key cascading from `tenants`, and a unique constraint carrying the
+  tenant, since two banks' customers legitimately share an entry reference.
+
 ## Order tax type feature requirements
 
 An order's tax type is how it is treated for tax, which is what decides how it

@@ -24,6 +24,7 @@ const ProductsPage = Loadable(lazy(() => import('pages/products')));
 const AccountingPage = Loadable(lazy(() => import('pages/accounting')));
 const ArchivesPage = Loadable(lazy(() => import('pages/archives')));
 const ReconciliationPage = Loadable(lazy(() => import('pages/reconciliation')));
+const BankStatementsPage = Loadable(lazy(() => import('pages/bank-statements')));
 
 // ==============================|| MAIN ROUTES ||============================== //
 
@@ -58,6 +59,12 @@ const MainRoutes = {
           path: 'reconciliation',
           element: <ReconciliationPage />,
           // A month of orders is a wide table beside a filter panel, and the trail already names the page.
+          handle: { fullWidth: true, heading: false } satisfies PageLayout
+        },
+        {
+          path: 'bank-statements',
+          element: <BankStatementsPage />,
+          // A statement is a wide table, and the month over it already names the page.
           handle: { fullWidth: true, heading: false } satisfies PageLayout
         }
       ]

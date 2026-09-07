@@ -1,4 +1,4 @@
-import { DocumentText } from 'iconsax-reactjs';
+import { Bank, DocumentText } from 'iconsax-reactjs';
 
 import { NavItemType } from 'types/menu';
 
@@ -13,6 +13,13 @@ const reconciliationMenu: NavItemType = {
       type: 'item',
       url: '/reconciliation',
       icon: DocumentText
+    },
+    {
+      id: 'bank-statements',
+      title: 'bank-statements',
+      type: 'item',
+      url: '/bank-statements',
+      icon: Bank
     }
   ]
 };
