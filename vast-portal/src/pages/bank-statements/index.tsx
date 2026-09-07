@@ -123,6 +123,16 @@ function MappingCell({
         onBlur={save}
         onKeyDown={handleKeyDown}
         slotProps={{ htmlInput: { 'aria-label': intl.formatMessage({ id: 'bank-statement-mapping' }) } }}
+        // A line under this field in every row is another rung of the ladder the table has just been rid of, and a
+        // louder one than the entries it runs beside. It draws its underline when the row is pointed at or the field
+        // is being written in, and reads as the value it holds otherwise; the placeholder says there is something to
+        // write here even while the line is away.
+        sx={(theme) => ({
+          '& .MuiInput-root:before': { borderBottomColor: 'transparent' },
+          'tr:hover & .MuiInput-root:before, & .MuiInput-root.Mui-focused:before': {
+            borderBottomColor: theme.palette.divider
+          }
+        })}
       />
     </TableCell>
   );
@@ -282,7 +292,7 @@ export default function BankStatementsPage() {
                   minWidth: 1100,
                   // The theme gives every head cell but the last `position: relative`, to hang the column divider
                   // off, and that beats the `sticky` the stickyHeader prop asks for. Asked for again here, where it
-                  // out-specifies the theme, so the head stays put and the divider still hangs.
+                  // out-specifies the theme, so the head stays put.
                   '& .MuiTableCell-stickyHeader:not(:last-of-type)': { position: 'sticky' },
                   // The page is what scrolls, so the head stops under the app header rather than at nought, and it
                   // keeps the ground and the edge the row it sits in would otherwise have carried behind it.
@@ -290,7 +300,20 @@ export default function BankStatementsPage() {
                     top: STICKY_TOP,
                     bgcolor: 'secondary.lighter',
                     borderBottom: (theme) => `2px solid ${theme.palette.divider}`
-                  }
+                  },
+                  // The head hangs a divider off every column but the last. They crossed the line under every entry
+                  // and made a grid of the statement; the head is grounded and ruled off already, which is enough to
+                  // read it as the head.
+                  '& .MuiTableCell-stickyHeader:after': { display: 'none' },
+                  // An entry is separated from the next by its ground rather than by a line of its own. A statement
+                  // is dozens of rows long and a line under each of them read exactly as loudly as the rule under
+                  // the head and the rule above the summary, which are the two the reader is steering by, so the
+                  // ladder is taken away and those two are left to carry the table's shape.
+                  '& tbody .MuiTableCell-root': { borderBottom: 0 },
+                  '& tbody .MuiTableRow-root:nth-of-type(even)': { bgcolor: 'secondary.lighter' },
+                  // The banded ground is the theme's own hover colour, so the row under the pointer answers in a
+                  // different one rather than in the one every other row already wears.
+                  '& tbody .MuiTableRow-root:hover': { bgcolor: 'primary.lighter' }
                 }}
               >
                 <TableHead>

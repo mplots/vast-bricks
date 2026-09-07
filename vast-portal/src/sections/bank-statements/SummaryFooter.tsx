@@ -61,6 +61,11 @@ const linesOf = (currency: BankStatementCurrencySummary) => [
  * upper case a footer is otherwise set in. The tint is close enough to the page behind the card that the figures sat
  * in a band that read as neither table nor page; the case is for column headings, and these are three sentences
  * about money.
+ *
+ * <p>That ground is carried by the cells and not by the foot itself, and the foot is stripped of the edges the theme
+ * draws on it. Both are squares the full width of the table: a ground painted on the foot fills in the corners the
+ * last line rounds, and the theme's own bottom edge rules straight across them, so the card came out square-cornered
+ * under a foot that had asked to be round. What is rounded is now the only thing painted.
  */
 export default function SummaryFooter({ summary, before, after }: Props) {
   const intl = useIntl();
@@ -71,19 +76,32 @@ export default function SummaryFooter({ summary, before, after }: Props) {
         position: 'sticky',
         bottom: 0,
         zIndex: 2,
-        // Its own ground, so the entries travel under the foot rather than through it.
-        bgcolor: 'background.paper',
+        // The theme grounds and edges the foot as a whole. Both are squares across the full width, so both square
+        // the corners the last line below rounds; the ground moves onto the cells and the edges are drawn there too.
+        bgcolor: 'transparent',
+        border: 0,
         // The theme sets a footer cell in small upper case, which is a column heading's voice, and at a column
         // heading's size. These read at the size the entries above them do.
-        '& .MuiTableCell-root': { textTransform: 'none', fontSize: '0.875rem' },
-        // Where the entries stop, said once across the whole width. The edge the theme draws on the foot itself does
-        // not paint in a collapsed table, so it is drawn on the cells of the first line, which do.
+        '& .MuiTableCell-root': {
+          textTransform: 'none',
+          fontSize: '0.875rem',
+          // Its own ground, so the entries travel under the foot rather than through it, carried cell by cell so the
+          // rounded corners of the last line are what the reader sees.
+          bgcolor: 'background.paper',
+          // No column dividers anywhere in the foot, and no line under each of the three: the summary is one
+          // statement across the width rather than cells of a row, and the only rules it keeps are the heavy one
+          // above it and the one the balance is ruled off by.
+          borderBottom: 0,
+          '&:after': { display: 'none' }
+        },
+        // Where the entries stop, said once across the whole width, and one of the two heavy rules the table keeps:
+        // under the head and above the summary. Drawn on the cells of the first line rather than on the foot, whose
+        // own edge would rule straight across the rounded corners below.
         '& tr:first-of-type .MuiTableCell-root': { borderTop: `2px solid ${theme.palette.divider}` },
         // The card cannot clip what overflows it, the stuck head and foot being the reason, so the last line rounds
         // the card's own bottom corners rather than filling them square. Taken from the shape the card rounds itself
         // to rather than stated again here, so the two cannot drift apart.
         '& tr:last-of-type .MuiTableCell-root': {
-          borderBottom: 0,
           '&:first-of-type': { borderBottomLeftRadius: Number(theme.shape.borderRadius) * 1.5 },
           '&:last-of-type': { borderBottomRightRadius: Number(theme.shape.borderRadius) * 1.5 }
         }
@@ -97,13 +115,12 @@ export default function SummaryFooter({ summary, before, after }: Props) {
 
           return (
             <TableRow key={`${currency.currency}:${line.id}`}>
-              {/* The columns the amount does not stand in carry the ground and nothing else: no divider of their own,
-                  the summary being one statement across them rather than cells of a row. */}
-              <TableCell colSpan={before} sx={{ border: 0, '&:after': { display: 'none' } }} />
+              {/* The columns the amount does not stand in carry the ground and nothing else. */}
+              <TableCell colSpan={before} sx={{ border: 0 }} />
               <TableCell sx={{ ...numericCell, ...ruled, color: line.colour, fontWeight: line.sum ? 700 : 500 }}>
                 {line.amount} {currency.currency}
               </TableCell>
-              <TableCell colSpan={after} sx={{ ...ruled, '&:after': { display: 'none' } }}>
+              <TableCell colSpan={after} sx={ruled}>
                 {intl.formatMessage({ id: line.id })}
               </TableCell>
             </TableRow>

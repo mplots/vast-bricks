@@ -648,6 +648,18 @@ here as they are provided; do not invent unspecified behavior prematurely.
   things — how an order reconciled, which tints the row and is what a reader
   is looking for, and which marketplace an order came from, colouring its chip
   — and a third would compete with the tint it ran through.
+- A line is spent only where the table changes, as it is on the bank statement
+  screen. The theme hangs a divider off every heading, which crossed the line
+  under every order and made a grid of the month; the head hangs none, so the
+  only vertical line the table draws is the run edge, which means something. The
+  line between one order and the next is rhythm rather than structure and is set
+  well under the two rules that are — the heavy one under the head and the run
+  edges down the body — rather than reading as loudly as either.
+- It is a quieter line and not no line at all, which is where this table parts
+  from the statement's. There the entries are banded, and a band is what
+  separates one from the next; here the ground already says how an order
+  reconciled, so it cannot also alternate, and two orders of one level would run
+  together with nothing drawn between them.
 - The detail view titles each source's fields and rules them off with a divider,
   the way a card titles what it holds. A heading alone left the groups to be
   noticed rather than seen, and which account stated a value is the whole reason
@@ -1017,6 +1029,18 @@ business data in the rewrite, and everything about the feature follows from that
   on to, but it puts a second scrollbar beside the page's, and a reader scrolling a table
   should not have to notice which of two bars they are pushing. So nothing between the
   table and the page may clip, the card included.
+- **A line is spent only where the table changes.** A statement is dozens of rows long, and a rule under every entry,
+  a divider between every heading, a line under each summary line and an underline under every mapping field all read
+  at one weight — a grid, in which the two rules that actually say something are lost. So the entries are separated by
+  a banded ground rather than by a line each, the head hangs no column dividers, the summary carries no line under
+  each of its three, and the mapping field draws its underline only when its row is pointed at or the field is being
+  written in. What is left is the heavy rule under the head, the heavy rule above the summary, and the light one the
+  closing balance is ruled off by. The band is the theme's own hover colour, so the row under the pointer answers in
+  another one rather than in the one half the rows already wear.
+- The foot is grounded and rounded **on its cells, never on the foot itself**. The theme grounds and edges a footer as
+  a whole, and both are squares the full width of the table: they fill in and rule across the corners the last line
+  rounds to meet the card, which the card cannot round for itself because it may not clip. So the foot is stripped of
+  the theme's ground and edges, its cells carry the ground, and the first line draws the rule above it.
 - The head is stuck cell by cell, the way MUI's own `stickyHeader` does it. **The foot is
   stuck as one element**, and this is not a matter of taste. The theme gives a table cell
   `position: relative` to hang a column divider off, under a selector that beats a plain

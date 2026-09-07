@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 
-import { emphasize, styled, type Theme } from '@mui/material/styles';
+import { alpha, emphasize, styled, type Theme } from '@mui/material/styles';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -963,6 +963,18 @@ export default function ReconciliationPage() {
                           top: STICKY_TOP + TITLE_HEIGHT,
                           height: GROUP_HEIGHT,
                           borderBottom: 'none'
+                        },
+                        // A line is spent only where the table changes. The theme hangs a divider off every heading
+                        // but the last, which crossed the line under every order and made a grid of the month; the
+                        // only vertical line this table draws is the edge between one source's run of columns and the
+                        // next, which means something. The head is grounded and ruled off, which is enough to read it
+                        // as the head.
+                        '& .MuiTableCell-stickyHeader:after': { display: 'none' },
+                        // The line between one order and the next is rhythm rather than structure, so it is set well
+                        // under the two rules that are: the heavy one under the head and the run edges down the body.
+                        // A month is a hundred rows, and a separator at full weight read as loudly as either.
+                        '& tbody .MuiTableCell-root': {
+                          borderBottomColor: (theme: Theme) => alpha(theme.palette.divider, 0.4)
                         }
                       }}
                     >
