@@ -25,6 +25,7 @@ const AccountingPage = Loadable(lazy(() => import('pages/accounting')));
 const ArchivesPage = Loadable(lazy(() => import('pages/archives')));
 const ReconciliationPage = Loadable(lazy(() => import('pages/reconciliation')));
 const BankStatementsPage = Loadable(lazy(() => import('pages/bank-statements')));
+const StripeTransactionsPage = Loadable(lazy(() => import('pages/stripe-transactions')));
 
 // ==============================|| MAIN ROUTES ||============================== //
 
@@ -65,6 +66,12 @@ const MainRoutes = {
           path: 'bank-statements',
           element: <BankStatementsPage />,
           // A statement is a wide table, and the month over it already names the page.
+          handle: { fullWidth: true, heading: false } satisfies PageLayout
+        },
+        {
+          path: 'stripe-transactions',
+          element: <StripeTransactionsPage />,
+          // A ledger is a wide table, and the period over it already names the page.
           handle: { fullWidth: true, heading: false } satisfies PageLayout
         }
       ]

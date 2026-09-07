@@ -4,9 +4,8 @@ import type { SettingsOverrides } from "./api-test";
 import type { WireMockValueMatcher } from "./wiremock";
 import { WireMockApi } from "./wiremock";
 import { orderDetailPage } from "./bricklink-order-detail";
+import { mockStripeSettings, stubStripeBalanceTransactions } from "./stripe";
 
-const stripeSecretKey = "test-stripe-secret-key";
-const stripeAccountId = "acct_test-stripe-account";
 const payPalClientId = "test-paypal-client-id";
 const payPalClientSecret = "test-paypal-client-secret";
 const payPalBasicAuth = Buffer.from(
@@ -204,7 +203,10 @@ async function addBrickLinkOrderDetailMappings(
 ) {
   await wireMock.addMethodHostMapping("GET", "/orderDetail.asp", {
     priority: 10,
-    response: { headers: { "Content-Type": "text/html" }, body: orderDetailPage("unrefunded") },
+    response: {
+      headers: { "Content-Type": "text/html" },
+      body: orderDetailPage("unrefunded"),
+    },
   });
   for (const [orderId, totalRefunded] of Object.entries(refunds)) {
     await wireMock.addMethodHostMapping("GET", "/orderDetail.asp", {
@@ -308,42 +310,23 @@ async function mockStripe(
   settings: SettingsOverrides,
   pages: StripeTransactionMock[][],
 ) {
-  await settings.set("VAST_STRIPE_BASE_URL", wireMock.baseUrl);
-  await settings.set("VAST_STRIPE_ACCOUNT_ID", stripeAccountId);
-  await settings.setSecret("VAST_STRIPE_SECRET_KEY", stripeSecretKey);
+  await mockStripeSettings(settings, wireMock);
 
+  // Numbered across the pages so every transaction and its charge is unique, whichever page it was returned on.
   let transactionNumber = 0;
-  let startingAfter: WireMockValueMatcher = { absent: true };
-  for (const [pageIndex, page] of pages.entries()) {
-    const transactions = page.map((transaction) => {
-      const number = ++transactionNumber;
-      return {
-        ...transaction,
-        id: `txn_${number}`,
-        charge: `test-charge-${number}`,
-      };
-    });
-    await wireMock.addMethodHostMapping("GET", "/v1/balance_transactions", {
-      // The key is asserted so a client that sends none misses the stub instead of passing unauthenticated.
-      request: {
-        headers: { Authorization: { equalTo: `Bearer ${stripeSecretKey}` } },
-        queryParameters: { starting_after: startingAfter },
-      },
-      response: {
-        json: {
-          object: "list",
-          url: "/v1/balance_transactions",
-          has_more: pageIndex < pages.length - 1,
-          data: transactions.map((transaction) =>
-            stripeBalanceTransaction(transaction),
-          ),
-        },
-      },
-    });
-    if (transactions.length > 0) {
-      startingAfter = { equalTo: transactions[transactions.length - 1].id };
-    }
-  }
+  await stubStripeBalanceTransactions(
+    wireMock,
+    pages.map((page) =>
+      page.map((transaction) => {
+        const number = ++transactionNumber;
+        return stripeBalanceTransaction({
+          ...transaction,
+          id: `txn_${number}`,
+          charge: `test-charge-${number}`,
+        });
+      }),
+    ),
+  );
 }
 
 function stripeBalanceTransaction(

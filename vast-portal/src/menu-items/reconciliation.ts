@@ -1,4 +1,4 @@
-import { Bank, DocumentText } from 'iconsax-reactjs';
+import { Bank, Card, DocumentText } from 'iconsax-reactjs';
 
 import { NavItemType } from 'types/menu';
 
@@ -20,6 +20,13 @@ const reconciliationMenu: NavItemType = {
       type: 'item',
       url: '/bank-statements',
       icon: Bank
+    },
+    {
+      id: 'stripe-transactions',
+      title: 'stripe-transactions',
+      type: 'item',
+      url: '/stripe-transactions',
+      icon: Card
     }
   ]
 };
