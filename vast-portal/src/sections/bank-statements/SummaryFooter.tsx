@@ -67,27 +67,27 @@ export default function SummaryFooter({ summary, before, after }: Props) {
 
   return (
     <TableFooter
-      sx={{
+      sx={(theme) => ({
         position: 'sticky',
         bottom: 0,
         zIndex: 2,
-        // The foot starts with one continuous rule, including the empty cells before the amount, so it reads as a
-        // separate account of the entries rather than another table row.
-        '& .MuiTableRow-root:first-of-type .MuiTableCell-root': {
-          borderTop: '1px solid',
-          borderTopColor: 'divider'
-        },
-        // The card cannot clip the sticky foot, so its last row carries the card's lower curves itself.
-        '& .MuiTableRow-root:last-of-type .MuiTableCell-root': {
-          '&:first-of-type': { borderBottomLeftRadius: 1.5 },
-          '&:last-of-type': { borderBottomRightRadius: 1.5 }
-        },
-        // Every cell carries its own ground so the entries travel under the foot rather than through it, while the
-        // footer itself stays clear of the lower corners cut away by its last row. The theme sets a footer cell in
-        // small upper case, which is a column heading's voice, and at a column heading's size. These read at the size
-        // the entries above them do.
-        '& .MuiTableCell-root': { bgcolor: 'background.paper', textTransform: 'none', fontSize: '0.875rem' }
-      }}
+        // Its own ground, so the entries travel under the foot rather than through it.
+        bgcolor: 'background.paper',
+        // The theme sets a footer cell in small upper case, which is a column heading's voice, and at a column
+        // heading's size. These read at the size the entries above them do.
+        '& .MuiTableCell-root': { textTransform: 'none', fontSize: '0.875rem' },
+        // Where the entries stop, said once across the whole width. The edge the theme draws on the foot itself does
+        // not paint in a collapsed table, so it is drawn on the cells of the first line, which do.
+        '& tr:first-of-type .MuiTableCell-root': { borderTop: `2px solid ${theme.palette.divider}` },
+        // The card cannot clip what overflows it, the stuck head and foot being the reason, so the last line rounds
+        // the card's own bottom corners rather than filling them square. Taken from the shape the card rounds itself
+        // to rather than stated again here, so the two cannot drift apart.
+        '& tr:last-of-type .MuiTableCell-root': {
+          borderBottom: 0,
+          '&:first-of-type': { borderBottomLeftRadius: Number(theme.shape.borderRadius) * 1.5 },
+          '&:last-of-type': { borderBottomRightRadius: Number(theme.shape.borderRadius) * 1.5 }
+        }
+      })}
     >
       {summary.flatMap((currency) =>
         linesOf(currency).map((line) => {
