@@ -10,6 +10,7 @@ import { useIntl } from 'react-intl';
 
 import IconButton from 'components/@extended/IconButton';
 import { monthDate, monthOf } from 'sections/reconciliation/month';
+import periodButtonSx from 'sections/reconciliation/periodButton';
 
 interface Props {
   /** The month on screen, as `YYYY-MM`. */
@@ -17,20 +18,22 @@ interface Props {
   /** The last month worth offering, as `YYYY-MM`: nothing has happened yet in a month that has not started. */
   max: string;
   onChange: (month: string) => void;
+  /** The message naming what this month is of, for screens other than reconciliation's own. */
+  labelId?: string;
 }
 
 /**
  * The month the reconciliation screen is reading, and the way to pick another one.
  *
- * <p>The month is the table's title, so it is worn as the title's own type rather than as a form field, and the whole
- * of it is the button that opens the picker. The picker itself is a year walked by arrows over the twelve months of
- * it, which is the shape of the question being asked: a month is picked, never a day.
+ * <p>The month is the table's title, worn the way {@link periodButtonSx} describes. The picker itself is a year
+ * walked by arrows over the twelve months of it, which is the shape of the question being asked: a month is picked,
+ * never a day.
  *
  * <p>This replaces the browser's own `month` input, which wrote the month in whatever form and font the browser
  * happened to keep, could not be themed with the rest of the screen, and which Safari does not offer a picker for at
  * all.
  */
-export default function MonthPicker({ value, max, onChange }: Props) {
+export default function MonthPicker({ value, max, onChange, labelId = 'reconciliation-month' }: Props) {
   const intl = useIntl();
   const [anchor, setAnchor] = useState<HTMLElement | null>(null);
   // The year the grid is showing, which is only the picked month's year until the arrows walk away from it.
@@ -49,19 +52,7 @@ export default function MonthPicker({ value, max, onChange }: Props) {
 
   return (
     <>
-      <Button
-        color="inherit"
-        onClick={open}
-        aria-label={intl.formatMessage({ id: 'reconciliation-month' })}
-        sx={{
-          typography: 'h5',
-          px: 0.75,
-          py: 0,
-          minWidth: 0,
-          textTransform: 'none',
-          '&:hover, &[aria-expanded="true"]': { bgcolor: 'secondary.lighter' }
-        }}
-      >
+      <Button color="inherit" onClick={open} aria-label={intl.formatMessage({ id: 'reconciliation-month' })} sx={periodButtonSx}>
         {label}
       </Button>
       <Popover

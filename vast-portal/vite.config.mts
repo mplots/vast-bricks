@@ -57,7 +57,8 @@ export default defineConfig(({ mode }) => {
       include: [
         '@mui/x-date-pickers/AdapterDateFns',
         '@mui/x-date-pickers/LocalizationProvider',
-        '@mui/x-date-pickers/MonthCalendar'
+        '@mui/x-date-pickers/MonthCalendar',
+        '@mui/x-date-pickers/YearCalendar'
       ]
     },
     plugins: [react(), tsconfigPaths()]

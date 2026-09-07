@@ -1,12 +1,19 @@
 package com.vastbricks.api.bankstatement;
 
+import static java.math.BigDecimal.ZERO;
+
 import com.vastbricks.api.bankstatement.BankStatementPayload.AccountImportResponse;
+import com.vastbricks.api.bankstatement.BankStatementPayload.CurrencySummaryResponse;
+import com.vastbricks.api.bankstatement.BankStatementPayload.EntriesResponse;
 import com.vastbricks.api.bankstatement.BankStatementPayload.EntryResponse;
 import com.vastbricks.api.bankstatement.BankStatementPayload.ImportResponse;
-import java.time.YearMonth;
+import com.vastbricks.api.reconciliation.ReconciliationAmount;
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -65,13 +72,49 @@ class BankStatementService {
         return new ImportResponse(accounts, read, created, updated);
     }
 
-    /** The month's entries by booking date, which is the day the account actually moved. */
+    /**
+     * The period's entries by booking date, which is the day the account actually moved, and what they came to.
+     *
+     * <p>The summary rides with the entries rather than in an endpoint of its own, for the reason the reconciliation
+     * field roster does: a screen can then never show a period's entries under a summary fetched for another one.
+     */
     @Transactional(readOnly = true)
-    List<EntryResponse> entriesOf(YearMonth month) {
-        return entries
-                .findByBookingDateBetweenOrderByBookingDateAscIdAsc(month.atDay(1), month.atEndOfMonth())
-                .stream()
-                .map(BankStatementService::toResponse)
+    EntriesResponse entriesOf(BankStatementPeriod period) {
+        var found = entries.findByBookingDateBetweenOrderByBookingDateAscIdAsc(period.getFrom(), period.getTo());
+        return new EntriesResponse(found.stream().map(BankStatementService::toResponse).toList(), summaryOf(found, period));
+    }
+
+    /**
+     * What the period came to, per currency: the two turnovers from the period's own entries, and the balance from
+     * every entry stored up to the end of it.
+     *
+     * <p>Only the currencies the period actually moved in get a row. A currency the account holds but did not move
+     * this period has a balance and no turnovers, and stating it under a period it took no part in would read as a
+     * movement that did not happen.
+     */
+    private List<CurrencySummaryResponse> summaryOf(List<BankStatementEntry> found, BankStatementPeriod period) {
+        var turnovers = new LinkedHashMap<String, BigDecimal[]>();
+        for (var entry : found) {
+            var currency = turnovers.computeIfAbsent(entry.getCurrency(), ignored -> new BigDecimal[]{ZERO, ZERO});
+            var slot = entry.getDirection() == BankStatementDirection.DEBIT ? 0 : 1;
+            currency[slot] = currency[slot].add(entry.getAmount());
+        }
+
+        var balances = new HashMap<String, BigDecimal>();
+        for (var total : entries.totalsUpTo(period.getTo())) {
+            // Credits less debits: the amounts are stored unsigned, so the direction is what puts the sign back.
+            var signed = total.getDirection() == BankStatementDirection.DEBIT ? total.getTotal().negate() : total.getTotal();
+            balances.merge(total.getCurrency(), signed, BigDecimal::add);
+        }
+
+        return turnovers.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .map(currency -> new CurrencySummaryResponse(
+                        currency.getKey(),
+                        ReconciliationAmount.normalize(currency.getValue()[0]),
+                        ReconciliationAmount.normalize(currency.getValue()[1]),
+                        ReconciliationAmount.normalize(balances.getOrDefault(currency.getKey(), ZERO))
+                ))
                 .toList();
     }
 

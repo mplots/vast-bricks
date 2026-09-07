@@ -974,6 +974,70 @@ business data in the rewrite, and everything about the feature follows from that
 - `bank_statement_entries` is tenant-owned in the full sense: a `@TenantId` field, a
   `tenant_id` foreign key cascading from `tenants`, and a unique constraint carrying the
   tenant, since two banks' customers legitimately share an entry reference.
+- The screen reads one **period** at a time, and the period is a month or a whole year: a
+  month while mappings are being written against entries, a year while a year is being
+  looked over. Both are asked for in one request parameter, `YYYY-MM` or `YYYY`, so which
+  of the two is being read is readable from the period itself and nothing carries a second
+  answer to the same question. A year lists its twelve months' entries flat, in the same
+  table, rather than collapsing them into a row each.
+- The neighbouring periods are arrows either side of the period, as they are on the
+  reconciliation screen, because a statement is read a period at a time and the period
+  before is the one asked for next more often than any other — too often to be worth
+  opening anything for. The step forward stops at the period being lived through, nothing
+  having happened yet in one that has not started.
+- Which of the two kinds of period is being read is asked **beside the period, in the title
+  bar**, not inside the picker: it is a question about how the table is read, not about
+  which period is being read, so it does not belong inside the thing that picks one. It is
+  a toggle of two buttons with the view already on screen disabled rather than merely
+  unselected, there being nothing to ask for by pressing it, which is the pattern
+  `vb-portal-full-version` uses wherever it offers a period of its own. Switching reads the
+  same span in the other view rather than starting the reader somewhere they did not ask
+  for: a month widens to its year, and a year narrows to its last month that has actually
+  happened.
+- The reconciliation screen's month and the bank statement screen's period are the title of
+  their table, and wear one shared look for it, so a title bar never shows two differently
+  sized titles of the same kind of thing.
+- The foot of the table states what the period came to, laid out the way a bank lays out
+  the foot of a statement: the figure in the amount column, what it is beside it. Three
+  lines — debit turnover, credit turnover, closing balance — per currency the period moved
+  in, and a whole group per currency rather than one set of totals, an account moving in
+  two currencies having two accounts of itself. The balance is ruled off from the turnovers
+  it sums, the way it would be on paper.
+- The summary keeps the table's own background rather than the tinted one a footer wears by
+  default, and drops the small upper case a footer is otherwise set in: these are three
+  sentences about money, not column headings. That tint is close enough to the page behind
+  the card that the figures sat in a band reading as neither table nor page; the rule above
+  the footer already says where the entries stop.
+- **The head and the summary both stay in view while the entries scroll.** The head names
+  the columns and the foot totals them, and a period long enough to scroll is exactly the
+  period where both are wanted while the middle is being read — a total cannot be arrived
+  at by looking. The page is the one thing that scrolls, as it is on the reconciliation
+  screen: the head stops under the app header and the foot at the bottom of the window.
+  Giving the entries a window of their own would have given both something nearer to hold
+  on to, but it puts a second scrollbar beside the page's, and a reader scrolling a table
+  should not have to notice which of two bars they are pushing. So nothing between the
+  table and the page may clip, the card included.
+- The head is stuck cell by cell, the way MUI's own `stickyHeader` does it. **The foot is
+  stuck as one element**, and this is not a matter of taste. The theme gives a table cell
+  `position: relative` to hang a column divider off, under a selector that beats a plain
+  `sx`, and exempts the last cell of a row — so a foot stuck cell by cell comes apart down
+  the middle, the name of a line resting while the figure beside it scrolls on. Out-
+  specifying the theme is possible, and the head does exactly that, but a foot has a second
+  reason not to: a cell resting against the bottom is placed by its own bottom edge where
+  the head is placed by its top, and cells of one line share a top edge but not necessarily
+  a bottom one. A screen adding a stuck row to a table should know which of the two it is
+  adding.
+- The turnovers are the period's own entries. The **closing balance is derived**, not the
+  bank's own figure: it is every stored entry up to the end of the period, credits less
+  debits, so it is the bank's closing balance only for an account imported from its opening
+  balance onward and states the movement it holds otherwise. Balances are still not read
+  from a camt document, for the reason above, so there is nothing to reconcile it against;
+  if that is ever wanted, the `Bal` elements are what to import.
+- The balance is summed in the database rather than by loading the rows it covers, that
+  range growing with every import while what is wanted out of it stays two numbers per
+  currency. It is the feature's one JPQL query, so it is also the one place where
+  `@TenantId` reaching an aggregate rather than an entity load is worth an acceptance test
+  of its own.
 
 ## Order tax type feature requirements
 

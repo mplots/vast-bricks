@@ -34,10 +34,14 @@ const postageEntry = {
   proprietaryCode: 'IZP',
 };
 
-async function entriesOf(request: APIRequestContext, requestedMonth = month) {
-  const response = await request.get(`/api/private/bank-statements/entries?month=${requestedMonth}`);
+async function pageOf(request: APIRequestContext, period = month) {
+  const response = await request.get(`/api/private/bank-statements/entries?period=${period}`);
   expect(response.status(), await response.text()).toBe(200);
-  return (await response.json()).entries as any[];
+  return (await response.json()) as { entries: any[]; summary: any[] };
+}
+
+async function entriesOf(request: APIRequestContext, period = month) {
+  return (await pageOf(request, period)).entries;
 }
 
 test('a camt.052 report imports its entries', async ({ request }) => {
@@ -147,6 +151,52 @@ test('an entry outside the requested month is not listed', async ({ request }) =
   expect(await entriesOf(request, '2026-09')).toHaveLength(1);
 });
 
+test('a year lists every month of it at once', async ({ request }) => {
+  await importDocument(request, camt052({ entries: [postageEntry, { ...paymentEntry, bookingDate: '2026-03-11' }] }));
+
+  // The March payment falls outside September, so a month view is the proof the year view is not just this month.
+  expect(await entriesOf(request, '2026-09')).toHaveLength(1);
+  expect(await entriesOf(request, '2026')).toHaveLength(2);
+  expect(await entriesOf(request, '2025')).toHaveLength(0);
+});
+
+/**
+ * The summary is what the screen states under the entries, so it is asserted against the same figures the entries
+ * were imported with. The closing balance deliberately reaches back past the period: it is everything the account
+ * has moved up to the end of it, not what it moved during it.
+ */
+test('a period is summarised per currency', async ({ request }) => {
+  await importDocument(
+    request,
+    camt052({
+      entries: [
+        postageEntry,
+        paymentEntry,
+        { ...paymentEntry, reference: 'earlier-credit', amount: '4319.70', bookingDate: '2026-08-14' },
+      ],
+    }),
+  );
+
+  const september = await pageOf(request, '2026-09');
+  expect(september.summary).toEqual([
+    { currency: 'EUR', debitTurnover: 16.01, creditTurnover: 5.07, closingBalance: 4308.76 },
+  ]);
+
+  // The year holds all three entries, so its turnovers are the whole of them and the balance is the same figure.
+  const year = await pageOf(request, '2026');
+  expect(year.summary).toEqual([
+    { currency: 'EUR', debitTurnover: 16.01, creditTurnover: 4324.77, closingBalance: 4308.76 },
+  ]);
+});
+
+test('a period nothing moved in is summarised as nothing rather than as zero', async ({ request }) => {
+  await importDocument(request, camt052({ entries: [paymentEntry] }));
+
+  const page = await pageOf(request, '2026-08');
+  expect(page.entries).toHaveLength(0);
+  expect(page.summary).toEqual([]);
+});
+
 test('an entry the bank gave no reference keeps its own identity across imports', async ({ request }) => {
   const unreferenced = { ...paymentEntry, reference: undefined };
 
@@ -195,6 +245,23 @@ test('a tenant never sees or writes another tenant\'s entries', async ({ request
   expect(authentication.tenant.id).toBeGreaterThan(0);
 });
 
+/**
+ * The summary's balance is the one query in the feature written as JPQL rather than derived from a method name, and
+ * it aggregates rather than loading entities, so this is what proves `@TenantId` reaches it too: a balance summed
+ * over both tenants' rows would be the leak no other assertion here would notice.
+ */
+test("a tenant's summary is summed over its own entries alone", async ({ request, otherTenant }) => {
+  await importDocument(request, camt052({ entries: [paymentEntry] }));
+  await importDocument(otherTenant.request, camt052({ entries: [postageEntry] }));
+
+  expect((await pageOf(request)).summary).toEqual([
+    { currency: 'EUR', debitTurnover: 0, creditTurnover: 5.07, closingBalance: 5.07 },
+  ]);
+  expect((await pageOf(otherTenant.request)).summary).toEqual([
+    { currency: 'EUR', debitTurnover: 16.01, creditTurnover: 0, closingBalance: -16.01 },
+  ]);
+});
+
 test('the same entry reference may belong to two tenants at once', async ({ request, otherTenant }) => {
   await importDocument(request, camt052({ entries: [paymentEntry] }));
   const theirs = await importDocument(otherTenant.request, camt052({ entries: [paymentEntry] }));
@@ -210,8 +277,9 @@ test('an unauthenticated caller cannot import', async ({ anonymousRequest }) => 
   expect(response.status()).toBe(401);
 });
 
-test('a month that is not YYYY-MM is refused', async ({ request }) => {
-  const response = await request.get('/api/private/bank-statements/entries?month=September');
-
-  expect(response.status()).toBe(400);
+test('a period that is neither a month nor a year is refused', async ({ request }) => {
+  for (const period of ['September', '2026-13', '20261', '']) {
+    const response = await request.get(`/api/private/bank-statements/entries?period=${period}`);
+    expect(response.status(), `period=${period}`).toBe(400);
+  }
 });

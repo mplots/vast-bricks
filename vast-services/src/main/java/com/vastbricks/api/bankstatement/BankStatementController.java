@@ -4,8 +4,6 @@ import com.vastbricks.api.bankstatement.BankStatementPayload.EntriesResponse;
 import com.vastbricks.api.bankstatement.BankStatementPayload.EntryResponse;
 import com.vastbricks.api.bankstatement.BankStatementPayload.ImportResponse;
 import com.vastbricks.api.bankstatement.BankStatementPayload.MappingRequest;
-import java.time.YearMonth;
-import java.time.format.DateTimeParseException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -49,9 +47,13 @@ class BankStatementController {
         return statements.importDocument(document);
     }
 
+    /**
+     * The entries of one period, and what they came to. The period is a month while mappings are being written
+     * against entries, and a year while a year is being looked over, so one parameter carries both forms.
+     */
     @GetMapping("/entries")
-    EntriesResponse entries(@RequestParam("month") String month) {
-        return new EntriesResponse(statements.entriesOf(monthOf(month)));
+    EntriesResponse entries(@RequestParam("period") String period) {
+        return statements.entriesOf(periodOf(period));
     }
 
     @PutMapping(path = "/entries/{id}/mapping", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -62,11 +64,11 @@ class BankStatementController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No such bank statement entry"));
     }
 
-    private static YearMonth monthOf(String month) {
+    private static BankStatementPeriod periodOf(String period) {
         try {
-            return YearMonth.parse(month);
-        } catch (DateTimeParseException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Month must be written as YYYY-MM: " + month, e);
+            return BankStatementPeriod.of(period);
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
         }
     }
 

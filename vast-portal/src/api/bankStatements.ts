@@ -7,12 +7,13 @@ import axiosServices, { fetcher } from 'utils/axios';
 
 const endpoint = '/api/private/bank-statements';
 
-export function useGetBankStatementEntries(month: string) {
+/** The entries of a period — `YYYY-MM` for a month, `YYYY` for a year — together with what they came to. */
+export function useGetBankStatementEntries(period: string) {
   const requestKey = useMemo(() => {
-    if (!month) return null;
-    const searchParams = new URLSearchParams({ month });
+    if (!period) return null;
+    const searchParams = new URLSearchParams({ period });
     return `${endpoint}/entries?${searchParams.toString()}`;
-  }, [month]);
+  }, [period]);
 
   const { data, error, isLoading, isValidating, mutate } = useSWR<BankStatementEntriesPage>(requestKey, fetcher, {
     revalidateIfStale: false,
@@ -23,6 +24,7 @@ export function useGetBankStatementEntries(month: string) {
   return useMemo(
     () => ({
       bankStatementEntries: data?.entries,
+      bankStatementSummary: data?.summary,
       bankStatementEntriesError: error,
       bankStatementEntriesLoading: isLoading,
       bankStatementEntriesRefreshing: isValidating,

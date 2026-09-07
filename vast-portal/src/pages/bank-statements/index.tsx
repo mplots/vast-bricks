@@ -13,6 +13,8 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import TextField from '@mui/material/TextField';
+import ToggleButton from '@mui/material/ToggleButton';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { DocumentUpload, Refresh } from 'iconsax-reactjs';
@@ -21,20 +23,36 @@ import { useIntl } from 'react-intl';
 import { importBankStatement, updateBankStatementMapping, useGetBankStatementEntries } from 'api/bankStatements';
 import IconButton from 'components/@extended/IconButton';
 import MainCard from 'components/MainCard';
-import MonthPicker from 'sections/reconciliation/MonthPicker';
+import { HEADER_HEIGHT } from 'config';
+import PeriodPicker from 'sections/bank-statements/PeriodPicker';
+import SummaryFooter from 'sections/bank-statements/SummaryFooter';
+import { formatAmount, numericCell } from 'sections/bank-statements/amount';
+import { periodIn, viewOf, type PeriodView } from 'sections/bank-statements/period';
 import { currentMonth } from 'sections/reconciliation/month';
 import toolButtonSx from 'sections/reconciliation/toolButton';
 import type { BankStatementEntry, BankStatementImportResult } from 'types/bankStatement';
 
-const numericCell = { textAlign: 'right', whiteSpace: 'nowrap' } as const;
+/** The table's columns, so the summary under it knows which of them the amount stands in. */
+const columns = ['date', 'counterparty', 'details', 'amount', 'code', 'reference', 'mapping'] as const;
+const amountColumn = columns.indexOf('amount');
+
+/**
+ * Where the table's head comes to rest while the page scrolls: the app header's own bottom.
+ *
+ * <p>The page is the one thing that scrolls, as it is on the reconciliation screen. A window of its own for the
+ * entries would have given the head and the foot something nearer to hold on to, but it would also have given the
+ * screen a second scrollbar beside the page's, and a reader scrolling a table should not have to notice which of two
+ * bars they are pushing. So the head stops under the app header and the foot stops at the bottom of the window,
+ * which means nothing between the table and the page may clip: a scrolling ancestor would catch them both and hold
+ * them inside the card.
+ */
+const STICKY_TOP = HEADER_HEIGHT;
 
 const formatDate = (value?: string | null) => {
   if (!value) return '—';
   const [year, month, day] = value.split('-');
   return year && month && day ? `${day}.${month}.${year}` : value;
 };
-
-const formatAmount = (value: number) => Number(value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 /** The bank's own code for what the entry was, its own wording first: `IZP` says more here than `PMNT/ICDT`. */
 const transactionCode = (entry: BankStatementEntry) =>
@@ -112,7 +130,9 @@ function MappingCell({
 
 export default function BankStatementsPage() {
   const intl = useIntl();
-  const [selectedMonth, setSelectedMonth] = useState(currentMonth());
+  // One string holds both what is being read and which view is reading it: `YYYY-MM` is a month, `YYYY` a year. The
+  // screen opens on this month, which is the period a statement is imported for.
+  const [selectedPeriod, setSelectedPeriod] = useState(currentMonth());
   const [importing, setImporting] = useState(false);
   const [importResult, setImportResult] = useState<BankStatementImportResult | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -120,11 +140,12 @@ export default function BankStatementsPage() {
 
   const {
     bankStatementEntries,
+    bankStatementSummary,
     bankStatementEntriesError,
     bankStatementEntriesLoading,
     bankStatementEntriesRefreshing,
     reloadBankStatementEntries
-  } = useGetBankStatementEntries(selectedMonth);
+  } = useGetBankStatementEntries(selectedPeriod);
 
   const handleFile = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -146,18 +167,44 @@ export default function BankStatementsPage() {
     }
   };
 
-  /** Puts the saved entry back in the list without re-reading the month, so the row settles where it already is. */
+  /** Puts the saved entry back in the list without re-reading the period, so the row settles where it already is. */
   const handleSaved = (saved: BankStatementEntry) => {
     setActionError(null);
     reloadBankStatementEntries(
-      (page) => (page ? { entries: page.entries.map((entry) => (entry.id === saved.id ? saved : entry)) } : page),
+      (page) =>
+        // The summary is carried over untouched: a mapping is the one field of an entry that no total is derived
+        // from, so nothing under the table has changed.
+        page ? { ...page, entries: page.entries.map((entry) => (entry.id === saved.id ? saved : entry)) } : page,
       { revalidate: false }
     );
   };
 
+  /** Reads the same span in the other view, rather than starting the reader over at a period they did not ask for. */
+  const handleView = (view: PeriodView | null) => {
+    if (view) setSelectedPeriod(periodIn(selectedPeriod, view));
+  };
+
+  const view = viewOf(selectedPeriod);
+
   const actions = (
     <Stack direction="row" sx={{ alignItems: 'center', gap: 1 }}>
       <input ref={fileInput} type="file" accept=".xml,text/xml,application/xml" hidden onChange={handleFile} />
+      {/* Beside the period rather than inside it: this is a question about how the table is read, not about which
+          period is being read. The one already being read is disabled rather than merely unselected, there being
+          nothing to ask for by pressing it. */}
+      <ToggleButtonGroup
+        exclusive
+        value={view}
+        onChange={(_event, picked: PeriodView | null) => handleView(picked)}
+        aria-label={intl.formatMessage({ id: 'bank-statement-view' })}
+      >
+        <ToggleButton disabled={view === 'month'} value="month" sx={{ px: 2, py: 0.5, textTransform: 'none' }}>
+          {intl.formatMessage({ id: 'bank-statement-view-month' })}
+        </ToggleButton>
+        <ToggleButton disabled={view === 'year'} value="year" sx={{ px: 2, py: 0.5, textTransform: 'none' }}>
+          {intl.formatMessage({ id: 'bank-statement-view-year' })}
+        </ToggleButton>
+      </ToggleButtonGroup>
       <Button
         variant="contained"
         size="small"
@@ -208,8 +255,11 @@ export default function BankStatementsPage() {
 
       <MainCard
         content={false}
-        title={<MonthPicker value={selectedMonth} max={currentMonth()} onChange={setSelectedMonth} />}
+        title={<PeriodPicker value={selectedPeriod} onChange={setSelectedPeriod} />}
         secondary={actions}
+        // Nothing between the table and the page may clip, the stuck head and foot being the reason: a scrolling
+        // ancestor would catch them and hold them inside the card.
+        sx={{ overflow: 'visible' }}
       >
         {bankStatementEntriesLoading && <Skeleton variant="rounded" height={320} sx={{ m: 2.5 }} />}
 
@@ -223,17 +273,33 @@ export default function BankStatementsPage() {
           !bankStatementEntriesError &&
           bankStatementEntries &&
           (bankStatementEntries.length ? (
-            <TableContainer>
-              <Table size="small" sx={{ minWidth: 1100 }} aria-label={intl.formatMessage({ id: 'bank-statement-table' })}>
+            <TableContainer sx={{ overflow: 'visible' }}>
+              <Table
+                stickyHeader
+                size="small"
+                aria-label={intl.formatMessage({ id: 'bank-statement-table' })}
+                sx={{
+                  minWidth: 1100,
+                  // The theme gives every head cell but the last `position: relative`, to hang the column divider
+                  // off, and that beats the `sticky` the stickyHeader prop asks for. Asked for again here, where it
+                  // out-specifies the theme, so the head stays put and the divider still hangs.
+                  '& .MuiTableCell-stickyHeader:not(:last-of-type)': { position: 'sticky' },
+                  // The page is what scrolls, so the head stops under the app header rather than at nought, and it
+                  // keeps the ground and the edge the row it sits in would otherwise have carried behind it.
+                  '& .MuiTableCell-stickyHeader': {
+                    top: STICKY_TOP,
+                    bgcolor: 'secondary.lighter',
+                    borderBottom: (theme) => `2px solid ${theme.palette.divider}`
+                  }
+                }}
+              >
                 <TableHead>
                   <TableRow>
-                    <TableCell>{intl.formatMessage({ id: 'bank-statement-date' })}</TableCell>
-                    <TableCell>{intl.formatMessage({ id: 'bank-statement-counterparty' })}</TableCell>
-                    <TableCell>{intl.formatMessage({ id: 'bank-statement-details' })}</TableCell>
-                    <TableCell sx={numericCell}>{intl.formatMessage({ id: 'bank-statement-amount' })}</TableCell>
-                    <TableCell>{intl.formatMessage({ id: 'bank-statement-code' })}</TableCell>
-                    <TableCell>{intl.formatMessage({ id: 'bank-statement-reference' })}</TableCell>
-                    <TableCell>{intl.formatMessage({ id: 'bank-statement-mapping' })}</TableCell>
+                    {columns.map((column, index) => (
+                      <TableCell key={column} sx={index === amountColumn ? numericCell : undefined}>
+                        {intl.formatMessage({ id: `bank-statement-${column}` })}
+                      </TableCell>
+                    ))}
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -272,6 +338,12 @@ export default function BankStatementsPage() {
                     </TableRow>
                   ))}
                 </TableBody>
+                {/* Under the entries it is the account of, and only once there is a period's worth of them to
+                    account for. The amount column is found by name rather than counted out here, so a column moved
+                    or added does not silently slide the totals into the wrong one. */}
+                {bankStatementSummary && bankStatementSummary.length > 0 && (
+                  <SummaryFooter summary={bankStatementSummary} before={amountColumn} after={columns.length - amountColumn - 1} />
+                )}
               </Table>
             </TableContainer>
           ) : (
