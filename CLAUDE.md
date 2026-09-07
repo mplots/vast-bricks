@@ -392,15 +392,23 @@ here as they are provided; do not invent unspecified behavior prematurely.
   it: the payment did take what it took, and what came back afterwards is the
   refunded amount rather than a shortfall in what was paid.
 - The refunded amount is what the marketplace reports was refunded to the buyer
-  on the order, as a positive amount, or nothing where it reports none. Nothing
-  collects it yet, so it is absent on every order and the rule comparing the two
-  sides of a refund fails wherever the payment shows one. That is the intended
-  reading rather than a gap left open: the failure is the standing report of
-  which orders had money come back that no marketplace mapping accounts for.
-  BrickOwl states a refund total on the order that it can be collected from when
-  requirements for it are supplied; the BrickLink export names no refund at all,
-  so a refunded BrickLink order stays failed until its refund is collected from
-  somewhere that does.
+  on the order, as a positive amount, or nothing where it reports none. The
+  BrickLink export names no refund at all, so it is read off the order detail
+  page instead, one page per order the export reports as `Cancelled`. The pages
+  are addressed by ids the export had to name first, so they are fetched by the
+  order source itself, all of them started before the first is joined, as the
+  BrickOwl detail batches are. Only a cancelled order is asked about, a page per
+  order being two hundred fetches a month against the handful of orders a refund
+  plausibly belongs to, so a partial refund on an order of another status stays
+  uncollected. The page states the refund in the order's own currency, which is
+  not collected: no collected order carries one, and the amount is compared with
+  the payment's as a number, as the payment matching's own amount key already
+  is. BrickOwl states a refund total on the order that it can be collected from
+  when requirements for it are supplied. Wherever it is uncollected the rule
+  comparing the two sides of a refund fails wherever the payment shows one,
+  which is the intended reading rather than a gap left open: the failure is the
+  standing report of which orders had money come back that no marketplace
+  mapping accounts for.
 - The gateway refunded amount is what the provider shows has come back out of
   the payment, as a positive amount, or nothing where it shows none. A partial
   refund and a full one are the same field: how much of the payment was
@@ -887,7 +895,9 @@ here as they are provided; do not invent unspecified behavior prematurely.
     BrickLink API client. The export names the buyer by real name or by
     username but never both, and the two requests are independent, so they are
     two sources: an order mapper produces the marketplace order and a detail
-    mapper merges the username onto it;
+    mapper merges the username onto it. The order source also fetches the detail
+    page of each cancelled order for its refund, which stays in that source
+    because those pages need the ids its export returned;
   - a BrickOwl source that fetches the order list and its detail batches, with a
     mapper that produces the marketplace order. Its batches stay in one source
     because they need the order ids the list returned.

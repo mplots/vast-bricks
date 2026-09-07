@@ -2290,3 +2290,197 @@ test("requires a reconciliation month", async ({ request }) => {
 
   expect(response.status(), await response.text()).toBe(400);
 });
+
+/** A BrickLink order as the export reports it, in whatever status the scenario is about. */
+const cancellableBrickLinkOrderXml = (
+  orderId: string,
+  total: string,
+  status: string,
+) => `
+  <ORDER>
+    <ORDERID>${orderId}</ORDERID>
+    <BUYER>Alan Turing</BUYER>
+    <DATEORDERED>08/30/2026 10:00</DATEORDERED>
+    <ORDERSTATUS>${status}</ORDERSTATUS>
+    <ORDERTOTAL>${total}</ORDERTOTAL>
+    <BASECURRENCYCODE>EUR</BASECURRENCYCODE>
+    <BASEGRANDTOTAL>${total}</BASEGRANDTOTAL>
+    <PAYMENTTYPE>Credit/Debit (Powered by Stripe)</PAYMENTTYPE>
+    <LOCATION>Poland</LOCATION>
+    <VATCHARGES>0.00</VATCHARGES>
+    <ITEM><ITEMID>3001</ITEMID><PRICE>${total}</PRICE><QTY>1</QTY></ITEM>
+  </ORDER>`;
+
+const brickLinkUsernameXml = (orderId: string, username: string) => `
+  <ORDER>
+    <ORDERID>${orderId}</ORDERID>
+    <BUYER>${username}</BUYER>
+  </ORDER>`;
+
+test("collects the refund BrickLink states on a cancelled order", async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: "2026-08",
+    brickLink: {
+      fullNameOrdersXml: brickLinkOrdersXml(
+        cancellableBrickLinkOrderXml("32100002", "19.63", "Cancelled"),
+      ),
+      usernameOrdersXml: brickLinkOrdersXml(
+        brickLinkUsernameXml("32100002", "alan-t"),
+      ),
+      refunds: { "32100002": "EUR&nbsp;19.63" },
+    },
+    stripe: [
+      {
+        description: "Payment for BrickLink from alan-t",
+        amount: 1963,
+        amountRefunded: 1963,
+      },
+    ],
+  });
+
+  const response = await request.get(
+    "/api/private/reconciliation/orders?month=2026-08",
+  );
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  expect(body.orders[0].order.refundedAmount).toBe(19.63);
+  expect(body.orders[0].gateway.refundedAmount).toBe(19.63);
+  // The two sides of the refund now agree, which is what the marketplace's side was missing.
+  expect(body.orders[0].failures).toEqual([]);
+});
+
+test("asks for a detail page only for the orders BrickLink cancelled", async ({
+  request,
+  settings,
+}, testInfo) => {
+  const wireMock = await mockReconciliationOrders(settings, request, testInfo, {
+    month: "2026-08",
+    brickLink: {
+      fullNameOrdersXml: brickLinkOrdersXml(
+        cancellableBrickLinkOrderXml("32100002", "19.63", "Cancelled"),
+        cancellableBrickLinkOrderXml("32100003", "5.00", "Completed"),
+      ),
+      usernameOrdersXml: brickLinkOrdersXml(),
+      refunds: { "32100002": "EUR&nbsp;19.63" },
+    },
+  });
+
+  const response = await request.get(
+    "/api/private/reconciliation/orders?month=2026-08",
+  );
+
+  expect(response.status(), await response.text()).toBe(200);
+  const detailRequests = await wireMock.findMethodHostRequests(
+    "GET",
+    "/orderDetail.asp",
+  );
+  expect(detailRequests).toHaveLength(1);
+  expect(detailRequests[0].url).toContain("ID=32100002");
+
+  const body = await response.json();
+  const byOrderId = Object.fromEntries(
+    body.orders.map((order: ReconciledOrderShape) => [
+      order.order.orderId,
+      order.order.refundedAmount,
+    ]),
+  );
+  expect(byOrderId).toEqual({ "32100002": 19.63, "32100003": null });
+});
+
+test("collects no refund where a cancelled order's page states none", async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: "2026-08",
+    brickLink: {
+      fullNameOrdersXml: brickLinkOrdersXml(
+        cancellableBrickLinkOrderXml("32100002", "19.63", "Cancelled"),
+      ),
+      usernameOrdersXml: brickLinkOrdersXml(
+        brickLinkUsernameXml("32100002", "alan-t"),
+      ),
+    },
+    stripe: [
+      {
+        description: "Payment for BrickLink from alan-t",
+        amount: 1963,
+        amountRefunded: 1963,
+      },
+    ],
+  });
+
+  const response = await request.get(
+    "/api/private/reconciliation/orders?month=2026-08",
+  );
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  expect(body.orders[0].order.refundedAmount).toBeNull();
+  expect(
+    body.orders[0].failures.map((failure: { code: string }) => failure.code),
+  ).toEqual(["refunded-amount-mismatch"]);
+});
+
+test("collects each cancelled order's own refund", async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: "2026-08",
+    brickLink: {
+      fullNameOrdersXml: brickLinkOrdersXml(
+        cancellableBrickLinkOrderXml("32100002", "19.63", "Cancelled"),
+        cancellableBrickLinkOrderXml("32100003", "5.00", "Cancelled"),
+      ),
+      usernameOrdersXml: brickLinkOrdersXml(),
+      // The second page states its amount with a thousands separator, which collects normalized like any other.
+      refunds: {
+        "32100002": "EUR&nbsp;19.63",
+        "32100003": "EUR&nbsp;1,234.567",
+      },
+    },
+  });
+
+  const response = await request.get(
+    "/api/private/reconciliation/orders?month=2026-08",
+  );
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  const byOrderId = Object.fromEntries(
+    body.orders.map((order: ReconciledOrderShape) => [
+      order.order.orderId,
+      order.order.refundedAmount,
+    ]),
+  );
+  expect(byOrderId).toEqual({ "32100002": 19.63, "32100003": 1234.57 });
+});
+
+test("asks for no detail page in a month BrickLink cancelled nothing in", async ({
+  request,
+  settings,
+}, testInfo) => {
+  const wireMock = await mockReconciliationOrders(settings, request, testInfo, {
+    month: "2026-08",
+    brickLink: {
+      fullNameOrdersXml: brickLinkOrdersXml(
+        cancellableBrickLinkOrderXml("32100003", "5.00", "Completed"),
+      ),
+      usernameOrdersXml: brickLinkOrdersXml(),
+    },
+  });
+
+  const response = await request.get(
+    "/api/private/reconciliation/orders?month=2026-08",
+  );
+
+  expect(response.status(), await response.text()).toBe(200);
+  await expect(
+    wireMock.findMethodHostRequests("GET", "/orderDetail.asp"),
+  ).resolves.toHaveLength(0);
+});

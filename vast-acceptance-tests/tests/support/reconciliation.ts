@@ -3,6 +3,7 @@ import type { APIRequestContext, TestInfo } from "@playwright/test";
 import type { SettingsOverrides } from "./api-test";
 import type { WireMockValueMatcher } from "./wiremock";
 import { WireMockApi } from "./wiremock";
+import { orderDetailPage } from "./bricklink-order-detail";
 
 const stripeSecretKey = "test-stripe-secret-key";
 const stripeAccountId = "acct_test-stripe-account";
@@ -55,6 +56,12 @@ export type BrickLinkOrdersMock = {
    */
   clientToken?: string;
   sessionToken?: string;
+  /**
+   * The refund each order's detail page states, by order id: what BrickLink writes in its "Total refunded" cell,
+   * spelled as BrickLink spells it (`EUR&nbsp;12.34`). An order named here has a refund; every other page states
+   * none, so an order fetched by mistake reads as unrefunded rather than as a failed request.
+   */
+  refunds?: Record<string, string>;
 };
 
 export type BrickOwlOrderMock = {
@@ -183,6 +190,31 @@ async function mockBrickLink(
     "useRealName=n",
     orders?.usernameOrdersXml ?? emptyOrdersXml,
   );
+  await addBrickLinkOrderDetailMappings(wireMock, orders?.refunds ?? {});
+}
+
+/**
+ * The order detail page of each cancelled order, which is where BrickLink states a refund. The catch-all answers with
+ * a page stating no refund, so a scenario asserting which orders were asked about sees the request it is counting
+ * rather than a request that failed.
+ */
+async function addBrickLinkOrderDetailMappings(
+  wireMock: WireMockApi,
+  refunds: Record<string, string>,
+) {
+  await wireMock.addMethodHostMapping("GET", "/orderDetail.asp", {
+    priority: 10,
+    response: { headers: { "Content-Type": "text/html" }, body: orderDetailPage("unrefunded") },
+  });
+  for (const [orderId, totalRefunded] of Object.entries(refunds)) {
+    await wireMock.addMethodHostMapping("GET", "/orderDetail.asp", {
+      request: { queryParameters: { ID: { equalTo: orderId } } },
+      response: {
+        headers: { "Content-Type": "text/html" },
+        body: orderDetailPage(orderId, { totalRefunded }),
+      },
+    });
+  }
 }
 
 async function addBrickLinkOrdersMapping(

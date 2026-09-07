@@ -15,11 +15,12 @@ import org.springframework.stereotype.Component;
  * invoiced for the wrong amount by whichever side is believed, so it reads as an `error` exactly as the facilitator
  * tax does.
  *
- * <p>Nothing collects the marketplace's side yet, so this rule fails every order a payment shows a refund on. That
- * is deliberate rather than premature: the failure is the standing report of which orders have a refund no
- * marketplace mapping accounts for, and it will go quiet for a marketplace as each one's refund is collected.
- * BrickOwl states a refund total on the order it can be collected from; the BrickLink export names no refund at all,
- * so a refunded BrickLink order stays failed until its refund is collected from somewhere that does.
+ * <p>The marketplace's side is only partly collected, so this rule still fails orders a payment shows a refund on.
+ * That is deliberate rather than premature: the failure is the standing report of which orders have a refund no
+ * marketplace mapping accounts for, and it goes quiet order by order as each one's refund is collected. BrickLink
+ * names no refund in its export, so it is collected from the order detail page of every cancelled order and of no
+ * other; a refund on an order of another status stays reported here. BrickOwl states a refund total on the order
+ * that can be collected when requirements for it are supplied.
  *
  * <p>The rule applies only once a payment has been matched to the order, which is what gives the payment's side an
  * account at all. An order no payment was matched to is reported by the rule that requires one, so it is not failed
