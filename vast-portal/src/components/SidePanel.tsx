@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 
+import { styled } from '@mui/material/styles';
 import Drawer from '@mui/material/Drawer';
 import Stack from '@mui/material/Stack';
 import Tooltip from '@mui/material/Tooltip';
@@ -19,6 +20,45 @@ import useConfig from 'hooks/useConfig';
  * table's rows scrolled through, the bar being all that stands between them and the header.
  */
 export const STICKY_TOP = HEADER_HEIGHT;
+
+/**
+ * The table beside a panel on one side of it, sliding over where the panel was when it is closed.
+ *
+ * <p>A docked drawer holds its width whether it is open or shut, so the table takes that width back with a negative
+ * margin rather than the panel giving it up: the panel slides out of its own place and the table follows it across.
+ *
+ * <p>For the screens with one panel — the bank statement's entries and the Stripe account's transactions. The
+ * reconciliation screen has a panel either side of its orders and asks the same question about both margins, so it
+ * keeps a main of its own.
+ */
+export const PanelMain = styled('main', { shouldForwardProp: (prop: string) => prop !== 'open' && prop !== 'container' })<{
+  open: boolean;
+  container: boolean;
+}>(({ theme }) => ({
+  flexGrow: 1,
+  minWidth: 0,
+  transition: theme.transitions.create('margin', {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.shorter
+  }),
+  marginLeft: -300,
+  // Below the breakpoint the panel is a temporary overlay, which takes no width out of the page at all.
+  [theme.breakpoints.down('lg')]: { marginLeft: 0 },
+  variants: [
+    { props: ({ container }) => container, style: { [theme.breakpoints.only('lg')]: { marginLeft: 0 } } },
+    { props: ({ container, open }) => container && !open, style: { [theme.breakpoints.only('lg')]: { marginLeft: -260 } } },
+    {
+      props: ({ open }) => open,
+      style: {
+        transition: theme.transitions.create('margin', {
+          easing: theme.transitions.easing.easeOut,
+          duration: theme.transitions.duration.shorter
+        }),
+        marginLeft: 0
+      }
+    }
+  ]
+}));
 
 export interface SidePanelProps {
   /**

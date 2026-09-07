@@ -1,6 +1,6 @@
 /**
  * The look a period wears when it is the title of a table: the reconciliation screen's month, and the bank statement
- * screen's month or year.
+ * and Stripe transaction screens' month or year.
  *
  * <p>The period is the table's title, so it is worn as the title's own type rather than as a form field, and the
  * whole of it is the button that opens the picker. Shared because the two screens ask the same question in the same

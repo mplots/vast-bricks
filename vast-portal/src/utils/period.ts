@@ -1,8 +1,9 @@
-import { currentMonth, monthDate, monthOf } from 'sections/reconciliation/month';
+import { currentMonth, monthDate, monthOf } from 'utils/month';
 
 /**
- * The span of days the bank statement screen is reading, held as the single string the API is asked in: `YYYY-MM`
- * for one month, `YYYY` for a whole year.
+ * The span of days a screen that reads a period is reading, held as the single string its API is asked in:
+ * `YYYY-MM` for one month, `YYYY` for a whole year. Shared by the bank statement and Stripe transaction screens,
+ * which read the same two shapes of period.
  *
  * <p>One string rather than a view beside a value, because the two cannot then disagree: which of the two views is
  * on is readable from the period itself, and switching view is producing the other form of the same span rather than

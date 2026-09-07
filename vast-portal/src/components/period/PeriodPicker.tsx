@@ -4,9 +4,9 @@ import { ArrowLeft2, ArrowRight2 } from 'iconsax-reactjs';
 import { useIntl } from 'react-intl';
 
 import IconButton from 'components/@extended/IconButton';
-import YearPicker from 'sections/bank-statements/YearPicker';
-import { currentPeriod, steppedPeriod, viewOf } from 'sections/bank-statements/period';
-import MonthPicker from 'sections/reconciliation/MonthPicker';
+import MonthPicker from 'components/period/MonthPicker';
+import YearPicker from 'components/period/YearPicker';
+import { currentPeriod, steppedPeriod, viewOf } from 'utils/period';
 
 interface Props {
   /** The period on screen: `YYYY-MM` in month view, `YYYY` in year view. */
@@ -15,10 +15,10 @@ interface Props {
 }
 
 /**
- * The period the bank statement screen is reading, with its neighbours a click away either side.
+ * The period a screen is reading, with its neighbours a click away either side.
  *
- * <p>The neighbours are arrows rather than a trip to the picker because a statement is read a period at a time and
- * the period before is the one asked for next more often than any other — too often to be worth opening anything
+ * <p>The neighbours are arrows rather than a trip to the picker because a period is read one at a time and the
+ * period before is the one asked for next more often than any other — too often to be worth opening anything
  * for. Which picker the middle opens is the only thing the view changes here: a month view steps and picks months, a
  * year view years, and the step forward stops at the period being lived through, nothing having happened yet in one
  * that has not started.
@@ -30,7 +30,7 @@ export default function PeriodPicker({ value, onChange }: Props) {
   const intl = useIntl();
   const view = viewOf(value);
   const max = currentPeriod(view);
-  const label = (of: 'previous' | 'next') => intl.formatMessage({ id: `bank-statement-${view}-${of}` });
+  const label = (of: 'previous' | 'next') => intl.formatMessage({ id: `period-${view}-${of}` });
 
   return (
     <Stack component="span" direction="row" useFlexGap sx={{ gap: 0.5, alignItems: 'center' }}>
@@ -40,9 +40,9 @@ export default function PeriodPicker({ value, onChange }: Props) {
         </IconButton>
       </Tooltip>
       {view === 'year' ? (
-        <YearPicker value={value} max={max} onChange={onChange} />
+        <YearPicker value={value} max={max} onChange={onChange} labelId="period-year" />
       ) : (
-        <MonthPicker value={value} max={max} onChange={onChange} labelId="bank-statement-month" />
+        <MonthPicker value={value} max={max} onChange={onChange} labelId="period-month" />
       )}
       <Tooltip title={label('next')} arrow>
         {/* Wrapped, a disabled button dispatching no events of its own for the tooltip to listen for. */}

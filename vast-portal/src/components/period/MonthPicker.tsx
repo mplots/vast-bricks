@@ -9,8 +9,8 @@ import { ArrowLeft2, ArrowRight2 } from 'iconsax-reactjs';
 import { useIntl } from 'react-intl';
 
 import IconButton from 'components/@extended/IconButton';
-import { monthDate, monthOf } from 'sections/reconciliation/month';
-import periodButtonSx from 'sections/reconciliation/periodButton';
+import periodButtonSx from 'components/period/periodButton';
+import { monthDate, monthOf } from 'utils/month';
 
 interface Props {
   /** The month on screen, as `YYYY-MM`. */
@@ -52,7 +52,7 @@ export default function MonthPicker({ value, max, onChange, labelId = 'reconcili
 
   return (
     <>
-      <Button color="inherit" onClick={open} aria-label={intl.formatMessage({ id: 'reconciliation-month' })} sx={periodButtonSx}>
+      <Button color="inherit" onClick={open} aria-label={intl.formatMessage({ id: labelId })} sx={periodButtonSx}>
         {label}
       </Button>
       <Popover

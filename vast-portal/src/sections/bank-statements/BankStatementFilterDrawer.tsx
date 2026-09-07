@@ -4,7 +4,8 @@ import { useIntl } from 'react-intl';
 
 import FilterFacets, { type FilterFacet } from 'components/FilterFacets';
 import SidePanel, { PanelCloseButton, PanelSection } from 'components/SidePanel';
-import { entryFacets, isNarrowed, matches, matchesSearch, type EntryNarrowing } from 'sections/bank-statements/narrowing';
+import { entryNarrowable } from 'sections/bank-statements/narrowing';
+import { facetOptions, isNarrowed, type Narrowing } from 'utils/narrowing';
 import type { BankStatementEntry } from 'types/bankStatement';
 
 export interface BankStatementFilterDrawerProps {
@@ -12,7 +13,7 @@ export interface BankStatementFilterDrawerProps {
   onClose: () => void;
   /** The period's whole entries, which is what the counts are of. */
   entries: BankStatementEntry[];
-  narrowing: EntryNarrowing;
+  narrowing: Narrowing;
   onToggle: (facetKey: string, value: string) => void;
   onClear: () => void;
 }
@@ -37,41 +38,13 @@ export default function BankStatementFilterDrawer({
   onClear
 }: BankStatementFilterDrawerProps) {
   const intl = useIntl();
-  const { selection, search } = narrowing;
 
-  const facets: FilterFacet[] = entryFacets
-    .map((facet) => {
-      // Counted against what the rest of the narrowing already lets through — the other facets and the search alike
-      // — so a count states what ticking it would leave.
-      const scoped = entries.filter(
-        (entry) => matchesSearch(entry, search) && entryFacets.every((other) => other.key === facet.key || matches(entry, other, selection))
-      );
-
-      // Every value the period holds keeps its box, at nought where the rest of the narrowing has emptied it: a group
-      // that shed options as it was narrowed would move under the pointer that was narrowing it.
-      const counts = new Map<string, number>();
-      entries.forEach((entry) => counts.set(facet.valueOf(entry), 0));
-      scoped.forEach((entry) => counts.set(facet.valueOf(entry), (counts.get(facet.valueOf(entry)) ?? 0) + 1));
-
-      const options = [...counts.entries()]
-        .sort(([left], [right]) => {
-          const declared = facet.declared;
-          if (!declared) return left.localeCompare(right);
-          // A value the facet names reads where it named it; anything else follows, in its own order.
-          const places = [declared.indexOf(left), declared.indexOf(right)];
-          const [leftPlace, rightPlace] = places.map((place) => (place < 0 ? declared.length : place));
-          return leftPlace === rightPlace ? left.localeCompare(right) : leftPlace - rightPlace;
-        })
-        .map(([value, count]) => ({
-          value,
-          label: facet.labelId ? intl.formatMessage({ id: facet.labelId(value) }) : value,
-          count
-        }));
-
-      return { key: facet.key, label: intl.formatMessage({ id: `bank-statement-filter-${facet.key}` }), options };
-    })
-    // A facet the whole period answers the same way narrows nothing, so it is not offered at all.
-    .filter((facet) => facet.options.length > 1);
+  // The options, their counts and which facets are worth offering all come from the shared narrowing: this screen
+  // states what its entries answer, and words the answers that are the screen's own vocabulary rather than the
+  // bank's.
+  const facets: FilterFacet[] = facetOptions(entries, entryNarrowable, narrowing, (facet, value) =>
+    facet.labelId ? intl.formatMessage({ id: facet.labelId(value) }) : value
+  ).map((facet) => ({ ...facet, label: intl.formatMessage({ id: `bank-statement-filter-${facet.key}` }) }));
 
   return (
     <SidePanel anchor="left" open={open} onClose={onClose}>
@@ -79,14 +52,14 @@ export default function BankStatementFilterDrawer({
         title={intl.formatMessage({ id: 'bank-statement-filters' })}
         action={
           <Stack direction="row" useFlexGap sx={{ gap: 0.5, alignItems: 'center' }}>
-            <Button size="small" color="secondary" disabled={!isNarrowed(narrowing)} onClick={onClear}>
+            <Button size="small" color="secondary" disabled={!isNarrowed(entryNarrowable, narrowing)} onClick={onClear}>
               {intl.formatMessage({ id: 'bank-statement-filter-clear' })}
             </Button>
             <PanelCloseButton label={intl.formatMessage({ id: 'bank-statement-filters-close' })} onClose={onClose} />
           </Stack>
         }
       >
-        <FilterFacets facets={facets} selection={selection} onToggle={onToggle} />
+        <FilterFacets facets={facets} selection={narrowing.selection} onToggle={onToggle} />
       </PanelSection>
     </SidePanel>
   );

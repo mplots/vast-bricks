@@ -6,7 +6,7 @@ import Stack from '@mui/material/Stack';
 import { YearCalendar } from '@mui/x-date-pickers/YearCalendar';
 import { useIntl } from 'react-intl';
 
-import periodButtonSx from 'sections/reconciliation/periodButton';
+import periodButtonSx from 'components/period/periodButton';
 
 interface Props {
   /** The year on screen, as `YYYY`. */
@@ -14,6 +14,8 @@ interface Props {
   /** The last year worth offering, as `YYYY`: nothing has happened yet in a year that has not started. */
   max: string;
   onChange: (year: string) => void;
+  /** The message naming what this year is of. */
+  labelId: string;
 }
 
 /**
@@ -22,7 +24,7 @@ interface Props {
  * <p>Worn the way {@link periodButtonSx} describes, as the month is on the screens that read one. The grid of years
  * needs no arrows of its own, `YearCalendar` scrolling as far back as the account goes.
  */
-export default function YearPicker({ value, max, onChange }: Props) {
+export default function YearPicker({ value, max, onChange, labelId }: Props) {
   const intl = useIntl();
   const [anchor, setAnchor] = useState<HTMLElement | null>(null);
 
@@ -31,7 +33,7 @@ export default function YearPicker({ value, max, onChange }: Props) {
       <Button
         color="inherit"
         onClick={(event: MouseEvent<HTMLElement>) => setAnchor(event.currentTarget)}
-        aria-label={intl.formatMessage({ id: 'bank-statement-year' })}
+        aria-label={intl.formatMessage({ id: labelId })}
         sx={periodButtonSx}
       >
         {value}

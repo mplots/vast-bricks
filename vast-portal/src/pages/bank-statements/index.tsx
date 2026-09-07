@@ -1,6 +1,5 @@
 import { useDeferredValue, useEffect, useRef, useState, type ChangeEvent, type KeyboardEvent } from 'react';
 
-import { styled } from '@mui/material/styles';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -13,8 +12,6 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import ToggleButton from '@mui/material/ToggleButton';
-import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
@@ -22,21 +19,23 @@ import { DocumentUpload, FilterSearch, Refresh, SearchNormal1 } from 'iconsax-re
 import { useIntl } from 'react-intl';
 
 import { importBankStatement, updateBankStatementMapping, useGetBankStatementEntries } from 'api/bankStatements';
+import Highlighted from 'components/Highlighted';
 import IconButton from 'components/@extended/IconButton';
 import MainCard from 'components/MainCard';
-import { HEADER_HEIGHT } from 'config';
+import { PanelMain } from 'components/SidePanel';
+import TableSummaryFooter, { type SummaryLine } from 'components/TableSummaryFooter';
+import TableTextField from 'components/TableTextField';
+import ledgerTableSx from 'components/ledgerTable';
+import PeriodPicker from 'components/period/PeriodPicker';
+import PeriodViewToggle from 'components/period/PeriodViewToggle';
+import toolButtonSx from 'components/toolButton';
 import useConfig from 'hooks/useConfig';
 import BankStatementFilterDrawer from 'sections/bank-statements/BankStatementFilterDrawer';
-import EntryTextField from 'sections/bank-statements/EntryTextField';
-import Highlighted from 'sections/bank-statements/Highlighted';
-import PeriodPicker from 'sections/bank-statements/PeriodPicker';
-import SummaryFooter from 'sections/bank-statements/SummaryFooter';
-import { formatAmount, numericCell } from 'sections/bank-statements/amount';
-import { noNarrowing, searchColumns, shownEntries, termsFor, toggled, type EntryNarrowing } from 'sections/bank-statements/narrowing';
-import { periodIn, viewOf, type PeriodView } from 'sections/bank-statements/period';
-import { currentMonth } from 'sections/reconciliation/month';
-import toolButtonSx from 'sections/reconciliation/toolButton';
-import type { BankStatementEntry, BankStatementImportResult } from 'types/bankStatement';
+import { entryNarrowable, entrySearchColumns } from 'sections/bank-statements/narrowing';
+import { formatAmount, numericCell } from 'utils/amount';
+import { currentMonth } from 'utils/month';
+import { noNarrowing, shownRows, termsFor, toggled, type Narrowing } from 'utils/narrowing';
+import type { BankStatementCurrencySummary, BankStatementEntry, BankStatementImportResult } from 'types/bankStatement';
 
 /**
  * The table's columns and the share of the table each of them takes, so the summary under it knows which of them the
@@ -59,58 +58,42 @@ const columns = [
 ] as const;
 const amountColumn = columns.findIndex((column) => column.key === 'amount');
 
-/**
- * Where the table's head comes to rest while the page scrolls: the app header's own bottom.
- *
- * <p>The page is the one thing that scrolls, as it is on the reconciliation screen. A window of its own for the
- * entries would have given the head and the foot something nearer to hold on to, but it would also have given the
- * screen a second scrollbar beside the page's, and a reader scrolling a table should not have to notice which of two
- * bars they are pushing. So the head stops under the app header and the foot stops at the bottom of the window,
- * which means nothing between the table and the page may clip: a scrolling ancestor would catch them both and hold
- * them inside the card.
- */
-const STICKY_TOP = HEADER_HEIGHT;
-
-/**
- * The entries beside their filter panel, sliding over where the panel was when it is closed.
- *
- * <p>A docked drawer holds its width whether it is open or shut, so the table takes that width back with a negative
- * margin rather than the panel giving it up: the panel slides out of its own place and the table follows it across.
- */
-const Main = styled('main', { shouldForwardProp: (prop: string) => prop !== 'open' && prop !== 'container' })<{
-  open: boolean;
-  container: boolean;
-}>(({ theme }) => ({
-  flexGrow: 1,
-  minWidth: 0,
-  transition: theme.transitions.create('margin', {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.shorter
-  }),
-  marginLeft: -300,
-  // Below the breakpoint the panel is a temporary overlay, which takes no width out of the page at all.
-  [theme.breakpoints.down('lg')]: { marginLeft: 0 },
-  variants: [
-    { props: ({ container }) => container, style: { [theme.breakpoints.only('lg')]: { marginLeft: 0 } } },
-    { props: ({ container, open }) => container && !open, style: { [theme.breakpoints.only('lg')]: { marginLeft: -260 } } },
-    {
-      props: ({ open }) => open,
-      style: {
-        transition: theme.transitions.create('margin', {
-          easing: theme.transitions.easing.easeOut,
-          duration: theme.transitions.duration.shorter
-        }),
-        marginLeft: 0
-      }
-    }
-  ]
-}));
-
 const formatDate = (value?: string | null) => {
   if (!value) return '—';
   const [year, month, day] = value.split('-');
   return year && month && day ? `${day}.${month}.${year}` : value;
 };
+
+/**
+ * The three lines a currency is accounted for in, in the order a bank states them.
+ *
+ * <p>They are the screen's rather than the footer's: what a period comes to is a fact about bank statements, and the
+ * footer only lays the lines out and holds them still while the entries scroll under them.
+ */
+const summaryLines = (currency: BankStatementCurrencySummary, label: (id: string) => string): SummaryLine[] => [
+  {
+    key: `${currency.currency}:debit`,
+    // The turnovers are stored unsigned, so the sign is put back here from what the line is, the way an entry's row
+    // puts it back from the entry's direction.
+    amount: `−${formatAmount(Math.abs(currency.debitTurnover))} ${currency.currency}`,
+    label: label('bank-statement-debit-turnover'),
+    colour: 'error.main'
+  },
+  {
+    key: `${currency.currency}:credit`,
+    amount: `+${formatAmount(Math.abs(currency.creditTurnover))} ${currency.currency}`,
+    label: label('bank-statement-credit-turnover'),
+    colour: 'success.main'
+  },
+  {
+    // The balance is signed already and keeps whatever sign it came with: an overdrawn account is a fact about it
+    // rather than a direction of movement. It is what the two above come to, so it is ruled off from them.
+    key: `${currency.currency}:balance`,
+    amount: `${formatAmount(currency.closingBalance)} ${currency.currency}`,
+    label: label('bank-statement-closing-balance'),
+    sum: true
+  }
+];
 
 /** The bank's own code for what the entry was, its own wording first: `IZP` says more here than `PMNT/ICDT`. */
 const transactionCode = (entry: BankStatementEntry) =>
@@ -128,7 +111,7 @@ function SearchField({ column, value, onChange }: { column: string; value: strin
   const intl = useIntl();
 
   return (
-    <EntryTextField
+    <TableTextField
       value={value}
       placeholder={intl.formatMessage({ id: 'bank-statement-search-placeholder' })}
       ariaLabel={intl.formatMessage({ id: 'bank-statement-search-in' }, { column: intl.formatMessage({ id: `bank-statement-${column}` }) })}
@@ -195,7 +178,7 @@ function MappingCell({
 
   return (
     <TableCell>
-      <EntryTextField
+      <TableTextField
         value={draft}
         disabled={saving}
         placeholder={intl.formatMessage({ id: 'bank-statement-mapping-placeholder' })}
@@ -216,7 +199,7 @@ export default function BankStatementsPage() {
   // Which entries of the period are being read: what was ticked, and what was searched for. It is held beside the
   // period, and for the same reason: this screen is read a period at a time rather than linked to, so what it is
   // showing is state of its own rather than an address the way the reconciliation screen's narrowing is.
-  const [narrowing, setNarrowing] = useState<EntryNarrowing>(noNarrowing);
+  const [narrowing, setNarrowing] = useState<Narrowing>(noNarrowing);
   const { container } = useConfig();
   const downLG = useMediaQuery((theme) => theme.breakpoints.down('lg'));
   // Room for it means it is open: the entries are read against what they were narrowed to, so the panel showing that
@@ -285,18 +268,12 @@ export default function BankStatementsPage() {
     );
   };
 
-  /** Reads the same span in the other view, rather than starting the reader over at a period they did not ask for. */
-  const handleView = (view: PeriodView | null) => {
-    if (view) setSelectedPeriod(periodIn(selectedPeriod, view));
-  };
-
-  const view = viewOf(selectedPeriod);
   const collectedEntries = bankStatementEntries ?? [];
   // A year of entries is thousands of rows, and every one of them is filtered again at each keystroke of a search.
   // The field itself answers the key at once and the table catches up a render later, so typing never waits on a
   // period however long it is.
   const settled = useDeferredValue(narrowing);
-  const shown = shownEntries(collectedEntries, settled);
+  const shown = shownRows(collectedEntries, entryNarrowable, settled);
   // Marked from the narrowing the entries were filtered by rather than from what is in the fields this moment, so a
   // cell never marks a word that is not why its row is here.
   const termsOf = (column: string) => termsFor(settled.search, column);
@@ -370,22 +347,7 @@ export default function BankStatementsPage() {
   const actions = (
     <Stack direction="row" sx={{ alignItems: 'center', gap: 1 }}>
       <input ref={fileInput} type="file" accept=".xml,text/xml,application/xml" hidden onChange={handleFile} />
-      {/* Beside the period rather than inside it: this is a question about how the table is read, not about which
-          period is being read. The one already being read is disabled rather than merely unselected, there being
-          nothing to ask for by pressing it. */}
-      <ToggleButtonGroup
-        exclusive
-        value={view}
-        onChange={(_event, picked: PeriodView | null) => handleView(picked)}
-        aria-label={intl.formatMessage({ id: 'bank-statement-view' })}
-      >
-        <ToggleButton disabled={view === 'month'} value="month" sx={{ px: 2, py: 0.5, textTransform: 'none' }}>
-          {intl.formatMessage({ id: 'bank-statement-view-month' })}
-        </ToggleButton>
-        <ToggleButton disabled={view === 'year'} value="year" sx={{ px: 2, py: 0.5, textTransform: 'none' }}>
-          {intl.formatMessage({ id: 'bank-statement-view-year' })}
-        </ToggleButton>
-      </ToggleButtonGroup>
+      <PeriodViewToggle value={selectedPeriod} onChange={setSelectedPeriod} />
       <Button
         variant="contained"
         size="small"
@@ -424,7 +386,7 @@ export default function BankStatementsPage() {
           onClear={clearFilters}
         />
 
-        <Main open={filtersOpen} container={container}>
+        <PanelMain open={filtersOpen} container={container}>
           <Stack sx={{ gap: 3, mt: 2.5 }}>
             {importResult && (
               <Alert severity="success" onClose={() => setImportResult(null)}>
@@ -471,49 +433,7 @@ export default function BankStatementsPage() {
                       stickyHeader
                       size="small"
                       aria-label={intl.formatMessage({ id: 'bank-statement-table' })}
-                      sx={{
-                        minWidth: 1100,
-                        // Laid out to the stated column shares rather than to what is in the cells, so nothing moves
-                        // sideways when the search row opens or another period is read.
-                        tableLayout: 'fixed',
-                        // The theme gives every head cell but the last `position: relative`, to hang the column divider
-                        // off, and that beats the `sticky` the stickyHeader prop asks for. Asked for again here, where it
-                        // out-specifies the theme, so the head stays put.
-                        '& .MuiTableCell-stickyHeader:not(:last-of-type)': { position: 'sticky' },
-                        // The page is what scrolls, so the head stops under the app header rather than at nought, and it
-                        // keeps the ground the row it sits in would otherwise have carried behind it.
-                        '& .MuiTableCell-stickyHeader': { top: STICKY_TOP, bgcolor: 'secondary.lighter' },
-                        // The search row rests under the headings rather than beside them, at the height they came out
-                        // at, so the two of them stack up under the app header instead of over each other. It carries
-                        // the card's own ground rather than the head's tint: the tint is what says a row is headings,
-                        // and fields to type in sitting on it read as headings that happen to be editable. The two
-                        // grounds are also what tell the reader where the head's naming stops and its asking starts,
-                        // which saves the row a line of its own.
-                        '& thead tr:nth-of-type(2) .MuiTableCell-stickyHeader': {
-                          top: STICKY_TOP + headingHeight,
-                          bgcolor: 'background.paper'
-                        },
-                        // The rule under the head goes under the last row of it, whichever of the two that is: a rule
-                        // under the headings as well would make the search row a band of its own rather than part of
-                        // the head it belongs to.
-                        '& thead tr:last-of-type .MuiTableCell-root': { borderBottom: (theme) => `2px solid ${theme.palette.divider}` },
-                        // The head hangs a divider off every column but the last. They crossed the line under every entry
-                        // and made a grid of the statement; the head is grounded and ruled off already, which is enough to
-                        // read it as the head.
-                        '& .MuiTableCell-stickyHeader:after': { display: 'none' },
-                        // An entry is separated from the next by its ground rather than by a line of its own. A statement
-                        // is dozens of rows long and a line under each of them read exactly as loudly as the rule under
-                        // the head and the rule above the summary, which are the two the reader is steering by, so the
-                        // ladder is taken away and those two are left to carry the table's shape.
-                        // The columns are laid out to their stated shares, so text that cannot be broken at a space
-                        // — an IBAN, a reference, a remittance line a payer ran together — is broken anyway rather
-                        // than allowed to spill across the column beside it.
-                        '& tbody .MuiTableCell-root': { borderBottom: 0, overflowWrap: 'anywhere' },
-                        '& tbody .MuiTableRow-root:nth-of-type(even)': { bgcolor: 'secondary.lighter' },
-                        // The banded ground is the theme's own hover colour, so the row under the pointer answers in a
-                        // different one rather than in the one every other row already wears.
-                        '& tbody .MuiTableRow-root:hover': { bgcolor: 'primary.lighter' }
-                      }}
+                      sx={ledgerTableSx(headingHeight, 1100)}
                     >
                       <colgroup>
                         {columns.map((column) => (
@@ -534,7 +454,7 @@ export default function BankStatementsPage() {
                         {searchOpen && (
                           <TableRow>
                             {columns.map((column) => {
-                              const searchable = searchColumns.some((searched) => searched.column === column.key);
+                              const searchable = entrySearchColumns.some((searched) => searched.column === column.key);
                               return (
                                 <TableCell key={column.key} sx={{ py: 0.75 }}>
                                   {searchable && (
@@ -611,7 +531,11 @@ export default function BankStatementsPage() {
                           amount column is found by name rather than counted out here, so a column moved or added
                           does not silently slide the totals into the wrong one. */}
                       {bankStatementSummary && bankStatementSummary.length > 0 && (
-                        <SummaryFooter summary={bankStatementSummary} before={amountColumn} after={columns.length - amountColumn - 1} />
+                        <TableSummaryFooter
+                          lines={bankStatementSummary.flatMap((currency) => summaryLines(currency, (id) => intl.formatMessage({ id })))}
+                          before={amountColumn}
+                          after={columns.length - amountColumn - 1}
+                        />
                       )}
                     </Table>
                   </TableContainer>
@@ -622,7 +546,7 @@ export default function BankStatementsPage() {
                 ))}
             </MainCard>
           </Stack>
-        </Main>
+        </PanelMain>
       </Box>
     </Stack>
   );

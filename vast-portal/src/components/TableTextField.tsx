@@ -3,7 +3,7 @@ import type { KeyboardEvent, ReactNode } from 'react';
 import InputAdornment from '@mui/material/InputAdornment';
 import TextField from '@mui/material/TextField';
 
-export interface EntryTextFieldProps {
+export interface TableTextFieldProps {
   value: string;
   /** What there is to type here, which is the only thing a field at rest says about itself. */
   placeholder: string;
@@ -11,7 +11,7 @@ export interface EntryTextFieldProps {
   /**
    * A mark before the text saying what kind of field this is, where it has one: the search fields carry a magnifier,
    * the mapping carries nothing, an icon standing in every row of a period being noise rather than a cue. It is the
-   * one thing the two are allowed to differ in — the field itself stays one style.
+   * one thing the fields are allowed to differ in — the field itself stays one style.
    */
   icon?: ReactNode;
   disabled?: boolean;
@@ -21,9 +21,9 @@ export interface EntryTextFieldProps {
 }
 
 /**
- * The one field this screen is typed in, wherever that is: the mapping written against an entry, and the search asked
- * of a column in the head. They are one style rather than two because a reader meets them in the same table and a
- * second look would read as a second kind of control.
+ * The one field a ledger table is typed in, wherever that is: the mapping written against a bank entry, and the
+ * search asked of a column in the head. They are one style rather than two because a reader meets them in the same
+ * table, and on neighbouring screens, and a second look would read as a second kind of control.
  *
  * <p>A line under the text and no box around it: a box drawn in every searchable column read heavier than the
  * headings it was asking about. The line answers a hand in three steps. At rest it is under the divider's own weight
@@ -33,7 +33,7 @@ export interface EntryTextFieldProps {
  * resting line would be another rung of the ladder this table was deliberately rid of; held under it, it sits well
  * below the two rules that carry the table's shape.
  */
-export default function EntryTextField({
+export default function TableTextField({
   value,
   placeholder,
   ariaLabel,
@@ -42,7 +42,7 @@ export default function EntryTextField({
   onChange,
   onBlur,
   onKeyDown
-}: EntryTextFieldProps) {
+}: TableTextFieldProps) {
   return (
     <TextField
       fullWidth
