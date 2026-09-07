@@ -1,4 +1,7 @@
+import type { APIRequestContext } from "@playwright/test";
+
 import { expect, test } from "../support/api-test";
+import { camt053, importDocument } from "../support/bank-statements";
 import {
   BrickOwlOrderMock,
   mockReconciliationOrders,
@@ -1904,6 +1907,356 @@ test("collects PayPal payments that span several pages", async ({
     "/v1/reporting/transactions",
   );
   expect(transactionRequests).toHaveLength(3);
+});
+
+/**
+ * Bank transfers, which are payments like a card provider's but read out of the statements a person imported rather
+ * than asked of a provider. The bank is the payment provider of an order settled that way, so what it booked is
+ * collected under the gateway source and the same rules judge it.
+ *
+ * A transfer is attached to an order only by the order id it names — the mapping a person wrote first, then the
+ * remittance the payer wrote — so these scenarios import a document and then reconcile the month, rather than mocking
+ * a provider.
+ */
+
+/** BrickLink orders the marketplace says were settled by bank transfer. */
+const brickLinkBankTransferOrdersXml = (
+  orders: Array<{ orderId: string; buyer: string; total: string }>,
+) =>
+  `<?xml version="1.0" encoding="UTF-8"?><ORDERS>${orders
+    .map(
+      (order) => `
+  <ORDER>
+    <ORDERID>${order.orderId}</ORDERID>
+    <ORDERDATE>8/30/2026</ORDERDATE>
+    <BUYER>${order.buyer}</BUYER>
+    <ORDERTOTAL>${order.total}</ORDERTOTAL>
+    <BASEGRANDTOTAL>${order.total}</BASEGRANDTOTAL>
+    <PAYMENTTYPE>Bank Transfer</PAYMENTTYPE>
+    <ITEM><ITEMID>3001</ITEMID><PRICE>${order.total}</PRICE><QTY>1</QTY></ITEM>
+  </ORDER>`,
+    )
+    .join("")}</ORDERS>`;
+
+/** A BrickOwl order the marketplace says was settled by bank transfer, which it words as `bank`. */
+const brickOwlBankTransferOrder = (
+  orderId: string,
+  total: string,
+): BrickOwlOrderMock => ({
+  orderId,
+  orderDate: "1786320000",
+  view: {
+    buyer_name: "Grace Hopper",
+    payment_method_type: "bank",
+    sub_total: total,
+    base_order_total: total,
+  },
+});
+
+/**
+ * One booked entry of the statement, dated a few days into the month after the order's. That is deliberate: a buyer
+ * pays a bank transfer when they get around to it, and the window the entries are read for reaches past the month
+ * for exactly that reason.
+ */
+const bankEntry = (entry: {
+  reference: string;
+  amount: string;
+  remittance?: string;
+  direction?: "CRDT" | "DBIT";
+}) => ({
+  reference: entry.reference,
+  amount: entry.amount,
+  direction: entry.direction ?? ("CRDT" as const),
+  bookingDate: "2026-09-02",
+  counterpartyName: "Grace Hopper",
+  remittance: entry.remittance,
+});
+
+/** The reconciled order with this id, whichever place the month's sort put it in. */
+const orderOf = (body: { orders: any[] }, orderId: string) =>
+  body.orders.find((order: any) => order.order.orderId === orderId);
+
+/** The stored entry the month after the orders, which is where these scenarios book their transfers. */
+async function storedEntries(request: APIRequestContext) {
+  const response = await request.get(
+    "/api/private/bank-statements/entries?period=2026-09",
+  );
+  expect(response.status(), await response.text()).toBe(200);
+  return (await response.json()).entries as Array<{ id: number }>;
+}
+
+async function reconciled(request: APIRequestContext) {
+  const response = await request.get(
+    "/api/private/reconciliation/orders?month=2026-08",
+  );
+  expect(response.status(), await response.text()).toBe(200);
+  return await response.json();
+}
+
+test("reports what the bank was paid for a BrickOwl order the transfer names", async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: "2026-08",
+    brickOwl: [brickOwlBankTransferOrder("7500001", "7.69")],
+  });
+  await importDocument(
+    request,
+    camt053({
+      entries: [
+        bankEntry({
+          reference: "2026090200000001-1",
+          amount: "7.69",
+          remittance: "Payment for order 7500001, thanks",
+        }),
+      ],
+    }),
+  );
+
+  const body = await reconciled(request);
+
+  expect(orderOf(body, "7500001").gateway.paidAmount).toBe(7.69);
+  expect(orderOf(body, "7500001").failures).toEqual([]);
+});
+
+test("reports what the bank was paid for a BrickLink order the transfer names", async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: "2026-08",
+    brickLink: {
+      fullNameOrdersXml: brickLinkBankTransferOrdersXml([
+        { orderId: "32456563", buyer: "Grace Hopper", total: "11.39" },
+      ]),
+      usernameOrdersXml: emptyOrdersXml,
+    },
+  });
+  await importDocument(
+    request,
+    camt053({
+      entries: [
+        bankEntry({
+          reference: "2026090200000002-1",
+          amount: "11.39",
+          remittance: "BL 32456563",
+        }),
+      ],
+    }),
+  );
+
+  const body = await reconciled(request);
+
+  expect(orderOf(body, "32456563").gateway.paidAmount).toBe(11.39);
+  expect(orderOf(body, "32456563").failures).toEqual([]);
+});
+
+test("prefers the mapping a person wrote to what the payer wrote on the transfer", async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: "2026-08",
+    brickOwl: [
+      brickOwlBankTransferOrder("7500001", "5.00"),
+      brickOwlBankTransferOrder("7500002", "9.99"),
+    ],
+  });
+  // The payer named the wrong order, which is exactly the case the mapping column exists for.
+  await importDocument(
+    request,
+    camt053({
+      entries: [
+        bankEntry({
+          reference: "2026090200000003-1",
+          amount: "9.99",
+          remittance: "order 7500001",
+        }),
+      ],
+    }),
+  );
+  const stored = await storedEntries(request);
+  await request.put(
+    `/api/private/bank-statements/entries/${stored[0].id}/mapping`,
+    { data: { mapping: "7500002" } },
+  );
+
+  const body = await reconciled(request);
+
+  expect(orderOf(body, "7500002").gateway.paidAmount).toBe(9.99);
+  expect(orderOf(body, "7500002").failures).toEqual([]);
+  expect(orderOf(body, "7500001").gateway.paidAmount).toBeNull();
+});
+
+test("sums every bank transfer that names one order", async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: "2026-08",
+    brickOwl: [brickOwlBankTransferOrder("7500001", "7.69")],
+  });
+  // A buyer who underpaid and was asked for the rest paid twice, and both transfers are money the store received.
+  await importDocument(
+    request,
+    camt053({
+      entries: [
+        bankEntry({
+          reference: "2026090200000004-1",
+          amount: "4.00",
+          remittance: "order 7500001",
+        }),
+        bankEntry({
+          reference: "2026090200000005-1",
+          amount: "3.69",
+          remittance: "order 7500001 remainder",
+        }),
+      ],
+    }),
+  );
+
+  const body = await reconciled(request);
+
+  expect(orderOf(body, "7500001").gateway.paidAmount).toBe(7.69);
+  expect(orderOf(body, "7500001").failures).toEqual([]);
+});
+
+test("reports a bank transfer sent back out as the gateway's refund", async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: "2026-08",
+    brickOwl: [brickOwlBankTransferOrder("7500001", "7.69")],
+  });
+  await importDocument(
+    request,
+    camt053({
+      entries: [
+        bankEntry({
+          reference: "2026090200000006-1",
+          amount: "7.69",
+          remittance: "order 7500001",
+        }),
+        bankEntry({
+          reference: "2026090200000007-1",
+          amount: "2.00",
+          direction: "DBIT",
+          remittance: "refund order 7500001",
+        }),
+      ],
+    }),
+  );
+
+  const body = await reconciled(request);
+
+  const order = orderOf(body, "7500001");
+  expect(order.gateway.paidAmount).toBe(7.69);
+  expect(order.gateway.refundedAmount).toBe(2);
+  // What may still be invoiced is cut by the refund, the store no longer holding it.
+  expect(order.calculated.targetInvoice).toBe(5.69);
+  // The marketplace reports no refund of its own, so the two accounts of it disagree.
+  expect(order.failures).toEqual([
+    {
+      code: "refunded-amount-mismatch",
+      level: "error",
+      fields: ["order.refundedAmount", "gateway.refundedAmount"],
+    },
+  ]);
+});
+
+test("attaches a bank transfer naming two collected orders to neither", async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: "2026-08",
+    brickOwl: [
+      brickOwlBankTransferOrder("7500001", "5.00"),
+      brickOwlBankTransferOrder("7500002", "9.99"),
+    ],
+  });
+  await importDocument(
+    request,
+    camt053({
+      entries: [
+        bankEntry({
+          reference: "2026090200000008-1",
+          amount: "9.99",
+          remittance: "orders 7500001 7500002",
+        }),
+      ],
+    }),
+  );
+
+  const body = await reconciled(request);
+
+  expect(orderOf(body, "7500001").gateway.paidAmount).toBeNull();
+  expect(orderOf(body, "7500002").gateway.paidAmount).toBeNull();
+});
+
+test("does not attach a bank transfer to an order settled another way", async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: "2026-08",
+    brickOwl: [
+      {
+        orderId: "7500001",
+        orderDate: "1786320000",
+        view: {
+          buyer_name: "Grace Hopper",
+          payment_method_type: "stripe",
+          sub_total: "7.69",
+          base_order_total: "7.69",
+        },
+      },
+    ],
+  });
+  await importDocument(
+    request,
+    camt053({
+      entries: [
+        bankEntry({
+          reference: "2026090200000009-1",
+          amount: "7.69",
+          remittance: "order 7500001",
+        }),
+      ],
+    }),
+  );
+
+  const body = await reconciled(request);
+
+  expect(orderOf(body, "7500001").gateway.paidAmount).toBeNull();
+});
+
+test("does not read an order id out of a longer number on a transfer", async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: "2026-08",
+    brickOwl: [brickOwlBankTransferOrder("7500001", "7.69")],
+  });
+  await importDocument(
+    request,
+    camt053({
+      entries: [
+        bankEntry({
+          reference: "2026090200000010-1",
+          amount: "7.69",
+          remittance: "invoice 75000012",
+        }),
+      ],
+    }),
+  );
+
+  const body = await reconciled(request);
+
+  expect(orderOf(body, "7500001").gateway.paidAmount).toBeNull();
 });
 
 test("reports a bad gateway when PayPal fails", async ({

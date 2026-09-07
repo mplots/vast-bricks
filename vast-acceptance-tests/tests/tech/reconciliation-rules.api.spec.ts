@@ -1,4 +1,5 @@
 import { expect, test } from "../support/api-test";
+import { camt053, importDocument } from "../support/bank-statements";
 import { mockReconciliationOrders } from "../support/reconciliation";
 import { wireMockMode } from "../support/wiremock";
 
@@ -301,5 +302,57 @@ test("does not fail a refunded order no payment was matched to for the refund it
   // The missing payment is reported once, by the rule that requires one, and not again as a refund disagreement.
   expect(body.orders[0].failures).toEqual([
     { code: "amount-missing", level: "error", fields: ["gateway.paidAmount"] },
+  ]);
+});
+
+test("fails a bank-transfer order the bank shows was paid less than its grand total", async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: "2026-08",
+    brickOwl: [
+      {
+        orderId: "7500001",
+        orderDate: "1786320000",
+        view: {
+          buyer_name: "Grace Hopper",
+          payment_method_type: "bank",
+          sub_total: "5.20",
+          base_order_total: "5.20",
+        },
+      },
+    ],
+  });
+  // The buyer transferred too little and was never asked for the rest, so the two accounts of the order disagree.
+  await importDocument(
+    request,
+    camt053({
+      entries: [
+        {
+          reference: "2026090200000011-1",
+          amount: "5.00",
+          direction: "CRDT",
+          bookingDate: "2026-09-02",
+          counterpartyName: "Grace Hopper",
+          remittance: "order 7500001",
+        },
+      ],
+    }),
+  );
+
+  const response = await request.get(
+    "/api/private/reconciliation/orders?month=2026-08",
+  );
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  expect(body.orders[0].gateway.paidAmount).toBe(5);
+  expect(body.orders[0].failures).toEqual([
+    {
+      code: "paid-amount-mismatch",
+      level: "error",
+      fields: ["gateway.paidAmount", "order.grandTotal"],
+    },
   ]);
 });

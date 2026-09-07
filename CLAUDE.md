@@ -236,16 +236,20 @@ here as they are provided; do not invent unspecified behavior prematurely.
   — BrickLink for a person (`Credit/Debit (Powered by Stripe)`, `PayPal
   (Onsite)`), BrickOwl as a code (`stripe`, `paypal`) — so the mapping unifies
   them to one name per provider: `PayPal` and `Stripe`. Matching is on the
-  marketplace wording containing the provider's name, case-insensitively.
+  marketplace wording containing the provider's name, case-insensitively. A bank
+  transfer is unified the same way and for the same reason, though no provider
+  stands behind it: BrickLink's `Bank Transfer` and BrickOwl's `bank` both
+  collect as `Bank Transfer`.
 - A payment method no provider is known for is collected as the marketplace
   worded it, trimmed, rather than dropped or lumped into an "other" name: the
   screen must still show how the order was paid. A missing or blank method is
   collected as no method at all.
 - Unifying happens in the mapping stage, once, for the same reason amounts are
   normalized there: every rule and the screen then see one name per provider and
-  never match on a marketplace's wording. Adding a provider name is a change to
+  never match on a marketplace's wording. Adding a name is a change to
   `ReconciliationPaymentMethod`, which the category packages see alongside
-  `ReconciliationAmount`.
+  `ReconciliationAmount`. Its fragments do not overlap, so the mapping needs no
+  order to be unambiguous.
 - The tax type is how the order is treated for tax. It is not reconciliation's
   own vocabulary, so it lives in the shared `tax` feature and is only collected
   here; see "Order tax type feature requirements". The mapping stage derives it
@@ -463,6 +467,44 @@ here as they are provided; do not invent unspecified behavior prematurely.
   currency it was taken in. The collected order carries no currency, so the two
   are compared as numbers. That is correct while both are the same currency and
   is worth revisiting when a payment in another currency has to reconcile.
+- An order the marketplace says was settled by bank transfer is paid through the
+  bank, which is the one party to an order no provider exposes, so its payment is
+  read out of the statement entries a person imported rather than asked of
+  anyone. See "Bank statement feature requirements" for the import itself. The
+  bank is that order's payment provider, so what it booked is collected under the
+  `gateway` source exactly as a card provider's payment is, and every rule
+  holding a payment against an order covers it without knowing where it came
+  from. There is no payment link: a bank has no page the transfer can be opened
+  at.
+- Bank entries are read for the month's booking days padded seven back and ninety
+  forward. The pad is lopsided because a bank transfer is paid after the order
+  rather than around it: a buyer pays when they get around to it, sometimes weeks
+  later, and a buyer who underpaid sends the rest later still, while the few days
+  before cover only the marketplaces dating an order in a zone of their own. A
+  wide window is safe here in a way it would not be for a weaker key, a transfer
+  being attached only by the order ID it names and never by its date.
+- A bank entry is matched to an order by the order ID it names and by nothing
+  else. The mapping a person wrote is read first, being the manual last resort
+  and therefore the one thing a payer's own wording must not override; failing
+  that, the entry's remittance information is read. An ID counts only as a whole
+  token, so "invoice 75000012" does not name order `7500001`, and text naming two
+  collected orders names neither. Only orders the marketplace says were paid by
+  bank transfer are considered, as the PayPal mappers consider only PayPal
+  orders. Matching a bank transfer to a buyer by name is deliberately not
+  attempted yet.
+- A bank entry names no marketplace, so one mapper reads the text against every
+  collected order rather than one mapper per marketplace each guessing at the
+  other's orders. The ID scan is a match key like any other, so it is
+  `ReconciledOrders.findNamedIn` rather than a scan inside the mapper.
+- Every bank credit naming one order is summed into its paid amount, which is
+  where bank transfers depart from the first-payment-wins rule the providers
+  follow: a buyer who underpaid and was asked for the rest made two transfers for
+  one order, and both are money the store received, whereas a card payment is one
+  authorization of one amount. A debit naming the order is money that went back
+  out and is summed into the gateway refunded amount the same way. No entry
+  either way leaves the field absent rather than zero, the bank having said
+  nothing about it. The gateway facilitator tax stays absent because a bank
+  deducts none.
 - Because a BrickLink payment is matched on the buyer, its mapper reads fields
   another detail mapper merged. Detail mappers therefore declare their bean order
   explicitly rather than relying on scan order, and the payment mappers declare a
@@ -558,7 +600,8 @@ here as they are provided; do not invent unspecified behavior prematurely.
   category packages see `Source`, `Mapper`, `OrderMapper`, `DetailMapper`,
   `ReconciledOrder`, `ReconciledOrders.find`,
   `ReconciledOrders.findByBuyerUsername`, `ReconciledOrders.findByBuyer`,
-  `ReconciledOrders.findByGrandTotalOn`, `Marketplace`,
+  `ReconciledOrders.findByGrandTotalOn`, `ReconciledOrders.findNamedIn`,
+  `Marketplace`,
   `ReconciliationAmount`, `ReconciliationPaymentMethod`, and `ParallelTasks`; the rule package exposes `Rule`
   and `ReconciliationFailure` back to the root, which the orchestrator and the
   payload need. Everything else stays package-private: the orchestrator,
@@ -812,12 +855,15 @@ here as they are provided; do not invent unspecified behavior prematurely.
   single failure, not the order.
 - Current rules:
   - An order paid through a payment provider must have been paid its grand
-    total. The rule applies only to orders paid through a provider payments are
-    collected from, currently Stripe and PayPal: an order paid another way has
-    nothing to compare against yet, and reporting it as unpaid would say more
-    about the migration than about the order. An order the rule applies to with
-    no collected payment fails, because within a collected provider no matched
-    payment means the money was not found rather than that the order was free.
+    total. The rule applies only to orders paid a way payments are collected
+    for, currently Stripe, PayPal and bank transfer: an order paid another way
+    has nothing to compare against yet, and reporting it as unpaid would say
+    more about the migration than about the order. An order the rule applies to
+    with no collected payment fails, because within a collected provider no
+    matched payment means the money was not found rather than that the order was
+    free. A bank transfer is compared against what every entry naming the order
+    came to, so an order a buyer underpaid and then topped up agrees while one
+    they never topped up does not.
   - The facilitator-tax rule reports its failures at `info`. The paid-amount
     rule reports both of its failures at `error`: money that was not found, or
     that does not add up, is something to fix.
@@ -858,6 +904,12 @@ here as they are provided; do not invent unspecified behavior prematurely.
   client-credentials token request and the transaction search.
 - The legacy accounting screen keeps its own Stripe and PayPal code in
   `vb-portal-api` until that screen is retired.
+- The bank is not a client at all: no provider exposes the account, so its
+  entries are uploaded and stored, and reconciliation reads them through the
+  `bankstatement` feature's public `BankTransfers` and `BankTransfer` boundary
+  rather than through a source of its own transport. Reconciliation is that
+  boundary's first caller, not its owner; importing, upserting, the summary the
+  screen reads and the mapping a person writes stay inside the feature.
 - The current shipping client implementation is Mans Pasts.
 - The current accounting client implementation is Manakabata, migrated into
   `vast-services`: the `invoice` feature creates invoices for an order.
@@ -1057,6 +1109,12 @@ business data in the rewrite, and everything about the feature follows from that
   balance onward and states the movement it holds otherwise. Balances are still not read
   from a camt document, for the reason above, so there is nothing to reconcile it against;
   if that is ever wanted, the `Bal` elements are what to import.
+- The feature exposes two public types and nothing else: `BankTransfer`, one booked entry
+  as another feature reads it, and `BankTransfers`, which answers the entries of a span of
+  days. That is the whole of what leaves the package — importing, upserting, the summary
+  and the mapping a person writes are internals, and what another feature needs is what the
+  bank booked. Reconciliation matches bank-transfer orders through it; see "Reconciliation
+  feature requirements".
 - The balance is summed in the database rather than by loading the rows it covers, that
   range growing with every import while what is wanted out of it stays two numbers per
   currency. It is the feature's one JPQL query, so it is also the one place where

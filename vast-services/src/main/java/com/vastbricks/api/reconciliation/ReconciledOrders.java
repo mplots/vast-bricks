@@ -14,7 +14,7 @@ import java.util.function.Function;
  * look their data's order up in it, and the rule stage iterates it. Insertion order is the API response order.
  *
  * <p>This is the only place that knows how an order is matched across systems. A detail mapper is given one to look
- * its data's order up in, so {@link #find} is the only method the category packages see.
+ * its data's order up in, and every key it may look one up by is a method here rather than a scan of its own.
  */
 public final class ReconciledOrders {
 
@@ -73,6 +73,44 @@ public final class ReconciledOrders {
                         && order.getOrder().getGrandTotal().compareTo(grandTotal) == 0)
                 .filter(order -> orderDate.equals(order.getOrder().getOrderDate()))
                 .toList();
+    }
+
+    /**
+     * Every collected order whose order id this text names, of any marketplace. A bank transfer carries free text a
+     * payer wrote rather than a field naming the order, and it names no marketplace either, so the text is searched
+     * for the ids that were actually collected instead of the ids being guessed out of the text by their shape.
+     *
+     * <p>An id counts only as a whole token, bounded by a character that is neither a letter nor a digit or by an end
+     * of the text, so "payment for order 16000010" does not name order {@code 1600001}. All matches are returned: a
+     * text naming two collected orders is ambiguous, and a caller must treat that as naming none.
+     */
+    public List<ReconciledOrder> findNamedIn(String text) {
+        if (text == null || text.isBlank()) {
+            return List.of();
+        }
+        var searched = text.toLowerCase();
+        return orders.stream()
+                .filter(order -> names(searched, order.getOrder().getOrderId()))
+                .toList();
+    }
+
+    /** Whether the text carries this order id as a whole token. */
+    private static boolean names(String searched, String orderId) {
+        if (orderId == null || orderId.isBlank()) {
+            return false;
+        }
+        var named = orderId.trim().toLowerCase();
+        for (var at = searched.indexOf(named); at >= 0; at = searched.indexOf(named, at + 1)) {
+            if (bounded(searched, at - 1) && bounded(searched, at + named.length())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** Whether the character at this position ends a token: past either end of the text, or not alphanumeric. */
+    private static boolean bounded(String searched, int at) {
+        return at < 0 || at >= searched.length() || !Character.isLetterOrDigit(searched.charAt(at));
     }
 
     List<ReconciledOrder> all() {
