@@ -4,7 +4,7 @@ import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 import { useIntl } from 'react-intl';
 
-import SidePanel, { PanelCloseButton, PanelSection } from 'sections/reconciliation/SidePanel';
+import SidePanel, { PanelCloseButton, PanelSection } from 'components/SidePanel';
 
 export interface ReconciliationFilterDrawerProps {
   open: boolean;

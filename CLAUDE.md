@@ -1061,6 +1061,113 @@ business data in the rewrite, and everything about the feature follows from that
 - The reconciliation screen's month and the bank statement screen's period are the title of
   their table, and wear one shared look for it, so a title bar never shows two differently
   sized titles of the same kind of thing.
+- The period's entries are narrowed by a panel down the left of the table: the same panel
+  the reconciliation screen puts beside its orders, persistent where there is room for it
+  and a temporary overlay where there is not, opened by a button in the title bar beside
+  the period. The shell and the facet list are shared with that screen rather than copied
+  for this one. The panel holds `Filters` and nothing else, there being nothing on this
+  screen that decides how the entries read, and the title bar states how many of the
+  period's entries the narrowing left on screen.
+- Searching is the other way the entries are narrowed, and it is not in the panel. A switch
+  in the title bar beside the panel's own opens a second row in the table's head, holding
+  one search field per column that can be searched, each under the column it searches: the
+  text a reader is matching against is in that column, so that is where the field for it
+  belongs. The row is asked for rather than always there, most reading of a statement being
+  reading it, and it rests under the heading row so both stay over the entries while a long
+  period scrolls. The heading row's height is measured rather than assumed, a heading
+  wrapping onto a second line on a narrow screen.
+- The search row carries the card's own ground rather than the head's tint. The tint is what
+  says a row is headings, so fields to type in sitting on it read as headings that happen to
+  be editable; and the two grounds are what tell a reader where the head's naming stops and
+  its asking starts, which saves the row a rule of its own.
+- There is one field style on this screen, wherever it is typed in: the mapping written
+  against an entry and the search asked of a column are the same field, declared once. A
+  reader meets both in the same table and a second look would read as a second kind of
+  control. It is a line under the text and no box around it: a box in every searchable
+  column reads heavier than the headings it is asking about. The line answers a hand in
+  three steps, each one louder than the last. At rest it is drawn under the divider's own
+  weight but plainly there, saying a field is here to a reader pointing at nothing; a hand
+  anywhere on the row brings it up to the divider's weight; and pointing at the field itself
+  sweeps a line in over it, in the accent colour, the way the focused field's own line
+  arrives — one pixel to the focused line's two, so a hovered field stays quieter than the
+  one being typed in. At full weight under every row of a period the resting line would be
+  another rung of the ladder this table was rid of, and it is faded by the line's own opacity
+  rather than by a paler colour so one number covers both themes, the divider being a
+  transparent colour already.
+- The sweep is what marks a hovered field, so the resting line can afford to be read: the
+  two states are no longer told apart by how invisible one of them is. It is therefore the
+  colour that has to arrive and not the weight. A sweep in the divider's own colour was an
+  animation nobody could see, landing on a resting line of the same weight and colour, and a
+  hovered field that answered by thickening its line instead read heavier than the rule under
+  the table's head — a hand resting on a field is not a change in the table.
+- The placeholder still names what goes in the field rather than repeating the heading over
+  it. The line is held off the text and the mark above it by padding under the field as a
+  whole rather than under the text: the mark is the input's sibling, so room made on the text
+  alone would leave the mark on the line.
+- A mark before the text is the one thing the two are allowed to differ in: a search field
+  carries a magnifier, the mapping carries nothing, an icon standing in every row of a
+  period being noise rather than a cue. It is set quieter than the text it stands before,
+  and the field's label says the same thing in words, so nothing rests on the mark alone.
+- The columns are laid out to stated shares of the table rather than to what is in the
+  cells. A column measured from its own content moves whenever the content does — the
+  search row opening under the headings, a period stepped to whose amounts are a digit
+  longer, a month widened to its year — and a reader who has just found the entry they were
+  looking for should not have the table shift under them to say so. They are shares rather
+  than pixels so the columns grow with the width the table is given, and text that cannot
+  be broken at a space is broken anyway rather than allowed to spill into the column
+  beside it.
+- Putting the row away empties it. A row put away with words still in it would go on
+  narrowing the table from somewhere the reader cannot see, which is the one thing a screen
+  that states how much of a period it is showing must not do.
+- A column searches what it shows, so the counterparty field searches the account beside
+  the name: both are in that cell, and a reader pasting an IBAN is searching what is in
+  front of them. The fields are currently the counterparty, the details and the reference.
+  The mapping has none: it is a text input in every row, and an input cannot carry the mark
+  that says which part of it was found.
+- Within one field the text is split on whitespace and every word has to be found, anywhere
+  within a word and with case ignored, so half a name or a fragment of an order number is
+  worth typing and a counterparty the bank spelled surname first is still found by typing
+  the name out. Across fields they narrow: a name under the counterparty and a number under
+  the details asks for the entries answering both. No closer approximation is attempted: a
+  search that guessed at spelling would hide the entry a mapping is being written for.
+- What was found is marked in the cell, in the palette's warm shade and as a `mark`
+  element, so it says the same thing to a reader who cannot see the colour. Marking it is
+  what makes a search worth running against a column of long remittance lines: the reader
+  is looking for an order number inside a sentence a payer wrote, and a row that merely
+  matched somewhere leaves them to find it again by eye. The mark keeps the cell's own text
+  colour, the amount column being coloured by direction. Every word the field asked for is
+  marked wherever it appears in that column.
+- A year of entries is filtered again at every keystroke, so the fields answer the key at
+  once and the table catches up a render later. Typing never waits on the period being
+  read, however long it is. The marks are drawn from the same narrowing the entries were
+  filtered by, so a cell never marks a word that is not why its row is there.
+- Narrowing is otherwise a facet, as it is on the reconciliation screen: a facet states how
+  an entry answers it and how that answer reads, and the options, their counts and the
+  narrowing follow. A group's counts are of the entries the rest of the narrowing already
+  lets through — the search as much as the other groups — so a count states what ticking it
+  would leave, and every value the period holds keeps its box for as long as that period is
+  on screen. A facet the whole period answers the same way narrows nothing and is not
+  offered. Adding a filter is adding a facet to the screen's list.
+- The current facet is the direction, credit first: which way the account moved is the
+  coarsest question there is about a statement, and money in is what a mapping is normally
+  written against. A booked entry answers every facet there is so far — it moved one way,
+  in one currency — so no option stands for having answered nothing; a facet over a field
+  an entry may leave empty is when to bring that option over from the reconciliation
+  screen, which has one.
+- Narrowing decides which entries are on screen and never what the period came to. The
+  foot stays the bank's account of the period: both turnovers are stated whichever way the
+  entries were narrowed, and the closing balance is derived over every stored entry up to
+  the end of the period, so it could not follow a filter at all.
+- Which entries are shown is this screen's own state rather than something the address
+  carries, as the period is. The reconciliation screen keeps its narrowing in the address
+  because a month of orders is worth handing to someone as a link; a statement is read a
+  period at a time in front of the entries a mapping is being written against.
+- A period whose narrowing lets nothing through says so in the table rather than in place
+  of it: the search row is in that table's own head, and a message drawn instead of the
+  table would take away the fields the reader has to reach to get their entries back. A
+  period nothing was imported for has no table at all and says that instead.
+- The panel's clear button empties the search row and the facets together, being the one
+  control over the whole narrowing; Escape empties one field from inside it.
 - The foot of the table states what the period came to, laid out the way a bank lays out
   the foot of a statement: the figure in the amount column, what it is beside it. Three
   lines — debit turnover, credit turnover, closing balance — per currency the period moved

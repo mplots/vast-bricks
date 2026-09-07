@@ -55,7 +55,7 @@ import { currentMonth, monthDate, monthOf } from 'sections/reconciliation/month'
 import OrderTaxTypeIcon from 'components/OrderTaxTypeIcon';
 import ReconciliationColumnDrawer from 'sections/reconciliation/ReconciliationColumnDrawer';
 import ReconciliationFilterDrawer from 'sections/reconciliation/ReconciliationFilterDrawer';
-import { STICKY_TOP } from 'sections/reconciliation/SidePanel';
+import { STICKY_TOP } from 'components/SidePanel';
 import toolButtonSx from 'sections/reconciliation/toolButton';
 import useColumnDrag from 'hooks/useColumnDrag';
 import useConfig from 'hooks/useConfig';

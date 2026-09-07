@@ -2,7 +2,7 @@ import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import { useIntl } from 'react-intl';
 
-import SidePanel, { PanelCloseButton, PanelSection } from 'sections/reconciliation/SidePanel';
+import SidePanel, { PanelCloseButton, PanelSection } from 'components/SidePanel';
 import type { ReactNode } from 'react';
 
 export interface ReconciliationColumnDrawerProps {

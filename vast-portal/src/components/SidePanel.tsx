@@ -116,7 +116,7 @@ export default function SidePanel({ anchor, open, onClose, children }: SidePanel
           position: 'relative',
           boxShadow: 'none',
           [edge]: 0,
-          // A long month scrolls past the panel rather than away from it. The docked drawer stretches to the row's
+          // A long table scrolls past the panel rather than away from it. The docked drawer stretches to the row's
           // height, which is what gives the sticky paper room to travel.
           ...(!downLG && {
             // The card inside rounds its corners, and the paper's own ground would sit square behind them. The
