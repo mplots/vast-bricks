@@ -9,7 +9,6 @@ import Box from '@mui/material/Box';
 
 // project-imports
 import DebugDock from './DebugDock';
-import DebugTrigger from './DebugDock/DebugTrigger';
 import Drawer from './Drawer';
 import Header from './Header';
 import Footer from './Footer';
@@ -69,7 +68,6 @@ export default function MainLayout() {
             <Outlet />
             <Footer />
           </Container>
-          <DebugTrigger />
         </Box>
 
         <DebugDock />

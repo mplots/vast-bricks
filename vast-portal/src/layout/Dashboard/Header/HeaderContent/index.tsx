@@ -17,6 +17,7 @@ import Search from './Search';
 
 import { MenuOrientation } from 'config';
 import useConfig from 'hooks/useConfig';
+import DebugTrigger from 'layout/Dashboard/DebugDock/DebugTrigger';
 import DrawerHeader from 'layout/Dashboard/Drawer/DrawerHeader';
 
 // ==============================|| HEADER - CONTENT ||============================== //
@@ -38,6 +39,7 @@ export default function HeaderContent() {
       {!downLG && localization}
       {downLG && <Box sx={{ width: 1, ml: 1 }} />}
 
+      <DebugTrigger />
       <Notification />
       {!downLG && <FullScreen />}
       <Message />

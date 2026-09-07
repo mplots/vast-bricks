@@ -100,6 +100,12 @@ export default function SidePanel({ anchor, open, onClose, children }: SidePanel
         ...(container && { [theme.breakpoints.only('lg')]: { width: 260 } }),
         flexShrink: 0,
         zIndex: { xs: 1200, lg: 0 },
+        // A shut panel is slid out past the side it is docked to, and the one on the right lands past the right edge
+        // of the page, where it goes on counting towards how wide the page is and puts a scrollbar under a table that
+        // fits. Kept inside the width the panel holds either way. Clipped rather than hidden: `overflow: hidden`
+        // would make this a scrolling box, and the sticky paper would come to rest inside it rather than under the
+        // app header. The overlay is fixed and adds no width, so it is only the docked panel that needs it.
+        ...(!downLG && { overflowX: 'clip' }),
         [gap]: 0,
         ...(open && { [theme.breakpoints.up('md')]: { [gap]: 2.5 } }),
         '& .MuiDrawer-paper': {
