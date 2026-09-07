@@ -1,7 +1,7 @@
 package com.vastbricks.api.reconciliation.payment;
 
 import com.stripe.model.BalanceTransaction;
-import com.vastbricks.api.client.stripe.StripePaymentClient;
+import com.vastbricks.api.client.stripe.StripeBalanceClient;
 import com.vastbricks.api.reconciliation.Source;
 import java.time.YearMonth;
 import java.util.List;
@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 class SourceStripePayments implements Source<BalanceTransaction> {
 
-    private final StripePaymentClient stripePaymentClient;
+    private final StripeBalanceClient stripeBalanceClient;
 
     @Override
     public Class<BalanceTransaction> type() {
@@ -31,6 +31,6 @@ class SourceStripePayments implements Source<BalanceTransaction> {
     @Override
     public List<BalanceTransaction> fetch(YearMonth month) {
         var window = PaymentWindow.of(month);
-        return stripePaymentClient.listBalanceTransactions(window.from(), window.to());
+        return stripeBalanceClient.listBalanceTransactions(window.from(), window.to());
     }
 }

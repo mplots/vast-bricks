@@ -17,12 +17,15 @@ import org.springframework.stereotype.Component;
  * Stripe transport. It reports the balance transactions of a period, following Stripe's own cursor paging so its
  * callers see one flat list, and decides nothing about what a transaction means.
  *
- * <p>Named for the feature it serves rather than for the provider, because {@link StripeClient} is the SDK's own
- * client and this class builds one.
+ * <p>Named for what it reads rather than for the provider, because {@link StripeClient} is the SDK's own client and
+ * this class builds one, and named for the ledger rather than for one feature because two features read it: the
+ * reconciliation payment source, which maps the paying transactions onto orders, and the Stripe transaction screen,
+ * which shows the whole ledger. One endpoint is one client here even so — a second one would be the same paging
+ * written twice, and what a transaction means is decided by each caller anyway.
  */
 @Component
 @RequiredArgsConstructor
-public class StripePaymentClient {
+public class StripeBalanceClient {
 
     private static final String PROVIDER = "Stripe";
 
