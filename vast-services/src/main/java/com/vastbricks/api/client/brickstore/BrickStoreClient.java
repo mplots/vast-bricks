@@ -7,6 +7,7 @@ import com.vastbricks.api.client.HttpExchangeCapture;
 import com.vastbricks.api.tor.TorRestClientFactory;
 import com.vastbricks.api.tor.TorRestClientOptions;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -16,6 +17,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
+import java.util.regex.Pattern;
 import javax.xml.stream.XMLInputFactory;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -34,6 +37,12 @@ public class BrickStoreClient {
     private static final String SESSION_TOKEN_HEADER = "x-bl-session-token";
     private static final String SESSION_PATH = "/api/v1/actions/verify-and-create-session";
     private static final String ORDER_EXPORT_PATH = "/orderExcelFinal.asp";
+    private static final String ORDER_DETAIL_PATH = "/orderDetail.asp";
+    // The detail page states a refund as "Total refunded: EUR&nbsp;12.34", and states it only when the order has one.
+    private static final Pattern TOTAL_REFUNDED = Pattern.compile(
+            "Total refunded:.*?<strong>\\s*([A-Za-z]{3})(?:&nbsp;|\\s)*([0-9,]+(?:\\.[0-9]+)?)\\s*</strong>",
+            Pattern.CASE_INSENSITIVE | Pattern.DOTALL
+    );
     private static final String PROVIDER = "BrickLink";
 
     private final BrickStoreSettings settings;
@@ -92,9 +101,53 @@ public class BrickStoreClient {
         return bodyOrThrow(response);
     }
 
+    /**
+     * The order's refund as the BrickLink order detail page states it, or {@code null} where the page states none.
+     * An order nothing was refunded on shows no refund section at all, which is a different fact from a refund of
+     * zero. One recorded operation covers the session this page needs as well as the page itself.
+     */
+    public BrickStoreOrderRefund getOrderRefund(String orderId) {
+        if (orderId == null || orderId.isBlank()) {
+            throw new IllegalArgumentException("orderId is required");
+        }
+        var id = orderId.trim();
+        return capture.record(
+                PROVIDER,
+                List.of(configuredClientToken()),
+                () -> parseOrderRefund(getOrderDetail(id))
+        );
+    }
+
+    private String getOrderDetail(String orderId) {
+        var response = sendWithSession(token -> getOrderDetailPage(orderId, token));
+        if (authenticationExpired(response)) {
+            invalidateSessionToken(response.sessionToken);
+            response = sendWithSession(token -> getOrderDetailPage(orderId, token));
+        }
+        if (response.statusCode < 200 || response.statusCode >= 300) {
+            throw new BrickStoreClientException(
+                    "BrickStore order detail failed with HTTP " + response.statusCode + redirectSuffix(response)
+            );
+        }
+        return response.body == null ? "" : new String(response.body, StandardCharsets.UTF_8);
+    }
+
+    private BrickStoreOrderRefund parseOrderRefund(String html) {
+        var matcher = TOTAL_REFUNDED.matcher(html);
+        if (!matcher.find()) {
+            return null;
+        }
+        var amount = new BigDecimal(matcher.group(2).replace(",", ""));
+        return new BrickStoreOrderRefund(matcher.group(1).toUpperCase(Locale.ROOT), amount);
+    }
+
     private BrickStoreResponse sendOrderExportWithToken(BrickStoreOrderExportRequest orderRequest) {
+        return sendWithSession(token -> postOrderExport(orderRequest, token));
+    }
+
+    private BrickStoreResponse sendWithSession(Function<String, BrickStoreResponse> send) {
         var token = getOrCreateSessionToken();
-        var response = postOrderExport(orderRequest, token);
+        var response = send.apply(token);
         response.sessionToken = token;
         return response;
     }
@@ -189,6 +242,18 @@ public class BrickStoreClient {
                         rawResponse.getHeaders(),
                         rawResponse.getBody().readAllBytes()
                 )), "BrickStore order export request failed");
+    }
+
+    private BrickStoreResponse getOrderDetailPage(String orderId, String token) {
+        return exchange(() -> restClient().get()
+                .uri(resolve(ORDER_DETAIL_PATH + "?ID=" + encode(orderId)))
+                .header(CLIENT_ID_HEADER, CLIENT_ID)
+                .header(SESSION_TOKEN_HEADER, token)
+                .exchange((request, rawResponse) -> new BrickStoreResponse(
+                        rawResponse.getStatusCode().value(),
+                        rawResponse.getHeaders(),
+                        rawResponse.getBody().readAllBytes()
+                )), "BrickStore order detail request failed");
     }
 
     private BrickStoreResponse exchange(BrickStoreExchange request, String failureMessage) {
