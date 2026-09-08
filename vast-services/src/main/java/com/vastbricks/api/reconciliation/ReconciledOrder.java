@@ -52,6 +52,9 @@ public class ReconciledOrder {
         if (grandTotal == null) {
             return null;
         }
+        if (refundedInFullWithNoPayment(grandTotal)) {
+            return null;
+        }
         var facilitatorTax = order.getFacilitatorTax();
         var target = facilitatorTax == null ? grandTotal : grandTotal.subtract(facilitatorTax);
         var refunded = gateway.getRefundedAmount();
@@ -59,5 +62,16 @@ public class ReconciledOrder {
             return target;
         }
         return target.subtract(refunded).max(BigDecimal.ZERO);
+    }
+
+    /**
+     * Whether the marketplace says the whole of this order came back and no payment was ever matched to it. Such an
+     * order has no target to invoice for at all rather than a target of nothing: with no payment collected there is
+     * no account of the money to subtract a refund from, so what is left is not a figure this reconciliation arrived
+     * at but a question it cannot answer.
+     */
+    private boolean refundedInFullWithNoPayment(BigDecimal grandTotal) {
+        var refunded = order.getRefundedAmount();
+        return gateway.getPaidAmount() == null && refunded != null && refunded.compareTo(grandTotal) == 0;
     }
 }

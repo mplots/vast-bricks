@@ -197,8 +197,12 @@ const readValue = (written: string) => (written === 'unstated' ? unstated : writ
  */
 const highlightParam = 'highlight';
 
-/** Errors and warnings are coloured until an address says otherwise, being the rows the screen is opened to find. */
-const defaultTinted: FilterLevel[] = ['error', 'warning'];
+/**
+ * Every level a rule reports is coloured until an address says otherwise: a reader opens the screen to find the rows
+ * something was said about, and a notice is said about a row for the same reason a warning is. Only the reconciled
+ * rows are left uncoloured by default, there being nothing to find among them.
+ */
+const defaultTinted: FilterLevel[] = ['error', 'warning', 'info'];
 
 /** The levels an address colours: the default where it names none, and only what it names where it does. */
 const tintedIn = (params: URLSearchParams) => {

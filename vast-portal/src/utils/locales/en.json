@@ -113,6 +113,7 @@
   "reconciliation-failure-facilitator-tax-mismatch": "Facilitator tax {orderFacilitatorTax} does not match the {gatewayFacilitatorTax} taken from the payment.",
   "reconciliation-failure-refunded-amount-mismatch": "Refund {orderRefundedAmount} reported on the order does not match the {gatewayRefundedAmount} refunded through the payment.",
   "reconciliation-failure-amount-missing": "Missing: {fields}.",
+  "reconciliation-failure-refunded-without-payment": "Refunded in full {orderRefundedAmount} of {orderGrandTotal} with no payment recorded, so the gateway only released a reservation.",
   "debug-body-download": "Download {filename}",
   "debug-body-download-label": "Download this body as a file",
   "debug-body-download-failed": "The body could not be downloaded.",

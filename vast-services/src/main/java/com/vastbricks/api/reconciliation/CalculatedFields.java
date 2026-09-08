@@ -22,7 +22,10 @@ public class CalculatedFields {
      * of the refund is collected to be compared against that one, not to be calculated from.
      *
      * <p>An order no facilitator collected on is invoiced for its whole grand total, one nothing was refunded on for
-     * the whole of what is left, and one with no grand total has no target to invoice for.
+     * the whole of what is left, and one with no grand total has no target to invoice for. Neither has an order the
+     * marketplace says was refunded in full and that no payment was matched to: with no payment collected there is
+     * no account of the money the refund could be taken out of, so the order has no target at all rather than a
+     * target of nothing.
      *
      * <p>A refund reaching past what was the store's to invoice leaves nothing to invoice rather than a negative
      * invoice. The two subtractions are not taken out of the same pocket: the marketplace keeps the facilitator tax

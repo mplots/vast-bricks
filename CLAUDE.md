@@ -333,7 +333,12 @@ here as they are provided; do not invent unspecified behavior prematurely.
   from. An order no facilitator collected on is targeted at its whole grand
   total, one
   nothing was refunded on at the whole of what is left, and one with no grand
-  total has no target at all. A refund reaching past what was the store's to
+  total has no target at all. Nor has an order the marketplace says was refunded
+  its whole grand total and that no payment was matched to: with no payment
+  collected there is no account of the money the refund could come out of, so
+  such an order has no target rather than a target of nothing. A partial
+  marketplace refund on an order with no payment is not subtracted; only the
+  gateway's refund is. A refund reaching past what was the store's to
   invoice leaves nothing to invoice rather than a negative invoice: the two
   subtractions do not come out of the same pocket, since the marketplace keeps
   the facilitator tax it took whether or not the buyer was refunded, and no
@@ -891,9 +896,11 @@ here as they are provided; do not invent unspecified behavior prematurely.
 - It is also the coloring control, which is a different thing in a different
   section: one chip per level among the orders on screen, under `Highlights`,
   filled where that level's rows are tinted and outlined where they are not.
-  Errors and warnings are tinted by default, being the rows the screen is opened
-  to find. The chips never hide a row — that is what `Filters` is for — so a
-  count on a chip always matches what is under it.
+  Errors, warnings and notices are tinted by default: a reader opens the screen
+  to find the rows something was said about, and a notice is said about a row
+  for the same reason a warning is. Only the reconciled rows are left untinted.
+  The chips never hide a row — that is what `Filters` is for — so a count on a
+  chip always matches what is under it.
 - Dates are shown as `dd.mm.yyyy`, as the accounting and archive screens show
   them. The API carries them as ISO days.
 - Reconciliation screen text is translated through `vast-portal`'s `en.json` and
@@ -914,6 +921,25 @@ here as they are provided; do not invent unspecified behavior prematurely.
     free. A bank transfer is compared against what every entry naming the order
     came to, so an order a buyer underpaid and then topped up agrees while one
     they never topped up does not.
+  - An order with no target invoice is required no payment. Nothing being left
+    to invoice for is exactly the case where no payment is owed: an order the
+    marketplace says was refunded its whole grand total that no payment was
+    matched to has nothing a payment could be shown for, and one with no grand
+    total states no amount a payment could have been made of. So the rule
+    requiring a collected payment does not apply to such an order at all rather
+    than reporting money it never expected as missing.
+  - An order the marketplace says was refunded its whole grand total that no
+    payment was matched to is reported at `info`. Nothing is wrong with it: a
+    gateway that only reserved the funds books no transaction at all when the
+    reservation is cancelled rather than captured, so the order was refunded
+    without money ever having moved and there is nothing for a payment to be
+    found under. It is reported all the same, because no other rule covers such
+    an order — the one requiring a payment does not apply to an order with
+    nothing left to invoice for — and an order refunded without a payment
+    would otherwise read exactly like a reconciled one. Only a refund of the
+    whole grand total reads this way; a partial refund on an order with no
+    payment is left to the rules holding the two sides of a payment against
+    each other.
   - The facilitator-tax rule reports its failures at `info`. The paid-amount
     rule reports both of its failures at `error`: money that was not found, or
     that does not add up, is something to fix.

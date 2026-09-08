@@ -178,13 +178,8 @@ test("lists BrickLink reconciliation orders for the selected month", async ({
         calculated: {
           targetInvoice: null,
         },
-        failures: [
-          {
-            code: "amount-missing",
-            level: "error",
-            fields: ["gateway.paidAmount"],
-          },
-        ],
+        // No grand total was collected, so there is nothing to invoice for and no payment is required.
+        failures: [],
       },
       {
         order: {
@@ -308,13 +303,8 @@ test("lists BrickOwl reconciliation orders for the selected month", async ({
         calculated: {
           targetInvoice: null,
         },
-        failures: [
-          {
-            code: "amount-missing",
-            level: "error",
-            fields: ["gateway.paidAmount"],
-          },
-        ],
+        // No grand total was collected, so there is nothing to invoice for and no payment is required.
+        failures: [],
       },
       {
         order: {
@@ -474,13 +464,8 @@ test("lists BrickOwl reconciliation orders that span several batch requests", as
     calculated: {
       targetInvoice: null,
     },
-    failures: [
-      {
-        code: "amount-missing",
-        level: "error",
-        fields: ["gateway.paidAmount"],
-      },
-    ],
+    // No grand total was collected, so there is nothing to invoice for and no payment is required.
+    failures: [],
   });
   expect(body.orders[59].order.orderId).toBe("bulk-order-60");
 
@@ -1062,6 +1047,93 @@ test("leaves nothing to invoice, rather than less than nothing, for a refunded o
   expect(body.orders[0].order.facilitatorTax).toBe(1);
   expect(body.orders[0].gateway.refundedAmount).toBe(5.2);
   expect(body.orders[0].calculated.targetInvoice).toBe(0);
+});
+
+test("leaves no target invoice for a fully refunded BrickOwl order no payment was matched to", async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: "2026-08",
+    brickOwl: [
+      {
+        orderId: "test-order-0813",
+        orderDate: "1786320000",
+        view: {
+          buyer_name: "Test Buyer Alpha",
+          payment_method_type: "stripe",
+          sub_total: "5.20",
+          base_order_total: "5.20",
+          refund_total: "5.20",
+        },
+      },
+    ],
+    // Nothing Stripe reports names the order, so no payment is matched to it.
+    stripe: [{ description: "Brick Owl Order some-other-order", amount: 520 }],
+  });
+
+  const response = await request.get(
+    "/api/private/reconciliation/orders?month=2026-08",
+  );
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  expect(body.orders[0].order.refundedAmount).toBe(5.2);
+  expect(body.orders[0].gateway.paidAmount).toBeNull();
+  // With no payment collected there is no account of the money the refund could come out of, so the order has no
+  // target at all rather than a target of nothing.
+  expect(body.orders[0].calculated.targetInvoice).toBeNull();
+  // Nothing being left to invoice for is where no payment is owed, so the payment is not reported as missing.
+  // The order is reported at info all the same: the gateway only released a reservation, which is worth seeing
+  // rather than reading as a reconciled order.
+  expect(body.orders[0].failures).toEqual([
+    {
+      code: "refunded-without-payment",
+      level: "info",
+      fields: [
+        "order.refundedAmount",
+        "order.grandTotal",
+        "gateway.paidAmount",
+      ],
+    },
+  ]);
+});
+
+test("keeps the target invoice of a partly refunded BrickOwl order no payment was matched to", async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: "2026-08",
+    brickOwl: [
+      {
+        orderId: "test-order-0814",
+        orderDate: "1786320000",
+        view: {
+          buyer_name: "Test Buyer Alpha",
+          payment_method_type: "stripe",
+          sub_total: "5.20",
+          base_order_total: "5.20",
+          refund_total: "2.00",
+        },
+      },
+    ],
+    stripe: [{ description: "Brick Owl Order some-other-order", amount: 520 }],
+  });
+
+  const response = await request.get(
+    "/api/private/reconciliation/orders?month=2026-08",
+  );
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  expect(body.orders[0].gateway.paidAmount).toBeNull();
+  // Only the gateway's refund is subtracted, so a partial marketplace refund leaves the whole grand total targeted.
+  expect(body.orders[0].calculated.targetInvoice).toBe(5.2);
+  // There is still something to invoice for, so the payment that was never collected is still missing.
+  expect(
+    body.orders[0].failures.map((failure: { code: string }) => failure.code),
+  ).toEqual(["amount-missing"]);
 });
 
 test("reports no refunded amount for a Stripe payment nothing was refunded out of", async ({
