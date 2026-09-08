@@ -64,6 +64,15 @@ public final class BankStatementPayload {
         private final BigDecimal creditTurnover;
 
         /**
+         * What the period itself moved the account by: its credits less its debits, and therefore signed.
+         *
+         * <p>It is the two turnovers above come to, and it is a different question from the balance below: the
+         * movement is about the period, the balance about where the account stood when it ended. Every ledger
+         * screen states both, so the three can be read against each other.
+         */
+        private final BigDecimal netMovement;
+
+        /**
          * Everything the account has moved up to the end of the period, credits less debits, and therefore signed.
          *
          * <p>Derived from the entries that are stored, so it is the closing balance only for an account imported

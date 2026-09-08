@@ -1,5 +1,6 @@
 package com.vastbricks.api.stripeledger;
 
+import com.vastbricks.api.ledger.LedgerPeriod;
 import com.vastbricks.api.stripeledger.StripeLedgerPayload.TransactionsResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -40,9 +41,9 @@ class StripeLedgerController {
         return transactions.transactionsOf(periodOf(period));
     }
 
-    private static StripeLedgerPeriod periodOf(String period) {
+    private static LedgerPeriod periodOf(String period) {
         try {
-            return StripeLedgerPeriod.of(period);
+            return LedgerPeriod.of(period);
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
         }

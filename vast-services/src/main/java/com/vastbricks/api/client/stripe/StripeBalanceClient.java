@@ -2,6 +2,7 @@ package com.vastbricks.api.client.stripe;
 
 import com.stripe.StripeClient;
 import com.stripe.exception.StripeException;
+import com.stripe.model.Balance;
 import com.stripe.model.BalanceTransaction;
 import com.stripe.model.StripeCollection;
 import com.stripe.net.HttpURLConnectionClient;
@@ -50,6 +51,23 @@ public class StripeBalanceClient {
                 List.of(secretKey()),
                 () -> collectBalanceTransactions(createdFrom, createdTo)
         );
+    }
+
+    /**
+     * What the account holds now, which is the one balance Stripe states.
+     *
+     * <p>Stripe answers for the balance at this moment and for no other: there is no asking it what the account
+     * stood at on a day gone by. A caller that wants one works back from this, which is why this reports Stripe's
+     * own figure and does no arithmetic on it.
+     */
+    public Balance retrieveBalance() {
+        return capture.record(PROVIDER, List.of(secretKey()), () -> {
+            try {
+                return stripeClient().balance().retrieve();
+            } catch (StripeException e) {
+                throw new StripeClientException("Stripe balance request failed", e);
+            }
+        });
     }
 
     private List<BalanceTransaction> collectBalanceTransactions(Instant createdFrom, Instant createdTo) {

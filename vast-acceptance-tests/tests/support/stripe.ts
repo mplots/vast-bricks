@@ -25,6 +25,28 @@ export async function mockStripeSettings(
   await settings.setSecret("VAST_STRIPE_SECRET_KEY", stripeSecretKey);
 }
 
+/** What the account holds, as Stripe's balance endpoint states it: one entry per currency, in minor units. */
+export type StripeHeldMock = { available?: [number, string][]; pending?: [number, string][] };
+
+/** Stubs what Stripe says the account holds now, which is the one balance Stripe answers for. */
+export async function stubStripeBalance(wireMock: WireMockApi, held: StripeHeldMock) {
+  const money = (entries: [number, string][] = []) =>
+    entries.map(([amount, currency]) => ({ amount, currency, source_types: {} }));
+  await wireMock.addMethodHostMapping("GET", "/v1/balance", {
+    request: {
+      headers: { Authorization: { equalTo: `Bearer ${stripeSecretKey}` } },
+    },
+    response: {
+      json: {
+        object: "balance",
+        livemode: false,
+        available: money(held.available),
+        pending: money(held.pending),
+      },
+    },
+  });
+}
+
 /**
  * Stubs one page of balance transactions per entry, keyed by the cursor Stripe's paging sends: the first page is
  * asked for without one, and each page after it names the last transaction of the page before.
@@ -34,13 +56,30 @@ export async function mockStripeSettings(
 export async function stubStripeBalanceTransactions(
   wireMock: WireMockApi,
   pages: Record<string, unknown>[][],
+  createdFrom?: WireMockValueMatcher,
 ) {
+  // A window the scenario did not state its transactions for reports none. The Stripe ledger asks for a second
+  // window when it works a closing balance back from what the account holds now, and without this it would be
+  // answered with the period's own transactions and subtract them twice.
+  await wireMock.addMethodHostMapping("GET", "/v1/balance_transactions", {
+    priority: 10,
+    request: {
+      headers: { Authorization: { equalTo: `Bearer ${stripeSecretKey}` } },
+    },
+    response: {
+      json: { object: "list", url: "/v1/balance_transactions", has_more: false, data: [] },
+    },
+  });
+
   let startingAfter: WireMockValueMatcher = { absent: true };
   for (const [pageIndex, page] of pages.entries()) {
     await wireMock.addMethodHostMapping("GET", "/v1/balance_transactions", {
       request: {
         headers: { Authorization: { equalTo: `Bearer ${stripeSecretKey}` } },
-        queryParameters: { starting_after: startingAfter },
+        queryParameters: {
+          starting_after: startingAfter,
+          ...(createdFrom === undefined ? {} : { "created[gte]": createdFrom }),
+        },
       },
       response: {
         json: {

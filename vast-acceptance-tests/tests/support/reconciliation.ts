@@ -10,13 +10,7 @@ import {
   type MansPastsShipmentMock,
 } from "./manspasts";
 import { mockStripeSettings, stubStripeBalanceTransactions } from "./stripe";
-
-const payPalClientId = "test-paypal-client-id";
-const payPalClientSecret = "test-paypal-client-secret";
-const payPalBasicAuth = Buffer.from(
-  `${payPalClientId}:${payPalClientSecret}`,
-).toString("base64");
-const payPalAccessToken = "test-paypal-access-token";
+import { mockPayPalSettings, stubPayPalTransactions } from "./paypal";
 
 const emptyOrdersXml = '<?xml version="1.0" encoding="UTF-8"?><ORDERS/>';
 const brickOwlMaxBatchRequests = 50;
@@ -394,69 +388,23 @@ async function mockPayPal(
   pages: PayPalTransactionMock[][],
   month?: string,
 ) {
-  await settings.set("VAST_PAYPAL_BASE_URL", wireMock.baseUrl);
-  await settings.setSecret("VAST_PAYPAL_CLIENT_ID", payPalClientId);
-  await settings.setSecret("VAST_PAYPAL_CLIENT_SECRET", payPalClientSecret);
+  await mockPayPalSettings(settings, wireMock);
 
-  // Client credentials are asserted so a client that sends none misses the stub instead of passing unauthenticated.
-  await wireMock.addMethodHostMapping("POST", "/v1/oauth2/token", {
-    request: {
-      headers: { Authorization: { equalTo: `Basic ${payPalBasicAuth}` } },
-    },
-    response: {
-      json: {
-        access_token: payPalAccessToken,
-        token_type: "Bearer",
-        expires_in: 32400,
-      },
-    },
-  });
-
-  // PayPal searches a limited range in one request, so the client asks for a padded month a segment at a time. The
-  // scenario's transactions answer the segment the window opens with; a later segment reports none rather than the
-  // same transactions again, which would read as a second payment of every order.
-  await wireMock.addMethodHostMapping("GET", "/v1/reporting/transactions", {
-    priority: 10,
-    request: {
-      headers: { Authorization: { equalTo: `Bearer ${payPalAccessToken}` } },
-    },
-    response: {
-      json: {
-        transaction_details: [],
-        account_number: "test-paypal-account",
-        page: 1,
-        total_items: 0,
-        total_pages: 1,
-      },
-    },
-  });
-
+  // The window a reconciled month is searched in opens at the padded month, so a scenario that names its month pins
+  // its transactions to that first segment and asserts the window the API actually asked for.
   const firstSegment: WireMockValueMatcher | undefined =
     month === undefined ? undefined : { equalTo: paymentWindow(month).fromIso };
 
   let transactionNumber = 0;
-  for (const [pageIndex, page] of pages.entries()) {
-    await wireMock.addMethodHostMapping("GET", "/v1/reporting/transactions", {
-      request: {
-        headers: { Authorization: { equalTo: `Bearer ${payPalAccessToken}` } },
-        queryParameters: {
-          page: { equalTo: String(pageIndex + 1) },
-          ...(firstSegment === undefined ? {} : { start_date: firstSegment }),
-        },
-      },
-      response: {
-        json: {
-          transaction_details: page.map((transaction) =>
-            payPalTransaction(transaction, ++transactionNumber),
-          ),
-          account_number: "test-paypal-account",
-          page: pageIndex + 1,
-          total_items: page.length,
-          total_pages: pages.length,
-        },
-      },
-    });
-  }
+  await stubPayPalTransactions(
+    wireMock,
+    pages.map((page) =>
+      page.map((transaction) =>
+        payPalTransaction(transaction, ++transactionNumber),
+      ),
+    ),
+    firstSegment,
+  );
 }
 
 function payPalTransaction(

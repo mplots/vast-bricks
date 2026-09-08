@@ -1,7 +1,12 @@
 import type { APIRequestContext, TestInfo } from "@playwright/test";
 
 import type { SettingsOverrides } from "./api-test";
-import { mockStripeSettings, stubStripeBalanceTransactions } from "./stripe";
+import {
+  mockStripeSettings,
+  stubStripeBalance,
+  stubStripeBalanceTransactions,
+  type StripeHeldMock,
+} from "./stripe";
 import { WireMockApi } from "./wiremock";
 
 /**
@@ -31,16 +36,36 @@ export type StripeLedgerTransactionMock = {
   charge?: { id: string; paymentIntent?: string | null };
 };
 
-/** Mocks Stripe for one scenario: the settings that reach WireMock, and the pages the ledger is returned in. */
+/** The UTC window a period is fetched as, in the epoch seconds Stripe is asked for it in. */
+export function ledgerWindow(period: string) {
+  const [year, month] = period.split("-").map(Number);
+  const from = month
+    ? Date.UTC(year, month - 1, 1, 0, 0, 0)
+    : Date.UTC(year, 0, 1, 0, 0, 0);
+  const to = month
+    ? Date.UTC(year, month, 0, 23, 59, 59)
+    : Date.UTC(year, 11, 31, 23, 59, 59);
+  return { from: from / 1000, to: to / 1000 };
+}
+
+/**
+ * Mocks Stripe for one scenario: the settings that reach WireMock, and the pages the ledger is returned in.
+ *
+ * <p>A scenario reading a closing balance states `period`, which pins its transactions to that period's own window:
+ * the ledger asks for a second window when it works the balance back from what the account holds now, and an
+ * unpinned stub would answer that one with the period's transactions too.
+ */
 export async function mockStripeLedger(
   settings: SettingsOverrides,
   request: APIRequestContext,
   testInfo: TestInfo,
   pages: StripeLedgerTransactionMock[][],
+  options: { period?: string; held?: StripeHeldMock } = {},
 ) {
   const wireMock = WireMockApi.forTest(request, testInfo);
   await wireMock.reset();
   await mockStripeSettings(settings, wireMock);
+  if (options.held) await stubStripeBalance(wireMock, options.held);
 
   let transactionNumber = 0;
   await stubStripeBalanceTransactions(
@@ -50,6 +75,9 @@ export async function mockStripeLedger(
         balanceTransaction(transaction, ++transactionNumber),
       ),
     ),
+    options.period === undefined
+      ? undefined
+      : { equalTo: String(ledgerWindow(options.period).from) },
   );
 
   return wireMock;
@@ -110,6 +138,7 @@ export type StripeLedgerPage = {
     debitTurnover: number;
     creditTurnover: number;
     fees: number;
-    net: number;
+    netMovement: number;
+    closingBalance: number | null;
   }>;
 };

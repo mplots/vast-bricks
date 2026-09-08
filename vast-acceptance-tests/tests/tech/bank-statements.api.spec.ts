@@ -179,13 +179,13 @@ test('a period is summarised per currency', async ({ request }) => {
 
   const september = await pageOf(request, '2026-09');
   expect(september.summary).toEqual([
-    { currency: 'EUR', debitTurnover: 16.01, creditTurnover: 5.07, closingBalance: 4308.76 },
+    { currency: 'EUR', debitTurnover: 16.01, creditTurnover: 5.07, netMovement: -10.94, closingBalance: 4308.76 },
   ]);
 
   // The year holds all three entries, so its turnovers are the whole of them and the balance is the same figure.
   const year = await pageOf(request, '2026');
   expect(year.summary).toEqual([
-    { currency: 'EUR', debitTurnover: 16.01, creditTurnover: 4324.77, closingBalance: 4308.76 },
+    { currency: 'EUR', debitTurnover: 16.01, creditTurnover: 4324.77, netMovement: 4308.76, closingBalance: 4308.76 },
   ]);
 });
 
@@ -255,10 +255,10 @@ test("a tenant's summary is summed over its own entries alone", async ({ request
   await importDocument(otherTenant.request, camt052({ entries: [postageEntry] }));
 
   expect((await pageOf(request)).summary).toEqual([
-    { currency: 'EUR', debitTurnover: 0, creditTurnover: 5.07, closingBalance: 5.07 },
+    { currency: 'EUR', debitTurnover: 0, creditTurnover: 5.07, netMovement: 5.07, closingBalance: 5.07 },
   ]);
   expect((await pageOf(otherTenant.request)).summary).toEqual([
-    { currency: 'EUR', debitTurnover: 16.01, creditTurnover: 0, closingBalance: -16.01 },
+    { currency: 'EUR', debitTurnover: 16.01, creditTurnover: 0, netMovement: -16.01, closingBalance: -16.01 },
   ]);
 });
 

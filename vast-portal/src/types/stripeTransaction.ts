@@ -13,9 +13,12 @@ export interface StripeTransaction {
   /** Unsigned, the way a bank states an entry's amount; `direction` says which way the balance moved. */
   amount: number | null;
   direction: StripeTransactionDirection;
-  /** What Stripe deducted from this transaction, unsigned, or `null` where it deducted nothing. */
+  /**
+   * What Stripe deducted from this transaction, signed as a deduction, or `null` where it deducted nothing. Stripe
+   * states a fee the other way up from PayPal, so the backend negates it and the two ledgers state a fee alike.
+   */
   fee: number | null;
-  /** What the transaction left in the balance: the amount less the fee, signed as the amount was. */
+  /** What the transaction left in the balance: the amount with the fee added in, signed as the amount was. */
   net: number | null;
   currency: string | null;
   status: string | null;
@@ -34,10 +37,20 @@ export interface StripeTransactionCurrencySummary {
   /** Unsigned, the way a transaction's amount is: the direction is in the name rather than in the sign. */
   debitTurnover: number;
   creditTurnover: number;
-  /** What Stripe deducted across the period, unsigned, the marketplaces' application fees included. */
+  /**
+   * What Stripe deducted across the period, signed as each fee was.
+   *
+   * <p>A memo of how much of the turnovers were fees rather than a term beside them: a fee is money that left the
+   * account, so it is already counted in the turnover it moved. The PayPal ledger states its own the same way.
+   */
   fees: number;
   /** What the balance moved by: credits less debits less fees, and therefore signed. */
-  net: number;
+  netMovement: number;
+  /**
+   * Where the account stood at the end of the period, or `null` where it could not be established. Stripe answers
+   * for the balance at this moment and no other, so it is worked back from what the account holds now.
+   */
+  closingBalance: number | null;
 }
 
 export interface StripeTransactionsPage {

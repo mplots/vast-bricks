@@ -1,4 +1,4 @@
-import { Bank, Card, DocumentText } from 'iconsax-reactjs';
+import { Bank, Card, DocumentText, Wallet } from 'iconsax-reactjs';
 
 import { NavItemType } from 'types/menu';
 
@@ -27,6 +27,13 @@ const reconciliationMenu: NavItemType = {
       type: 'item',
       url: '/stripe-transactions',
       icon: Card
+    },
+    {
+      id: 'paypal-transactions',
+      title: 'paypal-transactions',
+      type: 'item',
+      url: '/paypal-transactions',
+      icon: Wallet
     }
   ]
 };

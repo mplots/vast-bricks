@@ -15,6 +15,11 @@ export interface SummaryLine {
   colour?: string;
   /** Whether this line sums the ones above it, and is therefore ruled off from them. */
   sum?: boolean;
+  /**
+   * Whether this line is a figure in its own right that sums nothing above it — a closing balance beside a period's
+   * movement — so it carries a total's weight without a rule that would claim the lines above add up to it.
+   */
+  balance?: boolean;
 }
 
 interface Props {
@@ -106,7 +111,9 @@ export default function TableSummaryFooter({ lines, before, after }: Props) {
           <TableRow key={line.key}>
             {/* The columns the amount does not stand in carry the ground and nothing else. */}
             <TableCell colSpan={before} sx={{ border: 0 }} />
-            <TableCell sx={{ ...numericCell, ...ruled, color: line.colour ?? 'text.primary', fontWeight: line.sum ? 700 : 500 }}>
+            <TableCell
+              sx={{ ...numericCell, ...ruled, color: line.colour ?? 'text.primary', fontWeight: line.sum || line.balance ? 700 : 500 }}
+            >
               {line.amount}
             </TableCell>
             <TableCell colSpan={after} sx={ruled}>

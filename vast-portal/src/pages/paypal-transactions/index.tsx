@@ -17,7 +17,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { FilterSearch, Refresh, SearchNormal1 } from 'iconsax-reactjs';
 import { useIntl } from 'react-intl';
 
-import { useGetStripeTransactions } from 'api/stripeTransactions';
+import { useGetPayPalTransactions } from 'api/payPalTransactions';
 import Highlighted from 'components/Highlighted';
 import IconButton from 'components/@extended/IconButton';
 import MainCard from 'components/MainCard';
@@ -29,43 +29,47 @@ import PeriodPicker from 'components/period/PeriodPicker';
 import PeriodViewToggle from 'components/period/PeriodViewToggle';
 import toolButtonSx from 'components/toolButton';
 import useConfig from 'hooks/useConfig';
-import StripeTransactionFilterDrawer from 'sections/stripe-transactions/StripeTransactionFilterDrawer';
-import { transactionNarrowable, transactionSearchColumns } from 'sections/stripe-transactions/narrowing';
-import { formatAmount, numericCell, signedAmount } from 'utils/amount';
+import PayPalTransactionDetail from 'sections/paypal-transactions/PayPalTransactionDetail';
+import PayPalTransactionFilterDrawer from 'sections/paypal-transactions/PayPalTransactionFilterDrawer';
+import { transactionNarrowable, transactionSearchColumns } from 'sections/paypal-transactions/narrowing';
+import { formatAmount, numericCell, signedAmount as signed } from 'utils/amount';
 import { currentMonth } from 'utils/month';
 import { noNarrowing, shownRows, termsFor, toggled, type Narrowing } from 'utils/narrowing';
-import type { StripeTransaction, StripeTransactionCurrencySummary } from 'types/stripeTransaction';
+import { wordedOr } from 'utils/wording';
+import type { PayPalTransaction, PayPalTransactionCurrencySummary } from 'types/payPalTransaction';
 
 /**
  * The table's columns and the share of the table each of them takes, so the summary under it knows which of them the
  * amount stands in and every column keeps its place.
  *
- * <p>The widths are stated for the reason the bank statement's are: a column measured from its own content moves
- * whenever the content does — the search row opening under the headings, a period stepped to whose amounts are a
- * digit longer, a month widened to its year — and a reader who has just found the transaction they were looking for
- * should not have the table shift under them to say so.
+ * <p>The widths are stated for the reason the two ledger screens beside this one state theirs: a column measured
+ * from its own content moves whenever the content does — the search row opening under the headings, a period stepped
+ * to whose amounts are a digit longer, a month widened to its year — and a reader who has just found the transaction
+ * they were looking for should not have the table shift under them to say so.
  *
- * <p>They are laid out the way the ledger reads: what the transaction is, then the three amounts in the order Stripe
- * subtracts them — what it took, what it kept, what was left — so the arithmetic reads across the row.
+ * <p>They are laid out the way the ledger reads: who the money moved between and what it was for, then the three
+ * amounts in the order PayPal subtracts them — what it took, what it kept, what was left — so the arithmetic reads
+ * across the row. The counterparty is where a bank statement puts it and where a PayPal ledger wants it: PayPal
+ * names a person on nearly every transaction, which is more than Stripe does.
  */
 const columns = [
-  { key: 'date', width: '10%' },
-  { key: 'type', width: '11%' },
-  { key: 'description', width: '24%' },
+  { key: 'date', width: '8%' },
+  { key: 'type', width: '9%' },
+  { key: 'counterparty', width: '17%' },
+  { key: 'description', width: '16%' },
   { key: 'amount', width: '12%' },
   { key: 'fee', width: '9%' },
   { key: 'net', width: '11%' },
-  { key: 'status', width: '8%' },
-  { key: 'reference', width: '15%' }
+  { key: 'status', width: '7%' },
+  { key: 'reference', width: '11%' }
 ] as const;
 const amountColumn = columns.findIndex((column) => column.key === 'amount');
 
 /**
- * The day Stripe dated a transaction, as `dd.mm.yyyy`, read in UTC.
+ * The day PayPal dated a transaction, as `dd.mm.yyyy`, read in UTC.
  *
- * <p>UTC because that is the zone the period was asked for in: Stripe dates a balance transaction in UTC, so the
- * window a month is fetched as is a UTC window, and a transaction shown in the reader's own zone could read as
- * falling outside the month it was collected for.
+ * <p>UTC because that is the zone the period was asked for in: the window a month is fetched as is a UTC window, so
+ * a transaction shown in the reader's own zone could read as falling outside the month it was collected for.
  */
 const formatDate = (value?: string | null) => {
   if (!value) return '—';
@@ -81,74 +85,75 @@ const formatTime = (value?: string | null) => {
   return time ? time.slice(0, 5) : null;
 };
 
-/** An amount with its currency, or an em dash where the provider stated none. */
+/** An amount with its currency, or an em dash where PayPal stated none. */
 const withCurrency = (amount: number | null, currency: string | null) =>
   amount === null || amount === undefined ? '—' : `${formatAmount(amount)}${currency ? ` ${currency}` : ''}`;
 
 /**
  * The four lines a currency is accounted for in, in the order a ledger states them.
  *
- * <p>They are the bank statement's, with a memo under the debits saying how much of them were fees. The turnovers
- * are every movement of the account, the fees Stripe deducted inside a transaction included: a fee is not a
+ * <p>They are the bank statement's, with a memo under the debits saying how much of them were fees. The
+ * turnovers are every movement of the account, the fees deducted inside a transaction included: a fee is not a
  * transaction of this ledger, but it is money that left the account, and a bank charging the same fee would book it
- * as an entry of its own. So the fee memo sits under the turnover it is part of rather than between the turnovers
- * and the sum, where it would read as a second subtraction. The PayPal ledger's foot says the same things in the
- * same order, the two being read against each other.
+ * as an entry of its own. So a fee line sits under the turnover it is part of rather than between the turnovers and
+ * the sum, where it would read as a second subtraction.
  *
- * <p>Then two figures that answer two different questions: what the period moved the account by, which the lines
- * above come to, and where the account stood when it ended, which holds everything before the period as well. Every
- * ledger screen states both, so the bank statement and the two provider ledgers can be read against each other.
+ * <p>The Stripe ledger's foot says the same things in the same order, the two being read against each other and
+ * against the bank statement's.
  *
- * <p>Stripe answers for the balance at this moment and no other, so the closing one is worked back from what the
- * account holds now. A period it could not be worked back over states none rather than a guess.
+ * <p>The fee memo keeps the sign it came with rather than always reading as a deduction. PayPal states a fee as an
+ * amount of its own, and a period holding refunds can have given more of it back than it took.
+ *
+ * <p>The last line is what the balance moved by rather than a closing balance. PayPal knows the account's balance and
+ * this screen does not ask for it: a balance is a fact about now, and the period being read is normally not now.
  */
-const summaryLines = (currency: StripeTransactionCurrencySummary, label: (id: string) => string): SummaryLine[] => {
-  const money = (amount: number) => `${formatAmount(amount)}${currency.currency ? ` ${currency.currency}` : ''}`;
+const summaryLines = (currency: PayPalTransactionCurrencySummary, label: (id: string) => string): SummaryLine[] => {
+  const suffix = currency.currency ? ` ${currency.currency}` : '';
 
   return [
     {
       key: `${currency.currency}:debit`,
       // The turnovers are reported unsigned, so the sign is put back here from what the line is, the way a row puts
-      // it back from the transaction's direction. Debit first, as on the bank statement screen: the two feet are
+      // it back from the transaction's direction. Debit first, as on the two screens beside this one: the feet are
       // read against each other, so they state the same figures in the same order.
-      amount: `−${money(Math.abs(currency.debitTurnover))}`,
-      label: label('stripe-transaction-debit-turnover'),
+      amount: `−${formatAmount(Math.abs(currency.debitTurnover))}${suffix}`,
+      label: label('paypal-transaction-debit-turnover'),
       colour: 'error.main'
     },
     {
       // Part of the turnover above rather than a term of its own, so it stands under it and is set quieter than the
-      // figures that do add up. One figure for everything Stripe took: which fee of Stripe's a transaction paid is
-      // a detail of that transaction, and a foot is read for what a period came to.
+      // figures that do add up. One figure for everything that came off, whoever took it: which party took which
+      // part of a transaction's cost is a detail of that transaction, stated where the rest of its account is, and
+      // a foot is read for what a period came to.
       key: `${currency.currency}:fees`,
-      amount: `${signedAmount(currency.fees)}${currency.currency ? ` ${currency.currency}` : ''}`,
-      label: label('stripe-transaction-fees'),
+      amount: `${signed(currency.fees)}${suffix}`,
+      label: label('paypal-transaction-fees'),
       colour: 'text.secondary'
     },
     {
       key: `${currency.currency}:credit`,
-      amount: `+${money(Math.abs(currency.creditTurnover))}`,
-      label: label('stripe-transaction-credit-turnover'),
+      amount: `+${formatAmount(Math.abs(currency.creditTurnover))}${suffix}`,
+      label: label('paypal-transaction-credit-turnover'),
       colour: 'success.main'
     },
     {
       // What the two turnovers come to, so it is ruled off from them, and signed already: a period that gave back
       // more than it took is a fact about the period rather than a direction of movement.
       key: `${currency.currency}:net`,
-      amount: money(currency.netMovement),
-      label: label('stripe-transaction-net-movement'),
+      amount: `${formatAmount(currency.netMovement)}${suffix}`,
+      label: label('paypal-transaction-net-movement'),
       sum: true
     },
     // And where the account stood when the period ended, which is a different question from what the period did: it
-    // holds everything before the period as well. Stripe answers for the balance at this moment and no other, so it
-    // is worked back from what the account holds now, and a period it could not be worked back over states none
-    // rather than a guess.
+    // holds everything before the period as well. PayPal's own figure rather than one worked out, and a period it
+    // did not answer for states none rather than a guess.
     ...(currency.closingBalance === null
       ? []
       : [
           {
             key: `${currency.currency}:balance`,
-            amount: money(currency.closingBalance),
-            label: label('stripe-transaction-closing-balance'),
+            amount: `${formatAmount(currency.closingBalance)}${suffix}`,
+            label: label('paypal-transaction-closing-balance'),
             balance: true
           }
         ])
@@ -158,10 +163,9 @@ const summaryLines = (currency: StripeTransactionCurrencySummary, label: (id: st
 /**
  * One column's search field, sitting in the search row under the column it searches.
  *
- * <p>The same field the bank statement screen is searched in, labelled by the column it searches rather than by a
- * placeholder repeating the heading right above it. Escape empties it, which is the way out of a search from inside
- * it: the panel's clear button says the same thing about the whole narrowing, but a reader who has just mistyped an
- * order number is already at the keyboard.
+ * <p>The same field the bank statement and Stripe transaction screens are searched in, labelled by the column it
+ * searches rather than by a placeholder repeating the heading right above it. Escape empties it, which is the way
+ * out of a search from inside it.
  */
 function SearchField({ column, value, onChange }: { column: string; value: string; onChange: (query: string) => void }) {
   const intl = useIntl();
@@ -169,10 +173,10 @@ function SearchField({ column, value, onChange }: { column: string; value: strin
   return (
     <TableTextField
       value={value}
-      placeholder={intl.formatMessage({ id: 'stripe-transaction-search-placeholder' })}
+      placeholder={intl.formatMessage({ id: 'paypal-transaction-search-placeholder' })}
       ariaLabel={intl.formatMessage(
-        { id: 'stripe-transaction-search-in' },
-        { column: intl.formatMessage({ id: `stripe-transaction-${column}` }) }
+        { id: 'paypal-transaction-search-in' },
+        { column: intl.formatMessage({ id: `paypal-transaction-${column}` }) }
       )}
       icon={<SearchNormal1 size={14} />}
       onChange={onChange}
@@ -184,20 +188,18 @@ function SearchField({ column, value, onChange }: { column: string; value: strin
 }
 
 /**
- * Stripe's own id for the transaction, with what it was raised against under it, and a link where Stripe has a page
- * to send the reader to.
+ * PayPal's own id for the transaction, with what it was raised against under it, and the link PayPal shows it at.
  *
- * <p>The link rides the reference rather than taking a column of its own, as the reconciliation screen's links ride
- * the field naming what they open. Only a transaction that settled a payment has one — Stripe addresses a payment,
- * not a payout or a fee — so the rest are left as the plain reference they were, which is still what a reader would
- * search Stripe for.
+ * <p>The link rides the reference rather than taking a column of its own, as the reconciliation and Stripe screens'
+ * links ride the field naming what they open. Unlike Stripe's, it needs no account to be addressed under, so every
+ * transaction PayPal reported has one.
  */
-function ReferenceCell({ transaction, terms }: { transaction: StripeTransaction; terms: string[] }) {
+function ReferenceCell({ transaction, terms }: { transaction: PayPalTransaction; terms: string[] }) {
   const intl = useIntl();
 
   const reference = (
     <Typography variant="caption" color="text.secondary">
-      <Highlighted text={transaction.id} terms={terms} />
+      <Highlighted text={transaction.id ?? '—'} terms={terms} />
     </Typography>
   );
 
@@ -208,7 +210,9 @@ function ReferenceCell({ transaction, terms }: { transaction: StripeTransaction;
           href={transaction.link}
           target="_blank"
           rel="noopener"
-          aria-label={intl.formatMessage({ id: 'stripe-transaction-open-payment' })}
+          // The row opens the transaction's own account, so a link out to PayPal stops its click reaching the row.
+          onClick={(event) => event.stopPropagation()}
+          aria-label={intl.formatMessage({ id: 'paypal-transaction-open-transaction' })}
         >
           {reference}
         </Link>
@@ -224,14 +228,14 @@ function ReferenceCell({ transaction, terms }: { transaction: StripeTransaction;
   );
 }
 
-export default function StripeTransactionsPage() {
+export default function PayPalTransactionsPage() {
   const intl = useIntl();
   // One string holds both what is being read and which view is reading it: `YYYY-MM` is a month, `YYYY` a year. The
   // screen opens on this month, which is the period a ledger is normally looked over.
   const [selectedPeriod, setSelectedPeriod] = useState(currentMonth());
   // Which transactions of the period are being read: what was ticked, and what was searched for. Held beside the
-  // period, and for the same reason as on the bank statement screen: a ledger is read a period at a time in front of
-  // the transactions rather than linked to, so what it is showing is state of its own.
+  // period, and for the same reason as on the screens beside this one: a ledger is read a period at a time in front
+  // of the transactions rather than linked to, so what it is showing is state of its own.
   const [narrowing, setNarrowing] = useState<Narrowing>(noNarrowing);
   const { container } = useConfig();
   const downLG = useMediaQuery((theme) => theme.breakpoints.down('lg'));
@@ -245,15 +249,18 @@ export default function StripeTransactionsPage() {
   // stated: a heading wraps onto a second line on a narrow screen.
   const [headingRow, setHeadingRow] = useState<HTMLTableRowElement | null>(null);
   const [headingHeight, setHeadingHeight] = useState(0);
+  // The transaction whose own account is open. PayPal reported it as several records and the table states it as
+  // one, so this is where it comes apart again.
+  const [selected, setSelected] = useState<PayPalTransaction | null>(null);
 
   const {
-    stripeTransactions,
-    stripeTransactionSummary,
-    stripeTransactionsError,
-    stripeTransactionsLoading,
-    stripeTransactionsRefreshing,
-    reloadStripeTransactions
-  } = useGetStripeTransactions(selectedPeriod);
+    payPalTransactions,
+    payPalTransactionSummary,
+    payPalTransactionsError,
+    payPalTransactionsLoading,
+    payPalTransactionsRefreshing,
+    reloadPayPalTransactions
+  } = useGetPayPalTransactions(selectedPeriod);
 
   useEffect(() => {
     if (!headingRow) return;
@@ -264,7 +271,7 @@ export default function StripeTransactionsPage() {
     return () => observer.disconnect();
   }, [headingRow]);
 
-  const collected = stripeTransactions ?? [];
+  const collected = payPalTransactions ?? [];
   // A year of transactions is filtered again at every keystroke of a search. The field itself answers the key at
   // once and the table catches up a render later, so typing never waits on the period however long it is.
   const settled = useDeferredValue(narrowing);
@@ -300,11 +307,11 @@ export default function StripeTransactionsPage() {
     <Stack component="span" direction="row" useFlexGap sx={{ gap: 1, alignItems: 'center', flexWrap: 'wrap' }}>
       {/* Only while the panel is away: open, the panel is its own close button. */}
       {!filtersOpen && (
-        <Tooltip title={intl.formatMessage({ id: 'stripe-transaction-filters' })} arrow>
+        <Tooltip title={intl.formatMessage({ id: 'paypal-transaction-filters' })} arrow>
           <IconButton
             variant="light"
             color="secondary"
-            aria-label={intl.formatMessage({ id: 'stripe-transaction-filters' })}
+            aria-label={intl.formatMessage({ id: 'paypal-transaction-filters' })}
             onClick={() => setFiltersOpen(true)}
             sx={toolButtonSx}
           >
@@ -312,12 +319,12 @@ export default function StripeTransactionsPage() {
           </IconButton>
         </Tooltip>
       )}
-      <Tooltip title={intl.formatMessage({ id: searchOpen ? 'stripe-transaction-search-hide' : 'stripe-transaction-search' })} arrow>
+      <Tooltip title={intl.formatMessage({ id: searchOpen ? 'paypal-transaction-search-hide' : 'paypal-transaction-search' })} arrow>
         <IconButton
           variant={searchOpen ? 'contained' : 'light'}
           color={searchOpen ? 'primary' : 'secondary'}
           aria-pressed={searchOpen}
-          aria-label={intl.formatMessage({ id: searchOpen ? 'stripe-transaction-search-hide' : 'stripe-transaction-search' })}
+          aria-label={intl.formatMessage({ id: searchOpen ? 'paypal-transaction-search-hide' : 'paypal-transaction-search' })}
           onClick={toggleSearch}
           sx={searchOpen ? undefined : toolButtonSx}
         >
@@ -326,9 +333,9 @@ export default function StripeTransactionsPage() {
       </Tooltip>
       <PeriodPicker value={selectedPeriod} onChange={setSelectedPeriod} />
       {/* Only once a period has been read: until then there is nothing to have shown a part of. */}
-      {stripeTransactions && (
+      {payPalTransactions && (
         <Typography component="span" variant="body2" color="text.secondary" sx={{ display: { xs: 'none', sm: 'block' } }}>
-          {intl.formatMessage({ id: 'stripe-transaction-filter-showing' }, { shown: shown.length, total: collected.length })}
+          {intl.formatMessage({ id: 'paypal-transaction-filter-showing' }, { shown: shown.length, total: collected.length })}
         </Typography>
       )}
     </Stack>
@@ -337,16 +344,16 @@ export default function StripeTransactionsPage() {
   const actions = (
     <Stack direction="row" sx={{ alignItems: 'center', gap: 1 }}>
       <PeriodViewToggle value={selectedPeriod} onChange={setSelectedPeriod} />
-      {/* Nothing is stored, so this asks Stripe for the period again. It is its icon alone, saying what it is in its
+      {/* Nothing is stored, so this asks PayPal for the period again. It is its icon alone, saying what it is in its
           tooltip and its label, and refuses a second click until the first has answered. */}
-      <Tooltip title={intl.formatMessage({ id: 'stripe-transaction-refresh' })} arrow>
+      <Tooltip title={intl.formatMessage({ id: 'paypal-transaction-refresh' })} arrow>
         <span>
           <IconButton
             variant="light"
             color="secondary"
-            disabled={stripeTransactionsRefreshing}
-            aria-label={intl.formatMessage({ id: 'stripe-transaction-refresh' })}
-            onClick={() => reloadStripeTransactions()}
+            disabled={payPalTransactionsRefreshing}
+            aria-label={intl.formatMessage({ id: 'paypal-transaction-refresh' })}
+            onClick={() => reloadPayPalTransactions()}
             sx={toolButtonSx}
           >
             <Refresh size={18} />
@@ -359,7 +366,7 @@ export default function StripeTransactionsPage() {
   return (
     <Stack>
       <Box sx={{ display: 'flex' }}>
-        <StripeTransactionFilterDrawer
+        <PayPalTransactionFilterDrawer
           open={filtersOpen}
           onClose={() => setFiltersOpen(false)}
           transactions={collected}
@@ -378,24 +385,24 @@ export default function StripeTransactionsPage() {
               // scrolling ancestor would catch them and hold them inside the card.
               sx={{ overflow: 'visible' }}
             >
-              {stripeTransactionsLoading && <Skeleton variant="rounded" height={320} sx={{ m: 2.5 }} />}
+              {payPalTransactionsLoading && <Skeleton variant="rounded" height={320} sx={{ m: 2.5 }} />}
 
-              {stripeTransactionsError && (
+              {payPalTransactionsError && (
                 <Alert severity="error" sx={{ m: 2.5 }}>
-                  {stripeTransactionsError.message || intl.formatMessage({ id: 'stripe-transaction-load-error' })}
+                  {payPalTransactionsError.message || intl.formatMessage({ id: 'paypal-transaction-load-error' })}
                 </Alert>
               )}
 
-              {!stripeTransactionsLoading &&
-                !stripeTransactionsError &&
-                stripeTransactions &&
+              {!payPalTransactionsLoading &&
+                !payPalTransactionsError &&
+                payPalTransactions &&
                 (collected.length ? (
                   <TableContainer sx={{ overflow: 'visible' }}>
                     <Table
                       stickyHeader
                       size="small"
-                      aria-label={intl.formatMessage({ id: 'stripe-transaction-table' })}
-                      sx={ledgerTableSx(headingHeight, 1100)}
+                      aria-label={intl.formatMessage({ id: 'paypal-transaction-table' })}
+                      sx={ledgerTableSx(headingHeight, 1200)}
                     >
                       <colgroup>
                         {columns.map((column) => (
@@ -406,7 +413,7 @@ export default function StripeTransactionsPage() {
                         <TableRow ref={setHeadingRow}>
                           {columns.map((column) => (
                             <TableCell key={column.key} sx={['amount', 'fee', 'net'].includes(column.key) ? numericCell : undefined}>
-                              {intl.formatMessage({ id: `stripe-transaction-${column.key}` })}
+                              {intl.formatMessage({ id: `paypal-transaction-${column.key}` })}
                             </TableCell>
                           ))}
                         </TableRow>
@@ -439,13 +446,16 @@ export default function StripeTransactionsPage() {
                           <TableRow>
                             <TableCell colSpan={columns.length} sx={{ py: 6, textAlign: 'center' }}>
                               <Typography color="text.secondary">
-                                {intl.formatMessage({ id: 'stripe-transaction-filtered-empty' })}
+                                {intl.formatMessage({ id: 'paypal-transaction-filtered-empty' })}
                               </Typography>
                             </TableCell>
                           </TableRow>
                         )}
                         {shown.map((transaction) => (
-                          <TableRow key={transaction.id} hover>
+                          // Selecting a transaction opens what PayPal reported it as: the lines its gross was made
+                          // up of, what came off it, and the records PayPal raised against it. The table states the
+                          // transaction; this is where it comes apart again.
+                          <TableRow key={transaction.id} hover onClick={() => setSelected(transaction)} sx={{ cursor: 'pointer' }}>
                             <TableCell sx={{ whiteSpace: 'nowrap' }}>
                               <Typography variant="body2">{formatDate(transaction.created)}</Typography>
                               {formatTime(transaction.created) && (
@@ -454,11 +464,32 @@ export default function StripeTransactionsPage() {
                                 </Typography>
                               )}
                             </TableCell>
-                            {/* Stripe's own word for what the transaction is, shown as Stripe words it: the set
-                                grows with the products the account uses. */}
-                            <TableCell>{transaction.type ?? '—'}</TableCell>
+                            {/* PayPal states an event code rather than a word, so the codes a merchant account meets
+                                are worded here and the rest read as the code itself. */}
                             <TableCell>
-                              <Highlighted text={transaction.description || '—'} terms={termsOf('description')} />
+                              {transaction.type ? wordedOr(intl, `paypal-transaction-event-${transaction.type}`, transaction.type) : '—'}
+                            </TableCell>
+                            <TableCell>
+                              <Typography variant="body2">
+                                <Highlighted text={transaction.counterparty || '—'} terms={termsOf('counterparty')} />
+                              </Typography>
+                              {transaction.counterpartyEmail && (
+                                <Typography variant="caption" color="text.secondary">
+                                  <Highlighted text={transaction.counterpartyEmail} terms={termsOf('counterparty')} />
+                                </Typography>
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              <Typography variant="body2">
+                                <Highlighted text={transaction.description || '—'} terms={termsOf('description')} />
+                              </Typography>
+                              {/* What the marketplace labelled the payment with, which for BrickOwl is the order
+                                  number a reader is normally looking the transaction up by. */}
+                              {transaction.invoiceId && (
+                                <Typography variant="caption" color="text.secondary">
+                                  <Highlighted text={transaction.invoiceId} terms={termsOf('description')} />
+                                </Typography>
+                              )}
                             </TableCell>
                             <TableCell sx={{ ...numericCell, color: transaction.direction === 'CREDIT' ? 'success.main' : 'error.main' }}>
                               {/* The amount is reported unsigned, the way a bank states an entry, so the sign is put
@@ -466,14 +497,20 @@ export default function StripeTransactionsPage() {
                               {transaction.direction === 'CREDIT' ? '+' : '−'}
                               {withCurrency(transaction.amount, transaction.currency)}
                             </TableCell>
-                            {/* Nothing deducted is no fee rather than a zero: Stripe takes its fee out of the
-                                transaction it belongs to rather than out of all of them. The sign is a deduction's
-                                own, as it is on the PayPal ledger: Stripe gives part of a fee back on a refund. */}
+                            {/* Everything that came off the transaction, whoever took it: PayPal's own processing fee
+                                and the commission the marketplace took as partner are both money out of it, and one
+                                figure is what a reader of the ledger wants. What it was made of is in the detail
+                                view, laid out the way PayPal's own panel lays it out. Nothing deducted is no fee
+                                rather than a zero, and the sign is PayPal's own. */}
                             <TableCell sx={{ ...numericCell, color: 'text.secondary' }}>
-                              {transaction.fee === null ? '—' : signedAmount(transaction.fee)}
+                              {transaction.fee === null ? '—' : signed(transaction.fee)}
                             </TableCell>
                             <TableCell sx={numericCell}>{withCurrency(transaction.net, transaction.currency)}</TableCell>
-                            <TableCell sx={{ whiteSpace: 'nowrap' }}>{transaction.status ?? '—'}</TableCell>
+                            <TableCell sx={{ whiteSpace: 'nowrap' }}>
+                              {transaction.status
+                                ? wordedOr(intl, `paypal-transaction-status-${transaction.status}`, transaction.status)
+                                : '—'}
+                            </TableCell>
                             <ReferenceCell transaction={transaction} terms={termsOf('reference')} />
                           </TableRow>
                         ))}
@@ -482,9 +519,9 @@ export default function StripeTransactionsPage() {
                           narrowed one: the turnovers are what the period came to whichever way the transactions were
                           narrowed. The amount column is found by name rather than counted out here, so a column
                           moved or added does not silently slide the totals into the wrong one. */}
-                      {stripeTransactionSummary && stripeTransactionSummary.length > 0 && (
+                      {payPalTransactionSummary && payPalTransactionSummary.length > 0 && (
                         <TableSummaryFooter
-                          lines={stripeTransactionSummary.flatMap((currency) => summaryLines(currency, (id) => intl.formatMessage({ id })))}
+                          lines={payPalTransactionSummary.flatMap((currency) => summaryLines(currency, (id) => intl.formatMessage({ id })))}
                           before={amountColumn}
                           after={columns.length - amountColumn - 1}
                         />
@@ -493,13 +530,15 @@ export default function StripeTransactionsPage() {
                   </TableContainer>
                 ) : (
                   <Box sx={{ p: 6, textAlign: 'center' }}>
-                    <Typography color="text.secondary">{intl.formatMessage({ id: 'stripe-transaction-empty' })}</Typography>
+                    <Typography color="text.secondary">{intl.formatMessage({ id: 'paypal-transaction-empty' })}</Typography>
                   </Box>
                 ))}
             </MainCard>
           </Stack>
         </PanelMain>
       </Box>
+
+      <PayPalTransactionDetail transaction={selected} onClose={() => setSelected(null)} />
     </Stack>
   );
 }

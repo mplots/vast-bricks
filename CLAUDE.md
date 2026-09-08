@@ -1344,10 +1344,16 @@ business data in the rewrite, and everything about the feature follows from that
   control over the whole narrowing; Escape empties one field from inside it.
 - The foot of the table states what the period came to, laid out the way a bank lays out
   the foot of a statement: the figure in the amount column, what it is beside it. Three
-  lines — debit turnover, credit turnover, closing balance — per currency the period moved
-  in, and a whole group per currency rather than one set of totals, an account moving in
-  two currencies having two accounts of itself. The balance is ruled off from the turnovers
-  it sums, the way it would be on paper.
+  lines — debit turnover, credit turnover, net movement, closing balance — per currency the
+  period moved in, and a whole group per currency rather than one set of totals, an account
+  moving in two currencies having two accounts of itself. The net movement is ruled off from
+  the turnovers it sums, the way it would be on paper.
+- **Every ledger screen states both the net movement and the closing balance**, because they
+  answer two different questions and a reader holding the bank statement against the two
+  provider ledgers needs both from each: the movement is what the period did, and the
+  balance is where the account stood when it ended, which holds everything before the
+  period as well. The balance is weighted like a total but is not ruled off, because
+  nothing above it adds up to it.
 - The summary keeps the table's own background rather than the tinted one a footer wears by
   default, and drops the small upper case a footer is otherwise set in: these are three
   sentences about money, not column headings. That tint is close enough to the page behind
@@ -1447,15 +1453,36 @@ other, so they may not read differently.
   moved in is the order the movement makes sense in. A transaction Stripe dated nothing
   sorts last, and transactions sharing an instant keep the order Stripe listed them in.
 - The foot of the table states what the period came to, one group per currency the
-  account moved in: debit turnover, credit turnover, the fees Stripe took, and what the
-  balance moved by, ruled off from the three above it. The turnovers come in the order the
-  bank statement screen states them, the two feet being read against each other. The fee line is the one thing a
-  Stripe ledger has that a bank statement does not — a bank charges its fees as entries
-  of their own — and it has to be stated separately for the sum to add up in front of
-  the reader.
-- The last line is what the balance moved by and not a closing balance. Stripe knows
-  the account's balance and this screen does not ask for it: a balance is a fact about
-  now, and the period being read is normally not now.
+  account moved in: debit turnover, a memo under it saying how much of it was fees, credit
+  turnover, what the balance moved by, ruled off from the two turnovers, and where the
+  account stood when the period ended.
+- **The Stripe and PayPal feet state the same things in the same order**, and mean the same
+  by them. The two are read against each other and against the bank statement, so a
+  difference between them has to be a difference in the accounts and not in how the screens
+  were written.
+- **The turnovers are every movement of the account, the fees included.** A fee is not a
+  transaction of this ledger — Stripe takes it out of the one it belongs to — but it is
+  money that left the account, and a bank charging the same fee books it as an entry of its
+  own. So credits less debits is the net movement on its own, and the fee total is a memo of
+  how much of the debits were fees rather than a term beside them, standing under the
+  turnover it is part of and set quieter than the figures that do add up.
+- **A fee is signed as a deduction**, the way PayPal states one. Stripe states it the other
+  way up — a positive number meaning money taken — so it is negated once, in the mapping,
+  and every rule and screen past that point sees one convention. That is not only tidiness:
+  a fee is counted in the turnovers now, and a fee whose sign was thrown away would be
+  counted in the wrong direction. Stripe does state a negative fee, when it gives back part
+  of an application fee on a refund.
+- **Stripe answers for the balance at this moment and for no other**, so the closing one is
+  worked back from the one it does state: what the account holds now — held and pending
+  together, since what the account stood at is everything in it — less everything it has
+  moved since the period ended. A period still running has moved nothing since, so its
+  closing balance is simply what Stripe holds today, which is the only true answer there is
+  for it, and costs one request.
+- Working back over a period long gone means reading every transaction since, which is the
+  same live aggregation this screen already accepts. Where it cannot be done — Stripe
+  refusing, or more pages than the client will walk — the balance is left unstated rather
+  than guessed, logged where it fails, and the foot omits the line rather than the whole
+  period failing to load.
 - The link opens the payment in Stripe's dashboard and rides the reference naming it,
   as the reconciliation screen's links ride the field naming what they open. Only a
   transaction that settled a payment has one: Stripe addresses a payment by the payment
@@ -1477,12 +1504,18 @@ other, so they may not read differently.
   nothing here is stored.
 - The screen text is translated through `vast-portal`'s `en.json` and `lv.json`, as
   every screen's is. Every new user-visible string must be added to both.
-- What the two ledger screens share lives outside either of them, so a third screen
+- What the ledger screens share lives outside any of them, so a further screen
   that reads a period is these parts again rather than a copy: the narrowing and its
   facet counting, the period picker and its month/year toggle, the ledger table's own
   look, the sticky summary foot, the field a table is typed in, and the mark a search
   puts on what it found. A screen states its facets, its columns and its summary lines;
-  none of the mechanics is written twice.
+  none of the mechanics is written twice. The PayPal transaction screen is the third
+  reader of them.
+- On the backend the same holds for the period a ledger screen is asked for.
+  `com.vastbricks.api.ledger.LedgerPeriod` reads `YYYY-MM` or `YYYY` and answers the UTC
+  window both ends included, and both provider ledgers use it: the two screens ask for a
+  period in the same words and mean the same window by it. The bank statement screen keeps
+  a period of its own because it reads booking days rather than instants.
 - The backend feature is `com.vastbricks.api.stripeledger`, named for the ledger it reads
   rather than for the screen, which stays the Stripe transaction screen and asks for
   `/api/private/stripe-transactions`. `vb-portal-api` holds the legacy accounting screen's
@@ -1500,6 +1533,203 @@ other, so they may not read differently.
   and the pages its cursor paging walks — is one shared test-support fixture with the
   reconciliation fixtures, so a scenario states the ledger facts it is about and nothing
   of the protocol.
+
+## PayPal transactions feature requirements
+
+The PayPal transaction screen is the account's own ledger, read a period at a time, and it
+is the Stripe transaction screen's twin: the two are read against each other and against
+the bank statement, so they may not read differently. What follows is only where PayPal
+differs from Stripe; everywhere else the Stripe requirements above govern.
+
+- The screen is backed entirely by live PayPal data. PayPal holds the account and answers
+  for it, so a period is fetched when the screen asks for it and stored nowhere.
+- Every transaction of the period is listed, not only the ones that paid for an order: the
+  payments, the refunds, the seller fees PayPal charged and the withdrawals to the bank.
+  Deciding which transaction pays for which order is reconciliation's business and stays
+  there.
+- Transactions read oldest first, as a statement's entries do. A transaction PayPal dated
+  nothing sorts last, and transactions sharing an instant keep the order PayPal listed them
+  in.
+- A transaction carries the instant PayPal dated it, PayPal's own event code, the subject
+  PayPal held, what the marketplace labelled the payment with, the counterparty and the
+  account they paid from, the amount, its direction, the fee, the net, the currency, the
+  status, the transaction it was raised against, PayPal's own breakdown of the gross, the
+  records raised against it, and the link to PayPal's own page for it.
+- **PayPal reports one payment as several records, and the screen reads them as one
+  transaction.** A payment, the commission the marketplace took as partner and the
+  conversions into the balance's currency are separate balance-affecting records, and
+  PayPal's own interface shows them under one transaction. So does this: the record raised
+  against nothing is the transaction, and what was raised against it is **never a row of
+  the period and never a figure in the summary** — it is either taken off the transaction
+  or carried as one of its lines.
+- What ties them is `paypal_reference_id`: a commission or a conversion names the
+  transaction it was raised against. **Two things have to be true before a record reads
+  under another, and both matter.**
+- It has to name a **collected** record. PayPal writes a payment's own base id into the
+  same field — the checkout it came from, which is no record of the ledger — and a
+  commission raised against last month's payment names nothing this period holds, so it is
+  a transaction of its own rather than pulling in a month it cannot see. The chain is
+  followed to its head, so a conversion raised against a commission reads under the payment
+  they both belong to, and a reference that comes back round to where it started is not a
+  grouping at all.
+- And it has to be **something a transaction's own account can state**: a deduction, or a
+  leg of a conversion. Plenty of records name a transaction without being part of it — a
+  refund names the payment it reverses, and it is money going back out on a day of its own,
+  weeks later, which no account of the payment has a line for. Grouping on the reference
+  alone folded such a record away into a transaction whose figures said nothing about it,
+  and its money left the ledger: a year's net movement came out over PayPal's own balance
+  by exactly the refund. So the rule is not "what points at this" but "what this
+  transaction is made of", and a record the transaction is not made of stays a transaction
+  of the period however plainly it names another one.
+- The guard against that returning is the `accountedFor` each line carries: a line the
+  amount details do not state is reported rather than quietly folded away. It is what
+  caught the refund, and it is worth keeping for the pathological cases grouping still
+  allows — a deduction in a currency neither the transaction's nor its target's, or a
+  transaction PayPal converted into two currencies at once.
+- **A period's net movement is checkable against the account's own balance.** For a year
+  in which every operation happened, the two must agree; a discrepancy means money has been
+  grouped away without being accounted for, which is exactly the bug above. It is the
+  cheapest test there is of whether this feature is right, and worth running against the
+  live account whenever the grouping or the summary changes.
+- **The fee column is everything that came off the transaction, whoever took it**: PayPal's
+  own processing fee and the partner commission both. One figure is what a reader of a
+  ledger wants — what the transaction cost — and the detail view is where it comes apart
+  into PayPal's own lines again. So the partner commission has no column: it is a detail,
+  and a column of its own would put a line of one transaction's account beside the
+  transactions.
+- **A conversion is not a deduction; it restates the transaction.** A payment taken in a
+  currency the balance is not held in does not stay in it: PayPal takes the whole of it
+  back out and puts the result into the balance's own currency. The account moved by the
+  second of those, so that is the currency the table states the transaction in — a row in
+  the currency the money passed through for a moment matches nothing in the bank, and its
+  own currency's figures cancel to nothing anyway.
+- A converted transaction's net is what PayPal put into the new currency, which is PayPal's
+  own figure. Its gross is the transaction's own gross at **the rate the two legs imply** —
+  what came back out of the old currency against what went into the new — because a gross
+  in one currency beside a net in another is a row that does not add up. Everything between
+  them is the fee, which is what the fee column already means: everything that came off,
+  whichever side of the conversion it was taken on. Only the gross is carried across, and
+  it is carried across by PayPal's own rate.
+- Where PayPal reported a leg into a new currency but none out of the old, there is no rate
+  to read: the transaction is stated at what landed, with no fee, rather than at a rate
+  nobody stated. A transaction converted into two currencies has no one currency to be
+  stated in and is left as PayPal reported it, its legs read in its detail.
+- The summary follows, so a converted transaction is counted only in the currency the
+  account actually moved in and no currency the money merely passed through appears in the
+  foot.
+- **PayPal answers for the balance at a stated moment**, unlike Stripe, so a period's
+  closing balance is PayPal's own figure rather than one worked back to — one request, and
+  right for any period. A moment ahead of now is refused the way a searched range reaching
+  into the future is, so it is asked for no further than the same margin short of now: a
+  period still running closes at what the account holds today. Everything the account holds
+  is taken, what is withheld against a dispute included, since what it stood at is
+  everything in it. A period PayPal did not answer for states no balance rather than a
+  guess, logged where it fails, and the foot omits the line. The conversion legs are counted in neither turnover: the transaction's own gross is
+  already what the account moved by there, and counting the legs too would state that money
+  twice.
+- **The turnovers are every movement of the account, the deductions included.** A fee is
+  not a transaction of this ledger — it is folded into the one it came out of — but it is
+  money that left the account, and a bank charging the same fee books it as an entry of its
+  own. A ledger meant to be read against a statement cannot leave it out. So credits less
+  debits is the net movement on its own, and a fee total is a memo of how much of the
+  turnovers were fees rather than a term beside them.
+- **One fee memo, not one per party.** What PayPal charged for taking the money and what a
+  marketplace took out of it as partner are both money off the same transaction, and which
+  party took which part of it is a detail of that transaction, stated where the rest of its
+  account is. A foot is read for what a period came to, not for how its costs were shared
+  out, so the memo is one figure — and the Stripe foot beside it says the same thing the
+  same way.
+- Opening a transaction shows what PayPal reported it as, laid out the way PayPal's own
+  transaction page lays it out: the transaction's own fields, then the amount details —
+  purchase total, sales tax, shipping, handling, insurance, discounts, gross, PayPal
+  transaction fee, partner commission, net — then the records PayPal raised against it. It
+  is read-only, as the ledger is.
+- **That panel stays in PayPal's own currency**, which for a converted transaction is not
+  the one the table states. It is PayPal's account of what it did, so it reads as PayPal
+  wrote it.
+- **The conversion is part of that account, not a footnote to it.** A panel ending on a net
+  in a currency the account never held is an account that stops before the money did, so
+  two lines follow it: what the conversion took back out of PayPal's own currency, and what
+  the transaction came to in the currency it was converted into — the figure the table
+  states. That last line is what the panel sums to.
+- Nearly every record PayPal raises against a transaction is either a deduction the panel
+  names or a leg of the conversion it ends on, so the panel already states it and listing
+  it again beside the account it is in would say the same thing twice. Each record carries
+  whether the panel accounts for it, and only the ones it does not are listed — a record
+  PayPal raised under a code the account has no line for is still reported rather than
+  silently dropped.
+- The detail names the transaction's type with **PayPal's own code after the word**, which
+  the table leaves out. It is what PayPal names a transaction by, so a reader holding the
+  two side by side has the thing to match on, and two codes this catalog happens to word
+  alike are still told apart.
+- The purchase total is the only derived figure in that panel: PayPal states what it added
+  to the purchase rather than the purchase itself, so what is left of the gross once those
+  come off is what was bought. A transaction PayPal broke down in no way gets no purchase
+  total rather than one equal to its gross, which would claim a breakdown that was never
+  stated. An amount line PayPal stated nothing for is left out rather than shown at nought;
+  the gross and the net always show, being what the lines run from and to.
+- The amount is reported unsigned with a direction beside it, as on the Stripe screen and
+  for the same reason.
+- **The fee keeps the sign PayPal gave it**, which is the second place the payload departs
+  from the Stripe ledger's. Stripe states a fee as the magnitude it deducted; PayPal states
+  a fee as an amount of its own, normally a debit and therefore negative, and a refunded
+  payment returns part of it. A column always read as a deduction could not say that, so
+  the sign travels and the screen writes it out. The period's fee line and the net that
+  sums it are signed for the same reason: the three lines above the sum add up to it in
+  front of the reader.
+- Nothing deducted is reported as no fee rather than as a zero, exactly as on the Stripe
+  screen. The net still states the whole of what was left.
+- Amounts are stated to two decimals, `HALF_UP`, as every collected amount in the rewrite
+  is. PayPal states them as decimal strings rather than in minor units.
+- The counterparty is who the money moved to or from, as PayPal spells them. PayPal spells
+  a payer several ways and carries whichever it has, so they are tried in the order they
+  name a person best: the payer's full name, the parts it was given in, then the shipping
+  recipient. A transaction with no counterparty at all — a withdrawal to the bank, a fee
+  PayPal charged — is left without one rather than given the account's own name. It is a
+  column of its own, which the Stripe screen has no use for and a bank statement has:
+  PayPal names a person on nearly every transaction.
+- **PayPal states codes where Stripe states words**, so this screen words them and the
+  Stripe screen does not. `T0006` and `S` say nothing to a reader, and showing them raw
+  would be showing nothing. The portal words the event codes and statuses a merchant
+  account meets, through `paypal-transaction-event-<code>` and
+  `paypal-transaction-status-<code>`, and **falls back to the code itself** wherever the
+  catalog has no message — which is what keeps the screen from going quiet on the next code
+  PayPal adds, the reason the Stripe screen translates nothing. `wordedOr` is that
+  fallback, and it is where any provider that states codes rather than words is worded. A
+  code showing raw on screen is the signal to add its wording, not a fault, and the detail
+  view shows every code beside its word so one can be looked up.
+- The link opens the transaction in PayPal, and every transaction has one: PayPal
+  addresses a transaction by its id alone, so unlike the Stripe screen there is no account
+  to configure and no row left without a link for want of a setting. It is the same address
+  the reconciliation screen sends a reader to.
+- The period is a month or a whole year, asked for in one `period` parameter, and becomes
+  the UTC window both ends included. It is not padded: reconciliation pads because a
+  payment is not dated where its order is, and this screen reads the ledger itself.
+- PayPal searches no more than 31 days in one request, so a year is covered a segment at a
+  time by the client, exactly as reconciliation's padded month is. That is the client's own
+  protocol and the screen states one window for it.
+- Narrowing is the bank statement screen's, shared rather than copied. The current facets
+  are the direction, PayPal's event code and the status; the searchable columns are the
+  counterparty, which searches the account beside the name, the description, which searches
+  the marketplace's label beside PayPal's subject, and the reference, which searches
+  PayPal's id together with the transaction it was raised against.
+- Nothing is editable and there is no mapping column: a mapping is a stored field, and
+  nothing here is stored.
+- The screen text is translated through `vast-portal`'s `en.json` and `lv.json`. Every new
+  user-visible string must be added to both.
+- The backend feature is `com.vastbricks.api.paypalledger`, named for the ledger it reads
+  rather than for the screen, which stays the PayPal transaction screen and asks for
+  `/api/private/paypal-transactions`. `vb-portal-api` already holds the legacy accounting
+  screen's own `PayPalTransaction` and `PayPalTransactionService`, which is exactly the
+  collision the `stripeledger` naming was chosen to avoid.
+- PayPal's transport is one client for both features that read it: reconciliation's payment
+  source and this screen. One endpoint is one client, and what a transaction means is
+  decided by each caller.
+- Acceptance tests are tech tests: they drive `/api/private/paypal-transactions` end to end
+  against a mocked PayPal. PayPal's own protocol — the settings that reach the mock, the
+  client-credentials token it exchanges first, and the pages its page numbering walks — is
+  one shared test-support fixture with the reconciliation fixtures, so a scenario states the
+  ledger facts it is about and nothing of the protocol.
 
 ## Shipment register requirements
 

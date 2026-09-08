@@ -26,6 +26,7 @@ const ArchivesPage = Loadable(lazy(() => import('pages/archives')));
 const ReconciliationPage = Loadable(lazy(() => import('pages/reconciliation')));
 const BankStatementsPage = Loadable(lazy(() => import('pages/bank-statements')));
 const StripeTransactionsPage = Loadable(lazy(() => import('pages/stripe-transactions')));
+const PayPalTransactionsPage = Loadable(lazy(() => import('pages/paypal-transactions')));
 const JobsPage = Loadable(lazy(() => import('pages/jobs')));
 
 // ==============================|| MAIN ROUTES ||============================== //
@@ -72,6 +73,12 @@ const MainRoutes = {
         {
           path: 'stripe-transactions',
           element: <StripeTransactionsPage />,
+          // A ledger is a wide table, and the period over it already names the page.
+          handle: { fullWidth: true, heading: false } satisfies PageLayout
+        },
+        {
+          path: 'paypal-transactions',
+          element: <PayPalTransactionsPage />,
           // A ledger is a wide table, and the period over it already names the page.
           handle: { fullWidth: true, heading: false } satisfies PageLayout
         },

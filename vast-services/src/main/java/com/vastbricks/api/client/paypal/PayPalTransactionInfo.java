@@ -24,6 +24,18 @@ public class PayPalTransactionInfo {
     @JsonProperty("transaction_amount") private PayPalAmount transactionAmount;
     @JsonProperty("fee_amount") private PayPalAmount feeAmount;
 
+    /**
+     * What the gross amount was made up of, as PayPal breaks it down. These are the lines PayPal's own transaction
+     * details panel lists above the gross, and what is left of the gross once they are taken off is the purchase
+     * itself. A field PayPal did not state is one the transaction had none of.
+     */
+    @JsonProperty("sales_tax_amount") private PayPalAmount salesTaxAmount;
+    @JsonProperty("shipping_amount") private PayPalAmount shippingAmount;
+    @JsonProperty("handling_amount") private PayPalAmount handlingAmount;
+    @JsonProperty("insurance_amount") private PayPalAmount insuranceAmount;
+    @JsonProperty("discount_amount") private PayPalAmount discountAmount;
+    @JsonProperty("shipping_discount_amount") private PayPalAmount shippingDiscountAmount;
+
     @JsonProperty("transaction_status") private String transactionStatus;
 
     /** What the marketplace asked the payment to be labelled with. BrickOwl puts its order number here. */

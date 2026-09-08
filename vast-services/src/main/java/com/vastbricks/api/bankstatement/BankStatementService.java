@@ -113,6 +113,8 @@ class BankStatementService {
                         currency.getKey(),
                         ReconciliationAmount.normalize(currency.getValue()[0]),
                         ReconciliationAmount.normalize(currency.getValue()[1]),
+                        // What the period itself moved by, which its own two turnovers come to.
+                        ReconciliationAmount.normalize(currency.getValue()[1].subtract(currency.getValue()[0])),
                         ReconciliationAmount.normalize(balances.getOrDefault(currency.getKey(), ZERO))
                 ))
                 .toList();

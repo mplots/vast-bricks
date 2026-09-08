@@ -36,6 +36,12 @@ export interface BankStatementCurrencySummary {
   debitTurnover: number;
   creditTurnover: number;
   /** Credits less debits over every stored entry up to the end of the period, and therefore signed. */
+  /**
+   * What the period itself moved the account by: its credits less its debits, and therefore signed. A different
+   * question from the balance below — the movement is about the period, the balance about where the account stood
+   * when it ended — and every ledger screen states both.
+   */
+  netMovement: number;
   closingBalance: number;
 }
 

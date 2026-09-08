@@ -65,7 +65,12 @@ const formatDate = (value?: string | null) => {
 };
 
 /**
- * The three lines a currency is accounted for in, in the order a bank states them.
+ * The four lines a currency is accounted for in, in the order a bank states them.
+ *
+ * <p>The two turnovers, then the two figures that answer two different questions: what the period moved the account
+ * by, which the turnovers come to, and where the account stood when it ended, which holds every entry before the
+ * period as well. Every ledger screen states both, so this and the two provider ledgers can be read against each
+ * other.
  *
  * <p>They are the screen's rather than the footer's: what a period comes to is a fact about bank statements, and the
  * footer only lays the lines out and holds them still while the entries scroll under them.
@@ -86,12 +91,22 @@ const summaryLines = (currency: BankStatementCurrencySummary, label: (id: string
     colour: 'success.main'
   },
   {
-    // The balance is signed already and keeps whatever sign it came with: an overdrawn account is a fact about it
-    // rather than a direction of movement. It is what the two above come to, so it is ruled off from them.
+    // What the period itself moved the account by, which is what the two turnovers above come to, so it is ruled
+    // off from them. Signed already: a period that paid out more than it took in is a fact about the period rather
+    // than a direction of movement.
+    key: `${currency.currency}:net`,
+    amount: `${formatAmount(currency.netMovement)} ${currency.currency}`,
+    label: label('bank-statement-net-movement'),
+    sum: true
+  },
+  {
+    // And where the account stood when the period ended, which is a different question from what the period did:
+    // it holds everything before the period as well. Every ledger screen states both, so the three can be read
+    // against each other.
     key: `${currency.currency}:balance`,
     amount: `${formatAmount(currency.closingBalance)} ${currency.currency}`,
     label: label('bank-statement-closing-balance'),
-    sum: true
+    balance: true
   }
 ];
 

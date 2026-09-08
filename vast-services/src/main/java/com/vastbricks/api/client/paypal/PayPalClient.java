@@ -83,6 +83,41 @@ public class PayPalClient {
         );
     }
 
+    /**
+     * What PayPal held at a moment, one entry per currency it holds.
+     *
+     * <p>Unlike Stripe, PayPal answers for the balance at a stated moment rather than only for now, so a period's
+     * closing balance is PayPal's own figure rather than something worked back to. A moment ahead of now is refused
+     * the way a searched range reaching into the future is, so it is asked for no further than the same margin
+     * short of now: a period that has not ended closes at what the account holds today, which is the only true
+     * answer there is for it.
+     */
+    public List<PayPalBalance> listBalances(Instant asOf) {
+        return capture.record(
+                PROVIDER,
+                List.of(
+                        required("PayPal client id", settings.getClientId()),
+                        required("PayPal client secret", settings.getClientSecret())
+                ),
+                () -> collectBalances(asOf)
+        );
+    }
+
+    private List<PayPalBalance> collectBalances(Instant asOf) {
+        var accessToken = accessToken();
+        var at = earliest(asOf, Instant.now().minus(NOW_MARGIN_MINUTES, ChronoUnit.MINUTES));
+        try {
+            var response = restClient.get()
+                    .uri(url("/v1/reporting/balances") + "?as_of_time={asOf}", Map.of("asOf", searchDate(at)))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                    .retrieve()
+                    .body(PayPalBalancesResponse.class);
+            return response == null || response.getBalances() == null ? List.of() : List.copyOf(response.getBalances());
+        } catch (RestClientException exception) {
+            throw new PayPalClientException("PayPal balances request failed", exception);
+        }
+    }
+
     private List<PayPalTransaction> collectTransactions(Instant from, Instant to) {
         // PayPal reports what it has taken, so a period reaching past now is searched up to now. A period lying
         // wholly ahead of it has nothing to report rather than nothing to ask, and is not asked for at all.

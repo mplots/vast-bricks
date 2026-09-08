@@ -2,6 +2,7 @@ package com.vastbricks.api.stripeledger;
 
 import com.stripe.model.BalanceTransaction;
 import com.vastbricks.api.client.stripe.StripeBalanceClient;
+import com.vastbricks.api.ledger.LedgerPeriod;
 import com.vastbricks.api.stripeledger.StripeLedgerPayload.CurrencySummaryResponse;
 import com.vastbricks.api.stripeledger.StripeLedgerPayload.TransactionResponse;
 import com.vastbricks.api.stripeledger.StripeLedgerPayload.TransactionsResponse;
@@ -10,9 +11,11 @@ import java.math.RoundingMode;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 /**
@@ -28,6 +31,7 @@ import org.springframework.stereotype.Service;
  * Deciding which of them pays for an order is reconciliation's business and stays there.
  */
 @Service
+@Slf4j
 @RequiredArgsConstructor
 class StripeLedgerService {
 
@@ -37,7 +41,7 @@ class StripeLedgerService {
     private final StripeBalanceClient stripeBalanceClient;
     private final StripeLedgerLinks links;
 
-    TransactionsResponse transactionsOf(StripeLedgerPeriod period) {
+    TransactionsResponse transactionsOf(LedgerPeriod period) {
         var transactions = stripeBalanceClient.listBalanceTransactions(period.getFrom(), period.getTo())
                 .stream()
                 // Oldest first, the way a ledger is read and the way the bank statement screen lists a period: the
@@ -51,7 +55,7 @@ class StripeLedgerService {
                 .map(this::transaction)
                 .toList();
 
-        return new TransactionsResponse(transactions, summaryOf(transactions));
+        return new TransactionsResponse(transactions, summaryOf(transactions, closingBalances(period)));
     }
 
     private TransactionResponse transaction(BalanceTransaction transaction) {
@@ -75,7 +79,12 @@ class StripeLedgerService {
     }
 
     /**
-     * What Stripe deducted from the transaction, or {@code null} where it deducted nothing.
+     * What Stripe deducted from the transaction, signed as a deduction, or {@code null} where it deducted nothing.
+     *
+     * <p>Stripe states a fee the other way up from PayPal — a positive number meaning money taken — so it is negated
+     * here and the two ledgers state a fee alike. That is not only tidiness: a fee is a movement of the account, so
+     * it is counted in the turnovers, and a fee whose sign was thrown away would be counted in the wrong direction.
+     * Stripe does state a negative fee, when it gives back part of an application fee on a refund.
      *
      * <p>Stripe states a fee of nothing as a zero, and a fee column reading {@code 0.00} down every payout and
      * refund says nothing a reader needs: Stripe takes its fee out of the transaction it belongs to rather than out
@@ -86,7 +95,7 @@ class StripeLedgerService {
         if (transaction.getFee() == null || transaction.getFee() == 0L) {
             return null;
         }
-        return amount(transaction.getFee()).abs();
+        return amount(transaction.getFee()).negate();
     }
 
     private static Instant createdAt(BalanceTransaction transaction) {
@@ -120,7 +129,61 @@ class StripeLedgerService {
      * questions the ledger above answers, and a period Stripe would state a balance for is normally not the period
      * being read.
      */
-    private static List<CurrencySummaryResponse> summaryOf(List<TransactionResponse> transactions) {
+    /**
+     * Where the account stood at the end of the period, per currency.
+     *
+     * <p>Stripe states one balance and it is the one at this moment, so the period's is worked back from it: what
+     * the account holds now, less everything it has moved since the period ended. A period still running has moved
+     * nothing since, so nothing is read and the answer is simply what Stripe holds.
+     *
+     * <p>Held and pending together, because what the account stood at is everything in it and not only the part it
+     * could have spent that day. A transaction still to land is money the account has.
+     *
+     * <p>It is allowed to fail without taking the period down with it: reading back over a period long gone means
+     * every transaction since, and a period the client will not walk that far for is better read without its
+     * closing balance than not at all. It is logged where it fails, naming the period, because a foot quietly short
+     * of a line says nothing about why.
+     */
+    private Map<String, BigDecimal> closingBalances(LedgerPeriod period) {
+        try {
+            Map<String, BigDecimal> held = new HashMap<>();
+            var balance = stripeBalanceClient.retrieveBalance();
+            if (balance.getAvailable() != null) {
+                balance.getAvailable().forEach(money -> hold(held, money.getCurrency(), money.getAmount()));
+            }
+            if (balance.getPending() != null) {
+                balance.getPending().forEach(money -> hold(held, money.getCurrency(), money.getAmount()));
+            }
+
+            var now = Instant.now();
+            if (period.getTo().isBefore(now)) {
+                for (var since : stripeBalanceClient.listBalanceTransactions(period.getTo().plusSeconds(1), now)) {
+                    if (since.getNet() != null) {
+                        held.merge(currency(since.getCurrency()), amount(since.getNet()).negate(), BigDecimal::add);
+                    }
+                }
+            }
+            return held;
+        } catch (RuntimeException e) {
+            log.error("Stripe closing balance could not be established for {} to {}", period.getFrom(), period.getTo(), e);
+            return Map.of();
+        }
+    }
+
+    /**
+     * Stripe states what is held and what is pending as two lists of their own types rather than one, so each is
+     * read by the two fields both of them carry.
+     */
+    private static void hold(Map<String, BigDecimal> held, String currency, Long minorUnits) {
+        if (minorUnits != null) {
+            held.merge(currency(currency), amount(minorUnits), BigDecimal::add);
+        }
+    }
+
+    private static List<CurrencySummaryResponse> summaryOf(
+            List<TransactionResponse> transactions,
+            Map<String, BigDecimal> closingBalances
+    ) {
         Map<String, Totals> byCurrency = new TreeMap<>(Comparator.nullsLast(Comparator.naturalOrder()));
         for (var transaction : transactions) {
             byCurrency.computeIfAbsent(transaction.getCurrency(), currency -> new Totals()).add(transaction);
@@ -132,32 +195,55 @@ class StripeLedgerService {
                         entry.getValue().debitTurnover,
                         entry.getValue().creditTurnover,
                         entry.getValue().fees,
-                        entry.getValue().net
+                        entry.getValue().net,
+                        closingBalances.get(entry.getKey())
                 ))
                 .toList();
     }
 
-    /** One currency's running totals while the period is being summed. */
+    /**
+     * One currency's running totals while the period is being summed.
+     *
+     * <p>The turnovers are every movement of the account, which is the transaction's own gross <em>and</em> what
+     * Stripe deducted from it. A fee is not a transaction of this ledger — Stripe takes it out of the one it belongs
+     * to — but it is money that left the account all the same, and a bank charging the same fee would book it as an
+     * entry of its own. Leaving it out of the turnover would make a ledger meant to be read against a statement
+     * disagree with one.
+     *
+     * <p>So the turnovers come to the movement between them — credits less debits is the net — and the fee total is
+     * a memo of how much of the debits were fees rather than a further subtraction. The PayPal ledger's foot says
+     * the same things in the same order, the two being read against each other and against the bank statement.
+     */
     private static final class Totals {
 
         private BigDecimal debitTurnover = zero();
         private BigDecimal creditTurnover = zero();
+        /** Signed as each fee was, and already inside the turnovers above rather than a term beside them. */
         private BigDecimal fees = zero();
         private BigDecimal net = zero();
 
         private void add(TransactionResponse transaction) {
             if (transaction.getAmount() != null) {
-                if (transaction.getDirection() == StripeLedgerDirection.DEBIT) {
-                    debitTurnover = debitTurnover.add(transaction.getAmount());
-                } else {
-                    creditTurnover = creditTurnover.add(transaction.getAmount());
-                }
+                moved(transaction.getDirection() == StripeLedgerDirection.DEBIT
+                        ? transaction.getAmount().negate()
+                        : transaction.getAmount());
             }
             if (transaction.getFee() != null) {
+                // Normally a debit; Stripe gives back part of an application fee on a refund, which is a credit and
+                // is counted as one rather than as a debit of less than nothing.
+                moved(transaction.getFee());
                 fees = fees.add(transaction.getFee());
             }
             if (transaction.getNet() != null) {
                 net = net.add(transaction.getNet());
+            }
+        }
+
+        private void moved(BigDecimal amount) {
+            if (amount.signum() < 0) {
+                debitTurnover = debitTurnover.add(amount.abs());
+            } else {
+                creditTurnover = creditTurnover.add(amount);
             }
         }
 

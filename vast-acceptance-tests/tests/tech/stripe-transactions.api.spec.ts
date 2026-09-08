@@ -1,7 +1,9 @@
 import type { APIRequestContext } from "@playwright/test";
 
 import { expect, test } from "../support/api-test";
+import { stubStripeBalanceTransactions } from "../support/stripe";
 import {
+  ledgerWindow,
   mockStripeLedger,
   type StripeLedgerPage,
   type StripeLedgerTransactionMock,
@@ -84,7 +86,9 @@ test("lists the balance transactions of the selected month, oldest first", async
     // Reported unsigned with the direction beside it, the way a bank states an entry.
     amount: 15.07,
     direction: "CREDIT",
-    fee: 0.47,
+    // Signed as a deduction, the way PayPal states one: Stripe states a fee the other way up and the backend turns
+    // it round so the two ledgers read alike.
+    fee: -0.47,
     net: 14.6,
     currency: "EUR",
     status: "available",
@@ -160,19 +164,90 @@ test("states what the period came to, per currency", async ({
     {
       currency: "EUR",
       creditTurnover: 15.07,
-      debitTurnover: 14,
-      fees: 0.47,
+      // The payout and the fee taken out of the payment, both being money that left the account.
+      debitTurnover: 14.47,
+      // Signed as a deduction, and already inside the debit turnover above rather than a term beside it.
+      fees: -0.47,
       // What the balance moved by: credits less debits less fees.
-      net: 0.6,
+      netMovement: 0.6,
+      // Stripe was not asked what it holds in this scenario, and a balance that could not be established is left
+      // unstated rather than guessed.
+      closingBalance: null,
     },
     {
       currency: "USD",
       creditTurnover: 20,
-      debitTurnover: 0,
-      fees: 1,
-      net: 19,
+      debitTurnover: 1,
+      fees: -1,
+      netMovement: 19,
+      closingBalance: null,
     },
   ]);
+});
+
+test("states where the account stood when the period ended", async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockStripeLedger(settings, request, testInfo, [[payment]], {
+    period: month,
+    // What the account holds now, held and pending together: what it stood at is everything in it, not only the
+    // part that could have been spent that day.
+    held: { available: [[100_00, "eur"]], pending: [[5_00, "eur"]] },
+  });
+
+  const { summary } = await ledgerOf(request);
+
+  // Nothing has moved since the period ended, so the closing balance is simply what Stripe holds.
+  expect(summary[0].closingBalance).toBe(105);
+  // And a different question from what the period did, which is the line above it.
+  expect(summary[0].netMovement).toBe(14.6);
+});
+
+test("works the closing balance back over what has moved since the period ended", async ({
+  request,
+  settings,
+}, testInfo) => {
+  const wireMock = await mockStripeLedger(
+    settings,
+    request,
+    testInfo,
+    [[payment]],
+    {
+      period: month,
+      held: { available: [[100_00, "eur"]] },
+    },
+  );
+  // Stripe answers for the balance at this moment and no other, so a period that has ended is worked back to: this
+  // landed after the month, and the account did not hold it when the month closed.
+  await stubStripeBalanceTransactions(
+    wireMock,
+    [
+      [
+        {
+          id: "txn_test-later",
+          object: "balance_transaction",
+          created: Math.floor(
+            new Date("2026-09-02T10:00:00Z").getTime() / 1000,
+          ),
+          type: "charge",
+          status: "available",
+          currency: "eur",
+          amount: 20_00,
+          fee: 0,
+          fee_details: [],
+          net: 20_00,
+          description: null,
+          source: null,
+        },
+      ],
+    ],
+    { equalTo: String(ledgerWindow(month).to + 1) },
+  );
+
+  const { summary } = await ledgerOf(request);
+
+  expect(summary[0].closingBalance).toBe(80);
 });
 
 test("links a payment to Stripe and leaves a payout without one", async ({
