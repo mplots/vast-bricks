@@ -71,10 +71,11 @@ public class OrderFields {
      * {@link GatewayFields#getRefundedAmount()} states from the payment's side; the two carry one name under two
      * sources, which is what makes them the two accounts of one refund rather than two amounts.
      *
-     * <p>BrickLink states it only on the order detail page, so it is collected for the orders the export reports as
-     * cancelled and for no others; nothing collects BrickOwl's yet. Where it is uncollected the rule that compares
-     * the two sides fails wherever the payment shows a refund, which is the intended reading: an order the money came
-     * back out of that the marketplace does not say came back is exactly the disagreement worth seeing.
+     * <p>BrickOwl states a refund total on the order itself. BrickLink states it only on the order detail page, so it
+     * is collected for the orders the export reports as cancelled and for no others. Where it is uncollected the rule
+     * that compares the two sides fails wherever the payment shows a refund, which is the intended reading: an order
+     * the money came back out of that the marketplace does not say came back is exactly the disagreement worth
+     * seeing.
      */
     private BigDecimal refundedAmount;
 }

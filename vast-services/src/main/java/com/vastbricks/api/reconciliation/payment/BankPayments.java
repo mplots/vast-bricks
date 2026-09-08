@@ -1,7 +1,7 @@
 package com.vastbricks.api.reconciliation.payment;
 
-import com.vastbricks.api.bankstatement.BankTransfer;
-import com.vastbricks.api.bankstatement.BankStatementDirection;
+import com.vastbricks.api.ledger.bank.BankTransfer;
+import com.vastbricks.api.ledger.bank.BankStatementDirection;
 import com.vastbricks.api.reconciliation.ReconciledOrder;
 import java.util.function.Predicate;
 

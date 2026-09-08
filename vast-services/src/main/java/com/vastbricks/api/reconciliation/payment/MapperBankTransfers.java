@@ -1,6 +1,6 @@
 package com.vastbricks.api.reconciliation.payment;
 
-import com.vastbricks.api.bankstatement.BankTransfer;
+import com.vastbricks.api.ledger.bank.BankTransfer;
 import com.vastbricks.api.reconciliation.DetailMapper;
 import com.vastbricks.api.reconciliation.ReconciledOrder;
 import com.vastbricks.api.reconciliation.ReconciledOrders;

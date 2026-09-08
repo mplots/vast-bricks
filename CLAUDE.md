@@ -406,12 +406,14 @@ here as they are provided; do not invent unspecified behavior prematurely.
   uncollected. The page states the refund in the order's own currency, which is
   not collected: no collected order carries one, and the amount is compared with
   the payment's as a number, as the payment matching's own amount key already
-  is. BrickOwl states a refund total on the order that it can be collected from
-  when requirements for it are supplied. Wherever it is uncollected the rule
-  comparing the two sides of a refund fails wherever the payment shows one,
-  which is the intended reading rather than a gap left open: the failure is the
-  standing report of which orders had money come back that no marketplace
-  mapping accounts for.
+  is. BrickOwl states it as `refund_total` on the order itself, so it is
+  collected in the mapping stage with the order's other amounts; the field is
+  written as `0.00` rather than omitted where nothing came back, so a zero is
+  the marketplace reporting no refund and is collected as no amount at all.
+  Wherever it is uncollected the rule comparing the two sides of a refund fails
+  wherever the payment shows one, which is the intended reading rather than a
+  gap left open: the failure is the standing report of which orders had money
+  come back that no marketplace mapping accounts for.
 - The gateway refunded amount is what the provider shows has come back out of
   the payment, as a positive amount, or nothing where it shows none. A partial
   refund and a full one are the same field: how much of the payment was

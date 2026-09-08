@@ -960,7 +960,8 @@ test("reduces the target invoice of a BrickOwl order by what Stripe shows was pa
   expect(body.orders[0].gateway.paidAmount).toBe(5.2);
   expect(body.orders[0].gateway.refundedAmount).toBe(2);
   expect(body.orders[0].calculated.targetInvoice).toBe(3.2);
-  // The marketplace's own side of the refund is not collected yet, so the rule comparing the two sides fails here.
+  // The order states no refund total of its own, so the two accounts of the refund disagree.
+  expect(body.orders[0].order.refundedAmount).toBeNull();
   expect(
     body.orders[0].failures.map((failure: { code: string }) => failure.code),
   ).toEqual(["refunded-amount-mismatch"]);
@@ -2499,4 +2500,78 @@ test("asks for no detail page in a month BrickLink cancelled nothing in", async 
   await expect(
     wireMock.findMethodHostRequests("GET", "/orderDetail.asp"),
   ).resolves.toHaveLength(0);
+});
+
+test("collects the refund BrickOwl states on an order", async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: "2026-08",
+    brickOwl: [
+      {
+        orderId: "test-order-0811",
+        orderDate: "1786320000",
+        view: {
+          buyer_name: "Test Buyer Alpha",
+          payment_method_type: "stripe",
+          sub_total: "5.20",
+          base_order_total: "5.20",
+          refund_total: "2.00",
+        },
+      },
+    ],
+    stripe: [
+      {
+        description: "Brick Owl Order test-order-0811",
+        amount: 520,
+        amountRefunded: 200,
+      },
+    ],
+  });
+
+  const response = await request.get(
+    "/api/private/reconciliation/orders?month=2026-08",
+  );
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  expect(body.orders[0].order.refundedAmount).toBe(2);
+  expect(body.orders[0].gateway.refundedAmount).toBe(2);
+  // The two sides of the refund agree, which is what the marketplace's side was missing.
+  expect(body.orders[0].failures).toEqual([]);
+});
+
+test("collects no refund from a BrickOwl order whose refund total is zero", async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: "2026-08",
+    brickOwl: [
+      {
+        orderId: "test-order-0812",
+        orderDate: "1786320000",
+        view: {
+          buyer_name: "Test Buyer Alpha",
+          payment_method_type: "stripe",
+          sub_total: "5.20",
+          base_order_total: "5.20",
+          // BrickOwl writes a refund total on every order, so a zero is the marketplace reporting no refund.
+          refund_total: "0.00",
+        },
+      },
+    ],
+    stripe: [{ description: "Brick Owl Order test-order-0812", amount: 520 }],
+  });
+
+  const response = await request.get(
+    "/api/private/reconciliation/orders?month=2026-08",
+  );
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  expect(body.orders[0].order.refundedAmount).toBeNull();
+  expect(body.orders[0].gateway.refundedAmount).toBeNull();
+  expect(body.orders[0].failures).toEqual([]);
 });

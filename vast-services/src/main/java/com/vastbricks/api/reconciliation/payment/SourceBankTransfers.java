@@ -1,7 +1,7 @@
 package com.vastbricks.api.reconciliation.payment;
 
-import com.vastbricks.api.bankstatement.BankTransfer;
-import com.vastbricks.api.bankstatement.BankTransfers;
+import com.vastbricks.api.ledger.bank.BankTransfer;
+import com.vastbricks.api.ledger.bank.BankTransfers;
 import com.vastbricks.api.reconciliation.Source;
 import java.time.YearMonth;
 import java.util.List;

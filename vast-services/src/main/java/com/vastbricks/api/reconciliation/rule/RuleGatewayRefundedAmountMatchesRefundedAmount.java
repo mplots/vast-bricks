@@ -17,10 +17,10 @@ import org.springframework.stereotype.Component;
  *
  * <p>The marketplace's side is only partly collected, so this rule still fails orders a payment shows a refund on.
  * That is deliberate rather than premature: the failure is the standing report of which orders have a refund no
- * marketplace mapping accounts for, and it goes quiet order by order as each one's refund is collected. BrickLink
- * names no refund in its export, so it is collected from the order detail page of every cancelled order and of no
- * other; a refund on an order of another status stays reported here. BrickOwl states a refund total on the order
- * that can be collected when requirements for it are supplied.
+ * marketplace mapping accounts for, and it goes quiet order by order as each one's refund is collected. BrickOwl
+ * states a refund total on the order itself, so its side is collected in full. BrickLink names no refund in its
+ * export, so it is collected from the order detail page of every cancelled order and of no other; a refund on an
+ * order of another status stays reported here.
  *
  * <p>The rule applies only once a payment has been matched to the order, which is what gives the payment's side an
  * account at all. An order no payment was matched to is reported by the rule that requires one, so it is not failed

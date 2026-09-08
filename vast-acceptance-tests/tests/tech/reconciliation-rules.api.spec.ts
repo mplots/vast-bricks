@@ -228,8 +228,8 @@ test("fails an order the payment shows a refund on that the marketplace reports 
 
   expect(response.status(), await response.text()).toBe(200);
   const body = await response.json();
-  // Nothing collects the marketplace's side of a refund yet, so every refunded order is reported as a disagreement.
-  // That is the point of the rule for now: it is the standing list of refunds no marketplace mapping accounts for.
+  // The order reports no refund of its own, which is that side saying nothing came back, and the payment
+  // contradicts it. An absent amount is a disagreement rather than missing data.
   expect(body.orders[0].order.refundedAmount).toBeNull();
   expect(body.orders[0].gateway.refundedAmount).toBe(2);
   expect(body.orders[0].failures).toEqual([
