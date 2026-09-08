@@ -71,6 +71,13 @@
             <artifactId>stripe-java</artifactId>
             <version>33.3.0</version>
         </dependency>
+        <!-- Reading the xlsx a provider exports. A streaming reader over a flat sheet, which is what these
+             exports are, rather than the whole of Apache POI's document model. -->
+        <dependency>
+            <groupId>org.dhatim</groupId>
+            <artifactId>fastexcel-reader</artifactId>
+            <version>0.15.7</version>
+        </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>

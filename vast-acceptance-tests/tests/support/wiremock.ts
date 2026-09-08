@@ -27,6 +27,8 @@ type WireMockResponse = {
   status: number;
   headers?: Record<string, string>;
   body?: string;
+  /** For a provider that answers with a file rather than with text: the bytes, base64 encoded. */
+  base64Body?: string;
 };
 
 type WireMockMapping = {
