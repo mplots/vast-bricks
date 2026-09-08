@@ -3,6 +3,7 @@ package com.vastbricks.api.reconciliation;
 import com.vastbricks.api.client.brickowl.BrickOwlClientException;
 import com.vastbricks.api.client.brickstore.BrickStoreClientException;
 import com.vastbricks.api.client.manakabata.ManakabataClientException;
+import com.vastbricks.api.client.manspasts.MansPastsClientException;
 import com.vastbricks.api.client.paypal.PayPalClientException;
 import com.vastbricks.api.client.stripe.StripeClientException;
 import com.vastbricks.api.reconciliation.ReconciliationPayload.ReconciliationFieldDescriptor;
@@ -52,6 +53,7 @@ class ReconciliationController {
             BrickStoreClientException.class,
             BrickOwlClientException.class,
             ManakabataClientException.class,
+            MansPastsClientException.class,
             PayPalClientException.class,
             StripeClientException.class
     })

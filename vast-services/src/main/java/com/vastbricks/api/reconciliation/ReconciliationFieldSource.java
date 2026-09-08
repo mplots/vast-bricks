@@ -23,6 +23,9 @@ public enum ReconciliationFieldSource {
     /** What the payment provider reports about the payment matched to the order. */
     GATEWAY("gateway"),
 
+    /** What the shipping provider reports about the shipment sent for the order. */
+    SHIPMENT("shipment"),
+
     /** What the accounting system holds for the order. Nothing is collected from it yet. */
     ACCOUNTING("accounting"),
 

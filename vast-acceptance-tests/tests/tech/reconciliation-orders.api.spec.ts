@@ -95,6 +95,7 @@ test("lists BrickLink reconciliation orders for the selected month", async ({
     <ORDERDATE>8/30/2026</ORDERDATE>
     <BUYER>some buyer</BUYER>
     <ORDERTOTAL>0.43</ORDERTOTAL>
+    <ORDERSHIPPING>3.00</ORDERSHIPPING>
     <BASECURRENCYCODE>EUR</BASECURRENCYCODE>
     <BASEGRANDTOTAL>3.435</BASEGRANDTOTAL>
     <PAYMENTTYPE>Credit/Debit (Powered by Stripe)</PAYMENTTYPE>
@@ -163,6 +164,7 @@ test("lists BrickLink reconciliation orders for the selected month", async ({
           taxType: null,
           facilitatorTax: null,
           subTotal: 3,
+          shippingCost: null,
           grandTotal: null,
           refundedAmount: null,
         },
@@ -172,6 +174,7 @@ test("lists BrickLink reconciliation orders for the selected month", async ({
           refundedAmount: null,
           paymentUrl: null,
         },
+        shipment: { totalAmount: null },
         calculated: {
           targetInvoice: null,
         },
@@ -196,6 +199,8 @@ test("lists BrickLink reconciliation orders for the selected month", async ({
           taxType: "domestic",
           facilitatorTax: null,
           subTotal: 0.43,
+          // What BrickLink charged the buyer for shipping, as its ORDERSHIPPING.
+          shippingCost: 3,
           grandTotal: 3.44,
           refundedAmount: null,
         },
@@ -205,6 +210,7 @@ test("lists BrickLink reconciliation orders for the selected month", async ({
           refundedAmount: null,
           paymentUrl: null,
         },
+        shipment: { totalAmount: null },
         calculated: {
           targetInvoice: 3.44,
         },
@@ -235,6 +241,7 @@ test("lists BrickOwl reconciliation orders for the selected month", async ({
           buyer_name: "Test Buyer Alpha",
           customer_username: "test_alpha",
           sub_total: "2.70",
+          ship_total: "2.50",
           payment_method_type: "paypal",
           base_order_total: "5.20",
           billing_country_code: "LV",
@@ -287,6 +294,7 @@ test("lists BrickOwl reconciliation orders for the selected month", async ({
           taxType: null,
           facilitatorTax: null,
           subTotal: 6,
+          shippingCost: null,
           grandTotal: null,
           refundedAmount: null,
         },
@@ -296,6 +304,7 @@ test("lists BrickOwl reconciliation orders for the selected month", async ({
           refundedAmount: null,
           paymentUrl: null,
         },
+        shipment: { totalAmount: null },
         calculated: {
           targetInvoice: null,
         },
@@ -322,6 +331,8 @@ test("lists BrickOwl reconciliation orders for the selected month", async ({
           taxType: "export-taxable",
           facilitatorTax: null,
           subTotal: 2.7,
+          // What BrickOwl charged the buyer for shipping, as its ship_total.
+          shippingCost: 2.5,
           grandTotal: 5.2,
           refundedAmount: null,
         },
@@ -331,6 +342,7 @@ test("lists BrickOwl reconciliation orders for the selected month", async ({
           refundedAmount: null,
           paymentUrl: null,
         },
+        shipment: { totalAmount: null },
         calculated: {
           targetInvoice: 5.2,
         },
@@ -448,6 +460,7 @@ test("lists BrickOwl reconciliation orders that span several batch requests", as
       taxType: null,
       facilitatorTax: null,
       subTotal: 1,
+      shippingCost: null,
       grandTotal: null,
       refundedAmount: null,
     },
@@ -457,6 +470,7 @@ test("lists BrickOwl reconciliation orders that span several batch requests", as
       refundedAmount: null,
       paymentUrl: null,
     },
+    shipment: { totalAmount: null },
     calculated: {
       targetInvoice: null,
     },
@@ -575,11 +589,13 @@ test("reports every order field with the source that stated it", async ({
     { name: "order.taxType", source: "order" },
     { name: "order.facilitatorTax", source: "order" },
     { name: "order.subTotal", source: "order" },
+    { name: "order.shippingCost", source: "order" },
     { name: "order.grandTotal", source: "order" },
     { name: "order.refundedAmount", source: "order" },
     { name: "gateway.paidAmount", source: "gateway" },
     { name: "gateway.facilitatorTax", source: "gateway" },
     { name: "gateway.refundedAmount", source: "gateway" },
+    { name: "shipment.totalAmount", source: "shipment" },
     { name: "calculated.targetInvoice", source: "calculated" },
   ]);
   // A field sits at the path that names it, so the two accounts of one refund carry one name under two sources.

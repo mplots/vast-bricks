@@ -18,7 +18,7 @@ import lombok.Getter;
  * {@link ReconciliationFieldSource} and will gain one when something collects it.
  */
 @Getter
-@JsonPropertyOrder({"order", "gateway", "calculated"})
+@JsonPropertyOrder({"order", "gateway", "shipment", "calculated"})
 public class ReconciledOrder {
 
     /** What the marketplace reported about the order itself, which the rest is reconciled against. */
@@ -26,6 +26,9 @@ public class ReconciledOrder {
 
     /** What the payment provider reports about the payment matched to the order. */
     private final GatewayFields gateway = new GatewayFields();
+
+    /** What the shipping provider reports about the shipment sent for the order. */
+    private final ShipmentFields shipment = new ShipmentFields();
 
     private ReconciledOrder(OrderFields order) {
         this.order = order;

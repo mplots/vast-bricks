@@ -13,7 +13,7 @@ export interface ReconciliationFailure {
 }
 
 /** Which account of the order stated a field. Reconciliation holds these against each other. */
-export type ReconciliationFieldSource = 'order' | 'gateway' | 'accounting' | 'calculated';
+export type ReconciliationFieldSource = 'order' | 'gateway' | 'shipment' | 'accounting' | 'calculated';
 
 /** One field an order carries, named as the orders expose it and attributed to the source that stated it. */
 export interface ReconciliationFieldDescriptor {
@@ -37,6 +37,11 @@ export interface ReconciliationOrderFields {
   /** What the marketplace collected on the order as tax facilitator, or `null` when it collected none. */
   facilitatorTax: number | null;
   subTotal: number | null;
+  /**
+   * What the marketplace charged the buyer for shipping the order, or `null` where it charged none. It is the buyer's
+   * side of the postage that `shipment.totalAmount` states from the post office's.
+   */
+  shippingCost: number | null;
   /** Order total in the store's base currency, shipping and additional charges included. */
   grandTotal: number | null;
   /** What the marketplace reports was refunded on the order, or `null` when it reports none. Nothing collects it yet. */
@@ -58,6 +63,18 @@ export interface ReconciliationGatewayFields {
   paymentUrl: string | null;
 }
 
+/**
+ * What the shipping provider reports about the shipment sent for the order. A shipment names its order in the notes
+ * the store wrote on it, so an order nothing was shipped for carries nothing here.
+ */
+export interface ReconciliationShipmentFields {
+  /**
+   * What the post office charged for the order's shipment: the postage with every additional service on it, and what
+   * every parcel of a split shipment came to, or `null` when no shipment was matched to the order.
+   */
+  totalAmount: number | null;
+}
+
 /** What reconciliation derives from the collected sources rather than any of them stating it. */
 export interface ReconciliationCalculatedFields {
   /**
@@ -70,6 +87,7 @@ export interface ReconciliationCalculatedFields {
 export interface ReconciliationOrder {
   order: ReconciliationOrderFields;
   gateway: ReconciliationGatewayFields;
+  shipment: ReconciliationShipmentFields;
   calculated: ReconciliationCalculatedFields;
   failures: ReconciliationFailure[];
 }

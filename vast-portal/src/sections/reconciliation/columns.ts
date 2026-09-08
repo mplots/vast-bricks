@@ -21,11 +21,13 @@ export const orderFields = [
   'order.taxType',
   'order.facilitatorTax',
   'order.subTotal',
+  'order.shippingCost',
   'order.grandTotal',
   'order.refundedAmount',
   'gateway.paidAmount',
   'gateway.facilitatorTax',
   'gateway.refundedAmount',
+  'shipment.totalAmount',
   'calculated.targetInvoice'
 ] as const;
 // Fields shown as table columns; the detail view shows all of them.
@@ -53,7 +55,10 @@ export const columnFields: string[] = [
   'gateway.refundedAmount',
   'calculated.targetInvoice',
   'gateway.paidAmount',
-  'gateway.facilitatorTax'
+  'gateway.facilitatorTax',
+  // What the post office charged comes after the payment's own account of the order: it is a third account of the
+  // same order rather than part of the subtraction the amounts before it make.
+  'shipment.totalAmount'
 ];
 
 /** Every column the table can be asked to show: whatever the detail view can state, a column can state too. */

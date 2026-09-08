@@ -40,6 +40,7 @@ class MapperBrickOwlOrders implements OrderMapper<SourcedBrickOwlOrder> {
                 .taxType(OrderTaxTypes.of(order))
                 .facilitatorTax(ReconciliationAmount.normalize(FacilitatorTaxes.of(order)))
                 .subTotal(ReconciliationAmount.normalize(order.getSubTotal()))
+                .shippingCost(ReconciliationAmount.normalize(order.getShipping()))
                 .grandTotal(ReconciliationAmount.normalize(order.getBaseOrderTotal()))
                 .build());
     }

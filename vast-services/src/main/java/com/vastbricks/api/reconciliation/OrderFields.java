@@ -48,6 +48,20 @@ public class OrderFields {
 
     private BigDecimal subTotal;
 
+    /**
+     * What the marketplace charged the buyer for shipping the order — BrickOwl's {@code ship_total} and BrickLink's
+     * {@code ORDERSHIPPING} — or {@code null} where it charged none.
+     *
+     * <p>It is the buyer's side of the postage, which {@link ShipmentFields#getTotalAmount()} states from the post
+     * office's: one is what the order collected for shipping and the other is what shipping it cost. Nothing compares
+     * them yet.
+     *
+     * <p>Stated as the marketplace stated it, in the currency it stated it in, as the sub-total above is: no order
+     * carries a currency, and the grand total is the one amount either marketplace gives in the store's base
+     * currency.
+     */
+    private BigDecimal shippingCost;
+
     /** What the order came to in the store's base currency, shipping and additional charges included. */
     private BigDecimal grandTotal;
 

@@ -191,19 +191,22 @@ here as they are provided; do not invent unspecified behavior prematurely.
   the selected month. Each collected order carries its marketplace source
   (`BrickLink` or `BrickOwl`), order ID, order date, buyer, buyer username,
   payment method, tax type, facilitator tax, sub-total, grand total, refunded
-  amount, gateway paid amount, gateway facilitator tax, gateway refunded amount,
-  and target invoice, together with its rule failures and the links to the order
+  amount, shipping charged, gateway paid amount, gateway facilitator tax,
+  gateway refunded amount, shipping cost, and target invoice, together with its
+  rule failures and the links to the order
   and its payment, each exposed beside the field it rides on. Add further fields
   and providers incrementally as their processing requirements are supplied.
-- Every field belongs to one of four sources, and reconciliation is the business
+- Every field belongs to one of five sources, and reconciliation is the business
   of holding those accounts of one order against each other: `order` is what the
   marketplace reported about the order itself, `gateway` what the payment
-  provider reports about the payment matched to it, `accounting` what the
+  provider reports about the payment matched to it, `shipment` what the shipping
+  provider reports about the shipment sent for it, `accounting` what the
   accounting system holds for it, and `calculated` what is derived from the rest
   rather than stated by anyone. Nothing is collected from the accounting system
   yet.
 - The source is structural, not a naming convention. An order carries one group
-  per source — `order`, `gateway`, `calculated` — and a field is addressed
+  per source — `order`, `gateway`, `shipment`, `calculated` — and a field is
+  addressed
   as `<source>.<field>`, the path it actually sits at. Do not prefix a field
   name with its source: the path already says it, and a prefix says it twice
   while stuttering on the fields that need it least (`orderOrderId`) and
@@ -513,6 +516,40 @@ here as they are provided; do not invent unspecified behavior prematurely.
   either way leaves the field absent rather than zero, the bank having said
   nothing about it. The gateway facilitator tax stays absent because a bank
   deducts none.
+- The shipping charged is what the marketplace charged the buyer for shipping
+  the order: BrickOwl's `ship_total` and BrickLink's `ORDERSHIPPING`, or nothing
+  where it charged none. It is stated as the marketplace stated it, in the
+  currency it stated it in, as the sub-total is — the grand total is the one
+  amount either marketplace gives in the store's base currency. It is the
+  buyer's side of the postage that the shipment source states from the post
+  office's, and no rule compares the two yet.
+- The shipping cost is what the post office charged for the order's shipment:
+  the postage with every additional service on it, as the Mans Pasts register
+  states it. See "Shipment register requirements" for how the register is read.
+- A shipment names its order in the notes the store wrote on it, which is where
+  both marketplaces put it — `Order #32400001` — and names no marketplace at
+  all, so the notes are read against every collected order rather than one
+  mapper per marketplace guessing at the other's orders. That is the bank
+  entry's reading and the same key, `ReconciledOrders.findNamedIn`. Notes naming
+  two collected orders name neither, a guessed shipment reading exactly like a
+  matched one, and a shipment naming no collected order is dropped.
+- Every shipment naming one order is summed, as the bank credits are: an order
+  shipped in two parcels was shipped twice for one order, and both parcels are
+  postage the store paid for it, so the figure is what shipping that order cost.
+  One parcel's own cost is a field of its own if it is ever wanted, not a
+  different sum here.
+- The register is not read by month and is not paged through: the export's first
+  page holds every shipment the account has, so one request is the whole
+  register and the month decides nothing about what is asked for. Everything the
+  export stated is passed on, shipments of other months included — a source
+  decides nothing, and a shipment naming no collected order is dropped by the
+  mapper. The page number stays the client's own protocol; a register that ever
+  outgrew its first page would be a walk added to the source rather than a
+  change to the client.
+- No rule compares the shipping cost against what the marketplace charged for
+  it yet. The two are collected to be held against each other when a rule for
+  them is supplied; a marketplace's postage is not the post office's price, so
+  what a disagreement between them means has to be stated before it is judged.
 - Because a BrickLink payment is matched on the buyer, its mapper reads fields
   another detail mapper merged. Detail mappers therefore declare their bean order
   explicitly rather than relying on scan order, and the payment mappers declare a
@@ -593,8 +630,8 @@ here as they are provided; do not invent unspecified behavior prematurely.
   reconciliation screen.
 - A source, its carrier type, and its mappers live in a subpackage named after
   the reconciliation category they serve: `reconciliation.order`,
-  `reconciliation.payment`, and later `shipping` and the store synchronization
-  one. Category, not provider: a category is the
+  `reconciliation.payment`, `reconciliation.shipping`, and later the store
+  synchronization one. Category, not provider: a category is the
   vocabulary the requirements use, a provider's transport knowledge already
   lives in its `com.vastbricks.api.client.<provider>` package, and the
   categories stay a bounded set as providers are added.
@@ -666,8 +703,11 @@ here as they are provided; do not invent unspecified behavior prematurely.
   own tolerances.
 - The orders table shows `Actions`, source, order ID, order date, buyer, payment
   method, grand total, facilitator tax, refunded amount, gateway refunded
-  amount, target invoice, gateway paid amount, and gateway facilitator tax,
-  newest order first as the API returns them. The gateway's paid amount and
+  amount, target invoice, gateway paid amount, gateway facilitator tax, and the
+  shipping cost, newest order first as the API returns them. The shipping cost
+  comes last, after the payment's own account of the order: it is a third
+  account of the same order rather than part of the subtraction the amounts
+  before it make. The gateway's paid amount and
   facilitator tax come last together, so they read as one account of the payment
   rather than interrupting the subtraction before them. The gateway's refund is
   part of that subtraction though most orders have none, because a target
@@ -925,8 +965,9 @@ here as they are provided; do not invent unspecified behavior prematurely.
   the shipment register a store sees under its own account is reached as a
   signed-in person, and that half is migrated into `vast-services` as
   `MansPastsClient`: a form login that answers with a session cookie, and the
-  profile's own xlsx export asked for a page at a time. Reconciliation does not
-  collect shipments yet; see "Shipment register requirements".
+  profile's own xlsx export asked for a page at a time. Reconciliation collects
+  the register through it as one source among several; see "Shipment register
+  requirements".
 - The current accounting client implementation is Manakabata, migrated into
   `vast-services`: the `invoice` feature creates invoices for an order.
   Reconciliation does not collect them — nothing compares an order against what

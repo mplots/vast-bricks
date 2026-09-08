@@ -3,6 +3,7 @@ package com.vastbricks.api.reconciliation;
 import static com.vastbricks.api.reconciliation.ReconciliationFieldSource.CALCULATED;
 import static com.vastbricks.api.reconciliation.ReconciliationFieldSource.GATEWAY;
 import static com.vastbricks.api.reconciliation.ReconciliationFieldSource.ORDER;
+import static com.vastbricks.api.reconciliation.ReconciliationFieldSource.SHIPMENT;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
@@ -33,12 +34,15 @@ public enum ReconciliationOrderField {
     ORDER_TAX_TYPE("order.taxType", ORDER),
     ORDER_FACILITATOR_TAX("order.facilitatorTax", ORDER),
     ORDER_SUB_TOTAL("order.subTotal", ORDER),
+    ORDER_SHIPPING_COST("order.shippingCost", ORDER),
     ORDER_GRAND_TOTAL("order.grandTotal", ORDER),
     ORDER_REFUNDED_AMOUNT("order.refundedAmount", ORDER),
 
     GATEWAY_PAID_AMOUNT("gateway.paidAmount", GATEWAY),
     GATEWAY_FACILITATOR_TAX("gateway.facilitatorTax", GATEWAY),
     GATEWAY_REFUNDED_AMOUNT("gateway.refundedAmount", GATEWAY),
+
+    SHIPMENT_TOTAL_AMOUNT("shipment.totalAmount", SHIPMENT),
 
     CALCULATED_TARGET_INVOICE("calculated.targetInvoice", CALCULATED);
 

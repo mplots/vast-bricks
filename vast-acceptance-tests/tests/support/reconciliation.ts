@@ -4,6 +4,11 @@ import type { SettingsOverrides } from "./api-test";
 import type { WireMockValueMatcher } from "./wiremock";
 import { WireMockApi } from "./wiremock";
 import { orderDetailPage } from "./bricklink-order-detail";
+import {
+  stubMansPasts,
+  stubMansPastsRefusedLogin,
+  type MansPastsShipmentMock,
+} from "./manspasts";
 import { mockStripeSettings, stubStripeBalanceTransactions } from "./stripe";
 
 const payPalClientId = "test-paypal-client-id";
@@ -120,6 +125,13 @@ export type ReconciliationProviders = {
   payPal?: PayPalTransactionMock[];
   /** PayPal transactions split into the pages PayPal returns them in, for paging scenarios. */
   payPalPages?: PayPalTransactionMock[][];
+  /**
+   * The Mans Pasts register, which the export states on its first page whole. A shipment names its order in the
+   * notes the store wrote on it.
+   */
+  mansPasts?: MansPastsShipmentMock[];
+  /** Mocks Mans Pasts refusing the sign-in, for the scenario about a provider that would not answer. */
+  mansPastsRefusesLogin?: boolean;
 };
 
 /**
@@ -153,6 +165,11 @@ export async function mockReconciliationOrders(
     providers.payPalPages ?? [providers.payPal ?? []],
     providers.month,
   );
+  if (providers.mansPastsRefusesLogin) {
+    await stubMansPastsRefusedLogin(wireMock, settings);
+  } else {
+    await stubMansPasts(wireMock, settings, [providers.mansPasts ?? []]);
+  }
 
   return wireMock;
 }

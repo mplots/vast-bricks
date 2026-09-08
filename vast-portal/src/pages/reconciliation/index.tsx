@@ -71,11 +71,13 @@ import { orderTaxTypes, type OrderTaxType } from 'types/tax';
 const amountFields: string[] = [
   'order.facilitatorTax',
   'order.subTotal',
+  'order.shippingCost',
   'order.grandTotal',
   'order.refundedAmount',
   'gateway.paidAmount',
   'gateway.facilitatorTax',
   'gateway.refundedAmount',
+  'shipment.totalAmount',
   'calculated.targetInvoice'
 ];
 const dateFields: string[] = ['order.orderDate'];
@@ -477,10 +479,12 @@ export default function ReconciliationPage() {
 
   const sourceLabel = (source: ReconciliationFieldSource) => intl.formatMessage({ id: `reconciliation-source-${source}` });
 
-  // Which account stated each field, as the API reports it. A field the API did not report is read as calculated:
-  // whatever it is, nobody stated it to this screen, and it is better grouped with the derived than dropped.
+  // Which account stated each field, as the API reports it. A field the roster does not name — a backend older than
+  // this screen — is read from the path it sits at rather than lumped in with the derived: the source is the path,
+  // `<source>.<field>`, so the name says which account stated it even when the roster has not caught up.
   const fieldSource = (field: string): ReconciliationFieldSource =>
-    reconciliationOrders?.fields.find((declared) => declared.name === field)?.source ?? 'calculated';
+    reconciliationOrders?.fields.find((declared) => declared.name === field)?.source ??
+    (field.split('.')[0] as ReconciliationFieldSource);
 
   /**
    * The shown columns in runs of one source. A source split apart by a column of another is two runs rather than

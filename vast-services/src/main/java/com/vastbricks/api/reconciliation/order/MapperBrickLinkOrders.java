@@ -41,6 +41,7 @@ class MapperBrickLinkOrders implements OrderMapper<SourcedBrickLinkOrder> {
                 .taxType(OrderTaxTypes.of(order))
                 .facilitatorTax(ReconciliationAmount.normalize(FacilitatorTaxes.of(order)))
                 .subTotal(ReconciliationAmount.normalize(order.getTotal()))
+                .shippingCost(ReconciliationAmount.normalize(order.getShipping()))
                 .grandTotal(ReconciliationAmount.normalize(order.getBaseGrandTotal()))
                 // A page stating no refund, and an order no page was asked for, both leave the field absent: that is
                 // already the marketplace saying no money came back.
