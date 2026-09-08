@@ -54,10 +54,36 @@ final class DebugPayload {
         private final String provider;
         private final String method;
         private final String url;
+
+        /** The body as text, or the note standing in for one kept as a file. */
         private final String requestBody;
+
+        /** What a download of the request body would be, or {@code null} when there is no file to download. */
+        private final BodyFileResponse requestFile;
+
         private final int statusCode;
         private final String responseBody;
+        private final BodyFileResponse responseFile;
         private final long durationMillis;
         private final boolean truncated;
+    }
+
+    /**
+     * A body kept as a file rather than as text, and what downloading it will hand over.
+     *
+     * <p>The panel shows the note in the body itself and offers this beside it, so a spreadsheet or a PDF a provider
+     * answered with is opened in the program that reads it rather than stared at as replacement characters.
+     */
+    @Getter
+    @AllArgsConstructor
+    public static final class BodyFileResponse {
+
+        /** What the provider called it, which is what the download is served as. */
+        private final String contentType;
+
+        private final int size;
+
+        /** What to save it as: the provider, the exchange it belongs to, and the extension for its type. */
+        private final String filename;
     }
 }

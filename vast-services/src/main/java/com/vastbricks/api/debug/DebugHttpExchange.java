@@ -41,16 +41,36 @@ class DebugHttpExchange {
     @Column(name = "request_body")
     private String requestBody;
 
+    /**
+     * The request body as it arrived, kept only where it was not text: the body column holds a note about it instead,
+     * and the panel offers this to download. {@code null} for a text body, for no body, and for one over the cap.
+     */
+    @Column(name = "request_body_file")
+    private byte[] requestBodyFile;
+
+    @Column(name = "request_body_content_type", length = 255)
+    private String requestBodyContentType;
+
     @Column(name = "status_code", nullable = false)
     private int statusCode;
 
     @Column(name = "response_body")
     private String responseBody;
 
+    /** The response body as it arrived, kept on the same terms as the request's. */
+    @Column(name = "response_body_file")
+    private byte[] responseBodyFile;
+
+    @Column(name = "response_body_content_type", length = 255)
+    private String responseBodyContentType;
+
     @Column(name = "duration_millis", nullable = false)
     private long durationMillis;
 
-    /** Whether a body was longer than the stored cap and was cut short. */
+    /**
+     * Whether a body was longer than the stored cap. A text body is cut short at it; a file is not kept at all,
+     * a truncated spreadsheet being a corrupt file rather than a shorter one.
+     */
     @Column(nullable = false)
     private boolean truncated;
 }

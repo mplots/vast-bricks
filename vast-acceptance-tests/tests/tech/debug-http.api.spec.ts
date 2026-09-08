@@ -1,10 +1,17 @@
 import { expect, test } from "../support/api-test";
 import {
   clearExchanges,
+  downloadBody,
   providersOf,
   readExchanges,
   setRecording,
 } from "../support/debug";
+import {
+  mansPastsPassword,
+  mansPastsSession,
+  mansPastsUsername,
+  mockMansPasts,
+} from "../support/manspasts";
 import { mockReconciliationOrders } from "../support/reconciliation";
 import {
   createVastUser,
@@ -173,4 +180,71 @@ test("masks a credential the provider issued mid-operation", async ({
   const traffic = JSON.stringify(exchanges);
   expect(traffic).not.toContain("debug-scenario-client-token");
   expect(traffic).not.toContain("debug-scenario-session-token");
+});
+
+/**
+ * A provider reached for one page of the Mans Pasts register, which is the one provider here that answers with a
+ * file. It is asked for through the test-only endpoint rather than through a screen: what these two scenarios are
+ * about is what the dock does with a body that is not text, and any call that answers with one will do.
+ */
+const readShipmentRegister = (request: Parameters<typeof readExchanges>[0]) =>
+  request.get("/api/test/manspasts/shipments");
+
+test("records a provider's sign-in and the call it was needed for as one operation", async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockMansPasts(settings, request, testInfo, [[]]);
+  await setRecording(request, true);
+
+  expect((await readShipmentRegister(request)).status()).toBe(200);
+
+  // One recorded operation is one client method however many requests it takes: reaching the register takes the
+  // sign-in before it, and both are that provider's traffic for this request.
+  const exchanges = await readExchanges(request);
+  expect(providersOf(exchanges)).toEqual(["Mans Pasts"]);
+  expect(
+    exchanges.map((exchange) => exchange.url.replace(/^https?:\/\/[^/]+/, "")),
+  ).toEqual(["/lv/login", "/lv/profile/orders/export?page=1"]);
+
+  const login = exchanges[0];
+  expect(login.requestBody).toContain(`_username=${mansPastsUsername}`);
+  // The password is what the client knows it sent, and the session it buys stands in for it once issued.
+  expect(login.requestBody).toContain("_password=***");
+  const traffic = JSON.stringify(exchanges);
+  expect(traffic).not.toContain(mansPastsPassword);
+  expect(traffic).not.toContain(mansPastsSession);
+});
+
+test("hands a recorded body that was not text over as the file it was", async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockMansPasts(settings, request, testInfo, [[]]);
+  await setRecording(request, true);
+
+  expect((await readShipmentRegister(request)).status()).toBe(200);
+
+  const exported = (await readExchanges(request)).find((exchange) =>
+    exchange.url.includes("/lv/profile/orders/export"),
+  );
+  // The export is a spreadsheet: decoded as text it is a screenful of replacement characters, and its NUL bytes
+  // cannot be stored in a text column at all. So the body carries a note and the file is kept beside it.
+  expect(exported?.responseBody).toMatch(/^\[\d+ bytes of /);
+  expect(exported?.responseFile).toMatchObject({
+    contentType:
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    filename: `mans-pasts-${exported?.id}-response.xlsx`,
+  });
+
+  const download = await downloadBody(request, exported!.id, "response");
+
+  expect(download.contentType).toContain(
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  );
+  expect(download.disposition).toContain("attachment");
+  expect(download.disposition).toContain(exported!.responseFile!.filename);
+  // The bytes the provider sent, not a rendering of them: a zip header is what an xlsx starts with.
+  expect(download.bytes.subarray(0, 2).toString("latin1")).toBe("PK");
+  expect(download.bytes.length).toBe(exported!.responseFile!.size);
 });

@@ -13,7 +13,8 @@ import { useIntl } from 'react-intl';
 // project-imports
 import IconButton from 'components/@extended/IconButton';
 import SyntaxHighlight from 'utils/SyntaxHighlight';
-import { Copy, TickCircle } from 'iconsax-reactjs';
+import { Copy, DocumentDownload, TickCircle } from 'iconsax-reactjs';
+import type { DebugBodyFile } from 'types/debug';
 
 import { byteLength, detectLanguage, formatBody, formatBytes, maxHighlightedLength } from './providerTraffic';
 
@@ -23,6 +24,9 @@ type Props = {
   body: string | null;
   /** Shown in place of the body when the call carried none. */
   emptyMessage: string;
+  /** Set where the backend kept this body as a file rather than as text, which is what there is to download. */
+  file?: DebugBodyFile | null;
+  onDownload?: () => void;
 };
 
 /**
@@ -31,7 +35,7 @@ type Props = {
  * <p>It carries no find of its own: the whole body is in the page, so the browser's own search reaches it, which is
  * what people use anyway.
  */
-export default function RawBodyView({ title, body, emptyMessage }: Props) {
+export default function RawBodyView({ title, body, emptyMessage, file, onDownload }: Props) {
   const intl = useIntl();
   const [copied, setCopied] = useState(false);
 
@@ -52,13 +56,33 @@ export default function RawBodyView({ title, body, emptyMessage }: Props) {
       <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
         <Stack direction="row" sx={{ gap: 1, alignItems: 'baseline' }}>
           <Typography variant="subtitle1">{title}</Typography>
-          {body && (
+          {/* A file states the size the provider sent rather than the length of the note standing in for it. */}
+          {(file || body) && (
             <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-              {formatBytes(byteLength(body))}
+              {formatBytes(file ? file.size : byteLength(body ?? ''))}
+            </Typography>
+          )}
+          {file?.contentType && (
+            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+              {file.contentType}
             </Typography>
           )}
         </Stack>
-        {body && (
+        {/* A body kept as a file is downloaded rather than copied: the note is all there would be to copy, and the
+            file is worth opening in the program that reads it. */}
+        {file && onDownload && (
+          <Tooltip title={intl.formatMessage({ id: 'debug-body-download' }, { filename: file.filename })} placement="top-end">
+            <IconButton
+              color="primary"
+              size="small"
+              aria-label={intl.formatMessage({ id: 'debug-body-download-label' })}
+              onClick={onDownload}
+            >
+              <DocumentDownload size={18} />
+            </IconButton>
+          </Tooltip>
+        )}
+        {body && !file && (
           <Tooltip title={intl.formatMessage({ id: copied ? 'debug-body-copied' : 'debug-body-copy' })} placement="top-end">
             <IconButton color={copied ? 'success' : 'secondary'} size="small" onClick={handleCopy}>
               {copied ? <TickCircle size={18} /> : <Copy size={18} />}

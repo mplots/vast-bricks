@@ -5,6 +5,7 @@ import com.stripe.net.HttpClient;
 import com.stripe.net.StripeRequest;
 import com.stripe.net.StripeResponse;
 import com.vastbricks.api.client.HttpExchangeCapture;
+import com.vastbricks.api.client.RawHttpBody;
 import com.vastbricks.api.client.RawHttpCall;
 
 /**
@@ -30,9 +31,9 @@ class RecordingHttpClient extends HttpClient {
         HttpExchangeCapture.add(new RawHttpCall(
                 request.method().name(),
                 request.url().toString(),
-                requestBody(request),
+                RawHttpBody.text(requestBody(request)),
                 response.code(),
-                response.body(),
+                RawHttpBody.text(response.body()),
                 HttpExchangeCapture.millisSince(startedAt)
         ));
         return response;

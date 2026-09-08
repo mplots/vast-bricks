@@ -6,11 +6,21 @@ export type DebugExchange = {
   provider: string;
   method: string;
   url: string;
+  /** The body as text, or the note standing in for one the backend kept as a file. */
   requestBody: string | null;
+  requestFile: DebugBodyFile | null;
   statusCode: number;
   responseBody: string | null;
+  responseFile: DebugBodyFile | null;
   durationMillis: number;
   truncated: boolean;
+};
+
+/** A body kept as a file rather than as text, and what downloading it hands over. */
+export type DebugBodyFile = {
+  contentType: string | null;
+  size: number;
+  filename: string;
 };
 
 const endpoint = '/api/private/debug/http';
@@ -48,6 +58,23 @@ export async function clearExchanges(request: APIRequestContext) {
   if (!response.ok()) {
     throw new Error(`Clearing debug exchanges failed with HTTP ${response.status()}.`);
   }
+}
+
+/** Downloads one recorded body as the file the provider sent, as the panel's download button does. */
+export async function downloadBody(
+  request: APIRequestContext,
+  id: number,
+  side: 'request' | 'response',
+) {
+  const response = await request.get(`${endpoint}/exchanges/${id}/${side}-body`);
+  if (!response.ok()) {
+    throw new Error(`Downloading a recorded body failed with HTTP ${response.status()}.`);
+  }
+  return {
+    contentType: response.headers()['content-type'] ?? '',
+    disposition: response.headers()['content-disposition'] ?? '',
+    bytes: await response.body(),
+  };
 }
 
 export const providersOf = (exchanges: DebugExchange[]) => [...new Set(exchanges.map((exchange) => exchange.provider))].sort();

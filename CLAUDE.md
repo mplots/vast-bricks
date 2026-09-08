@@ -972,6 +972,24 @@ covers every provider call the backend makes rather than one screen's.
   a scheduled retention window is the obvious follow-up if the table grows.
 - Bodies are stored up to a cap and the row is marked truncated beyond it, so one
   pathological response cannot bloat a row or the panel.
+- A body that is not text is kept as a file rather than decoded: an export hands
+  over a spreadsheet and a label a PDF, which read as a screenful of replacement
+  characters and, carrying NUL bytes, cannot be stored in a text column at all —
+  so recording one as text would have failed the request that made the call
+  rather than only the recording of it. A provider that states no content type is
+  taken at its word and decoded; a NUL in what comes out is what says it was not
+  text after all.
+- Such a body is stored as it arrived, with the type the provider called it, and
+  the body column carries a note of its type and size in its place. The panel
+  offers it as a download beside that note rather than as the copy button a text
+  body gets: what a spreadsheet is worth is opening in the program that reads
+  it. A download is fetched through the panel's own client and handed to the
+  browser, not linked to, because a link would arrive without the caller's token.
+- A file has a cap of its own and is not stored at all beyond it, a truncated
+  spreadsheet being a corrupt file rather than a shorter one; the note still says
+  what it was and the row is marked truncated. A file's bytes are stored
+  unmasked, there being no sensible way to mask inside a zip — a client's secrets
+  are masked in the text and the URL as before.
 - The client layer records; the debug feature decides what is kept. A client wraps the
   operation it wants recorded in `HttpExchangeCapture.record`, naming itself as the
   provider, and knows nothing about who wants the traffic. `HttpExchangeSink` is the

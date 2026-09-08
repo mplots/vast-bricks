@@ -21,7 +21,8 @@ import { useIntl } from 'react-intl';
 // project-imports
 import IconButton from 'components/@extended/IconButton';
 import hasTextSelection from 'utils/textSelection';
-import type { DebugExchange } from 'types/debug';
+import { downloadBodyFile } from 'api/debug';
+import type { DebugBodyFile, DebugBodySide, DebugExchange } from 'types/debug';
 import { ArrowLeft2, Clock, Layer, Record, Refresh, Stop, Trash } from 'iconsax-reactjs';
 
 import RawBodyView from './RawBodyView';
@@ -55,6 +56,19 @@ export default function NetworkPanel() {
   const [view, setView] = useState<NetworkView>('time');
   const [selectedProvider, setSelectedProvider] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<number | null>(null);
+  // A download that would not come through says so where the panel's own failures are said.
+  const [downloadError, setDownloadError] = useState<string | null>(null);
+
+  /** Hands one recorded body over as the file the provider sent. */
+  const download = async (id: number, side: DebugBodySide, file: DebugBodyFile | null) => {
+    if (!file) return;
+    setDownloadError(null);
+    try {
+      await downloadBodyFile(id, side, file.filename);
+    } catch (failure) {
+      setDownloadError(failure instanceof Error ? failure.message : intl.formatMessage({ id: 'debug-body-download-failed' }));
+    }
+  };
 
   // Grouped in the order each provider was first heard from, so the list does not reshuffle as calls arrive.
   const groups = useMemo(() => {
@@ -166,9 +180,9 @@ export default function NetworkPanel() {
       )}
       <Divider />
 
-      {error && (
+      {(error || downloadError) && (
         <Alert severity="error" sx={{ m: 1 }}>
-          {error}
+          {error ?? downloadError}
         </Alert>
       )}
 
@@ -270,12 +284,16 @@ export default function NetworkPanel() {
               title={intl.formatMessage({ id: 'debug-network-request' })}
               body={call.requestBody}
               emptyMessage={intl.formatMessage({ id: 'debug-network-no-request-body' })}
+              file={call.requestFile}
+              onDownload={() => download(call.id, 'request', call.requestFile)}
             />
             <Divider />
             <RawBodyView
               title={intl.formatMessage({ id: 'debug-network-response' })}
               body={call.responseBody}
               emptyMessage={intl.formatMessage({ id: 'debug-network-no-response-body' })}
+              file={call.responseFile}
+              onDownload={() => download(call.id, 'response', call.responseFile)}
             />
           </>
         )}

@@ -5,7 +5,7 @@ import useSWR, { mutate } from 'swr';
 
 // project-imports
 import axios from 'utils/axios';
-import type { DebugDockSide, DebugDockState, DebugExchangePage, DebugRecording } from 'types/debug';
+import type { DebugBodySide, DebugDockSide, DebugDockState, DebugExchangePage, DebugRecording } from 'types/debug';
 
 const endpoint = '/api/private/debug/http';
 const dockKey = 'api/debug/dock';
@@ -108,6 +108,29 @@ export async function getExchanges(afterId: number | null): Promise<DebugExchang
   const query = afterId === null ? '' : `?afterId=${afterId}`;
   const { data } = await axios.get<DebugExchangePage>(`${endpoint}/exchanges${query}`);
   return data;
+}
+
+/**
+ * Hands one recorded body over as the file it was.
+ *
+ * <p>It is fetched rather than linked to: the panel's requests carry the caller's token in a header, and a plain
+ * link would arrive without it. So the bytes come back through the same client as everything else and are handed to
+ * the browser as a download of their own.
+ */
+export async function downloadBodyFile(id: number, side: DebugBodySide, filename: string): Promise<void> {
+  const { data } = await axios.get<Blob>(`${endpoint}/exchanges/${id}/${side}-body`, { responseType: 'blob' });
+
+  const url = URL.createObjectURL(data);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  link.rel = 'noopener';
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  // Revoked a moment later rather than at once: a browser that has not started reading the object yet would be left
+  // downloading nothing.
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 export async function clearExchanges(): Promise<void> {

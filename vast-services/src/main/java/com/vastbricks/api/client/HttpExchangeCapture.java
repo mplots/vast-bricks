@@ -4,7 +4,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -55,9 +54,9 @@ public class HttpExchangeCapture {
             scope.add(new RawHttpCall(
                     request.getMethod().name(),
                     request.getURI().toString(),
-                    text(body, request.getHeaders()),
+                    RawHttpBody.of(body, request.getHeaders()),
                     response.getStatusCode().value(),
-                    text(responseBody, response.getHeaders()),
+                    RawHttpBody.of(responseBody, response.getHeaders()),
                     millisSince(startedAt)
             ));
             return new CapturedResponse(response, responseBody);
@@ -114,19 +113,6 @@ public class HttpExchangeCapture {
         return (System.nanoTime() - startedAtNanos) / 1_000_000;
     }
 
-    private static String text(byte[] body, HttpHeaders headers) {
-        if (body == null || body.length == 0) {
-            return null;
-        }
-        return new String(body, charset(headers));
-    }
-
-    private static Charset charset(HttpHeaders headers) {
-        var contentType = headers.getContentType();
-        var charset = contentType == null ? null : contentType.getCharset();
-        return charset == null ? StandardCharsets.UTF_8 : charset;
-    }
-
     /** One operation in progress: what it has sent so far, and what must never appear in it. */
     private static final class Scope {
 
@@ -159,9 +145,9 @@ public class HttpExchangeCapture {
                     .map(call -> new RawHttpCall(
                             call.getMethod(),
                             mask(call.getUrl()),
-                            mask(call.getRequestBody()),
+                            call.getRequestBody().masked(this::mask),
                             call.getStatusCode(),
-                            mask(call.getResponseBody()),
+                            call.getResponseBody().masked(this::mask),
                             call.getDurationMillis()
                     ))
                     .toList();

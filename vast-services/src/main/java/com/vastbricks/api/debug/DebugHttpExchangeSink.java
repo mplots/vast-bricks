@@ -1,6 +1,7 @@
 package com.vastbricks.api.debug;
 
 import com.vastbricks.api.client.HttpExchangeSink;
+import com.vastbricks.api.client.RawHttpBody;
 import com.vastbricks.api.client.RawHttpCall;
 import java.time.Instant;
 import java.util.List;
@@ -19,10 +20,19 @@ import org.springframework.stereotype.Component;
 class DebugHttpExchangeSink implements HttpExchangeSink {
 
     /**
-     * How much of a body is kept. A provider batch can answer megabytes, and one pathological response should not
+     * How much of a text body is kept. A provider batch can answer megabytes, and one pathological response should not
      * bloat a row or the panel; the metadata and the start of the body are what a reader needs.
      */
     static final int BODY_LIMIT = 1_000_000;
+
+    /**
+     * How large a body kept as a file may be. Generous enough for the exports and labels a provider hands over, and
+     * bounded, because these rows live in the database until someone presses Clear.
+     *
+     * <p>A file over it is not stored at all rather than cut short: a truncated spreadsheet is a corrupt file, not a
+     * shorter one, so there would be nothing worth downloading. The note in the body column still says what it was.
+     */
+    static final int FILE_LIMIT = 5_000_000;
 
     private final DebugHttpExchangeRepository exchanges;
     private final DebugRecordingService recording;
@@ -37,18 +47,41 @@ class DebugHttpExchangeSink implements HttpExchangeSink {
     }
 
     private DebugHttpExchange toRow(long userId, String provider, RawHttpCall call) {
+        var request = call.getRequestBody();
+        var response = call.getResponseBody();
+
         var row = new DebugHttpExchange();
         row.setUserId(userId);
         row.setRecordedAt(Instant.now());
         row.setProvider(provider);
         row.setMethod(call.getMethod());
         row.setUrl(call.getUrl());
-        row.setRequestBody(capped(call.getRequestBody()));
+        row.setRequestBody(capped(request.getText()));
         row.setStatusCode(call.getStatusCode());
-        row.setResponseBody(capped(call.getResponseBody()));
+        row.setResponseBody(capped(response.getText()));
         row.setDurationMillis(call.getDurationMillis());
-        row.setTruncated(isOverLimit(call.getRequestBody()) || isOverLimit(call.getResponseBody()));
+        row.setTruncated(isOverLimit(request) || isOverLimit(response));
+
+        if (keepsFile(request)) {
+            row.setRequestBodyFile(request.getBytes());
+            row.setRequestBodyContentType(request.getContentType());
+        }
+        if (keepsFile(response)) {
+            row.setResponseBodyFile(response.getBytes());
+            row.setResponseBodyContentType(response.getContentType());
+        }
         return row;
+    }
+
+    private boolean keepsFile(RawHttpBody body) {
+        return body.isFile() && body.getBytes().length <= FILE_LIMIT;
+    }
+
+    private boolean isOverLimit(RawHttpBody body) {
+        if (body.isFile()) {
+            return body.getBytes().length > FILE_LIMIT;
+        }
+        return isOverLimit(body.getText());
     }
 
     private boolean isOverLimit(String body) {
