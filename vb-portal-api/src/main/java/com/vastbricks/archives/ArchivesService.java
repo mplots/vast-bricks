@@ -3,12 +3,11 @@ package com.vastbricks.archives;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vastbricks.accounting.AccountingOrder;
 import com.vastbricks.accounting.AccountingService;
-import com.vastbricks.config.Env;
+import com.vastbricks.api.orderarchive.OrderArchive;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -33,7 +32,7 @@ public class ArchivesService {
     private static final Pattern VAT_INVOICE_ARCHIVE = Pattern.compile("^vat-invoice-(\\d+)-.+\\.pdf$");
 
     private final AccountingService accountingService;
-    private final Env env;
+    private final OrderArchive orderArchive;
     private final ObjectMapper objectMapper;
 
     public List<ArchiveOrder> findOrders(YearMonth month) {
@@ -59,12 +58,10 @@ public class ArchivesService {
         var accountingOrderIds = new HashSet<String>();
         var vatInvoiceOrderIds = new HashSet<String>();
         var vatInvoiceRequired = new HashMap<String, Boolean>();
-        if (StringUtils.isBlank(env.getBrickLinkOrderArchiveDir())) {
-            return new ArchiveIndex(apiOrderIds, accountingOrderIds, vatInvoiceOrderIds, vatInvoiceRequired);
-        }
-
         try {
-            var directory = Path.of(env.getBrickLinkOrderArchiveDir().trim());
+            // Where the archive job wrote them, which the rewrite owns: the serving tenant's own directory under
+            // the configured base. This screen is under /api/private, so the tenant is bound by the time it asks.
+            var directory = orderArchive.directory();
             if (!Files.isDirectory(directory)) {
                 return new ArchiveIndex(apiOrderIds, accountingOrderIds, vatInvoiceOrderIds, vatInvoiceRequired);
             }

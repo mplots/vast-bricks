@@ -4,7 +4,7 @@ import com.vastbricks.accounting.AccountingSummary;
 import com.vastbricks.archives.ArchiveOrder;
 import com.vastbricks.archives.ArchivesPage;
 import com.vastbricks.archives.ArchivesService;
-import com.vastbricks.job.BrickLinkOrderArchiveJob;
+import com.vastbricks.api.orderarchive.OrderArchive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.io.IOException;
 import java.time.YearMonth;
 import java.time.format.DateTimeParseException;
 
@@ -23,7 +22,7 @@ import java.time.format.DateTimeParseException;
 @RequiredArgsConstructor
 public class ArchivesController {
     private final ArchivesService archivesService;
-    private final BrickLinkOrderArchiveJob archiveJob;
+    private final OrderArchive orderArchive;
 
     @GetMapping("/api/private/archives")
     public ArchivesPage archives(
@@ -40,8 +39,8 @@ public class ArchivesController {
 
     @PostMapping("/api/private/archives/{orderId}/download-missing")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void downloadMissingArchives(@PathVariable("orderId") long orderId) throws IOException {
-        archiveJob.archiveOrder(orderId);
+    public void downloadMissingArchives(@PathVariable("orderId") long orderId) {
+        orderArchive.archive(orderId);
     }
 
     YearMonth parseMonth(String value) {

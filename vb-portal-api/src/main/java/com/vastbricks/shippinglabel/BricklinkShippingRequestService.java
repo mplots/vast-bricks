@@ -1,5 +1,8 @@
 package com.vastbricks.shippinglabel;
 
+import com.vastbricks.api.orderarchive.OrderArchive;
+import com.vastbricks.api.tenancy.TenantAccess;
+import com.vastbricks.api.tenancy.TenantContext;
 import com.vastbricks.config.Env;
 import com.vastbricks.jpa.entity.Marketplace;
 import com.vastbricks.market.link.Order;
@@ -29,6 +32,8 @@ import java.util.Arrays;
 @Slf4j
 class BricklinkShippingRequestService {
     private Env env;
+    private OrderArchive orderArchive;
+    private TenantAccess tenantAccess;
     private MansPastsShippingApiClient mansPastsClient;
     private TaxInvoiceParserService taxInvoiceParserService;
 
@@ -139,14 +144,27 @@ class BricklinkShippingRequestService {
         }
     }
 
+    /**
+     * The store's own archive directory, which is where the order archive writes and this writes the VAT invoice the
+     * extension posted.
+     *
+     * <p>The extension posts this from BrickLink with no login anywhere in the flow, so nothing has bound a tenant
+     * and the store has to be named by configuration. That is this endpoint's problem rather than the archive's, so
+     * it is solved here and goes when this application does.
+     */
     private Path archiveDirectory() {
-        if (StringUtils.isBlank(env.getBrickLinkOrderArchiveDir())) {
-            throw new ResponseStatusException(
+        var tenantId = tenantAccess.tenantIdByCode(env.getVastLegacyTenantCode())
+            .orElseThrow(() -> new ResponseStatusException(
                 HttpStatus.INTERNAL_SERVER_ERROR,
-                "BRICKLINK_ORDER_ARCHIVE_DIR is not configured"
-            );
+                "VAST_LEGACY_TENANT_CODE names no active tenant, so there is no store to archive for"
+            ));
+        var previous = TenantContext.currentTenantId().orElse(null);
+        TenantContext.setTenantId(tenantId);
+        try {
+            return orderArchive.directory();
+        } finally {
+            TenantContext.setTenantId(previous);
         }
-        return Path.of(env.getBrickLinkOrderArchiveDir().trim());
     }
 
     private String safeFilenamePart(String value) {

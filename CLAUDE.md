@@ -941,6 +941,12 @@ here as they are provided; do not invent unspecified behavior prematurely.
   - a BrickOwl source that fetches the order list and its detail batches, with a
     mapper that produces the marketplace order. Its batches stay in one source
     because they need the order ids the list returned.
+- BrickLink's own published store API is migrated as
+  `com.vastbricks.api.client.bricklink`, signed OAuth 1.0a. It is the other
+  half of BrickLink from `BrickStoreClient`, which reaches the pages a
+  signed-in store sees, and it is the only side that states an order as
+  BrickLink's own record of it. Reconciliation does not collect from it; the
+  order archive does.
 - Stripe and PayPal are both migrated into `vast-services`, each as a client
   with a payment source and one detail mapper per marketplace, since the two
   marketplaces label a payment differently. Every provider's base URL and
@@ -1129,6 +1135,46 @@ log. The rewrite's jobs feature is that shape with the account kept.
 - Acceptance tests are tech tests through those endpoints. The framework itself is driven by a test-only `Job` in
   `vast-acceptance-tests` that succeeds, fails, or blocks as a scenario tells it to, so what a run records can be
   tested without a provider.
+
+### BrickLink order archive requirements
+
+The first job of the rewrite, and the reason the feature exists. It keeps the store's own copy of what BrickLink
+held for an order, against the day BrickLink no longer holds it.
+
+- It runs nightly at 03:00, and archives every order BrickLink lists for the store.
+- Three files per order, named after the moment the order last changed — `api-<id>-<changed>.json`,
+  `accounting-<id>-<changed>.xml`, `vat-invoice-<id>-<changed>.pdf` — so an order that changes again is archived
+  again beside its earlier state rather than over it.
+- The API file is BrickLink's own response as it sent it, not a model of it written back out: an archive that
+  dropped a field the day BrickLink added it would be an archive of what the rewrite happened to parse.
+- The accounting export is the one a signed-in store sees, through `BrickStoreClient`. The VAT invoice is asked for
+  only where BrickLink states it collected the VAT, that being the only case in which it issued one.
+- An order whose files are all there is left alone, which is what makes running this nightly cheap. What is checked
+  is the file names, so an order whose state changed is not mistaken for one already archived.
+- One order that cannot be archived is counted and the run goes on: a provider that would not state one order has
+  not stopped the rest of the month from being archived. The tally is `archived`, `unchanged` and `failed`.
+- The archive is written under `<VAST_ORDER_ARCHIVE_DIR>/<tenant-code>/`. By tenant, because what is in it is
+  BrickLink's record of who bought what from that store; by code rather than by id, because a person looking in the
+  directory should see which store it holds.
+- `OrderArchive` is the feature's whole public API: the directory of the serving tenant, and archiving one order
+  by id. `vb-portal-api`'s archives screen calls it with no shim between them, being under `/api/private/**`, which
+  the rewrite's own interceptor authenticates in the legacy launcher exactly as it does in `vast-api` — so a legacy
+  screen already has a tenant bound by the time it asks.
+- The one caller with no tenant is the shipping label the BrickLink browser extension posts for, which comes from
+  the marketplace with no login anywhere in the flow and writes the VAT invoice it carries into the same archive.
+  It names its store by `VAST_LEGACY_TENANT_CODE`, as the extension's own token endpoint does, and binds it itself
+  rather than through a type in the archive feature: an endpoint that cannot say who it is for is that endpoint's
+  problem, and it goes when `vb-portal-api` does.
+- `BRICKLINK_ORDER_ARCHIVE_DIR` is gone: `VAST_ORDER_ARCHIVE_DIR` is the single source, overridable per tenant like
+  every other rewrite setting.
+- BrickLink's published store API is `com.vastbricks.api.client.bricklink`, signed one-legged OAuth 1.0a in the
+  `Authorization` header. The signing is written in the package rather than taken from a library: the one the
+  legacy client used is built on Apache HttpClient 4, which `vast-services` does not otherwise carry.
+- BrickLink answers a refused request with HTTP 200 and the refusal in the envelope's `meta`, so the status alone
+  says nothing and the client reads the code there. Without that check a request signed with the wrong credentials,
+  or made from an address the token is not whitelisted for, reads as a store with no orders — and an archive job
+  that reports having archived nothing is indistinguishable from one that had nothing to archive. The legacy client
+  did not check it either.
 
 ## Bank statement feature requirements
 

@@ -229,5 +229,9 @@
   "job-outcome-running": "Running",
   "job-outcome-succeeded": "Succeeded",
   "job-outcome-failed": "Failed",
-  "job-outcome-interrupted": "Interrupted"
+  "job-outcome-interrupted": "Interrupted",
+  "job-bricklink-order-archive": "BrickLink order archive",
+  "job-tally-archived": "archived",
+  "job-tally-unchanged": "unchanged",
+  "job-tally-failed": "failed"
 }

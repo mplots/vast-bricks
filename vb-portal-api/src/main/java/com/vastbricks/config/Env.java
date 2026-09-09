@@ -67,8 +67,8 @@ public class Env {
     @Value("#{environment.STRIPE_SECRET_KEY}")
     private String stripeSecretKey;
 
-    @Value("#{environment.BRICKLINK_ORDER_ARCHIVE_DIR ?: '/tmp/vast-bricks/order-archive'}")
-    private String brickLinkOrderArchiveDir;
+    @Value("#{environment.VAST_LEGACY_TENANT_CODE ?: ''}")
+    private String vastLegacyTenantCode;
 
     @Value("#{environment.BRICKSTORE_CLIENT_TOKEN}")
     private String brickStoreClientToken;

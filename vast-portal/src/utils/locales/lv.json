@@ -229,5 +229,9 @@
   "job-outcome-running": "Izpildās",
   "job-outcome-succeeded": "Izdevās",
   "job-outcome-failed": "Neizdevās",
-  "job-outcome-interrupted": "Pārtraukts"
+  "job-outcome-interrupted": "Pārtraukts",
+  "job-bricklink-order-archive": "BrickLink pasūtījumu arhīvs",
+  "job-tally-archived": "arhivēti",
+  "job-tally-unchanged": "nemainīti",
+  "job-tally-failed": "neizdevās"
 }

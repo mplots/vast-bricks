@@ -12,6 +12,7 @@ import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -38,6 +39,8 @@ public class BrickStoreClient {
     private static final String SESSION_PATH = "/api/v1/actions/verify-and-create-session";
     private static final String ORDER_EXPORT_PATH = "/orderExcelFinal.asp";
     private static final String ORDER_DETAIL_PATH = "/orderDetail.asp";
+    private static final String VAT_INVOICE_PATH = "/_file/orders/vat_invoice.file";
+    private static final byte[] PDF_SIGNATURE = {'%', 'P', 'D', 'F', '-'};
     // The detail page states a refund as "Total refunded: EUR&nbsp;12.34", and states it only when the order has one.
     private static final Pattern TOTAL_REFUNDED = Pattern.compile(
             "Total refunded:.*?<strong>\\s*([A-Za-z]{3})(?:&nbsp;|\\s)*([0-9,]+(?:\\.[0-9]+)?)\\s*</strong>",
@@ -116,6 +119,72 @@ public class BrickStoreClient {
                 List.of(configuredClientToken()),
                 () -> parseOrderRefund(getOrderDetail(id))
         );
+    }
+
+    /**
+     * The VAT invoice BrickLink issued for an order, as the PDF it serves.
+     *
+     * <p>Only an order BrickLink collected the VAT on has one. What comes back is checked for being a PDF rather
+     * than taken on the status alone: a session BrickLink no longer accepts answers a download with the login page,
+     * with a status that says nothing was wrong.
+     */
+    public byte[] downloadVatInvoice(String orderId) {
+        if (orderId == null || orderId.isBlank()) {
+            throw new IllegalArgumentException("orderId is required");
+        }
+        var id = orderId.trim();
+        return capture.record(
+                PROVIDER,
+                List.of(configuredClientToken()),
+                () -> vatInvoiceBodyOrThrow(getVatInvoice(id), id)
+        );
+    }
+
+    private BrickStoreResponse getVatInvoice(String orderId) {
+        var response = sendWithSession(token -> getVatInvoicePage(orderId, token));
+        if (authenticationExpired(response)) {
+            invalidateSessionToken(response.sessionToken);
+            response = sendWithSession(token -> getVatInvoicePage(orderId, token));
+        }
+        return response;
+    }
+
+    private BrickStoreResponse getVatInvoicePage(String orderId, String token) {
+        return exchange(() -> restClient().get()
+                .uri(resolve(VAT_INVOICE_PATH + "?oid=" + encode(orderId) + "&type=I"))
+                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_PDF_VALUE)
+                .header(CLIENT_ID_HEADER, CLIENT_ID)
+                .header(SESSION_TOKEN_HEADER, token)
+                .exchange((request, rawResponse) -> new BrickStoreResponse(
+                        rawResponse.getStatusCode().value(),
+                        rawResponse.getHeaders(),
+                        rawResponse.getBody().readAllBytes()
+                )), "BrickStore VAT invoice request failed");
+    }
+
+    private byte[] vatInvoiceBodyOrThrow(BrickStoreResponse response, String orderId) {
+        if (response.statusCode < 200 || response.statusCode >= 300) {
+            throw new BrickStoreClientException(
+                    "BrickStore VAT invoice download for order " + orderId + " failed with HTTP "
+                            + response.statusCode + redirectSuffix(response)
+            );
+        }
+        if (response.body == null || response.body.length == 0 || !isPdf(response.body)) {
+            throw new BrickStoreClientException(
+                    "BrickStore VAT invoice download for order " + orderId + " did not return a PDF"
+            );
+        }
+        return response.body;
+    }
+
+    private static boolean isPdf(byte[] body) {
+        var searchLength = Math.min(body.length, 1024);
+        for (var offset = 0; offset <= searchLength - PDF_SIGNATURE.length; offset++) {
+            if (Arrays.equals(body, offset, offset + PDF_SIGNATURE.length, PDF_SIGNATURE, 0, PDF_SIGNATURE.length)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private String getOrderDetail(String orderId) {
