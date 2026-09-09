@@ -78,6 +78,9 @@ const amountFields: string[] = [
   'gateway.facilitatorTax',
   'gateway.refundedAmount',
   'shipment.totalAmount',
+  'accounting.subTotal',
+  'accounting.vat',
+  'accounting.grandTotal',
   'calculated.targetInvoice'
 ];
 const dateFields: string[] = ['order.orderDate'];

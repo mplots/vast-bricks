@@ -28,6 +28,9 @@ export const orderFields = [
   'gateway.facilitatorTax',
   'gateway.refundedAmount',
   'shipment.totalAmount',
+  'accounting.subTotal',
+  'accounting.vat',
+  'accounting.grandTotal',
   'calculated.targetInvoice'
 ] as const;
 // Fields shown as table columns; the detail view shows all of them.
@@ -43,6 +46,9 @@ export const orderFields = [
 //
 // What the payment paid and what it shows the marketplace took come last together, so they read as one account of
 // the payment rather than interrupting that subtraction.
+//
+// The accounting invoice's own three amounts are choosable but not shown: nothing compares them against the order
+// yet, so a reader who wants to see what an order was invoiced for asks for them.
 export const columnFields: string[] = [
   'order.source',
   'order.orderId',

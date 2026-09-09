@@ -1,5 +1,6 @@
 package com.vastbricks.api.reconciliation;
 
+import static com.vastbricks.api.reconciliation.ReconciliationFieldSource.ACCOUNTING;
 import static com.vastbricks.api.reconciliation.ReconciliationFieldSource.CALCULATED;
 import static com.vastbricks.api.reconciliation.ReconciliationFieldSource.GATEWAY;
 import static com.vastbricks.api.reconciliation.ReconciliationFieldSource.ORDER;
@@ -43,6 +44,10 @@ public enum ReconciliationOrderField {
     GATEWAY_REFUNDED_AMOUNT("gateway.refundedAmount", GATEWAY),
 
     SHIPMENT_TOTAL_AMOUNT("shipment.totalAmount", SHIPMENT),
+
+    ACCOUNTING_SUB_TOTAL("accounting.subTotal", ACCOUNTING),
+    ACCOUNTING_VAT("accounting.vat", ACCOUNTING),
+    ACCOUNTING_GRAND_TOTAL("accounting.grandTotal", ACCOUNTING),
 
     CALCULATED_TARGET_INVOICE("calculated.targetInvoice", CALCULATED);
 

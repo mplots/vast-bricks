@@ -196,17 +196,36 @@ here as they are provided; do not invent unspecified behavior prematurely.
   rule failures and the links to the order
   and its payment, each exposed beside the field it rides on. Add further fields
   and providers incrementally as their processing requirements are supplied.
+- The accounting source collects the invoice that was actually written for the
+  order: its sub-total, the VAT it charges and the grand total it comes to. All
+  three come from one Manakabata invoice, so they are collected together or not
+  at all — an order with a sub-total and no grand total would be an invoice that
+  stated one and not the other, which is a different fact from no invoice having
+  been matched. An order no invoice was matched to carries none of the three,
+  which is itself the fact that it has not been invoiced.
+- An accounting invoice names no order of its own, so it is matched on the note
+  the `invoice` feature writes it with, `<marketplace>:<orderId>`, and the
+  legacy `<Marketplace> order <orderId>` wording is read as well. The first
+  invoice of an order wins. That note is the whole of the join between the two
+  features, which is why the `invoice` feature must go on writing it.
+- Manakabata's list endpoint offers no filter beyond the page size, and an order
+  may be invoiced outside the month it was placed in, so the whole invoice list
+  is fetched and the mapper searches it for the month's orders. The source
+  therefore ignores the month it is given.
+- No rule compares the invoice against the order yet. The three fields are
+  collected so a rule can be added later without touching the sourcing or the
+  screen; they are choosable columns rather than shown ones until something
+  compares them.
 - Every field belongs to one of five sources, and reconciliation is the business
   of holding those accounts of one order against each other: `order` is what the
   marketplace reported about the order itself, `gateway` what the payment
   provider reports about the payment matched to it, `shipment` what the shipping
   provider reports about the shipment sent for it, `accounting` what the
   accounting system holds for it, and `calculated` what is derived from the rest
-  rather than stated by anyone. Nothing is collected from the accounting system
-  yet.
+  rather than stated by anyone.
 - The source is structural, not a naming convention. An order carries one group
-  per source — `order`, `gateway`, `shipment`, `calculated` — and a field is
-  addressed
+  per source — `order`, `gateway`, `shipment`, `accounting`, `calculated` — and
+  a field is addressed
   as `<source>.<field>`, the path it actually sits at. Do not prefix a field
   name with its source: the path already says it, and a prefix says it twice
   while stuttering on the fields that need it least (`orderOrderId`) and
@@ -219,8 +238,8 @@ here as they are provided; do not invent unspecified behavior prematurely.
   twice, which is exactly what the rule comparing them is for. Reach for that
   whenever a second source reports something the first already does, rather than
   inventing a second name for it.
-- A source nothing is collected from yet carries no group. The accounting source
-  is declared and has none.
+- A source nothing is collected from yet carries no group. Every declared source
+  now has one.
 - Each field declares its source on `ReconciliationOrderField`, and the orders
   response reports the whole roster as `fields`, every field named by its path
   and attributed to its source. It rides with the orders rather than in an
@@ -637,8 +656,9 @@ here as they are provided; do not invent unspecified behavior prematurely.
   reconciliation screen.
 - A source, its carrier type, and its mappers live in a subpackage named after
   the reconciliation category they serve: `reconciliation.order`,
-  `reconciliation.payment`, `reconciliation.shipping`, and later the store
-  synchronization one. Category, not provider: a category is the
+  `reconciliation.payment`, `reconciliation.shipping`,
+  `reconciliation.accounting`, and later the store synchronization one.
+  Category, not provider: a category is the
   vocabulary the requirements use, a provider's transport knowledge already
   lives in its `com.vastbricks.api.client.<provider>` package, and the
   categories stay a bounded set as providers are added.
@@ -1003,9 +1023,9 @@ here as they are provided; do not invent unspecified behavior prematurely.
   the register through it as one source among several; see "Shipment register
   requirements".
 - The current accounting client implementation is Manakabata, migrated into
-  `vast-services`: the `invoice` feature creates invoices for an order.
-  Reconciliation does not collect them — nothing compares an order against what
-  it was invoiced for. A provider has one root client per feature, and a client
+  `vast-services`: the `invoice` feature creates invoices for an order, and
+  reconciliation's accounting source collects them back to show what each order
+  was invoiced for. A provider has one root client per feature, and a client
   stays transport: what an invoice says is decided by the `invoice` feature, not
   by `ManakabataClient`.
 - The current e-commerce store synchronization client implementation is
@@ -1871,6 +1891,76 @@ reconciliation: the reconciliation screen is its first caller, not its owner.
   a scenario is one marketplace's tax fields and the type they come to. It is
   not tested through the reconciliation order scenarios: those cover that the
   mapping stage collects the type onto an order, not what the type is.
+
+## Invoice feature requirements
+
+The invoice feature creates the accounting invoice for one marketplace order:
+the order is looked up at its marketplace, its buyer is upserted as an
+accounting client, and one invoice line is written for what the order is the
+store's to invoice for. Adding a marketplace is one more `InvoiceOrderSource`.
+
+- The VAT rate the invoice is issued under is decided by the order's tax type
+  and by nothing else: `domestic` and `european-union` at the Latvian 21%,
+  `export` and `export-taxable` at 0%. An export the marketplace taxed under
+  its own registration still carries no VAT of the store's, that tax not being
+  the store's to charge.
+- The tax type comes from the shared `tax` feature rather than being derived
+  again here, so the invoice and the reconciliation screen can never disagree
+  about how one order is treated. Reconciliation reads the same feature; neither
+  screen owns it.
+- An order with no tax type is not invoiced at all: how the sale is treated for
+  tax is what decides the rate, and there is no rate to fall back on. It is
+  rejected by the order source, before the buyer's accounting client is written,
+  so a failed invoice leaves nothing behind.
+- The amount invoiced is the grand total less what the marketplace collected as
+  tax facilitator, which is the same subtraction reconciliation's target invoice
+  makes and for the same reason: that tax was charged under the marketplace's
+  registration. Only an `export-taxable` order has one, so every other type
+  invoices its whole grand total. An order reporting no grand total is rejected.
+- The refund reconciliation's target invoice also subtracts is not subtracted
+  here. An invoice is generated for an order to be invoiced, not for one whose
+  money has come back; what a refunded order should be invoiced for has no
+  requirement yet.
+- Two things a Latvian invoice needs are not fields on the invoice at all. The
+  signature note a document is printed with (`Elektronisks dokuments, derīgs bez
+  paraksta`) is a property of the Manakabata **invoice type**, and the VAT
+  reference printed beside an untaxed line (`Preču eksports`, Directive
+  2006/112/EK art. 146(1)(a)) is a property of the **VAT rate**.
+- **Neither can be set through the API, and neither is attempted.** Both were
+  implemented and reverted: the invoice type and the per-line VAT rate are
+  settable in the request, but no combination of them makes Manakabata print
+  either note on a generated document. Manakabata's support has been asked, so
+  this is settled by their answer rather than by another attempt from here. Do
+  not reintroduce a setting, a per-line `invoice_vat`, or a custom invoice type
+  for these until that answer says how.
+- So the invoice type stays the built-in `bill_of_landing` key and a line states
+  its VAT as a bare `tax` percent, which is what the API does without either.
+  Both notes are set by hand in the Manakabata interface for now.
+- What the API listings do say is worth keeping, because it rules out the
+  obvious retries. `signature_type` is a field of the invoice type, not of the
+  invoice: the built-in `product` types are `prepayment` and `credit` at
+  `electronic_without_signature` and `bill_of_landing` at
+  `paper_with_signature_fields`, all three `is_system: true`. And an account's
+  VAT rate list comes back **empty**, the built-in 21/12/5/0 rates being
+  implicit options rather than records, so there is no zero-rated rate carrying
+  a `vat_reference` for a line to point at.
+- The published specification types the recipient, numerator and bank-account
+  fields as arrays of strings where the API expects lookup objects, which is why
+  `ManakabataInvoiceRequest` is handwritten. `invoice_vat` is a fourth such
+  field, but nothing sends it.
+- A marketplace states its totals with the tax it charged included, while
+  Manakabata reads a line's price as the price before VAT and adds the rate back
+  on top. So the rate is taken out of the amount once, in `InvoiceVat`, and the
+  invoice comes to what the order actually did. Line prices are two decimals,
+  `HALF_UP`.
+- The invoice note stays `<marketplace>:<orderId>`. It is not decoration: it is
+  the only thing tying an invoice back to its order, and reconciliation's
+  accounting source reads it to collect what an order was invoiced for. Changing
+  it silently unmatches every invoice already written.
+- Acceptance tests are tech tests against a mocked marketplace and a mocked
+  Manakabata: one scenario per tax type states the marketplace's own tax fields
+  and asserts the rate and the price of the invoice line it comes to. What the
+  type itself is stays a logic test of the `tax` feature.
 
 ## Order financials feature requirements
 

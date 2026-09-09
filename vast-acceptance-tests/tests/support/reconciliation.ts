@@ -106,6 +106,17 @@ export type PayPalTransactionMock = {
   referenceId?: string;
 };
 
+/** One accounting invoice Manakabata holds. It names its order in the note the `invoice` feature writes. */
+export type ManakabataInvoiceMock = {
+  /** Source/order key, e.g. `bricklink:32466549`; legacy `BrickLink order 32466549` is also accepted. */
+  invoiceNote: string;
+  subtotal: string;
+  /** VAT the invoice charges. Defaults to none charged, as an export is invoiced. */
+  tax?: string;
+  /** What the invoice comes to with VAT. Defaults to the sub-total plus the tax. */
+  total?: string;
+};
+
 export type ReconciliationProviders = {
   /** Reconciled month, as sent to the API. BrickOwl only serves order details for orders within it. */
   month?: string;
@@ -126,6 +137,8 @@ export type ReconciliationProviders = {
   mansPasts?: MansPastsShipmentMock[];
   /** Mocks Mans Pasts refusing the sign-in, for the scenario about a provider that would not answer. */
   mansPastsRefusesLogin?: boolean;
+  /** Accounting invoices Manakabata holds. Defaults to none, so no order is invoiced. */
+  manakabata?: ManakabataInvoiceMock[];
 };
 
 /**
@@ -164,8 +177,49 @@ export async function mockReconciliationOrders(
   } else {
     await stubMansPasts(wireMock, settings, [providers.mansPasts ?? []]);
   }
+  await mockManakabata(wireMock, settings, providers.manakabata ?? []);
 
   return wireMock;
+}
+
+async function mockManakabata(
+  wireMock: WireMockApi,
+  settings: SettingsOverrides,
+  invoices: ManakabataInvoiceMock[],
+) {
+  await settings.set("VAST_MANAKABATA_BASE_URL", wireMock.baseUrl);
+  await settings.setSecret(
+    "VAST_MANAKABATA_API_TOKEN",
+    "test-manakabata-api-token",
+  );
+  await wireMock.addMethodHostMapping("GET", "/invoices", {
+    response: {
+      json: {
+        data: invoices.map((invoice, index) => {
+          const tax = invoice.tax ?? "0.00";
+          return {
+            uuid: `00000000-0000-0000-0000-${String(index + 1).padStart(12, "0")}`,
+            invoice_number: `${index + 1}/0001EC`,
+            invoice_note: invoice.invoiceNote,
+            currency: "EUR",
+            subtotal: invoice.subtotal,
+            tax,
+            total:
+              invoice.total ??
+              (Number(invoice.subtotal) + Number(tax)).toFixed(2),
+            products: [],
+          };
+        }),
+        links: { first: null, last: null, prev: null, next: null },
+        meta: {
+          current_page: 1,
+          last_page: 1,
+          per_page: invoices.length,
+          total: invoices.length,
+        },
+      },
+    },
+  });
 }
 
 async function mockBrickLink(

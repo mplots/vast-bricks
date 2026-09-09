@@ -175,6 +175,11 @@ test("lists BrickLink reconciliation orders for the selected month", async ({
           paymentUrl: null,
         },
         shipment: { totalAmount: null },
+        accounting: {
+          subTotal: null,
+          vat: null,
+          grandTotal: null,
+        },
         calculated: {
           targetInvoice: null,
         },
@@ -206,6 +211,11 @@ test("lists BrickLink reconciliation orders for the selected month", async ({
           paymentUrl: null,
         },
         shipment: { totalAmount: null },
+        accounting: {
+          subTotal: null,
+          vat: null,
+          grandTotal: null,
+        },
         calculated: {
           targetInvoice: 3.44,
         },
@@ -300,6 +310,11 @@ test("lists BrickOwl reconciliation orders for the selected month", async ({
           paymentUrl: null,
         },
         shipment: { totalAmount: null },
+        accounting: {
+          subTotal: null,
+          vat: null,
+          grandTotal: null,
+        },
         calculated: {
           targetInvoice: null,
         },
@@ -333,6 +348,11 @@ test("lists BrickOwl reconciliation orders for the selected month", async ({
           paymentUrl: null,
         },
         shipment: { totalAmount: null },
+        accounting: {
+          subTotal: null,
+          vat: null,
+          grandTotal: null,
+        },
         calculated: {
           targetInvoice: 5.2,
         },
@@ -461,6 +481,11 @@ test("lists BrickOwl reconciliation orders that span several batch requests", as
       paymentUrl: null,
     },
     shipment: { totalAmount: null },
+    accounting: {
+      subTotal: null,
+      vat: null,
+      grandTotal: null,
+    },
     calculated: {
       targetInvoice: null,
     },
@@ -581,6 +606,9 @@ test("reports every order field with the source that stated it", async ({
     { name: "gateway.facilitatorTax", source: "gateway" },
     { name: "gateway.refundedAmount", source: "gateway" },
     { name: "shipment.totalAmount", source: "shipment" },
+    { name: "accounting.subTotal", source: "accounting" },
+    { name: "accounting.vat", source: "accounting" },
+    { name: "accounting.grandTotal", source: "accounting" },
     { name: "calculated.targetInvoice", source: "calculated" },
   ]);
   // A field sits at the path that names it, so the two accounts of one refund carry one name under two sources.
@@ -1475,6 +1503,90 @@ test("sums the partner fees PayPal raised against one BrickLink payment", async 
   expect(body.orders[0].order.facilitatorTax).toBe(1.97);
   expect(body.orders[0].gateway.facilitatorTax).toBe(1.97);
   expect(body.orders[0].failures).toEqual([]);
+});
+
+test("collects the accounting invoice onto the order it notes", async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: "2026-09",
+    brickLink: {
+      fullNameOrdersXml: brickLinkOrdersXml(
+        brickLinkOrderXml("32466549", "5.00", [["2.5000", "2"]], "9/1/2026"),
+      ),
+      usernameOrdersXml: emptyOrdersXml,
+    },
+    manakabata: [
+      { invoiceNote: "bricklink:32466549", subtotal: "5.00", tax: "1.05" },
+    ],
+  });
+
+  const response = await request.get(
+    "/api/private/reconciliation/orders?month=2026-09",
+  );
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  // All three amounts come from the one invoice, so they are merged together or not at all.
+  expect(body.orders[0].accounting).toEqual({
+    subTotal: 5,
+    vat: 1.05,
+    grandTotal: 6.05,
+  });
+});
+
+test("collects an accounting invoice noted in the legacy format", async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: "2026-09",
+    brickLink: {
+      fullNameOrdersXml: brickLinkOrdersXml(
+        brickLinkOrderXml("32466553", "5.00", [["2.5000", "2"]], "9/1/2026"),
+      ),
+      usernameOrdersXml: emptyOrdersXml,
+    },
+    manakabata: [{ invoiceNote: "BrickLink order 32466553", subtotal: "5.00" }],
+  });
+
+  const response = await request.get(
+    "/api/private/reconciliation/orders?month=2026-09",
+  );
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  expect(body.orders[0].accounting.subTotal).toBe(5);
+});
+
+test("leaves an order no accounting invoice notes uninvoiced", async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: "2026-09",
+    brickLink: {
+      fullNameOrdersXml: brickLinkOrdersXml(
+        brickLinkOrderXml("32466561", "5.00", [["2.5000", "2"]], "9/1/2026"),
+      ),
+      usernameOrdersXml: emptyOrdersXml,
+    },
+    // An invoice noting another order, so the list is searched rather than taken as this order's.
+    manakabata: [{ invoiceNote: "bricklink:32466562", subtotal: "5.00" }],
+  });
+
+  const response = await request.get(
+    "/api/private/reconciliation/orders?month=2026-09",
+  );
+
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  expect(body.orders[0].accounting).toEqual({
+    subTotal: null,
+    vat: null,
+    grandTotal: null,
+  });
 });
 
 test("links each order to where its own marketplace shows it", async ({

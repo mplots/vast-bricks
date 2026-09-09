@@ -23,7 +23,7 @@ test('generates an invoice for a BrickLink order and creates its accounting clie
       orderDate: '8/30/2026',
       buyer: 'Ada Lovelace',
       buyerUsername: 'ada-l',
-      subTotal: '12.34'
+      grandTotal: '12.34'
     }
   });
 
@@ -83,7 +83,8 @@ test('generates an invoice for a BrickLink order and creates its accounting clie
         name: 'LEGO parts',
         measurement: 'pieces',
         quantity: 1,
-        price: 12.34,
+        // A domestic order is invoiced at the Latvian rate, so its grand total is priced without the VAT in it.
+        price: 10.2,
         discount_type: 'flat',
         category: null,
         code: null,
@@ -105,7 +106,9 @@ test('generates an invoice for a BrickOwl order', async ({ request, settings }, 
         billing_first_name: 'Grace',
         billing_last_name: 'Hopper',
         iso_order_time: '2026-08-31T10:15:30+03:00',
-        sub_total: '7.50'
+        base_order_total: '7.50',
+        tax_rate: '21',
+        billing_country_code: 'LV'
       }
     }
   });
@@ -125,7 +128,7 @@ test('generates an invoice for a BrickOwl order', async ({ request, settings }, 
   expect(JSON.parse(createdInvoices[0].text())).toMatchObject({
     invoice_note: 'brickowl:10574321',
     invoiced_at: '2026-08-31',
-    products: [{ name: 'LEGO parts', quantity: 1, price: 7.5, tax: 21 }]
+    products: [{ name: 'LEGO parts', quantity: 1, price: 6.2, tax: 21 }]
   });
 });
 
@@ -177,15 +180,133 @@ test('rejects a request that does not identify one order', async ({ request, set
   expect(unknownOrder.status(), await unknownOrder.text()).toBe(400);
 });
 
-test('rejects an order that reports no sub-total to invoice', async ({ request, settings }, testInfo) => {
+test('rejects an order that reports no grand total to invoice', async ({ request, settings }, testInfo) => {
   const wireMock = await mockInvoiceGeneration(settings, request, testInfo, {
-    brickLink: { orderId: '32466554', buyerUsername: 'ada-l', subTotal: null }
+    brickLink: { orderId: '32466554', buyerUsername: 'ada-l', grandTotal: null }
   });
 
   const response = await request.post(endpoint, { data: { orderId: '32466554', source: 'BrickLink' } });
 
   expect(response.status(), await response.text()).toBe(400);
   expect(await wireMock.findMethodHostRequests('POST', '/invoices')).toHaveLength(0);
+});
+
+test('rejects an order the marketplace said too little to type for tax', async ({
+  request,
+  settings
+}, testInfo) => {
+  // No VATCHARGES element at all leaves the order untyped, and the rate follows from the type.
+  const wireMock = await mockInvoiceGeneration(settings, request, testInfo, {
+    brickLink: { orderId: '32466555', buyerUsername: 'ada-l', vatCharges: null }
+  });
+
+  const response = await request.post(endpoint, { data: { orderId: '32466555', source: 'BrickLink' } });
+
+  expect(response.status(), await response.text()).toBe(400);
+  expect(await wireMock.findMethodHostRequests('POST', '/invoices')).toHaveLength(0);
+  expect(await wireMock.findMethodHostRequests('POST', '/clients')).toHaveLength(0);
+});
+
+test('invoices an order sold into another member state at the Latvian rate', async ({
+  request,
+  settings
+}, testInfo) => {
+  const wireMock = await mockInvoiceGeneration(settings, request, testInfo, {
+    brickLink: {
+      orderId: '32466556',
+      buyerUsername: 'ada-l',
+      grandTotal: '24.20',
+      vatCharges: '4.20',
+      location: 'Germany, Berlin'
+    }
+  });
+
+  const response = await request.post(endpoint, { data: { orderId: '32466556', source: 'BrickLink' } });
+
+  expect(response.status(), await response.text()).toBe(200);
+  const createdInvoices = await wireMock.findMethodHostRequests('POST', '/invoices');
+  expect(JSON.parse(createdInvoices[0].text())).toMatchObject({
+    products: [{ price: 20, tax: 21 }]
+  });
+});
+
+test('invoices an untaxed export at no VAT and for its whole grand total', async ({
+  request,
+  settings
+}, testInfo) => {
+  const wireMock = await mockInvoiceGeneration(settings, request, testInfo, {
+    brickLink: {
+      orderId: '32466557',
+      buyerUsername: 'ada-l',
+      grandTotal: '24.20',
+      vatCharges: '0.00',
+      location: 'Canada, Toronto'
+    }
+  });
+
+  const response = await request.post(endpoint, { data: { orderId: '32466557', source: 'BrickLink' } });
+
+  expect(response.status(), await response.text()).toBe(200);
+  const createdInvoices = await wireMock.findMethodHostRequests('POST', '/invoices');
+  expect(JSON.parse(createdInvoices[0].text())).toMatchObject({
+    products: [{ price: 24.2, tax: 0 }]
+  });
+});
+
+test('invoices an export the marketplace taxed for its grand total less that tax', async ({
+  request,
+  settings
+}, testInfo) => {
+  // BrickLink splits what it collected as facilitator between the two jurisdictions it charges under.
+  const wireMock = await mockInvoiceGeneration(settings, request, testInfo, {
+    brickLink: {
+      orderId: '32466558',
+      buyerUsername: 'ada-l',
+      grandTotal: '24.20',
+      vatCharges: '0.00',
+      salesTax: '1.50',
+      vat: '0.70',
+      location: 'Australia, Sydney'
+    }
+  });
+
+  const response = await request.post(endpoint, { data: { orderId: '32466558', source: 'BrickLink' } });
+
+  expect(response.status(), await response.text()).toBe(200);
+  const createdInvoices = await wireMock.findMethodHostRequests('POST', '/invoices');
+  expect(JSON.parse(createdInvoices[0].text())).toMatchObject({
+    products: [{ price: 22, tax: 0 }]
+  });
+});
+
+test('invoices a BrickOwl export the marketplace taxed for its grand total less that tax', async ({
+  request,
+  settings
+}, testInfo) => {
+  const wireMock = await mockInvoiceGeneration(settings, request, testInfo, {
+    brickOwl: {
+      orderId: '10574322',
+      view: {
+        customer_user_id: '9912',
+        billing_first_name: 'Grace',
+        billing_last_name: 'Hopper',
+        iso_order_time: '2026-08-31T10:15:30+03:00',
+        base_order_total: '24.20',
+        tax_scheme_id: 'au-gst',
+        tax_rate: '10',
+        tax_amount: '2.20',
+        billing_country_code: 'AU'
+      }
+    }
+  });
+
+  const response = await request.post(endpoint, { data: { orderId: '10574322', source: 'BrickOwl' } });
+
+  expect(response.status(), await response.text()).toBe(200);
+  const createdInvoices = await wireMock.findMethodHostRequests('POST', '/invoices');
+  expect(JSON.parse(createdInvoices[0].text())).toMatchObject({
+    products: [{ price: 22, tax: 0 }]
+  });
 });
 
 test('reports a rejected Manakabata invoice as a bad gateway', async ({ request, settings }, testInfo) => {

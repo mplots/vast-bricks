@@ -16,8 +16,16 @@ export type BrickLinkOrderMock = {
   orderDate?: string;
   buyer?: string;
   buyerUsername?: string;
-  /** Order sub-total, or `null` for an export that reports none. */
-  subTotal?: string | null;
+  /** `BASEGRANDTOTAL`, or `null` for an export that reports none. */
+  grandTotal?: string | null;
+  /** `VATCHARGES`, the VAT the store charged under its own registration. Defaults to a domestic charge. */
+  vatCharges?: string | null;
+  /** `LOCATION`, which the export names the buyer's country first in. Defaults to Latvia. */
+  location?: string;
+  /** `ORDERSALESTAX`, one of the two taxes the marketplace charges as facilitator. */
+  salesTax?: string;
+  /** `ORDERVAT`, the other. */
+  vat?: string;
 };
 
 export type BrickOwlOrderMock = {
@@ -109,13 +117,18 @@ async function addBrickLinkOrderExportMapping(
 }
 
 const orderXml = (order: BrickLinkOrderMock, buyer: string) => {
-  const subTotal = order.subTotal === undefined ? '5.00' : order.subTotal;
+  const grandTotal = order.grandTotal === undefined ? '5.00' : order.grandTotal;
+  const vatCharges = order.vatCharges === undefined ? '0.87' : order.vatCharges;
   return `
   <ORDER>
     <ORDERID>${order.orderId}</ORDERID>
     <ORDERDATE>${order.orderDate ?? '8/30/2026'}</ORDERDATE>
     <BUYER>${buyer}</BUYER>
-    ${subTotal === null ? '' : `<ORDERTOTAL>${subTotal}</ORDERTOTAL>`}
+    ${grandTotal === null ? '' : `<BASEGRANDTOTAL>${grandTotal}</BASEGRANDTOTAL>`}
+    ${vatCharges === null ? '' : `<VATCHARGES>${vatCharges}</VATCHARGES>`}
+    <LOCATION>${order.location ?? 'Latvia, Riga'}</LOCATION>
+    <ORDERSALESTAX>${order.salesTax ?? '0.00'}</ORDERSALESTAX>
+    <ORDERVAT>${order.vat ?? '0.00'}</ORDERVAT>
     <BASECURRENCYCODE>EUR</BASECURRENCYCODE>
   </ORDER>`;
 };

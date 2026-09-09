@@ -4,6 +4,8 @@ import com.vastbricks.api.client.brickstore.BrickStoreClient;
 import com.vastbricks.api.client.brickstore.BrickStoreOrder;
 import com.vastbricks.api.client.brickstore.BrickStoreOrderExportRequest;
 import com.vastbricks.api.client.brickstore.BrickStoreOrderType;
+import com.vastbricks.api.tax.FacilitatorTaxes;
+import com.vastbricks.api.tax.OrderTaxTypes;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -38,14 +40,21 @@ class BrickLinkInvoiceOrderSource implements InvoiceOrderSource {
         if (fullNameOrder.getOrderDate() == null) {
             throw new InvoiceException("BrickLink order has no order date");
         }
-        if (fullNameOrder.getTotal() == null) {
-            throw new InvoiceException("BrickLink order has no sub-total");
+        if (fullNameOrder.getBaseGrandTotal() == null) {
+            throw new InvoiceException("BrickLink order has no grand total");
+        }
+        // The tax type decides the rate the invoice is issued under, so an order the export said too little to type
+        // is rejected here rather than after its accounting client has already been written.
+        if (OrderTaxTypes.of(fullNameOrder) == null) {
+            throw new InvoiceException("BrickLink order has no tax type");
         }
         return new InvoiceOrder(
                 marketplace().key() + ":customer:" + username,
                 name,
                 fullNameOrder.getOrderDate(),
-                fullNameOrder.getTotal()
+                OrderTaxTypes.of(fullNameOrder),
+                fullNameOrder.getBaseGrandTotal(),
+                FacilitatorTaxes.of(fullNameOrder)
         );
     }
 

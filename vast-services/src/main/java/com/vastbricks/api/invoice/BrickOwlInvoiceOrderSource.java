@@ -5,6 +5,8 @@ import com.vastbricks.api.client.brickowl.BrickOwlBatchResponse;
 import com.vastbricks.api.client.brickowl.BrickOwlClient;
 import com.vastbricks.api.client.brickowl.BrickOwlClientException;
 import com.vastbricks.api.client.brickowl.BrickOwlOrder;
+import com.vastbricks.api.tax.FacilitatorTaxes;
+import com.vastbricks.api.tax.OrderTaxTypes;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -46,14 +48,20 @@ class BrickOwlInvoiceOrderSource implements InvoiceOrderSource {
         if (orderTime == null) {
             throw new InvoiceException("BrickOwl order has no order date");
         }
-        if (order.getSubTotal() == null) {
-            throw new InvoiceException("BrickOwl order has no sub-total");
+        if (order.getBaseOrderTotal() == null) {
+            throw new InvoiceException("BrickOwl order has no grand total");
+        }
+        // Rejected here for the same reason as on BrickLink: without a tax type there is no rate to invoice under.
+        if (OrderTaxTypes.of(order) == null) {
+            throw new InvoiceException("BrickOwl order has no tax type");
         }
         return new InvoiceOrder(
                 marketplace().key() + ":customer:" + customerId,
                 name,
                 orderTime.toLocalDate(),
-                order.getSubTotal()
+                OrderTaxTypes.of(order),
+                order.getBaseOrderTotal(),
+                FacilitatorTaxes.of(order)
         );
     }
 

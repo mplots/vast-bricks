@@ -14,11 +14,10 @@ import lombok.Getter;
  * {@code <source>.<field>} throughout: that is how the roster names it, how a failure cites it, and how the screen
  * asks for it as a column.
  *
- * <p>A source nothing is collected from yet has no group here. The accounting source is declared on
- * {@link ReconciliationFieldSource} and will gain one when something collects it.
+ * <p>A source nothing is collected from yet has no group here.
  */
 @Getter
-@JsonPropertyOrder({"order", "gateway", "shipment", "calculated"})
+@JsonPropertyOrder({"order", "gateway", "shipment", "accounting", "calculated"})
 public class ReconciledOrder {
 
     /** What the marketplace reported about the order itself, which the rest is reconciled against. */
@@ -29,6 +28,9 @@ public class ReconciledOrder {
 
     /** What the shipping provider reports about the shipment sent for the order. */
     private final ShipmentFields shipment = new ShipmentFields();
+
+    /** What the accounting system holds for the order: the invoice that was written for it. */
+    private final AccountingFields accounting = new AccountingFields();
 
     private ReconciledOrder(OrderFields order) {
         this.order = order;

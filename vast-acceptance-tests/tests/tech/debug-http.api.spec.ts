@@ -64,6 +64,7 @@ test("records the provider calls of a request made while recording", async ({
   expect(providersOf(exchanges)).toEqual([
     "BrickLink",
     "BrickOwl",
+    "Manakabata",
     "Mans Pasts",
     "PayPal",
     "Stripe",

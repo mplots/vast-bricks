@@ -75,6 +75,19 @@ export interface ReconciliationShipmentFields {
   totalAmount: number | null;
 }
 
+/**
+ * What the accounting system holds for the order: the invoice that was written for it. Every field is `null` on an
+ * order no invoice was matched to, which is itself the fact that the order has not been invoiced.
+ */
+export interface ReconciliationAccountingFields {
+  /** What the invoice was written for before VAT. */
+  subTotal: number | null;
+  /** The VAT the invoice charges on that sub-total. */
+  vat: number | null;
+  /** What the invoice comes to with VAT, which is what the buyer is billed. */
+  grandTotal: number | null;
+}
+
 /** What reconciliation derives from the collected sources rather than any of them stating it. */
 export interface ReconciliationCalculatedFields {
   /**
@@ -88,6 +101,7 @@ export interface ReconciliationOrder {
   order: ReconciliationOrderFields;
   gateway: ReconciliationGatewayFields;
   shipment: ReconciliationShipmentFields;
+  accounting: ReconciliationAccountingFields;
   calculated: ReconciliationCalculatedFields;
   failures: ReconciliationFailure[];
 }

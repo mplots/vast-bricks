@@ -6,7 +6,6 @@ import com.vastbricks.api.client.manakabata.ManakabataUuidReference;
 import com.vastbricks.api.client.manakabata.model.PersonTypeEnum;
 import com.vastbricks.api.client.manakabata.model.StoreClientRequest;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -27,8 +26,6 @@ class InvoiceRequestFactory {
     private static final BigDecimal LINE_QUANTITY = BigDecimal.ONE;
     private static final String LINE_DISCOUNT_TYPE = "flat";
     private static final BigDecimal LINE_DISCOUNT = BigDecimal.ZERO;
-    private static final BigDecimal LINE_TAX = BigDecimal.valueOf(21);
-    private static final int AMOUNT_SCALE = 2;
 
     private final InvoiceSettings settings;
 
@@ -66,26 +63,25 @@ class InvoiceRequestFactory {
                 .teamBankAccount(new ManakabataUuidReference(
                         required(settings.getTeamBankAccountUuid(), "Team bank account UUID is not configured")
                 ))
-                .products(List.of(invoiceLine(order.getSubTotal())))
+                .products(List.of(invoiceLine(order)))
                 .build();
     }
 
     /**
-     * The single line the invoice is issued for. Its price is the amount reconciliation compares against the order, so
-     * it is rounded the way the order sub-total itself is; Manakabata reads the price as the price without VAT.
+     * The single line the invoice is issued for, priced at what the order is the store's to invoice for and taxed at
+     * the rate its tax type decides. Manakabata reads the price as the price without VAT and adds the rate back on
+     * top, so the line's own total comes to the amount the order did.
      */
-    private ManakabataInvoiceLine invoiceLine(BigDecimal subTotal) {
-        if (subTotal == null) {
-            throw new InvoiceException("Order has no sub-total to invoice");
-        }
+    private ManakabataInvoiceLine invoiceLine(InvoiceOrder order) {
+        var vat = InvoiceVat.of(order.getTaxType());
         return ManakabataInvoiceLine.builder()
                 .name(LINE_NAME)
                 .measurement(LINE_MEASUREMENT)
                 .quantity(LINE_QUANTITY)
-                .price(subTotal.setScale(AMOUNT_SCALE, RoundingMode.HALF_UP))
+                .price(vat.netOf(order.invoicedAmount()))
                 .discountType(LINE_DISCOUNT_TYPE)
                 .discount(LINE_DISCOUNT)
-                .tax(LINE_TAX)
+                .tax(vat.getRate())
                 .build();
     }
 
