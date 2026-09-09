@@ -1079,6 +1079,57 @@ covers every provider call the backend makes rather than one screen's.
   not open, and the toolbar states how many are stored and what they weigh, so Clear says
   what it would delete.
 
+## Scheduled jobs feature requirements
+
+Some of the backend's work is not a request: an archive is taken nightly, a catalog is synchronised, a store is
+scraped. The legacy application has seven such jobs, each with a cron and a trigger endpoint, and between runs they
+say nothing — whether one is working, whether last night's failed, and what it did are readable only in the server
+log. The rewrite's jobs feature is that shape with the account kept.
+
+- A job is a class implementing `Job` in `com.vastbricks.api.job`, declared as a bean in the feature package of the
+  work it does. The `job` package holds the boundary, the run store, the scheduler and the screen's endpoints, and
+  never a job implementation: a job in there would make it the layer package the rewrite does not have.
+- Adding a job changes nothing else. It states its code, the cron it fires on if it has one, and what its run came
+  to. The scheduler, the endpoints and the screen follow.
+- A job is tenant-specific, and which tenants a firing means is the difference between the two ways of firing one:
+  the schedule runs it for every active tenant, and the portal runs it for the tenant the caller is serving. The
+  tenant is bound to the thread before the job runs, so a job reads its store's settings and credentials without
+  ever asking whose run it is.
+- A scheduled firing starts each tenant's run separately, on a thread of its own. A tenant's credentials are its
+  own, so two stores reach two different provider accounts and there is nothing shared between them to take turns
+  over; one store being slow, or failing, therefore says nothing about when the next one runs. Each store's run is
+  its own row, and a store already running that job is skipped rather than delaying anyone. The scheduler does not
+  wait for them: nobody is watching when a cron fires, which is the whole reason runs are stored.
+- One job runs once at a time per tenant. A second firing while one is going is refused rather than queued: it
+  would reach the same providers and write the same files as the run already doing so. Another tenant's run of the
+  same job is not that.
+- Run state is stored, in the tenant-owned `job_runs` table, rather than held in memory. A job that failed at three
+  in the morning has to still say so in the morning, and how a job has been going is worth more than how it is
+  going now. History is kept; a retention window is the obvious follow-up if the table grows.
+- A run is written down as it starts, not when it ends, so a screen watching a job sees it working. A row left
+  running by a process that stopped is closed as `interrupted` when the next one starts: nothing in progress
+  survives a restart.
+- A job reports codes and numbers, never sentences. What a run came to is a `JobTally` of named counts, and the
+  wording of each count lives in the `vast-portal` catalogs keyed by its name, exactly as a reconciliation
+  failure's wording does. A failure is the one exception and is not wording either: what the job threw is stored as
+  a technical diagnostic and shown as it is, the way the debug dock shows a provider's own payload.
+- The scheduler is off unless `VAST_JOBS_SCHEDULER_ENABLED` says otherwise. A cron that fires by default fires in
+  every runtime `vast-services` is composed into — an acceptance run against mocked providers, and a developer's
+  local launch against real credentials — so the deployment turns it on deliberately and nothing else does.
+- It runs on a scheduler of its own rather than through `@EnableScheduling`, so composing `vast-services` into
+  `vb-portal-api` changes nothing about how the legacy application's own scheduled work is executed.
+- The screen is `/jobs`: one row per registered job with its schedule, whether it is working, when it last ran and
+  what that came to, and a button that runs it now. It polls only while something is running — a screen of idle
+  jobs has nothing to ask about. Every new user-visible string goes into both `en.json` and `lv.json`, and a job's
+  own name is one of them, keyed `job-<code>`.
+- The endpoints are `GET /api/private/jobs`, `POST /api/private/jobs/{code}/run`, which answers `202` with the run
+  it opened and `409` when one is already going, and `GET /api/private/jobs/{code}/runs` for the history. The
+  controller is `JobsController`, not `JobController`: `vb-portal-api` already has a bean of that name and the
+  legacy launcher scans both.
+- Acceptance tests are tech tests through those endpoints. The framework itself is driven by a test-only `Job` in
+  `vast-acceptance-tests` that succeeds, fails, or blocks as a scenario tells it to, so what a run records can be
+  tested without a provider.
+
 ## Bank statement feature requirements
 
 The bank is the one party to an order the backend cannot read live: no provider exposes

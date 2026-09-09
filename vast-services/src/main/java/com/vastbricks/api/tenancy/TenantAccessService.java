@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 /** The tenancy feature's own implementation of {@link TenantAccess}. */
 @Service
 @RequiredArgsConstructor
-class TenantAccessService implements TenantAccess, TenantProvisioning {
+class TenantAccessService implements TenantAccess, TenantProvisioning, TenantRoster {
 
     private final TenantRepository tenantRepository;
     private final UserTenantRepository userTenantRepository;
@@ -62,6 +62,23 @@ class TenantAccessService implements TenantAccess, TenantProvisioning {
         return tenantRepository.findByCode(code.trim().toLowerCase(Locale.ROOT))
                 .filter(Tenant::isActive)
                 .map(Tenant::getId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<TenantView> active() {
+        return tenantRepository.findByActiveTrueOrderByIdAsc().stream()
+                .map(TenantAccessService::toView)
+                .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<TenantView> byId(Long tenantId) {
+        if (tenantId == null) {
+            return Optional.empty();
+        }
+        return tenantRepository.findById(tenantId).map(TenantAccessService::toView);
     }
 
     @Override
