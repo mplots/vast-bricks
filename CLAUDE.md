@@ -1157,6 +1157,24 @@ log. The rewrite's jobs feature is that shape with the account kept.
 - One job runs once at a time per tenant. A second firing while one is going is refused rather than queued: it
   would reach the same providers and write the same files as the run already doing so. Another tenant's run of the
   same job is not that.
+- A running job can be stopped by hand, which is asking rather than killing: the JVM offers interrupting the thread
+  and nothing else, so what actually stops is a job that notices. A job that works through a list should check
+  whether its thread was interrupted between items and return what it has, and one that blocks should let the
+  interruption out. The archive job checks, because it archives every order under a `catch` that would otherwise
+  read the interruption as one order that could not be archived and carry on through the rest.
+- The run is marked stopped whether or not the job noticed, so one that runs on to its end is still recorded as
+  `cancelled` rather than as having succeeded: what a reader wants to know is that someone stopped this run.
+- A `cancelled` run is not a `failed` one and states no diagnostic. Nothing broke — a job was stopped — and what it
+  threw on its way out is the stopping rather than a fault of its own. It keeps whatever it managed to count, since
+  what a stopped run got through is exactly what a reader is left asking.
+- `cancelled` is a person stopping a run and `interrupted` is a process stopping one; they are different facts and
+  neither is worded as the other.
+- Only the serving tenant's run is stoppable, as only their runs are readable. There is nothing to stop when the job
+  is not running for that tenant, and that is refused the same way starting a second run is.
+- Stopping happens through the run in progress, which is the same registry that single-flights a job per tenant.
+  That registry stays the lock rather than the account: what a screen reads is still the stored run.
+- The interrupt is cleared before the run is written down. Writing it is a database call, and an interrupt left
+  standing on the thread would break it — leaving the run recorded by nothing at all.
 - Run state is stored, in the tenant-owned `job_runs` table, rather than held in memory. A job that failed at three
   in the morning has to still say so in the morning, and how a job has been going is worth more than how it is
   going now. History is kept; a retention window is the obvious follow-up if the table grows.
@@ -1177,12 +1195,16 @@ log. The rewrite's jobs feature is that shape with the account kept.
   jobs has nothing to ask about. Every new user-visible string goes into both `en.json` and `lv.json`, and a job's
   own name is one of them, keyed `job-<code>`.
 - The endpoints are `GET /api/private/jobs`, `POST /api/private/jobs/{code}/run`, which answers `202` with the run
-  it opened and `409` when one is already going, and `GET /api/private/jobs/{code}/runs` for the history. The
+  it opened and `409` when one is already going, `POST /api/private/jobs/{code}/cancel`, which answers `202` with
+  the run it asked to stop and `409` when there is none, and `GET /api/private/jobs/{code}/runs` for the history.
+  Cancelling answers `202` and a run that is still going for the same reason starting one does: stopping is asking,
+  so the screen goes on watching the same run to see it actually stop. The
   controller is `JobsController`, not `JobController`: `vb-portal-api` already has a bean of that name and the
   legacy launcher scans both.
 - Acceptance tests are tech tests through those endpoints. The framework itself is driven by a test-only `Job` in
   `vast-acceptance-tests` that succeeds, fails, or blocks as a scenario tells it to, so what a run records can be
-  tested without a provider.
+  tested without a provider. Those words are read as a set rather than as one, so a job that blocks and then throws
+  states the case a stopped run must not be recorded as a failed one.
 
 ### BrickLink order archive requirements
 

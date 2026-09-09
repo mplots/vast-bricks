@@ -10,6 +10,11 @@ import java.util.Optional;
  * store and the screen's endpoints, and never a job. Registering one is declaring it a Spring bean; nothing here
  * changes for it.
  *
+ * <p>A job is stopped by interrupting the thread it runs on, which is all the JVM offers: a run someone cancels is
+ * asked to stop rather than killed. A job that works through a list should check {@link Thread#isInterrupted()}
+ * between items and return what it has, and one that blocks should let the interruption out; a job that does
+ * neither runs to the end and is recorded as cancelled all the same.
+ *
  * <p>A job is tenant-specific. {@link #run()} is called with a tenant already bound to the calling thread, so an
  * implementation reads that tenant's settings and provider credentials without asking whose run it is: a cron fires
  * it once per active tenant, and the portal fires it for the tenant the caller is serving.

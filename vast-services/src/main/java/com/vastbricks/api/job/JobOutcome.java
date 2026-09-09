@@ -18,6 +18,12 @@ enum JobOutcome {
     FAILED("failed"),
 
     /**
+     * Someone asked for it to stop while it was going. Not a failure: the job did not break, it was stopped, so a
+     * cancelled run keeps whatever it managed to count and states no diagnostic.
+     */
+    CANCELLED("cancelled"),
+
+    /**
      * The process stopped while the run was going. Nothing in progress survives a restart, so a row left running is
      * closed this way rather than left to claim forever that the job is still working.
      */

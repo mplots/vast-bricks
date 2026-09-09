@@ -8,7 +8,7 @@ import com.vastbricks.api.tenancy.TenantRoster;
 import com.vastbricks.api.tenancy.TenantView;
 import jakarta.annotation.PreDestroy;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -38,9 +38,10 @@ class JobService {
 
     /**
      * The jobs running right now, keyed by job and tenant. This is the lock rather than the account: what a screen
-     * reads is the stored run, which stays right across a restart in a way a set in memory could not.
+     * reads is the stored run, which stays right across a restart in a way a map in memory could not. It is also
+     * the only handle on a run in progress, which is what stopping one goes through.
      */
-    private final Set<String> running = ConcurrentHashMap.newKeySet();
+    private final Map<String, RunningJob> running = new ConcurrentHashMap<>();
 
     private final ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
 
@@ -78,6 +79,38 @@ class JobService {
         executor.submit(work::get);
 
         return responseOf(opened);
+    }
+
+    /**
+     * Asks the tenant's run of this job to stop, and returns the run it asked.
+     *
+     * <p>Asks rather than kills: interrupting the thread is all the JVM offers, so what actually stops is a job that
+     * notices. The run is marked stopped here either way, so a job that runs on to its end is still recorded as
+     * cancelled rather than as having succeeded — what the reader wants to know is that someone stopped this run.
+     *
+     * <p>Only the serving tenant's run: another store's run of the same job is not this caller's to stop, and is
+     * not even visible from here.
+     */
+    RunResponse cancel(String code) {
+        Job job = job(code);
+        Long tenantId = TenantContext.currentTenantIdOrNone();
+        // A run reserved but not yet opened has no row to answer with, so it reads as nothing to stop. That window
+        // is between one caller's own trigger and its answer.
+        RunningJob stopping = running.get(key(job.code(), tenantId));
+        if (stopping == null || stopping.runId == null) {
+            throw new JobNotRunningException(job.code());
+        }
+
+        stopping.cancelled = true;
+        Thread worker = stopping.worker;
+        if (worker != null) {
+            worker.interrupt();
+        }
+        log.info("Job {} was asked to stop for tenant {}", job.code(), tenantId);
+
+        return runs.find(stopping.runId)
+                .map(this::responseOf)
+                .orElseThrow(() -> new JobNotRunningException(job.code()));
     }
 
     /**
@@ -148,34 +181,67 @@ class JobService {
     }
 
     private JobRun reserveAndOpen(Job job, Long tenantId, JobTrigger trigger) {
-        if (!running.add(key(job.code(), tenantId))) {
+        String key = key(job.code(), tenantId);
+        RunningJob reserved = new RunningJob();
+        if (running.putIfAbsent(key, reserved) != null) {
             throw new JobAlreadyRunningException(job.code());
         }
         try {
-            return runs.open(job.code(), trigger);
+            JobRun opened = runs.open(job.code(), trigger);
+            reserved.runId = opened.getId();
+            return opened;
         } catch (RuntimeException exception) {
-            running.remove(key(job.code(), tenantId));
+            running.remove(key);
             throw exception;
         }
     }
 
     private void execute(Job job, Long tenantId, Long runId) {
+        String key = key(job.code(), tenantId);
+        RunningJob entry = running.get(key);
+        if (entry != null) {
+            // The thread to interrupt, known only now: the row was opened on whichever thread asked for the run.
+            entry.worker = Thread.currentThread();
+        }
         try {
             JobTally tally = job.run();
-            runs.succeeded(runId, tally == null ? JobTally.empty() : tally);
+            JobTally stated = tally == null ? JobTally.empty() : tally;
+            if (stopped(entry)) {
+                runs.cancelled(runId, stated);
+            } else {
+                runs.succeeded(runId, stated);
+            }
         } catch (Exception exception) {
-            // Logged where it failed, with its stack: the run row keeps the diagnostic a reader sees, and a cron
-            // firing for every tenant would otherwise leave a failed store with no trace anywhere.
-            log.error("Job {} failed for tenant {}", job.code(), tenantId, exception);
-            runs.failed(runId, diagnostic(exception));
+            if (stopped(entry)) {
+                // What a stopped job threw on its way out is the stopping, not a failure of its own, so it is
+                // neither kept as a diagnostic nor logged as one.
+                runs.cancelled(runId, JobTally.empty());
+            } else {
+                // Logged where it failed, with its stack: the run row keeps the diagnostic a reader sees, and a cron
+                // firing for every tenant would otherwise leave a failed store with no trace anywhere.
+                log.error("Job {} failed for tenant {}", job.code(), tenantId, exception);
+                runs.failed(runId, diagnostic(exception));
+            }
         } finally {
-            running.remove(key(job.code(), tenantId));
+            running.remove(key);
         }
+    }
+
+    /**
+     * Whether this run was stopped by hand, and the point at which the interrupt that stopped it is cleared.
+     *
+     * <p>Cleared whichever way the job ended, because writing the run down is a database call and an interrupt left
+     * standing on the thread would break it — the run would then be recorded by nothing at all.
+     */
+    private static boolean stopped(RunningJob entry) {
+        boolean cancelled = entry != null && entry.cancelled;
+        Thread.interrupted();
+        return cancelled;
     }
 
     private JobResponse statusOf(Job job, Long tenantId) {
         RunResponse last = runs.latest(job.code()).map(this::responseOf).orElse(null);
-        return new JobResponse(job.code(), job.cron().orElse(null), running.contains(key(job.code(), tenantId)), last);
+        return new JobResponse(job.code(), job.cron().orElse(null), running.containsKey(key(job.code(), tenantId)), last);
     }
 
     private Job job(String code) {
@@ -195,6 +261,16 @@ class JobService {
                 run.getFinishedAt(),
                 runs.tallyOf(run),
                 run.getFailure());
+    }
+
+    /** One run in progress: the row it is writing, the thread it is on, and whether someone has asked it to stop. */
+    private static final class RunningJob {
+
+        private volatile Long runId;
+
+        private volatile Thread worker;
+
+        private volatile boolean cancelled;
     }
 
     private static String key(String code, Long tenantId) {

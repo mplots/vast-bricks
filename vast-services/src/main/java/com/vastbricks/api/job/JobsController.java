@@ -56,6 +56,17 @@ class JobsController {
         return ResponseEntity.accepted().body(jobs.trigger(code));
     }
 
+    /**
+     * Asks the tenant's run of this job to stop, and answers with the run it asked.
+     *
+     * <p>Accepted rather than done: stopping a job is interrupting the thread it runs on, so the screen watches the
+     * run it is handed to see the job actually stop, exactly as it watches one it started.
+     */
+    @PostMapping("/{code}/cancel")
+    ResponseEntity<RunResponse> cancel(@PathVariable("code") String code) {
+        return ResponseEntity.accepted().body(jobs.cancel(code));
+    }
+
     @GetMapping("/{code}/runs")
     RunsResponse runs(
             @PathVariable("code") String code,
@@ -74,6 +85,13 @@ class JobsController {
     ProblemDetail handleUnknownJob(UnknownJobException exception) {
         var problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, exception.getMessage());
         problem.setTitle("No such job");
+        return problem;
+    }
+
+    @ExceptionHandler(JobNotRunningException.class)
+    ProblemDetail handleNotRunning(JobNotRunningException exception) {
+        var problem = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, exception.getMessage());
+        problem.setTitle("Job not running");
         return problem;
     }
 

@@ -44,11 +44,16 @@ class VastTestJob implements Job {
         return JobTally.empty().count("ran", ran);
     }
 
-    /** Makes the next run succeed, fail, or wait until the scenario releases it. */
+    /**
+     * Makes the next run succeed, fail, or wait until the scenario releases it.
+     *
+     * <p>Read as a set of words rather than as one, so `block,fail` is a run that waits and then throws — which is
+     * how a job that lets an interruption out of it is stated.
+     */
     void behave(Long tenantId, String outcome) {
         Behaviour behaviour = behaviourOf(tenantId);
-        behaviour.failing = "fail".equals(outcome);
-        behaviour.gate = "block".equals(outcome) ? new CountDownLatch(1) : null;
+        behaviour.failing = outcome != null && outcome.contains("fail");
+        behaviour.gate = outcome != null && outcome.contains("block") ? new CountDownLatch(1) : null;
     }
 
     /** Lets a blocked run finish. */
@@ -80,6 +85,8 @@ class VastTestJob implements Job {
                 // Bounded, so a scenario that forgets to release cannot leave a thread waiting for the whole run.
                 waiting.await(30, TimeUnit.SECONDS);
             } catch (InterruptedException exception) {
+                // Stopping a run interrupts this thread. The flag is put back so the run reads as interrupted work
+                // rather than as a wait that simply ended.
                 Thread.currentThread().interrupt();
             }
         }

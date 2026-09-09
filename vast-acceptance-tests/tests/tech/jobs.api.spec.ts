@@ -36,13 +36,24 @@ async function statusOf(request: APIRequestContext, code = testJob): Promise<Job
   return (await response.json()) as JobStatus;
 }
 
-async function behave(request: APIRequestContext, outcome: 'succeed' | 'fail' | 'block') {
+async function behave(request: APIRequestContext, outcome: 'succeed' | 'fail' | 'block' | 'block,fail') {
   const response = await request.put(`/api/test/jobs/behaviour?outcome=${outcome}`);
   expect(response.status(), await response.text()).toBeLessThan(300);
 }
 
 async function trigger(request: APIRequestContext, code = testJob) {
   return request.post(`/api/private/jobs/${code}/run`);
+}
+
+async function cancel(request: APIRequestContext, code = testJob) {
+  return request.post(`/api/private/jobs/${code}/cancel`);
+}
+
+/** Starts a run that waits, and answers once the job is actually working. */
+async function started(request: APIRequestContext, outcome: 'block' | 'block,fail' = 'block') {
+  await behave(request, outcome);
+  expect((await trigger(request)).status()).toBe(202);
+  await expect.poll(async () => (await statusOf(request)).running, { timeout: 15_000 }).toBe(true);
 }
 
 async function settled(request: APIRequestContext, code = testJob): Promise<Run> {
@@ -135,4 +146,65 @@ test("a tenant's runs are invisible to another tenant", async ({ request, otherT
   expect((await statusOf(otherTenant.request)).lastRun).toBeNull();
   const response = await otherTenant.request.get(`/api/private/jobs/${testJob}/runs`);
   await expect(response.json()).resolves.toMatchObject({ runs: [] });
+});
+
+test('a running job is stopped when someone asks it to', async ({ request }) => {
+  await started(request);
+
+  const response = await cancel(request);
+  expect(response.status(), await response.text()).toBe(202);
+  // Answered with the run it asked to stop, which is still going: stopping is asking, so the screen watches the
+  // same run it was watching before.
+  await expect(response.json()).resolves.toMatchObject({ jobCode: testJob, outcome: 'running' });
+
+  const run = await settled(request);
+  expect(run.outcome).toBe('cancelled');
+  expect(run.finishedAt).not.toBeNull();
+  // Not a failure: nothing broke, so there is no diagnostic to show for it.
+  expect(run.failure).toBeNull();
+  expect((await statusOf(request)).running).toBe(false);
+});
+
+test('a stopped run keeps what the job counted before it stopped', async ({ request }) => {
+  await started(request);
+
+  expect((await cancel(request)).status()).toBe(202);
+
+  expect((await settled(request)).tally).toEqual({ ran: 1 });
+});
+
+test('a job that throws on its way out of a stopped run is still stopped rather than failed', async ({ request }) => {
+  await started(request, 'block,fail');
+
+  expect((await cancel(request)).status()).toBe(202);
+
+  const run = await settled(request);
+  expect(run.outcome).toBe('cancelled');
+  expect(run.failure).toBeNull();
+});
+
+test('a job that is not running has nothing to stop', async ({ request }) => {
+  expect((await cancel(request)).status()).toBe(409);
+
+  await behave(request, 'succeed');
+  expect((await trigger(request)).status()).toBe(202);
+  await settled(request);
+
+  // A run that has already ended is no more stoppable than one that never started.
+  expect((await cancel(request)).status()).toBe(409);
+});
+
+test('a job no one registered cannot be stopped', async ({ request }) => {
+  expect((await cancel(request, 'not-a-job')).status()).toBe(404);
+});
+
+test("one tenant cannot stop another tenant's run", async ({ request, otherTenant }) => {
+  await started(request);
+
+  // The other tenant sees no run of this job at all, so there is nothing there for them to stop.
+  expect((await cancel(otherTenant.request)).status()).toBe(409);
+
+  const release = await request.post('/api/test/jobs/release');
+  expect(release.status(), await release.text()).toBeLessThan(300);
+  expect((await settled(request)).outcome).toBe('succeeded');
 });

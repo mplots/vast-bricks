@@ -50,6 +50,12 @@ class JobRuns {
         close(runId, JobOutcome.FAILED, run -> run.setFailure(diagnostic));
     }
 
+    /** Closes a run someone stopped, keeping whatever the job managed to count before it did. */
+    @Transactional
+    void cancelled(Long runId, JobTally tally) {
+        close(runId, JobOutcome.CANCELLED, run -> run.setTally(writeTally(tally)));
+    }
+
     /**
      * Closes every run of the bound tenant that is still open, as interrupted.
      *
@@ -64,6 +70,12 @@ class JobRuns {
             run.setFinishedAt(Instant.now());
         });
         return stale.size();
+    }
+
+    /** One run of the bound tenant. Another tenant's run is not found here: the tenant is in the query already. */
+    @Transactional(readOnly = true)
+    Optional<JobRun> find(Long id) {
+        return repository.findById(id);
     }
 
     @Transactional(readOnly = true)

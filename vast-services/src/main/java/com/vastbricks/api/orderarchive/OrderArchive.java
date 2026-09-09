@@ -43,6 +43,13 @@ public class OrderArchive {
         var tally = new ArchiveTally();
 
         for (BrickLinkOrder order : brickLink.listOrders()) {
+            // Stopping a run interrupts this thread, and every order is archived under a catch that would otherwise
+            // read the interruption as one order that could not be archived and carry on through the rest. What has
+            // been archived stays archived, so the tally so far is what the run came to.
+            if (Thread.currentThread().isInterrupted()) {
+                log.info("BrickLink order archive stopped after {} order(s)", tally.archived + tally.unchanged + tally.failed);
+                break;
+            }
             if (order == null || order.getOrderId() == null) {
                 log.warn("Skipped a BrickLink order the list named no order id for");
                 tally.failed++;
