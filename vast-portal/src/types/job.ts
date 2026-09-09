@@ -1,5 +1,5 @@
 /** How a run ended, or that it has not. */
-export type JobOutcome = 'running' | 'succeeded' | 'failed' | 'interrupted';
+export type JobOutcome = 'running' | 'succeeded' | 'failed' | 'cancelled' | 'interrupted';
 
 /** What started a run: the schedule, which fires for every store, or a person, who fires it for their own. */
 export type JobTrigger = 'schedule' | 'manual';
@@ -27,4 +27,8 @@ export interface Job {
 
 export interface JobsPage {
   jobs: Job[];
+}
+
+export interface JobRunsPage {
+  runs: JobRun[];
 }

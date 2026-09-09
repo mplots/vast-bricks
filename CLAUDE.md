@@ -1190,10 +1190,31 @@ log. The rewrite's jobs feature is that shape with the account kept.
   local launch against real credentials — so the deployment turns it on deliberately and nothing else does.
 - It runs on a scheduler of its own rather than through `@EnableScheduling`, so composing `vast-services` into
   `vb-portal-api` changes nothing about how the legacy application's own scheduled work is executed.
-- The screen is `/jobs`: one row per registered job with its schedule, whether it is working, when it last ran and
-  what that came to, and a button that runs it now. It polls only while something is running — a screen of idle
-  jobs has nothing to ask about. Every new user-visible string goes into both `en.json` and `lv.json`, and a job's
-  own name is one of them, keyed `job-<code>`.
+- The screen is `/jobs`: a card per registered job rather than a row per job. The jobs are few and each has a good
+  deal to say — a schedule, a state, a moment, a duration, a tally of counts — and a table of that is a grid read
+  across columns nobody compares one job to another in. What a reader compares is a job against its own past.
+- A card states the job, the cron it fires on or that it only runs when asked, how it last went and what that came
+  to, and carries the two things a reader does to it. The state is said twice over: a chip in words, and the mark
+  beside the name, which turns to a spinner while the job works — a working job is what the screen is opened to
+  find, and a spinner says so without being read.
+- The buttons are labelled rather than bare icons, unlike the tool buttons every reading screen carries. This is
+  the one screen that does something to the backend instead of reading it, and a control that fires a nightly job
+  by hand, or stops one halfway, should say which in a word. Stop stands where Run stood, because the place a run
+  was started from is where a reader looks to stop it.
+- Each card opens its own recent runs, which are asked for only then: how a job has been going is worth more than
+  how it is going now, but it is still a second question, and a screen of jobs nobody has opened has no reason to
+  ask it. They are polled while the job works, so the run being watched lands in its own history when it ends.
+- The runs read as a timeline rather than a table: they are the same few facts over and over, and what is wanted is
+  the shape of them down time — a run that failed among the ones that did not, a nightly job that skipped a night.
+  A dot per run says which was which without a column headed for it, and never carries the outcome alone: every run
+  states it in words beside the moment it started, with how long it took and whether the schedule or a person fired
+  it. That last is on no other screen, and it is what tells last night's run from someone's retry of it.
+- Cards of one row are of one height, but nothing inside one is stretched to fill it. A card opening its runs makes
+  the row tall, and a neighbour that pushed its buttons to the bottom would strand them under an empty card.
+- The screen polls only while something is running — a screen of idle jobs has nothing to ask about. Every new
+  user-visible string goes into both `en.json` and `lv.json`, and a job's own name is one of them, keyed
+  `job-<code>`. The wording of a tally count and of an outcome are others; a stopped run wears neither the colour of
+  a success nor that of a problem.
 - The endpoints are `GET /api/private/jobs`, `POST /api/private/jobs/{code}/run`, which answers `202` with the run
   it opened and `409` when one is already going, `POST /api/private/jobs/{code}/cancel`, which answers `202` with
   the run it asked to stop and `409` when there is none, and `GET /api/private/jobs/{code}/runs` for the history.
