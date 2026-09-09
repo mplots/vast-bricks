@@ -28,6 +28,13 @@ interface Props {
   /** How many columns of the table stand before the amount, and how many after it. */
   before: number;
   after: number;
+  /**
+   * Which side of the figure its name stands on. After it by default, which is where a bank prints it and where
+   * there is room for it on a whole screen. Before it where the columns after the amount are too narrow to hold a
+   * name — the entries in the pane of the matching split — since the columns before it are the wide ones there and
+   * a name broken over two lines makes four lines of a foot read as eight.
+   */
+  labelBefore?: boolean;
 }
 
 /**
@@ -64,7 +71,7 @@ interface Props {
  * last line rounds, and the theme's own bottom edge rules straight across them, so the card came out square-cornered
  * under a foot that had asked to be round. What is rounded is now the only thing painted.
  */
-export default function TableSummaryFooter({ lines, before, after }: Props) {
+export default function TableSummaryFooter({ lines, before, after, labelBefore = false }: Props) {
   return (
     <TableFooter
       sx={(theme) => ({
@@ -109,15 +116,17 @@ export default function TableSummaryFooter({ lines, before, after }: Props) {
 
         return (
           <TableRow key={line.key}>
-            {/* The columns the amount does not stand in carry the ground and nothing else. */}
-            <TableCell colSpan={before} sx={{ border: 0 }} />
+            {/* The columns the name does not stand in carry the ground and nothing else. */}
+            <TableCell colSpan={before} sx={labelBefore ? { ...ruled, textAlign: 'right' } : { border: 0 }}>
+              {labelBefore ? line.label : null}
+            </TableCell>
             <TableCell
               sx={{ ...numericCell, ...ruled, color: line.colour ?? 'text.primary', fontWeight: line.sum || line.balance ? 700 : 500 }}
             >
               {line.amount}
             </TableCell>
-            <TableCell colSpan={after} sx={ruled}>
-              {line.label}
+            <TableCell colSpan={after} sx={labelBefore ? { border: 0 } : ruled}>
+              {labelBefore ? null : line.label}
             </TableCell>
           </TableRow>
         );

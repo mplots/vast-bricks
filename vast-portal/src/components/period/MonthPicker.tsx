@@ -1,10 +1,10 @@
 import { useState, type MouseEvent } from 'react';
 
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Popover from '@mui/material/Popover';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import { MonthCalendar } from '@mui/x-date-pickers/MonthCalendar';
 import { ArrowLeft2, ArrowRight2 } from 'iconsax-reactjs';
 import { useIntl } from 'react-intl';
 
@@ -46,9 +46,8 @@ export default function MonthPicker({ value, max, onChange, labelId = 'reconcili
 
   const selected = monthDate(value);
   const maxDate = monthDate(max);
-  // The grid answers for whichever year is being shown, so the picked month is only marked while that is its own year.
-  const shown = new Date(shownYear, selected.getMonth(), 1);
   const label = `${new Intl.DateTimeFormat(intl.locale, { month: 'long' }).format(selected)} ${selected.getFullYear()}`;
+  const monthName = new Intl.DateTimeFormat(intl.locale, { month: 'short' });
 
   return (
     <>
@@ -84,14 +83,30 @@ export default function MonthPicker({ value, max, onChange, labelId = 'reconcili
               <ArrowRight2 size={16} />
             </IconButton>
           </Stack>
-          <MonthCalendar
-            value={shown}
-            maxDate={maxDate}
-            onChange={(picked) => {
-              onChange(monthOf(picked as Date));
-              setAnchor(null);
-            }}
-          />
+          {/* A month grid needs none of the date picker's parsing or field machinery. Keeping it here also means the
+          popover cannot lose a lazily loaded localization context during a development dependency refresh. */}
+          <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 0.5, width: 320, p: 1 }}>
+            {Array.from({ length: 12 }, (_, month) => {
+              const date = new Date(shownYear, month, 1);
+              const picked = shownYear === selected.getFullYear() && month === selected.getMonth();
+              return (
+                <Button
+                  key={month}
+                  variant={picked ? 'contained' : 'text'}
+                  color={picked ? 'primary' : 'inherit'}
+                  disabled={date > maxDate}
+                  aria-pressed={picked}
+                  onClick={() => {
+                    onChange(monthOf(date));
+                    setAnchor(null);
+                  }}
+                  sx={{ minWidth: 0 }}
+                >
+                  {monthName.format(date)}
+                </Button>
+              );
+            })}
+          </Box>
         </Stack>
       </Popover>
     </>

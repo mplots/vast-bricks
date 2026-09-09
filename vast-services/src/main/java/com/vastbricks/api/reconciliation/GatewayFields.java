@@ -1,6 +1,8 @@
 package com.vastbricks.api.reconciliation;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -46,4 +48,18 @@ public class GatewayFields {
      * show or it cannot be addressed. The screen links the payment method to it.
      */
     private String paymentUrl;
+
+    /**
+     * The bank entries this order was settled by, each named by the bank's own reference, or empty for an order no
+     * bank transfer was matched to.
+     *
+     * <p>It says which entries rather than how much, which the amounts above already say. The screen reads the bank
+     * statement beside these orders and draws the link between the two, and an order matched by what a payer wrote
+     * on the transfer is as linked as one a person mapped by hand — but only the mapping is written on the entry, so
+     * without this the screen could show one kind of link and not the other.
+     *
+     * <p>Several because a buyer who underpaid and was asked for the rest made two transfers for one order, which is
+     * the same reason the paid amount above is a sum.
+     */
+    private final List<String> entryReferences = new ArrayList<>();
 }

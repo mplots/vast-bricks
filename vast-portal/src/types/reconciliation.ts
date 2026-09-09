@@ -61,6 +61,12 @@ export interface ReconciliationGatewayFields {
   refundedAmount: number | null;
   /** Where the provider shows the matched payment, or `null` when there is no payment to link to. */
   paymentUrl: string | null;
+  /**
+   * The bank entries this order was settled by, each by the bank's own reference, empty for an order no transfer was
+   * matched to. It says which entries rather than how much, and it is how the matching split knows an order and an
+   * entry are two ends of one link — including the links nobody wrote by hand.
+   */
+  entryReferences: string[];
 }
 
 /**

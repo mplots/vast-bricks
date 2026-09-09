@@ -173,6 +173,7 @@ test("lists BrickLink reconciliation orders for the selected month", async ({
           facilitatorTax: null,
           refundedAmount: null,
           paymentUrl: null,
+          entryReferences: [],
         },
         shipment: { totalAmount: null },
         accounting: {
@@ -209,6 +210,7 @@ test("lists BrickLink reconciliation orders for the selected month", async ({
           facilitatorTax: null,
           refundedAmount: null,
           paymentUrl: null,
+          entryReferences: [],
         },
         shipment: { totalAmount: null },
         accounting: {
@@ -308,6 +310,7 @@ test("lists BrickOwl reconciliation orders for the selected month", async ({
           facilitatorTax: null,
           refundedAmount: null,
           paymentUrl: null,
+          entryReferences: [],
         },
         shipment: { totalAmount: null },
         accounting: {
@@ -346,6 +349,7 @@ test("lists BrickOwl reconciliation orders for the selected month", async ({
           facilitatorTax: null,
           refundedAmount: null,
           paymentUrl: null,
+          entryReferences: [],
         },
         shipment: { totalAmount: null },
         accounting: {
@@ -479,6 +483,7 @@ test("lists BrickOwl reconciliation orders that span several batch requests", as
       facilitatorTax: null,
       refundedAmount: null,
       paymentUrl: null,
+      entryReferences: [],
     },
     shipment: { totalAmount: null },
     accounting: {
@@ -2183,7 +2188,7 @@ async function storedEntries(request: APIRequestContext) {
     "/api/private/bank-statements/entries?period=2026-09",
   );
   expect(response.status(), await response.text()).toBe(200);
-  return (await response.json()).entries as Array<{ id: number }>;
+  return (await response.json()).entries as Array<{ id: number; entryReference: string }>;
 }
 
 async function reconciled(request: APIRequestContext) {
@@ -2321,6 +2326,62 @@ test("sums every bank transfer that names one order", async ({
 
   expect(orderOf(body, "7500001").gateway.paidAmount).toBe(7.69);
   expect(orderOf(body, "7500001").failures).toEqual([]);
+});
+
+test("names the bank entries an order was settled by, however they were matched", async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: "2026-08",
+    brickOwl: [brickOwlBankTransferOrder("7500001", "7.69")],
+  });
+  // One the payer named the order on and one a person mapped by hand: the order is settled by both, and says so
+  // the same way for both. Only the mapping is written on the entry, so an order that named neither would leave
+  // the screen able to draw the link a person typed and not the one the matching found for itself.
+  await importDocument(
+    request,
+    camt053({
+      entries: [
+        bankEntry({
+          reference: "2026090200000006-1",
+          amount: "4.00",
+          remittance: "order 7500001",
+        }),
+        bankEntry({
+          reference: "2026090200000007-1",
+          amount: "3.69",
+          remittance: "no order named here",
+        }),
+      ],
+    }),
+  );
+  const stored = await storedEntries(request);
+  const mapped = stored.find((entry) => entry.entryReference === "2026090200000007-1");
+  await request.put(`/api/private/bank-statements/entries/${mapped!.id}/mapping`, { data: { mapping: "7500001" } });
+
+  const body = await reconciled(request);
+
+  expect(orderOf(body, "7500001").gateway.entryReferences.toSorted()).toEqual([
+    "2026090200000006-1",
+    "2026090200000007-1",
+  ]);
+  // What it was settled by, not how much: the amounts say that, and they still add up.
+  expect(orderOf(body, "7500001").gateway.paidAmount).toBe(7.69);
+});
+
+test("names no bank entry on an order no transfer settled", async ({
+  request,
+  settings,
+}, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: "2026-08",
+    brickOwl: [brickOwlBankTransferOrder("7500001", "7.69")],
+  });
+
+  const body = await reconciled(request);
+
+  expect(orderOf(body, "7500001").gateway.entryReferences).toEqual([]);
 });
 
 test("reports a bank transfer sent back out as the gateway's refund", async ({

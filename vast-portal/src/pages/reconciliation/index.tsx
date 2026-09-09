@@ -26,7 +26,7 @@ import TableRow from '@mui/material/TableRow';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { ArrowLeft2, ArrowRight2, FilterSearch, Kanban, ReceiptAdd, Refresh } from 'iconsax-reactjs';
+import { ArrowLeft2, ArrowRight2, FilterSearch, Kanban, Link21, ReceiptAdd, Refresh } from 'iconsax-reactjs';
 import { useIntl } from 'react-intl';
 import { useSearchParams } from 'react-router-dom';
 
@@ -46,6 +46,7 @@ import {
   defaultColumns,
   defaultOrder,
   fullOrder,
+  matchingFields,
   orderFields,
   readStored,
   storedColumnsKey,
@@ -55,7 +56,10 @@ import { currentMonth, monthDate, monthOf } from 'utils/month';
 import OrderTaxTypeIcon from 'components/OrderTaxTypeIcon';
 import ReconciliationColumnDrawer from 'sections/reconciliation/ReconciliationColumnDrawer';
 import ReconciliationFilterDrawer from 'sections/reconciliation/ReconciliationFilterDrawer';
-import { STICKY_TOP } from 'components/SidePanel';
+import { paneGap, stickyTop, STICKY_TOP } from 'components/SidePanel';
+import { BankMatchingProvider, isBankTransferOrder, settledBy, useBankMatching } from 'contexts/BankMatchingContext';
+import BankStatementsPage from 'pages/bank-statements';
+import BankMatchingSplit from 'sections/reconciliation/BankMatchingSplit';
 import toolButtonSx from 'components/toolButton';
 import useColumnDrag from 'hooks/useColumnDrag';
 import useConfig from 'hooks/useConfig';
@@ -222,6 +226,24 @@ const tintedIn = (params: URLSearchParams) => {
 const orderKey = (order: ReconciliationOrder) => `${order.order.source}-${order.order.orderId}`;
 
 /**
+ * The element this one scrolls inside, or null when that is the page itself. A screen is normally scrolled by the
+ * page; in the matching split it is scrolled by its own pane, and what its bar sticks against changes with it.
+ */
+const scrollParentOf = (element: HTMLElement): HTMLElement | null => {
+  for (let parent = element.parentElement; parent; parent = parent.parentElement) {
+    const { overflowY } = getComputedStyle(parent);
+    if (overflowY === 'auto' || overflowY === 'scroll') {
+      return parent;
+    }
+  }
+  return null;
+};
+
+/** What the address calls the split, beside the month, the filters and the highlighting it already carries. */
+export const matchKey = 'match';
+export const matchValue = 'bank';
+
+/**
  * The height of the table card's title bar. It sticks under the app header and the table's head stops under it in
  * turn, so the two of them need to agree on a number. It is kept to a single row — the month, how much of it is on
  * screen, and the buttons — which is what lets that number be stated rather than measured.
@@ -313,7 +335,7 @@ const Main = styled('main', {
   ]
 }));
 
-export default function ReconciliationPage() {
+function ReconciliationOrders() {
   const intl = useIntl();
   // What is being read is where the screen is rather than something it merely remembers, so all of it is kept in the
   // address: the month, the filters narrowing it, and the levels coloured. A reload, a bookmark, a link handed to
@@ -321,6 +343,9 @@ export default function ReconciliationPage() {
   // is a step with the same narrowing and colouring rather than a fresh start. An address that names no month, or
   // names one that is not a month or has not happened, is read as this one.
   const [searchParams, setSearchParams] = useSearchParams();
+  // What the screens of a split hold in common. Inactive outside one, which is what leaves this screen unchanged.
+  const matching = useBankMatching();
+  const matchingOpen = searchParams.get(matchKey) === matchValue;
   const selectedMonth = monthIn(searchParams);
   // Colouring is not filtering: this decides how the rows that are shown read, not which rows those are.
   const tintedLevels = tintedIn(searchParams);
@@ -336,16 +361,29 @@ export default function ReconciliationPage() {
   // one thing about this screen that cannot be said in CSS, so a mark at the card's top says it.
   const cardTopRef = useRef<HTMLDivElement>(null);
   const [stuck, setStuck] = useState(false);
-  const [filtersOpen, setFiltersOpen] = useState(!downLG);
+  // Room for it means it is open — except in the split, where the pane is half a screen and the panel would be
+  // taking that width from the orders it narrows. It is a click away in the bar either way.
+  const [filtersOpen, setFiltersOpen] = useState(!downLG && !matching.active);
   // The columns are arranged now and then and read every day, so their panel stays shut until it is asked for.
   const [columnsOpen, setColumnsOpen] = useState(false);
+
+  // It follows the split rather than being settled once: this screen is the same mounted screen inside the split and
+  // out of it, so a panel set at its first render would stay as it was found — open in a pane that has no width for
+  // it, or shut on a whole screen that does. Following it is also what animates it, a drawer that was already there
+  // sliding where one that has just been put there cannot.
+  useEffect(() => setFiltersOpen(!downLG && !matching.active), [downLG, matching.active]);
+
+  // Said to the split, which draws no lines across a panel: one slides over the very rows the lines run between.
+  useEffect(() => matching.notePanel('orders', filtersOpen || columnsOpen), [matching, filtersOpen, columnsOpen]);
   // Which columns are read is where the screen is as much as which orders are, so the address carries them too and a
   // link hands the table over arranged as it was left. What this browser opens with is a separate question, asked of
   // storage rather than of the address and answered only when the save button says so: an address that names columns
   // is answering for the visit it opened, and one that names none falls back to what was saved here.
   const [storedColumns, setStoredColumns] = useLocalStorage<StoredColumns>(storedColumnsKey, defaultColumns);
   const remembered = readStored(storedColumns);
-  const shownColumns = columnsIn(searchParams) ?? remembered.shown;
+  // In the split the orders are half a screen wide, so they open on the columns that matching is about. The address
+  // still wins: a reader who asks for more columns in there keeps them, and the panel is where they ask.
+  const shownColumns = columnsIn(searchParams) ?? (matching.active ? matchingFields : remembered.shown);
   // The address carries the shown columns alone — that is what a link is worth handing over — so where the hidden
   // ones stand is the screen's own to hold until it is saved. It starts from what was saved, which is what brings a
   // hidden column back where it was left rather than at the end of the list.
@@ -366,8 +404,12 @@ export default function ReconciliationPage() {
     if (!cardTop) {
       return;
     }
+    // Against whatever actually scrolls under this screen: the page on its own, and the pane in the matching split.
+    // The margin follows, the bar resting at nought in a pane where it rests under the app header on the page.
+    const pane = scrollParentOf(cardTop);
     const observer = new IntersectionObserver(([entry]) => setStuck(!entry.isIntersecting), {
-      rootMargin: `-${STICKY_TOP}px 0px 0px 0px`
+      root: pane,
+      rootMargin: `-${pane ? 0 : STICKY_TOP}px 0px 0px 0px`
     });
     observer.observe(cardTop);
     return () => observer.disconnect();
@@ -474,6 +516,29 @@ export default function ReconciliationPage() {
     setSelectedFailure(first ? failureKey(first) : null);
   };
 
+  /**
+   * What a click on a row does. Outside the split it opens the order's detail, as it always has; inside one it picks
+   * the order to be tied to an entry — but only a bank-transfer order, the bank having settled no other kind, so a
+   * row that could never be linked still opens its detail rather than doing nothing.
+   */
+  const chooseOrder = (order: ReconciliationOrder) => {
+    if (!matching.active || !isBankTransferOrder(order)) {
+      openOrder(order);
+      return;
+    }
+    matching.selectOrder(pickedOrder(order) ? null : order);
+  };
+
+  const pickedOrder = (order: ReconciliationOrder) =>
+    matching.order !== null && matching.order.order.source === order.order.source && matching.order.order.orderId === order.order.orderId;
+
+  /**
+   * Whether the entry picked on the other side already names this order. Picking one end of a link lights up both
+   * ends of it: a reader who picks an entry to see what it was tied to should not have to read the id it names and
+   * go looking for that order down the list.
+   */
+  const linkedToPicked = (order: ReconciliationOrder) => matching.entry != null && settledBy(order, matching.entry);
+
   const closeOrder = () => {
     setSelectedOrder(null);
     setSelectedFailure(null);
@@ -490,8 +555,7 @@ export default function ReconciliationPage() {
   // this screen — is read from the path it sits at rather than lumped in with the derived: the source is the path,
   // `<source>.<field>`, so the name says which account stated it even when the roster has not caught up.
   const fieldSource = (field: string): ReconciliationFieldSource =>
-    reconciliationOrders?.fields.find((declared) => declared.name === field)?.source ??
-    (field.split('.')[0] as ReconciliationFieldSource);
+    reconciliationOrders?.fields.find((declared) => declared.name === field)?.source ?? (field.split('.')[0] as ReconciliationFieldSource);
 
   /**
    * The shown columns in runs of one source. A source split apart by a column of another is two runs rather than
@@ -800,6 +864,21 @@ export default function ReconciliationPage() {
   // says what it is in its tooltip and its label.
   const monthActions = (
     <Stack direction="row" useFlexGap sx={{ gap: 0.5, alignItems: 'center' }}>
+      {/* The way into the split, where this screen is read beside the bank statement to tie an order the bank paid
+          to the entry that paid it. It rides in the address as everything else this screen reads does, so the split
+          survives a reload and can be handed to someone as the link it is. */}
+      <Tooltip title={intl.formatMessage({ id: matchingOpen ? 'reconciliation-match-close' : 'reconciliation-match' })} arrow>
+        <IconButton
+          variant={matchingOpen ? 'contained' : 'light'}
+          color={matchingOpen ? 'primary' : 'secondary'}
+          aria-label={intl.formatMessage({ id: matchingOpen ? 'reconciliation-match-close' : 'reconciliation-match' })}
+          aria-pressed={matchingOpen}
+          onClick={() => updateParams((params) => (matchingOpen ? params.delete(matchKey) : params.set(matchKey, 'bank')), true)}
+          sx={toolButtonSx}
+        >
+          <Link21 size={18} />
+        </IconButton>
+      </Tooltip>
       {/* Only while the panel is away, as the filter button is: open, the panel is its own close button. */}
       {!columnsOpen && (
         <Tooltip title={intl.formatMessage({ id: 'reconciliation-columns' })} arrow>
@@ -863,7 +942,7 @@ export default function ReconciliationPage() {
         </ReconciliationFilterDrawer>
 
         <Main open={filtersOpen} columns={columnsOpen} container={container}>
-          <Stack spacing={2} sx={{ mt: 2.5 }}>
+          <Stack spacing={2} sx={{ mt: paneGap }}>
             {generationError && <Alert severity="error">{generationError}</Alert>}
             {generationMessage && <Alert severity="success">{generationMessage}</Alert>}
 
@@ -886,7 +965,7 @@ export default function ReconciliationPage() {
                 '& .MuiCardHeader-root': {
                   position: 'sticky',
                   // The same rest the panel beside it comes to, so the two stop level rather than one under the other.
-                  top: STICKY_TOP,
+                  top: stickyTop(),
                   zIndex: 3,
                   height: TITLE_HEIGHT,
                   py: 0,
@@ -966,12 +1045,12 @@ export default function ReconciliationPage() {
                         // The head is two rows now, so each stops at its own height: the groups under the title bar
                         // and the columns under the groups. The bottom edge belongs to the row the body meets.
                         '& .MuiTableCell-stickyHeader': {
-                          top: STICKY_TOP + TITLE_HEIGHT + GROUP_HEIGHT,
+                          top: stickyTop(TITLE_HEIGHT + GROUP_HEIGHT),
                           bgcolor: 'secondary.lighter',
                           borderBottom: (theme) => `2px solid ${theme.palette.divider}`
                         },
                         '& .MuiTableRow-root:first-of-type .MuiTableCell-stickyHeader': {
-                          top: STICKY_TOP + TITLE_HEIGHT,
+                          top: stickyTop(TITLE_HEIGHT),
                           height: GROUP_HEIGHT,
                           borderBottom: 'none'
                         },
@@ -1036,7 +1115,17 @@ export default function ReconciliationPage() {
                               // the colour. The dot that used to name it is gone: the tint says the same thing louder.
                               aria-label={rowLabel(order)}
                               // Not when the click merely ended a text selection: copying a cell must not open the detail.
-                              onClick={() => !hasTextSelection() && openOrder(order)}
+                              onClick={() => !hasTextSelection() && chooseOrder(order)}
+                              aria-selected={pickedOrder(order)}
+                              // Which end of a link this row is, for the line the split draws between the two, and
+                              // which entries settled this order, which is what the lines are drawn from.
+                              data-vast-link={pickedOrder(order) ? 'picked' : linkedToPicked(order) ? 'counterpart' : undefined}
+                              data-vast-order={matching.active ? order.order.orderId : undefined}
+                              data-vast-entries={
+                                matching.active && order.gateway.entryReferences?.length
+                                  ? order.gateway.entryReferences.join(' ')
+                                  : undefined
+                              }
                               sx={(theme) => ({
                                 cursor: 'pointer',
                                 // The row itself carries the verdict, which is why the dot that once did is gone. The
@@ -1049,6 +1138,11 @@ export default function ReconciliationPage() {
                                   bgcolor: theme.palette[tint].lighter,
                                   '&&.MuiTableRow-hover:hover': { bgcolor: emphasize(theme.palette[tint].lighter, 0.08) }
                                 })
+                                // In the split the row is a thing to pick, so the picked one is marked as picked.
+                                // An outline rather than a ground: the ground already says how the order reconciled,
+                                // which is the very thing a reader is picking it for. The order the picked entry
+                                // already names is outlined too, in the same colour and dashed: it is the other end
+                                // of a link rather than a second thing picked.
                               })}
                             >
                               {/* The row opens the detail dialog, so the action cell must not bubble its click. */}
@@ -1232,5 +1326,34 @@ export default function ReconciliationPage() {
         )}
       </Dialog>
     </Stack>
+  );
+}
+
+/**
+ * The screen, or the screen beside the bank statement when the address asks for the split.
+ *
+ * <p>Both are the same component either way. The split is a mode of this screen rather than a screen of its own
+ * because it is this screen a reader is on when they meet an order the bank paid and no entry names — and because
+ * the orders are what the split is opened from, they stay on the left.
+ */
+export default function ReconciliationPage() {
+  const [searchParams] = useSearchParams();
+  const month = monthIn(searchParams);
+  const asked = searchParams.get(matchKey) === matchValue;
+
+  // The split wraps the orders whether or not it is open, so the orders are one mounted screen across the toggle.
+  // Swapped in and out instead, they would come back with their panel already open, having never had a shut state
+  // to open from — and with the month scrolled back to the top.
+  return (
+    <BankMatchingProvider active={asked}>
+      <BankMatchingSplit
+        open={asked}
+        orders={<ReconciliationOrders />}
+        // The statement opens on the month the orders are of, that being the month whose transfers are in question.
+        // It is only where it opens: a transfer is paid when a buyer gets around to it, so the period is the
+        // reader's to step from there, which is what the picker in its own bar is for.
+        entries={<BankStatementsPage initialPeriod={month} />}
+      />
+    </BankMatchingProvider>
   );
 }

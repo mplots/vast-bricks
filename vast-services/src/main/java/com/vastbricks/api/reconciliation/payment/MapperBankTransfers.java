@@ -6,6 +6,7 @@ import com.vastbricks.api.reconciliation.ReconciledOrder;
 import com.vastbricks.api.reconciliation.ReconciledOrders;
 import com.vastbricks.api.reconciliation.ReconciliationAmount;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
@@ -72,13 +73,19 @@ class MapperBankTransfers implements DetailMapper<BankTransfer> {
         return orders.stream().filter(BankPayments.PAID_BY_BANK_TRANSFER).toList();
     }
 
-    /** What one order's own entries came to, each way, while the entries are being walked. */
+    /** What one order's own entries came to, each way, and which entries those were. */
     private static final class Settlement {
 
         private BigDecimal paid;
         private BigDecimal refunded;
+        private final List<String> references = new ArrayList<>();
 
         void add(BankTransfer transfer) {
+            // Named whichever way it went: a refund is as much this order's entry as the payment it came out of, and
+            // the screen draws the link to both.
+            if (transfer.getEntryReference() != null) {
+                references.add(transfer.getEntryReference());
+            }
             if (BankPayments.isCredit(transfer)) {
                 paid = sum(paid, transfer.getAmount());
             } else if (BankPayments.isDebit(transfer)) {
@@ -95,6 +102,7 @@ class MapperBankTransfers implements DetailMapper<BankTransfer> {
             if (refunded != null) {
                 order.getGateway().setRefundedAmount(ReconciliationAmount.normalize(refunded));
             }
+            order.getGateway().getEntryReferences().addAll(references);
         }
 
         private static BigDecimal sum(BigDecimal running, BigDecimal amount) {

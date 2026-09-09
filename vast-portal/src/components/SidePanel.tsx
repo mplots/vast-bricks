@@ -22,6 +22,37 @@ import useConfig from 'hooks/useConfig';
 export const STICKY_TOP = HEADER_HEIGHT;
 
 /**
+ * Where the sticky things of a screen come to rest, as a value a container can move.
+ *
+ * <p>A screen's own bar, its table's head and the panel beside it all stop under the app header, which is right for
+ * the page being the one thing that scrolls. Put that screen in a pane that scrolls on its own — the two halves of
+ * the bank matching split — and the app header is no longer above it: the pane's own top is, and the same things
+ * have to stop at nought instead.
+ *
+ * <p>So the offset is read from a custom property rather than baked in, and a pane sets that property to zero. Every
+ * screen keeps one rule for where its head rests, and neither the screens nor the table look they share need to know
+ * they are in a pane at all.
+ */
+export const stickyTopVar = '--vast-sticky-top';
+
+export const stickyTop = (offset = 0) => `calc(var(${stickyTopVar}, ${STICKY_TOP}px) + ${offset}px)`;
+
+/**
+ * The gap a screen leaves above its own card, as a value a container can move — the same idea as the sticky origin
+ * and needed for the same reason.
+ *
+ * <p>On the page that gap is the room between the breadcrumb and the card. In a pane that scrolls, it is room the
+ * card's own bar would jump over the moment a reader scrolled: the bar comes to rest at the pane's top, and a card
+ * standing twenty pixels below it has twenty pixels to travel before it settles. So a pane sets the gap to nothing
+ * and the bar is where it will stay from the first row onward.
+ */
+export const paneGapVar = '--vast-pane-gap';
+
+export const PANE_GAP = 20;
+
+export const paneGap = `var(${paneGapVar}, ${PANE_GAP}px)`;
+
+/**
  * The table beside a panel on one side of it, sliding over where the panel was when it is closed.
  *
  * <p>A docked drawer holds its width whether it is open or shut, so the table takes that width back with a negative
@@ -162,10 +193,10 @@ export default function SidePanel({ anchor, open, onClose, children }: SidePanel
             // The card inside rounds its corners, and the paper's own ground would sit square behind them. The
             // overlay keeps its ground: there the card is borderless and fills it.
             bgcolor: 'transparent',
-            marginTop: 2.5,
+            marginTop: paneGap,
             position: 'sticky',
-            top: STICKY_TOP,
-            maxHeight: `calc(100vh - ${STICKY_TOP + 24}px)`,
+            top: stickyTop(),
+            maxHeight: `calc(100vh - ${stickyTop(24)})`,
             overflowY: 'auto'
           })
         }

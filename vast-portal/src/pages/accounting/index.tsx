@@ -44,15 +44,7 @@ const formatDate = (value?: string | null) => {
 
 const numericCell = { textAlign: 'right', whiteSpace: 'nowrap' } as const;
 
-function OrderRow({
-  order,
-  generating,
-  onGenerate
-}: {
-  order: AccountingOrder;
-  generating: boolean;
-  onGenerate: () => void;
-}) {
+function OrderRow({ order, generating, onGenerate }: { order: AccountingOrder; generating: boolean; onGenerate: () => void }) {
   const rowColor = order.unmatchedOnlinePayment ? '#fee2e2' : order.bankTransfer ? '#fef3c7' : undefined;
   const rowHoverColor = order.unmatchedOnlinePayment ? '#fecaca' : order.bankTransfer ? '#fde68a' : undefined;
   const grandTotal = (
@@ -95,12 +87,7 @@ function OrderRow({
         </Tooltip>
       </TableCell>
       <TableCell>
-        <Chip
-          label={order.source}
-          size="small"
-          color={order.source === 'Brick Owl' ? 'secondary' : 'primary'}
-          variant="outlined"
-        />
+        <Chip label={order.source} size="small" color={order.source === 'Brick Owl' ? 'secondary' : 'primary'} variant="outlined" />
       </TableCell>
       <TableCell sx={{ whiteSpace: 'nowrap' }}>{formatDate(order.orderDate)}</TableCell>
       <TableCell>{order.orderNumber}</TableCell>

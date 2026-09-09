@@ -177,7 +177,8 @@ here as they are provided; do not invent unspecified behavior prematurely.
   included, and an address that names no columns falls back to what was saved.
   Arranging the table never writes that store on its own, so a table pulled
   apart to answer one question does not become the table the browser opens with.
-- The first iteration is read-only.
+- The screen is read-only except in one place: an order the bank paid that no entry names can be tied to the entry
+  that paid it, from the split the screen opens beside the bank statement. See "Matching a bank transfer by hand".
 - Only the failed state is currently required. Do not introduce additional
   reconciliation states until their requirements are provided.
 
@@ -533,6 +534,14 @@ here as they are provided; do not invent unspecified behavior prematurely.
   collected order rather than one mapper per marketplace each guessing at the
   other's orders. The ID scan is a match key like any other, so it is
   `ReconciledOrders.findNamedIn` rather than a scan inside the mapper.
+- An order also carries the bank entries it was settled by, each named by the
+  bank's own reference, and none for an order no transfer was matched to. It says
+  which entries rather than how much, which the amounts already say: the matching
+  screen reads the statement beside the orders and draws the link between the
+  two, and an order matched by what a payer wrote on the transfer is as linked as
+  one a person mapped by hand — but only the mapping is written on the entry, so
+  without this the screen could show one kind of link and not the other. It is
+  not a column and not in the field roster, as the payment link is not.
 - Every bank credit naming one order is summed into its paid amount, which is
   where bank transfers depart from the first-payment-wins rule the providers
   follow: a buyer who underpaid and was asked for the rest made two transfers for
@@ -1450,11 +1459,25 @@ business data in the rewrite, and everything about the feature follows from that
   sentences about money, not column headings. That tint is close enough to the page behind
   the card that the figures sat in a band reading as neither table nor page; the rule above
   the footer already says where the entries stop.
-- **The head and the summary both stay in view while the entries scroll.** The head names
-  the columns and the foot totals them, and a period long enough to scroll is exactly the
-  period where both are wanted while the middle is being read — a total cannot be arrived
-  at by looking. The page is the one thing that scrolls, as it is on the reconciliation
-  screen: the head stops under the app header and the foot at the bottom of the window.
+- **The period, the head and the summary all stay in view while the entries scroll.** The
+  bar says what period is being read, the head names the columns and the foot totals them,
+  and a period long enough to scroll is exactly the period where all three are wanted while
+  the middle is being read — a total cannot be arrived at by looking, and a picker that has
+  scrolled away is a period that cannot be stepped from the foot of a long one. The head
+  rests under the bar at the height the bar came out at, measured rather than assumed: the
+  period, the view toggle and the buttons wrap onto a second line in a narrow window, and in
+  the pane of the matching split, which is half a screen.
+- **Where those things rest is a value the container sets**, not the app header's height
+  baked in. The page is normally what scrolls, so they stop under the app header; in the
+  matching split the pane scrolls instead, and the same things stop at the pane's own top.
+  It is one custom property, read by this screen, by the reconciliation screen, by the
+  ledger table look they share and by the side panel — so a screen keeps one rule for where
+  its head rests and none of them needs to know it is in a pane.
+- **The gap a screen leaves above its own card is a second such value**, and needed for the
+  same reason. On the page it is the room between the breadcrumb and the card; in a pane it
+  is room the bar would jump over the moment a reader scrolled, the bar coming to rest at
+  the pane's top while the card stood twenty pixels below it. A pane sets the gap to nothing,
+  so the bar is where it will stay from the first row onward.
   Giving the entries a window of their own would have given both something nearer to hold
   on to, but it puts a second scrollbar beside the page's, and a reader scrolling a table
   should not have to notice which of two bars they are pushing. So nothing between the
@@ -1498,6 +1521,187 @@ business data in the rewrite, and everything about the feature follows from that
   currency. It is the feature's one JPQL query, so it is also the one place where
   `@TenantId` reaching an aggregate rather than an entity load is worth an acceptance test
   of its own.
+
+### Matching a bank transfer by hand
+
+A bank transfer is matched to an order by the order id it names, and a payer who named
+none leaves an order the bank paid reading as unpaid. The mapping is the manual last
+resort for exactly that, and this is how a person writes one without typing an id.
+
+- It is a **mode of the reconciliation screen**, opened from the bar over the month and
+  carried in the address like everything else that screen reads, so the split survives a
+  reload and can be handed to someone as the link it is.
+- The split shows **the two screens themselves**, side by side: the reconciliation orders
+  as they are read anywhere, with their own filters, failures and columns, and the bank
+  statement with its own period, search and narrowing. Neither is a list written again for
+  this. What the split adds is one sentence spanning them — this order was paid by that
+  transfer — and the bar across the foot that states it.
+- The orders stay on the left, being what the split is opened from. The statement opens on
+  the month the orders are of; where it goes from there is the reader's, because a transfer
+  is paid when a buyer gets around to it and the entry is as often in the month after.
+- Picking is a click on a row on either side, and only the two screens' own rows: a
+  bank-transfer order on one side, an entry on the other. An order the marketplace settled
+  another way still opens its detail on a click, the bank having settled no other kind, so
+  a row that could never be linked does not sit there answering nothing.
+- Linking writes the order's id into the entry's `mapping` and nothing else. That is the
+  whole of what reconciliation reads out of one: it scans the text for the ids of the
+  orders it collected, so anything written around the id would only be text to scan past.
+- Both screens are read again afterwards, which re-collects the month from every provider.
+  That is the price of the answer being live: the order goes green because the bank now
+  names it, and nothing short of collecting it again can say so.
+- Untying is offered on the entry, because the mapping is the entry's own field: an order
+  is linked by whatever names it, and clearing that is clearing the entry that does.
+- Every entry of the period is shown, an entry that already names an order marked as
+  linked, so a reader picking one can see which are spoken for without reading the mapping
+  of every row. An entry matched by the payer's own words rather than by a mapping is not
+  marked, the entries knowing nothing of what the remittance text matched; the order side
+  says it instead, by having a paid amount.
+- In the split the orders open on the columns matching is about — who the order is, what it
+  came to, and whether a payment has been found. A pane is half a screen, and the month's
+  own columns in half a screen are wrapped headings with no room under them. The address
+  still wins, so a reader who asks for more keeps them. Both panels start shut for the same
+  reason.
+- **Each pane scrolls on its own.** One side is walked down while the other stays where it
+  was, which is the whole of reading two lists against each other: a page that scrolled both
+  would move the order out of sight exactly as the entry that pays it came into view. It is
+  the one place the ledger screens' own rule — the page is the only thing that scrolls —
+  does not hold, and it holds again the moment the panes stack on a narrow screen.
+- A pane is therefore what its screens stick against, which is what the sticky origin above
+  is for: the bar, the table head, the summary foot and the panel all come to rest at the
+  pane's own top rather than under an app header that is no longer above them.
+- Dragging the divider moves a custom property on the split and nothing else: as a style it
+  would be a class generated and injected for every pixel dragged, as state it would re-render
+  both screens, and either way the transition that carries the split open would be easing the
+  columns after the pointer rather than following it. What was dragged to becomes state once,
+  when the pointer is let go — which is also the only moment it is written to this browser.
+  A pointer taken away rather than lifted ends the drag as well, a split left dragging being
+  one that follows a pointer nobody is holding.
+- **The divider between the panes is dragged**, and the share it was left at is remembered
+  in that browser: a reader who widens the entries to read a payer's own words expects them
+  still wide the next time they come to match a month. Neither pane is dragged away to
+  nothing. It answers the arrow keys as well as the pointer, a split that could only be set
+  with a mouse being one not everyone can set.
+- **The line between the panes is also where the two sides are tied together**: once a row
+  is picked on either side, a circle stands on it carrying the link. On the line because that
+  is where the two sides meet and where a reader's eye already is, having just picked a row on
+  either side of it — and **at the height the link itself runs at**, halfway along its own
+  curve, not halfway down the window. A reader who has just picked two rows near the top of a
+  long month is looking at those two rows; a circle pinned to the middle of the pane is a
+  circle nowhere near the pair it would tie, and reads as a control belonging to nothing. The
+  button that unties a link stands on that link the same way and always did. Nothing picked is
+  nothing to do, and the line is left a line.
+- There is no bar across the foot. One said the same thing and spent a strip of every screen
+  saying it, most of the time with nothing picked and nothing to say. What it also carried
+  is elsewhere: closing the split is the same button in the month bar that opened it, and a
+  failure is said in the app's own snackbar — a message drawn between two panes would push
+  one of them down, which is the one thing a screen a reader is picking rows in must not do.
+- **Neither pane is read sideways.** Two tables in half a screen each would scroll sideways
+  to reach their last column, which on the entries is the mapping — the column the split is
+  open for. So the entries hold no width open in a pane and drop the bank's own code and
+  reference, whose width is the mapping's, and the orders open on the columns matching is
+  about. Both are only where the split opens: the address still carries the orders' columns,
+  and the entries' own screen is untouched.
+- **The scrollbars are thin and drawn only while a pane is under the pointer**, which is the
+  pane being scrolled. Two panes side by side are two permanent bars framing every table in
+  grey, and a split is already two of everything. The gutter is held either way, so nothing
+  shifts sideways when a thumb arrives — and on both edges of a pane rather than one, since
+  on one it is reserved at the pane's right, which for the left pane is the side the line is
+  on, and the two cards then stand at different distances from it.
+- **The page itself does not scroll while the split is open.** The panes fill the window
+  under the breadcrumb and the document is held still: a page scrolling behind them would
+  carry both lists out of the window at once, which is the one thing two lists read against
+  each other must not do. The line therefore runs the whole height of the window.
+- **The line says it can be moved rather than leaving a reader to find out.** A grip stands
+  in the middle of it, which is where a hand reaches for a divider, and it stays there while a
+  link is being offered: the circle that ties one now stands where that link runs rather than
+  in the middle, so the two no longer share a spot for one of them to give up. What the grip
+  says — this line moves — is true whether or not a pair is picked.
+- **The entries come in from the side they stand on and leave the same way**, so the split
+  reads as the orders being joined by them rather than as one screen replaced by another. It
+  is the panel this screen already opens beside its orders in shape — the same easing, a step
+  slower, half a screen being more to take in than a panel — and the split outlives the
+  address by the length of its own closing, an unmounted pane not being something anyone can
+  watch leave.
+- A pane carries the rounded bottom the card would have rounded for itself. The card is
+  taller than the pane and the pane is what clips it, so without it the entries end in a
+  square cut across the foot of the window.
+- **Picking one end of a link lights up both ends**, and every end is marked the same way —
+  dotted, on whichever side it is and whichever end was picked. It is stated once, by the
+  split, because it is a fact about the two tables together rather than about either of them:
+  a row marked one way on one side and another on the other reads as two different things.
+  It is the theme's own quiet colour — this table already spends colour on how an
+  order reconciled and on which marketplace it came from, and a third loud one would be read
+  as a third fact.
+- Which rows those are is the order's own account of what settled it rather than the text on
+  the entry, so a link the matching found for itself is drawn exactly as one a person wrote.
+- **The other end is brought level with the picked row**, in its own pane and nothing else's:
+  the two ends read as a link when the line between them goes across, and as two coincidences
+  when it runs the height of a table. It is moved outright rather than glided — this is where
+  a row is rather than something happening to it, and a glide stops progressing in a tab
+  nobody is looking at.
+- **A link is drawn for the row a reader is looking at**: one they have picked, one the
+  pointer is over, one they have taken hold of, or one they are about to make. Not all of
+  them at once — a month of transfers is a month of lines across the middle of the screen,
+  and a drawing that never changes is one nobody reads. Each is a curve across the gap from
+  one row to the other; two outlines leave them to be paired up by eye, and the line says
+  which two.
+- The pointer is noted on the split rather than on every row of two tables: one listener for
+  a screenful of rows, and neither screen has to know that a pointer over one of its rows
+  means anything. A click on the ground around the tables puts both picks down: pointing
+  at two rows is how a reader picks them, so pointing at nothing at all is how they stop. A
+  control is not that ground — closing a panel, or pressing anything either screen carries,
+  is a reader working with what they picked rather than pointing away from it.
+- **No lines while a panel is out.** A filter or column panel slides over the very rows the
+  lines run between, and a curve laid across it reads as a line through the panel. The screens
+  say when they have one out, the way their rows say what they are; the split reads it. Nor
+  are they drawn while the divider is being dragged, being measured then against panes that
+  are still changing width.
+- The lines are read off the rows themselves — an order states the entries that settled it,
+  an entry states its own reference — so the split pairs up what the two tables are showing
+  without holding a list of its own. They are re-measured whenever a pane scrolls and
+  whenever a pane changes shape, the panes opening by animating their own width.
+- A link with an end scrolled out of its pane is drawn against that pane's edge and faded,
+  so it reads as pointing off the screen rather than as joining the row it happens to touch.
+  A link nobody can see is a link nobody knows is there.
+- **A link about to be made is drawn too, dotted**: two rows picked on either side are a link
+  a reader is proposing, and the dots are what tell it from the ones that exist. The circle
+  at the divider offers to tie it, and offers it only while it is still a proposal: once the
+  link exists there is nothing left to tie, so what stands there is the button that breaks
+  it and nothing beside it. Two circles, one offering to make what the other has just made,
+  would leave a reader to work out which of them already happened.
+- Both rows stay picked once a link is made, and its line stays drawn. What was a link about
+  to be made is now one that exists, and a reader who has just made it is looking straight at
+  it: dropping the picks would take the line and the marks off the two rows at the very
+  moment they became true.
+- A linked entry wears no ground of its own. The dotted marks and the line say it is an end
+  of a link, and this table already colours an amount by its direction — a row tinted for
+  being spoken for would be a second colour saying a second thing.
+- The line between the panes answers a hand on the line. A hand on the button standing on it
+  is reaching for the button, not for the divider, so the line stays as it was.
+- **Untying belongs to the link being untied.** Taking hold of a line, or picking either of
+  the rows it runs between, brings up the button that breaks it — and only where a person
+  wrote the mapping that tied it. An automatic match is what the payer's own words say and
+  has nothing on the entry to clear, so it is drawn like any other link and offers no break.
+- Neither pane shows a scrollbar. Two panes side by side are two more bars than a screen
+  should carry, and they frame every table in grey down the very edges the lines are drawn
+  across. The panes still scroll, by wheel, by touch, and by being asked to bring a row into
+  view.
+- Each pane keeps its own stacking to itself. A screen's sticky bar and table head sit above
+  their own rows by number, and without that containment they are numbered against the line
+  between the panes as well. Nor does the line clip what stands on it: the circle is wider
+  than the line, and a clipped one reads as a pill wedged between the tables.
+- **The orders are one mounted screen whether the split is open or not**, the split wrapping
+  them either way. Swapped in and out instead, they come back with their panel already open,
+  having never had a shut state to open from, and with the month scrolled back to the top.
+  The panel follows the split rather than being settled at the first render, which is also
+  what animates it: a drawer that was already there slides where one just put there cannot.
+- What was picked is forgotten when the split closes, along with the lines and the buttons: a
+  screen no longer read beside anything has no links on it to be an end of.
+- The orders show how an order was paid in the split as well, that being the column which says
+  whether the statement beside them could have paid it at all.
+- In a pane the summary's own names stand on the wide side of the figure rather than after
+  it. The columns after the amount are the narrow ones there, and a name broken over two
+  lines makes four lines of a foot read as eight.
 
 ## Stripe transactions feature requirements
 

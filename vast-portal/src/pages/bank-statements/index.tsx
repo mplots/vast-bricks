@@ -22,10 +22,11 @@ import { importBankStatement, updateBankStatementMapping, useGetBankStatementEnt
 import Highlighted from 'components/Highlighted';
 import IconButton from 'components/@extended/IconButton';
 import MainCard from 'components/MainCard';
-import { PanelMain } from 'components/SidePanel';
+import { PanelMain, paneGap, stickyTop } from 'components/SidePanel';
 import TableSummaryFooter, { type SummaryLine } from 'components/TableSummaryFooter';
 import TableTextField from 'components/TableTextField';
 import ledgerTableSx from 'components/ledgerTable';
+import { settledBy, useBankMatching } from 'contexts/BankMatchingContext';
 import PeriodPicker from 'components/period/PeriodPicker';
 import PeriodViewToggle from 'components/period/PeriodViewToggle';
 import toolButtonSx from 'components/toolButton';
@@ -56,7 +57,22 @@ const columns = [
   { key: 'reference', width: '14%' },
   { key: 'mapping', width: '14%' }
 ] as const;
-const amountColumn = columns.findIndex((column) => column.key === 'amount');
+
+/**
+ * What an entry reads as in the pane of the matching split: when it was booked, who it was with, what they wrote on
+ * it, what it came to, and what it names.
+ *
+ * <p>A set of its own because a pane is half a screen, and the whole table in half a screen is a table read sideways
+ * — the mapping being the column furthest right, it is the one a reader would have to scroll to, which is the one
+ * thing this screen is open for. The bank's own code and reference are what a scroll would have been spent on.
+ */
+const matchingColumns = [
+  { key: 'date', width: '14%' },
+  { key: 'counterparty', width: '25%' },
+  { key: 'details', width: '26%' },
+  { key: 'amount', width: '17%' },
+  { key: 'mapping', width: '18%' }
+] as const;
 
 const formatDate = (value?: string | null) => {
   if (!value) return '—';
@@ -206,11 +222,17 @@ function MappingCell({
   );
 }
 
-export default function BankStatementsPage() {
+/**
+ * @param initialPeriod where the screen opens, for a caller that knows which period is in question. The split beside
+ * the reconciliation orders opens it on their month; the screen on its own opens on this one.
+ */
+export default function BankStatementsPage({ initialPeriod }: { initialPeriod?: string } = {}) {
   const intl = useIntl();
+  // What the two screens of a split hold in common. Inactive outside one, which leaves this screen as it was.
+  const matching = useBankMatching();
   // One string holds both what is being read and which view is reading it: `YYYY-MM` is a month, `YYYY` a year. The
   // screen opens on this month, which is the period a statement is imported for.
-  const [selectedPeriod, setSelectedPeriod] = useState(currentMonth());
+  const [selectedPeriod, setSelectedPeriod] = useState(initialPeriod || currentMonth());
   // Which entries of the period are being read: what was ticked, and what was searched for. It is held beside the
   // period, and for the same reason: this screen is read a period at a time rather than linked to, so what it is
   // showing is state of its own rather than an address the way the reconciliation screen's narrowing is.
@@ -219,7 +241,9 @@ export default function BankStatementsPage() {
   const downLG = useMediaQuery((theme) => theme.breakpoints.down('lg'));
   // Room for it means it is open: the entries are read against what they were narrowed to, so the panel showing that
   // is worth its width wherever there is width to spare.
-  const [filtersOpen, setFiltersOpen] = useState(!downLG);
+  // Room for it means it is open — except in the split beside the orders, where the pane is half a screen and the
+  // panel would be taking that width from the entries it narrows.
+  const [filtersOpen, setFiltersOpen] = useState(!downLG && !matching.active);
   // The search row is asked for rather than always there: most reading of a statement is reading it, and a row of
   // empty fields under the headings would cost every reader a line of the table to say so.
   const [searchOpen, setSearchOpen] = useState(false);
@@ -228,6 +252,11 @@ export default function BankStatementsPage() {
   // assumed would land over the headings on the first scroll of the page.
   const [headingRow, setHeadingRow] = useState<HTMLTableRowElement | null>(null);
   const [headingHeight, setHeadingHeight] = useState(0);
+  // The bar over the entries sticks, so the head has to know how tall it came out. Measured rather than stated: the
+  // period, the view toggle and the buttons wrap onto a second line in a narrow window — and in the pane of the
+  // matching split, which is half a screen — and a head stopping at an assumed height would land over them.
+  const card = useRef<HTMLDivElement>(null);
+  const [titleHeight, setTitleHeight] = useState(0);
   const [importing, setImporting] = useState(false);
   const [importResult, setImportResult] = useState<BankStatementImportResult | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -241,6 +270,14 @@ export default function BankStatementsPage() {
     bankStatementEntriesRefreshing,
     reloadBankStatementEntries
   } = useGetBankStatementEntries(selectedPeriod);
+
+  useEffect(() => {
+    const bar = card.current?.querySelector<HTMLElement>('.MuiCardHeader-root');
+    if (!bar) return;
+    const observer = new ResizeObserver(() => setTitleHeight(bar.offsetHeight));
+    observer.observe(bar);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     if (!headingRow) return;
@@ -282,6 +319,22 @@ export default function BankStatementsPage() {
       { revalidate: false }
     );
   };
+
+  // Half a screen holds fewer columns than a whole one, and the table is laid out to whichever set it is showing.
+  const shownColumns = matching.active ? matchingColumns : columns;
+  const amountColumn = shownColumns.findIndex((column) => column.key === 'amount');
+
+  // Said to the split, which draws no lines across a panel: one slides over the very rows the lines run between.
+  useEffect(() => matching.notePanel('entries', filtersOpen), [matching, filtersOpen]);
+
+  /** Whether this row is the entry picked in the split. */
+  const picked = (entry: BankStatementEntry) => matching.entry?.id === entry.id;
+
+  /**
+   * Whether this entry already names the order picked on the other side. Picking one end of a link lights up both
+   * ends of it, so an order picked to see what paid it shows its own entries wherever they sit in the period.
+   */
+  const linkedToPicked = (entry: BankStatementEntry) => matching.order != null && settledBy(matching.order, entry);
 
   const collectedEntries = bankStatementEntries ?? [];
   // A year of entries is thousands of rows, and every one of them is filtered again at each keystroke of a search.
@@ -402,7 +455,7 @@ export default function BankStatementsPage() {
         />
 
         <PanelMain open={filtersOpen} container={container}>
-          <Stack sx={{ gap: 3, mt: 2.5 }}>
+          <Stack sx={{ gap: 3, mt: paneGap }}>
             {importResult && (
               <Alert severity="success" onClose={() => setImportResult(null)}>
                 {intl.formatMessage(
@@ -424,12 +477,32 @@ export default function BankStatementsPage() {
             )}
 
             <MainCard
+              ref={card}
               content={false}
               title={periodTitle}
               secondary={actions}
-              // Nothing between the table and the page may clip, the stuck head and foot being the reason: a scrolling
-              // ancestor would catch them and hold them inside the card.
-              sx={{ overflow: 'visible' }}
+              // The bar draws its own bottom edge, the card's divider being a sibling that would scroll out from
+              // under it.
+              divider={false}
+              sx={{
+                // Nothing between the table and the page may clip, the stuck head and foot being the reason: a
+                // scrolling ancestor would catch them and hold them inside the card.
+                overflow: 'visible',
+                // The period is what the table is of, so it stays over the entries the way the head does: a period
+                // long enough to scroll is a period whose picker must still be reachable at the bottom of it. It
+                // rests at the same origin as everything else this screen sticks — the app header on the page, the
+                // pane's own top in the matching split.
+                '& .MuiCardHeader-root': {
+                  position: 'sticky',
+                  top: stickyTop(),
+                  zIndex: 3,
+                  bgcolor: 'background.paper',
+                  borderTopLeftRadius: 'inherit',
+                  borderTopRightRadius: 'inherit',
+                  borderBottom: '1px solid',
+                  borderColor: 'divider'
+                }
+              }}
             >
               {bankStatementEntriesLoading && <Skeleton variant="rounded" height={320} sx={{ m: 2.5 }} />}
 
@@ -448,16 +521,19 @@ export default function BankStatementsPage() {
                       stickyHeader
                       size="small"
                       aria-label={intl.formatMessage({ id: 'bank-statement-table' })}
-                      sx={ledgerTableSx(headingHeight, 1100)}
+                      // No width held open in the pane of the split: the columns are shares of the table, so they take whatever
+                      // the pane gives them, and a width held open there is a table read sideways to reach the
+                      // mapping — which is the column the split is open for.
+                      sx={ledgerTableSx(headingHeight, matching.active ? 0 : 1100, titleHeight)}
                     >
                       <colgroup>
-                        {columns.map((column) => (
+                        {shownColumns.map((column) => (
                           <col key={column.key} style={{ width: column.width }} />
                         ))}
                       </colgroup>
                       <TableHead>
                         <TableRow ref={setHeadingRow}>
-                          {columns.map((column, index) => (
+                          {shownColumns.map((column, index) => (
                             <TableCell key={column.key} sx={index === amountColumn ? numericCell : undefined}>
                               {intl.formatMessage({ id: `bank-statement-${column.key}` })}
                             </TableCell>
@@ -468,7 +544,7 @@ export default function BankStatementsPage() {
                             column with nothing to search keeps its cell so the row stays in step with the table. */}
                         {searchOpen && (
                           <TableRow>
-                            {columns.map((column) => {
+                            {shownColumns.map((column) => {
                               const searchable = entrySearchColumns.some((searched) => searched.column === column.key);
                               return (
                                 <TableCell key={column.key} sx={{ py: 0.75 }}>
@@ -491,13 +567,32 @@ export default function BankStatementsPage() {
                             take away the fields the reader has to reach to get their entries back. */}
                         {shown.length === 0 && (
                           <TableRow>
-                            <TableCell colSpan={columns.length} sx={{ py: 6, textAlign: 'center' }}>
+                            <TableCell colSpan={shownColumns.length} sx={{ py: 6, textAlign: 'center' }}>
                               <Typography color="text.secondary">{intl.formatMessage({ id: 'bank-statement-filtered-empty' })}</Typography>
                             </TableCell>
                           </TableRow>
                         )}
                         {shown.map((entry) => (
-                          <TableRow key={entry.id} hover>
+                          <TableRow
+                            key={entry.id}
+                            hover
+                            // In the split a row is a thing to pick; outside one it is a row to read and to write a
+                            // mapping in, and it answers no click at all.
+                            onClick={matching.active ? () => matching.selectEntry(picked(entry) ? null : entry) : undefined}
+                            aria-selected={picked(entry)}
+                            // Which end of a link this row is, for the line the split draws between the two, and
+                            // what the link is made of: the reference an order names it by, the row to write a
+                            // mapping on, and whether the mapping is what tied it — an automatic match has nothing
+                            // to untie.
+                            data-vast-link={picked(entry) ? 'picked' : linkedToPicked(entry) ? 'counterpart' : undefined}
+                            data-vast-entry={matching.active ? entry.entryReference : undefined}
+                            data-vast-entry-id={matching.active ? entry.id : undefined}
+                            data-vast-mapped={matching.active && entry.mapping?.trim() ? 'true' : undefined}
+                            // An entry that is an end of a link is marked as one by the split, which marks both ends
+                            // alike. No ground of its own: this table already colours an amount by its direction,
+                            // and a row tinted for being spoken for would be a second colour saying a second thing.
+                            sx={matching.active ? { cursor: 'pointer' } : undefined}
+                          >
                             <TableCell sx={{ whiteSpace: 'nowrap' }}>{formatDate(entry.bookingDate)}</TableCell>
                             <TableCell>
                               {/* Both lines of the cell are marked, the field under this column searching both. */}
@@ -519,15 +614,21 @@ export default function BankStatementsPage() {
                               {entry.direction === 'CREDIT' ? '+' : '−'}
                               {formatAmount(entry.amount)} {entry.currency}
                             </TableCell>
-                            <TableCell sx={{ whiteSpace: 'nowrap' }}>{transactionCode(entry) || '—'}</TableCell>
-                            <TableCell>
-                              {/* Wrapped rather than held on one line: a bank's reference is as long as that bank
-                                  made it, and the column is a share of the table rather than as wide as the longest
-                                  one that turns up. */}
-                              <Typography variant="caption" color="text.secondary">
-                                <Highlighted text={entry.entryReference} terms={termsOf('reference')} />
-                              </Typography>
-                            </TableCell>
+                            {/* The bank's own code and reference keep their columns on the whole screen and lose
+                                them in the pane of the split, where the width they took is the mapping's. */}
+                            {!matching.active && (
+                              <>
+                                <TableCell sx={{ whiteSpace: 'nowrap' }}>{transactionCode(entry) || '—'}</TableCell>
+                                <TableCell>
+                                  {/* Wrapped rather than held on one line: a bank's reference is as long as that
+                                      bank made it, and the column is a share of the table rather than as wide as
+                                      the longest one that turns up. */}
+                                  <Typography variant="caption" color="text.secondary">
+                                    <Highlighted text={entry.entryReference} terms={termsOf('reference')} />
+                                  </Typography>
+                                </TableCell>
+                              </>
+                            )}
                             {/* Keyed by what the server holds, so an entry whose mapping changed underneath — a reload,
                           another tab — comes back with the stored value rather than a draft of the old one. */}
                             <MappingCell
@@ -549,7 +650,10 @@ export default function BankStatementsPage() {
                         <TableSummaryFooter
                           lines={bankStatementSummary.flatMap((currency) => summaryLines(currency, (id) => intl.formatMessage({ id })))}
                           before={amountColumn}
-                          after={columns.length - amountColumn - 1}
+                          after={shownColumns.length - amountColumn - 1}
+                          // In the pane the columns after the amount are the narrow ones, so the name stands on the
+                          // wide side of the figure rather than wrapping in a column a third of a half-screen wide.
+                          labelBefore={matching.active}
                         />
                       )}
                     </Table>
