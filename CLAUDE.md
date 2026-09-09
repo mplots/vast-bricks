@@ -2281,29 +2281,48 @@ looks like. Read it, and never commit it.
   acceptance tests against mocked providers and must never be given production
   credentials, by an environment file, a shell that sourced one, or any other
   route. Only `./vast`'s own settings for the managed port win over the file.
-- Because it runs against real credentials, `vast-api` is never launched
-  implicitly: `./vast services start` without service names leaves it alone.
-  `./vast services restart` without names does rebuild and restart it when it is
-  already running, so it never serves a JAR older than the rest, and leaves it
-  down when it is not. Listing and stopping always include it.
+- Every command that takes service names covers every service when given none:
+  `./vast services start` starts them all, `restart` restarts them all, and
+  listing and stopping have always done so. A developer starting their
+  environment wants the environment, not most of it, and a service left out of
+  "all" is one that is silently missing exactly when something does not work.
 - `./vast services` (alias `./vast svc`) manages `postgres`, `tor-proxy`,
-  `vast-api-test`, `vast-api`, `wiremock`, and `vast-portal`. Managed
-  application instances use ports 6362, 6363, 9011, and 3100 respectively,
-  leaving the normal IntelliJ ports 6161, 6262, and 3200 available for
-  independently launched instances.
-- The managed `vast-portal` proxies `/api/**` to the managed `vast-api` service
-  on port 6363, so the portal runs against the same backend a deployment
-  serves. Start `vast-api` alongside it; the acceptance runtime is for tests,
-  not for the portal.
-- The managed `vast-portal` on port 3100 therefore sits in front of production
-  data. Never sign in to it, drive it with browser automation, or click anything
-  in it: its screens act on real marketplace orders and can generate real
-  invoices, and its credentials are the deployment's own. Agents must not enter
-  credentials there under any circumstances, and a running portal on 3100 is not
-  a place to verify a change.
-- To check a portal change visually, ask the developer for a screenshot of their
-  own session, or reproduce the layout in a throwaway page under the scratchpad
-  and check the behaviour there. Neither route touches production.
+  `vast-api-test`, `vast-api`, `wiremock`, `vast-portal`, and
+  `vast-portal-test`. Managed application instances use ports 6362, 6363, 9011,
+  3100, and 3101 respectively, leaving the normal IntelliJ ports 6161, 6262,
+  and 3200 available for independently launched instances.
+- There are two managed portals because there are two backends, and which
+  backend a portal proxies `/api/**` to is the whole difference between them.
+  `vast-portal` on 3100 proxies to `vast-api` on 6363, so it runs against the
+  same backend a deployment serves. `vast-portal-test` on 3101 proxies to
+  `vast-api-test` on 6362, whose providers are the managed WireMock.
+- The managed `vast-portal` therefore sits in front of production data. Never
+  sign in to it, drive it with browser automation, or click anything in it: its
+  screens act on real marketplace orders and can generate real invoices, and its
+  credentials are the deployment's own. Agents must not enter credentials there
+  under any circumstances, and a running portal on 3100 is not a place to verify
+  a change.
+- `vast-portal-test` is that place instead. It is the one portal a change may be
+  driven in a browser to check, because everything its screens read and
+  everything they do stops at WireMock: a scenario is stubbed there, the screen
+  is opened at 3101, and no real account is reachable from it at all. A
+  developer's own screenshot and a throwaway page under the scratchpad remain
+  the other two routes, and none of the three touches production.
+- What a browser signs in as there is a tenant of its own, seeded by `./vast`
+  when `vast-api-test` starts: `wiremock@vastbricks.test` / `wiremock`, whose
+  every provider is the managed WireMock under credentials that are plainly
+  nobody's. The credentials are there because a client refuses to call a
+  provider it holds no credential for, so a base URL alone would leave the
+  screens unable to read a stub at all.
+- It has to be a tenant and not the runtime's own environment. An environment
+  value wins over a database override by design, so a provider set in the
+  environment would take that setting away from every scenario that overrides
+  it — the acceptance suite sets exactly these keys, per tenant, on its own
+  WireMock host. The seed is therefore rows like a scenario's own, and one more
+  tenant is invisible to the scenarios beside it.
+- It is seeded by the CLI rather than by the local Flyway data because a secret
+  override is encrypted with the runtime's own key, which SQL cannot do, and
+  because the deployable runtime applies that same data to the same database.
 - `./vast ps` is the shortcut for `./vast services list`.
 - Runtime process state and logs belong under the ignored `.vast` directory.
   Service stop operations must affect only processes recorded and verified as

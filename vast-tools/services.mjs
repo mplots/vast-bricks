@@ -81,13 +81,14 @@ function printHelp() {
   ./vast services <list|start|stop|restart> [services...] [options]
 
 Services:
-  postgres | tor-proxy | vast-api-test | vast-api | wiremock | vast-portal
+  postgres | tor-proxy | vast-api-test | vast-api | wiremock | vast-portal |
+  vast-portal-test
 
 Commands:
   list                  Print service health and managed process state
-  start [services...]   Start selected services, or all but vast-api when omitted
+  start [services...]   Start selected services, or all of them when omitted
   stop [services...]    Stop selected managed services, or all when omitted
-  restart [services...] Restart selected services, or all running ones when omitted
+  restart [services...] Restart selected services, or all of them when omitted
 
 Options:
   --skip-build, -sb     Use existing built service artifacts
@@ -95,19 +96,30 @@ Options:
   --help, -h            Show this help
 
 Managed ports:
-  postgres       2345
-  tor-proxy      8118
-  vast-api-test  6362
-  vast-api       6363
-  wiremock       9011
-  vast-portal    3100
+  postgres          2345
+  tor-proxy         8118
+  vast-api-test     6362
+  vast-api          6363
+  wiremock          9011
+  vast-portal       3100
+  vast-portal-test  3101
 
 Postgres intentionally uses non-default host port 2345.
 IntelliJ launches keep their existing ports 6262 and 3000.
 
 vast-api runs the deployable vb-portal-api JAR, serving the legacy and
-rewritten backend together. It starts only when named, because it reads real
-credentials from the external file VAST_API_ENV_FILE points at, by default
-~/.vast/vast-api.env. Acceptance tests run against vast-api-test, which never
-reads that file.`);
+rewritten backend together. It reads real credentials from the external file
+VAST_API_ENV_FILE points at, by default ~/.vast/vast-api.env, and is the only
+service ever given them. Acceptance tests run against vast-api-test, which
+never reads that file.
+
+vast-portal serves the portal in front of vast-api and therefore in front of
+the real accounts. vast-portal-test serves the same portal in front of
+vast-api-test, so it is the one to open in a browser: everything it reads and
+everything it does stops at WireMock.
+
+Starting vast-api-test seeds the tenant that browser signs in as, whose every
+provider is the managed WireMock: wiremock@vastbricks.test / wiremock. Stub
+what a screen should read at http://127.0.0.1:9011/__admin/mappings and open
+http://127.0.0.1:3101.`);
 }

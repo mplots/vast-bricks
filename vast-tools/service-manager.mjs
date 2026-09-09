@@ -111,7 +111,7 @@ function printServiceList(rows) {
 }
 
 export async function startServices(names, options = {}) {
-  const services = startableServices(names).map(findService);
+  const services = selectedServices(names).map(findService);
 
   for (const service of services) {
     await startService(service, options);
@@ -131,7 +131,7 @@ export async function stopServices(names) {
 }
 
 export async function restartServices(names, options = {}) {
-  const services = restartableServices(names).map(findService);
+  const services = selectedServices(names).map(findService);
 
   for (const service of [...services].reverse()) {
     await stopService(service);
@@ -216,6 +216,10 @@ async function startService(service, { skipBuild = false, cleanDb = false } = {}
     throw new Error(`${service.name} did not become healthy within ${readinessTimeoutMs / 1_000}s: ${ready.detail}`);
   }
   console.log(`${statusLabel("healthy")} ${service.name.padEnd(13)} ${service.healthUrl}`);
+
+  if (service.afterHealthy) {
+    await service.afterHealthy(service);
+  }
 }
 
 function serviceEnvironment(service, { cleanDb = false, externalEnvironment = {} } = {}) {
@@ -575,32 +579,3 @@ function selectedServices(names) {
   return names.length > 0 ? names : managedServices.map(({ name }) => name);
 }
 
-/**
- * A service marked startWhenNamed is left out of "all", so starting everything never launches a service that runs
- * against real credentials. Listing and stopping still cover it.
- */
-function startableServices(names) {
-  return names.length > 0
-    ? names
-    : managedServices.filter(({ startWhenNamed }) => !startWhenNamed).map(({ name }) => name);
-}
-
-/**
- * Restarting everything also rebuilds a running startWhenNamed service, so it never keeps serving a JAR older than
- * the rest. One that is not running stays down: restart refreshes what is up, it does not launch anything new.
- */
-function restartableServices(names) {
-  if (names.length > 0) {
-    return names;
-  }
-
-  const state = readState();
-  return managedServices
-    .filter((service) => !service.startWhenNamed || isRunningManagedService(service, state))
-    .map(({ name }) => name);
-}
-
-function isRunningManagedService(service, state) {
-  const record = state.find(({ name }) => name === service.name);
-  return Boolean(record) && isOwnedProcessRunning(service, record);
-}

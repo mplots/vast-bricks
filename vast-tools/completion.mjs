@@ -8,7 +8,7 @@ export default function completions() {
   const serviceNames = managedServices.map(({ name }) => name).join(" ");
   const startOptions = "--skip-build -sb --help -h";
   const restartOptions = "--skip-build -sb --clean-db --help -h";
-  const testOptions = "--build -b --clean-build -cb --help -h";
+  const testOptions = "--tech --logic --build -b --clean-build -cb --help -h";
   const logsOptions = "--follow -f --tail -t --help -h";
   const basicOptions = "--help -h";
 

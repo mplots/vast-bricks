@@ -1,6 +1,7 @@
 import { readdirSync } from "node:fs";
 import { resolve, sep } from "node:path";
 
+import { ensureMockedTenant } from "./mocked-tenant.mjs";
 import { vastApiEnvFile } from "./env-file.mjs";
 import { repoRoot } from "./paths.mjs";
 
@@ -43,11 +44,13 @@ export const managedServices = [
       args: ["-pl", "vast-acceptance-tests", "-am", "clean", "package", "-DskipTests"],
     },
     processMarker: "vast-acceptance-tests-",
+    // So a browser opening vast-portal-test has a tenant whose providers are the managed WireMock.
+    afterHealthy: ensureMockedTenant,
   },
   {
     // The deployable runtime: vb-portal-api serving legacy and rewritten features from one launch, as production
-    // does. It is started only when named, because its environment file holds real credentials that no test run
-    // should ever reach.
+    // does. Its environment file holds real credentials, which is why no other service is ever given it; the file
+    // reaches this process alone.
     name: "vast-api",
     port: 6363,
     healthUrl: "http://127.0.0.1:6363/api/health",
@@ -64,7 +67,6 @@ export const managedServices = [
       args: ["-pl", "vb-portal-api", "-am", "clean", "package", "-DskipTests"],
     },
     processMarker: `vb-portal-api${sep}target${sep}vb-portal-api-`,
-    startWhenNamed: true,
   },
   {
     name: "wiremock",
@@ -97,6 +99,34 @@ export const managedServices = [
       VAST_MANAGED: "true",
       // The portal proxies to the standalone launcher, not to the acceptance runtime with its test-only endpoints.
       VITE_APP_API_PROXY: "http://127.0.0.1:6363",
+    },
+    processMarker: "node_modules/.bin/vite",
+  },
+  {
+    // The same portal in front of the acceptance runtime, which reads mocked providers instead of the account's own.
+    // It is the one portal a change may be driven in a browser to check: nothing it shows or does leaves WireMock.
+    name: "vast-portal-test",
+    port: 3101,
+    healthUrl: "http://127.0.0.1:3101/",
+    dependency: {
+      path: viteExecutable,
+      install: {
+        command: "yarn",
+        args: ["--cwd", "vast-portal", "install", "--frozen-lockfile"],
+      },
+    },
+    command: viteExecutable,
+    args: [
+      "--host",
+      "127.0.0.1",
+      "--port",
+      "3101",
+      "--strictPort",
+    ],
+    cwd: resolve(repoRoot, "vast-portal"),
+    env: {
+      VAST_MANAGED: "true",
+      VITE_APP_API_PROXY: "http://127.0.0.1:6362",
     },
     processMarker: "node_modules/.bin/vite",
   },
