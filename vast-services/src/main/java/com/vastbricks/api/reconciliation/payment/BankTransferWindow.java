@@ -1,10 +1,10 @@
 package com.vastbricks.api.reconciliation.payment;
 
 import java.time.LocalDate;
-import java.time.YearMonth;
+import com.vastbricks.api.reconciliation.ReconciliationPeriod;
 
 /**
- * The span of booking days the bank entries are read for when a month is reconciled.
+ * The span of booking days the bank entries are read for when a date range is reconciled.
  *
  * <p>It is days rather than instants, unlike {@link PaymentWindow}: a bank dates an entry by the day it booked it,
  * not by a moment in a zone of its own, and the entries are read out of Vast's own store rather than asked of a
@@ -12,7 +12,7 @@ import java.time.YearMonth;
  *
  * <p>The pad is lopsided because a bank transfer is paid after the order rather than around it. A buyer pays when
  * they get around to it, sometimes weeks later, and a buyer who underpaid sends the rest later still, so the window
- * reaches three months past the month and barely before it — the few days before covering only the marketplaces
+ * reaches ninety days past the selected end date and barely before it — the few days before covering only the marketplaces
  * dating an order in their own zone.
  *
  * <p>A wide window is safe here in a way it would not be for a weaker key: a transfer is attached to an order only
@@ -32,10 +32,10 @@ final class BankTransferWindow {
         this.to = to;
     }
 
-    static BankTransferWindow of(YearMonth month) {
+    static BankTransferWindow of(ReconciliationPeriod period) {
         return new BankTransferWindow(
-                month.atDay(1).minusDays(PAD_DAYS_BEFORE),
-                month.atEndOfMonth().plusDays(PAD_DAYS_AFTER)
+                period.getFrom().minusDays(PAD_DAYS_BEFORE),
+                period.getTo().plusDays(PAD_DAYS_AFTER)
         );
     }
 

@@ -27,8 +27,7 @@ import TableSummaryFooter, { type SummaryLine } from 'components/TableSummaryFoo
 import TableTextField from 'components/TableTextField';
 import ledgerTableSx from 'components/ledgerTable';
 import { settledBy, useBankMatching } from 'contexts/BankMatchingContext';
-import PeriodPicker from 'components/period/PeriodPicker';
-import PeriodViewToggle from 'components/period/PeriodViewToggle';
+import PeriodHeaderPicker from 'components/period/PeriodHeaderPicker';
 import toolButtonSx from 'components/toolButton';
 import useConfig from 'hooks/useConfig';
 import BankStatementFilterDrawer from 'sections/bank-statements/BankStatementFilterDrawer';
@@ -401,7 +400,7 @@ export default function BankStatementsPage({ initialPeriod }: { initialPeriod?: 
           <SearchNormal1 size={18} />
         </IconButton>
       </Tooltip>
-      <PeriodPicker value={selectedPeriod} onChange={setSelectedPeriod} />
+      <PeriodHeaderPicker value={selectedPeriod} onChange={setSelectedPeriod} />
       {/* Only once a period has been read: until then there is nothing to have shown a part of. It is the first
           thing a narrow screen gives up, the period and the buttons being what the bar is for. */}
       {bankStatementEntries && (
@@ -415,7 +414,6 @@ export default function BankStatementsPage({ initialPeriod }: { initialPeriod?: 
   const actions = (
     <Stack direction="row" sx={{ alignItems: 'center', gap: 1 }}>
       <input ref={fileInput} type="file" accept=".xml,text/xml,application/xml" hidden onChange={handleFile} />
-      <PeriodViewToggle value={selectedPeriod} onChange={setSelectedPeriod} />
       <Button
         variant="contained"
         size="small"

@@ -141,7 +141,29 @@ here as they are provided; do not invent unspecified behavior prematurely.
   all relevant orders, similarly to the current Orders screen.
 - The reconciliation screen must coexist with the current Orders screen during
   migration. In the long term, it is intended to replace the current screen.
-- The screen takes one month as its input and reconciles orders for that month.
+- The screen takes inclusive From/To order dates and asks the backend to collect
+  and reconcile that whole range, including ranges spanning months. The selector
+  offers Month, Year, and Custom range: a month covers its first through last day,
+  and a year covers January 1 through December 31. Apply submits both dates together;
+  the range travels in the URL and is separate from the local row filters.
+- Period selection stays in the report header. The period title opens a compact
+  popover with month/year/custom-range choices and Apply; month/year arrows stay
+  beside the title. Reconciliation, bank statements, Stripe, PayPal, Accounting,
+  and Archives share this header control. Each screen offers only the period
+  shapes its backend supports; Accounting and Archives remain month-only.
+- Custom ranges use one calendar. Once both dates are set, clicking near an
+  endpoint adjusts that endpoint and preserves the other; midpoint ties keep
+  editing the last-adjusted endpoint. Hovering previews the same change that a
+  click commits. Navigating months preserves the selection, and Start over is
+  the explicit way to clear it and pick a fresh range. A pending end date leaves
+  the chosen start visible in the summary. Keyboard arrows move by day/week,
+  Page Up/Down by month (with Shift, by year), and Home/End within the week.
+- Every reconciliation source receives the selected date range. BrickLink exports
+  use its bounds, and BrickOwl filters its list before requesting order details.
+  Payment windows retain seven days of padding at both ends, and bank transfers
+  retain seven days before and ninety days after the selected range. The API
+  continues accepting `month` for existing callers, or `from` and `to` together;
+  missing, invalid, reversed, or mixed inputs are rejected.
 - The purpose of the screen is to identify discrepancies for an order across
   the systems involved in commerce, payment, shipping, accounting, and store
   synchronization.
@@ -155,6 +177,10 @@ here as they are provided; do not invent unspecified behavior prematurely.
   which rows are there. Both exist, in different places.
 - Selecting an order shows all available details, including why its
   reconciliation failed.
+- The reconciliation table footer sums every money and count column in the
+  frontend over the orders currently shown after filtering. Totals follow the
+  visible column order, add money in cents and counts as whole numbers, and
+  leave a wholly unreported column absent.
 - The table's columns are chosen and ordered by the reader, from a panel down
   the right of the table that stays shut until it is asked for. Every collected
   order field can be a column; the screen opens with the subset it has always
@@ -183,6 +209,12 @@ here as they are provided; do not invent unspecified behavior prematurely.
   reconciliation states until their requirements are provided.
 
 ### Data collection and reconciliation
+
+- Item count and lot count are collected directly from the marketplace order:
+  BrickLink's `ORDERITEMS` and `ORDERLOTS`, and BrickOwl's `total_quantity`
+  and `total_lots`. They are exposed as `order.itemCount` and `order.lotCount`,
+  shown as whole-number columns and in order details. Missing counts remain
+  absent rather than being inferred from item lines; a reported zero stays zero.
 
 - The screen is backed entirely by live data sources. Reconciliation records,
   provider responses, and reconciliation results are not stored in the Vast

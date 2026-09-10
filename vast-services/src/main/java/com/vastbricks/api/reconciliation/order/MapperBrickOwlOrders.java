@@ -38,6 +38,8 @@ class MapperBrickOwlOrders implements OrderMapper<SourcedBrickOwlOrder> {
                 .orderDate(sourced.getOrderDate())
                 .buyer(order.getBuyerName())
                 .buyerUsername(order.getCustomerUsername())
+                .itemCount(order.getTotalQuantity())
+                .lotCount(order.getTotalLots())
                 .paymentMethod(ReconciliationPaymentMethod.normalize(order.getPaymentMethodType()))
                 .taxType(OrderTaxTypes.of(order))
                 .facilitatorTax(ReconciliationAmount.normalize(FacilitatorTaxes.of(order)))

@@ -120,6 +120,8 @@ export type ManakabataInvoiceMock = {
 export type ReconciliationProviders = {
   /** Reconciled month, as sent to the API. BrickOwl only serves order details for orders within it. */
   month?: string;
+  /** Inclusive order dates for range-based reconciliation scenarios. */
+  period?: { from: string; to: string };
   brickLink?: BrickLinkOrdersMock;
   brickOwl?: BrickOwlOrderMock[];
   /** Stripe balance transactions of the month, as one page. */
@@ -160,6 +162,7 @@ export async function mockReconciliationOrders(
     settings,
     providers.brickOwl ?? [],
     providers.month,
+    providers.period,
   );
   await mockStripe(
     wireMock,
@@ -303,6 +306,7 @@ async function mockBrickOwl(
   settings: SettingsOverrides,
   orders: BrickOwlOrderMock[],
   month?: string,
+  period?: { from: string; to: string },
 ) {
   await settings.set("VAST_BRICKOWL_BASE_URL", wireMock.baseUrl);
   await settings.setSecret("VAST_BRICKOWL_API_KEY", "test-brickowl-api-key");
@@ -316,7 +320,13 @@ async function mockBrickOwl(
   });
 
   const requestedOrders = orders.filter(
-    (order) => month === undefined || orderMonth(order.orderDate) === month,
+    (order) => {
+      if (period) {
+        const date = new Date(Number(order.orderDate) * 1000).toISOString().slice(0, 10);
+        return date >= period.from && date <= period.to;
+      }
+      return month === undefined || orderMonth(order.orderDate) === month;
+    },
   );
   for (const batch of brickOwlBatches(requestedOrders)) {
     await addBrickOwlBatchMapping(wireMock, batch, "order/view", (order) => ({

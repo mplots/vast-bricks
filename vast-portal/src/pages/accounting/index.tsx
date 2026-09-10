@@ -1,8 +1,7 @@
-import { FormEvent, useState } from 'react';
+import { useState } from 'react';
 
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import Chip from '@mui/material/Chip';
 import IconButton from '@mui/material/IconButton';
@@ -15,13 +14,13 @@ import TableContainer from '@mui/material/TableContainer';
 import TableFooter from '@mui/material/TableFooter';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { ReceiptAdd } from 'iconsax-reactjs';
 
 import { generateInvoice, useGetAccounting } from 'api/accounting';
 import MainCard from 'components/MainCard';
+import PeriodHeaderPicker from 'components/period/PeriodHeaderPicker';
 import type { AccountingOrder, AccountingSummary } from 'types/accounting';
 
 const previousMonth = () => {
@@ -133,17 +132,11 @@ function SummaryRow({ summary }: { summary: AccountingSummary }) {
 
 export default function AccountingPage() {
   const initialMonth = previousMonth();
-  const [selectedMonth, setSelectedMonth] = useState(initialMonth);
   const [requestedMonth, setRequestedMonth] = useState(initialMonth);
   const [generatingOrder, setGeneratingOrder] = useState<string | null>(null);
   const [generationError, setGenerationError] = useState<string | null>(null);
   const [generationMessage, setGenerationMessage] = useState<string | null>(null);
   const { accounting, accountingError, accountingLoading } = useGetAccounting(requestedMonth);
-
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setRequestedMonth(selectedMonth);
-  };
 
   const handleGenerateInvoice = async (order: AccountingOrder) => {
     const orderKey = `${order.source}-${order.orderNumber}`;
@@ -162,34 +155,26 @@ export default function AccountingPage() {
 
   return (
     <Stack spacing={3}>
-      <MainCard title="Accounting" contentSX={{ p: { xs: 2, sm: 3 } }}>
-        <Stack
-          component="form"
-          direction={{ xs: 'column', sm: 'row' }}
-          spacing={2}
-          alignItems={{ xs: 'stretch', sm: 'flex-end' }}
-          onSubmit={handleSubmit}
-        >
-          <TextField
-            label="Order month"
-            name="month"
-            type="month"
-            value={selectedMonth}
-            onChange={(event) => setSelectedMonth(event.target.value)}
-            slotProps={{ inputLabel: { shrink: true }, htmlInput: { pattern: '[0-9]{4}-[0-9]{2}' } }}
-          />
-          <Button type="submit" variant="contained" size="large" disabled={!selectedMonth}>
-            Show orders
-          </Button>
-          {accounting && (
-            <Chip
-              label={`${accounting.orders.length} ${accounting.orders.length === 1 ? 'order' : 'orders'}`}
-              variant="outlined"
-              sx={{ alignSelf: { sm: 'center' }, ml: { sm: 'auto !important' } }}
-            />
-          )}
-        </Stack>
-      </MainCard>
+      <MainCard
+        content={false}
+        title={
+          <Stack direction="row" sx={{ alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
+            <Typography variant="h5">Accounting</Typography>
+            <PeriodHeaderPicker value={requestedMonth} onChange={setRequestedMonth} allowYear={false} />
+          </Stack>
+        }
+        secondary={
+          <>
+            {accounting && (
+              <Chip
+                label={`${accounting.orders.length} ${accounting.orders.length === 1 ? 'order' : 'orders'}`}
+                variant="outlined"
+                sx={{ alignSelf: { sm: 'center' }, ml: { sm: 'auto !important' } }}
+              />
+            )}
+          </>
+        }
+      />
 
       {accountingLoading && <Skeleton variant="rounded" height={420} />}
 

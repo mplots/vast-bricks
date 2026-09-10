@@ -25,8 +25,7 @@ import { PanelMain } from 'components/SidePanel';
 import TableSummaryFooter, { type SummaryLine } from 'components/TableSummaryFooter';
 import TableTextField from 'components/TableTextField';
 import ledgerTableSx from 'components/ledgerTable';
-import PeriodPicker from 'components/period/PeriodPicker';
-import PeriodViewToggle from 'components/period/PeriodViewToggle';
+import PeriodHeaderPicker from 'components/period/PeriodHeaderPicker';
 import toolButtonSx from 'components/toolButton';
 import useConfig from 'hooks/useConfig';
 import StripeTransactionFilterDrawer from 'sections/stripe-transactions/StripeTransactionFilterDrawer';
@@ -324,7 +323,7 @@ export default function StripeTransactionsPage() {
           <SearchNormal1 size={18} />
         </IconButton>
       </Tooltip>
-      <PeriodPicker value={selectedPeriod} onChange={setSelectedPeriod} />
+      <PeriodHeaderPicker value={selectedPeriod} onChange={setSelectedPeriod} />
       {/* Only once a period has been read: until then there is nothing to have shown a part of. */}
       {stripeTransactions && (
         <Typography component="span" variant="body2" color="text.secondary" sx={{ display: { xs: 'none', sm: 'block' } }}>
@@ -336,7 +335,6 @@ export default function StripeTransactionsPage() {
 
   const actions = (
     <Stack direction="row" sx={{ alignItems: 'center', gap: 1 }}>
-      <PeriodViewToggle value={selectedPeriod} onChange={setSelectedPeriod} />
       {/* Nothing is stored, so this asks Stripe for the period again. It is its icon alone, saying what it is in its
           tooltip and its label, and refuses a second click until the first has answered. */}
       <Tooltip title={intl.formatMessage({ id: 'stripe-transaction-refresh' })} arrow>

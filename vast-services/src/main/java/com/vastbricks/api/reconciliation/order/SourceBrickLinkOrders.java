@@ -7,7 +7,7 @@ import com.vastbricks.api.client.brickstore.BrickStoreOrderRefund;
 import com.vastbricks.api.client.brickstore.BrickStoreOrderType;
 import com.vastbricks.api.reconciliation.ParallelTasks;
 import com.vastbricks.api.reconciliation.Source;
-import java.time.YearMonth;
+import com.vastbricks.api.reconciliation.ReconciliationPeriod;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 /**
- * Fetches the received BrickLink orders of the month, exported with the buyer's real name. The export names the buyer
+ * Fetches the received BrickLink orders in the selected date range, exported with the buyer's real name. The export names the buyer
  * either by real name or by username but never both, so the usernames are a separate source of their own.
  *
  * <p>The export names no refund at all, so the refund of each order it reports as cancelled is fetched from that
@@ -41,11 +41,11 @@ class SourceBrickLinkOrders implements Source<SourcedBrickLinkOrder> {
     }
 
     @Override
-    public List<SourcedBrickLinkOrder> fetch(YearMonth month) {
+    public List<SourcedBrickLinkOrder> fetch(ReconciliationPeriod period) {
         var exported = brickStoreClient.listOrders(BrickStoreOrderExportRequest.forDateRange(
                 BrickStoreOrderType.RECEIVED,
-                month.atDay(1),
-                month.atEndOfMonth(),
+                period.getFrom(),
+                period.getTo(),
                 true
         ));
 

@@ -22,11 +22,13 @@ import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
+import TableFooter from '@mui/material/TableFooter';
 import TableRow from '@mui/material/TableRow';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { ArrowLeft2, ArrowRight2, FilterSearch, Kanban, Link21, ReceiptAdd, Refresh } from 'iconsax-reactjs';
+import { endOfMonth, format, isValid, parseISO } from 'date-fns';
+import { FilterSearch, Kanban, Link21, ReceiptAdd, Refresh } from 'iconsax-reactjs';
 import { useIntl } from 'react-intl';
 import { useSearchParams } from 'react-router-dom';
 
@@ -38,7 +40,6 @@ import IconButton from 'components/@extended/IconButton';
 import ColumnPicker from 'components/ColumnPicker';
 import FilterFacets, { type FilterFacet, type FilterSelection } from 'components/FilterFacets';
 import MainCard from 'components/MainCard';
-import MonthPicker from 'components/period/MonthPicker';
 import {
   columnFields,
   columnParam,
@@ -52,9 +53,10 @@ import {
   storedColumnsKey,
   type StoredColumns
 } from 'sections/reconciliation/columns';
-import { currentMonth, monthDate, monthOf } from 'utils/month';
+import { currentMonth, monthDate } from 'utils/month';
 import OrderTaxTypeIcon from 'components/OrderTaxTypeIcon';
 import ReconciliationColumnDrawer from 'sections/reconciliation/ReconciliationColumnDrawer';
+import DatePeriodPicker from 'components/period/DatePeriodPicker';
 import ReconciliationFilterDrawer from 'sections/reconciliation/ReconciliationFilterDrawer';
 import { paneGap, stickyTop, STICKY_TOP } from 'components/SidePanel';
 import { BankMatchingProvider, isBankTransferOrder, settledBy, useBankMatching } from 'contexts/BankMatchingContext';
@@ -87,6 +89,8 @@ const amountFields: string[] = [
   'accounting.grandTotal',
   'calculated.targetInvoice'
 ];
+const countFields = ['order.itemCount', 'order.lotCount'];
+const numericFields = [...amountFields, ...countFields];
 const dateFields: string[] = ['order.orderDate'];
 
 // A field path is not a name a message can interpolate — an ICU argument carries no dot — so a failure hands its
@@ -105,6 +109,9 @@ const formatAmount = (value?: number | null) => {
   return `€${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 };
 
+const formatCount = (value?: number | null) =>
+  value === null || value === undefined || Number.isNaN(value) ? '—' : value.toLocaleString(undefined, { maximumFractionDigits: 0 });
+
 const formatText = (value?: string | null) => value ?? '—';
 
 // Dates arrive as ISO days and are shown the way the rest of the portal shows them.
@@ -121,6 +128,7 @@ const formatFieldValue = (order: ReconciliationOrder, field: string) => {
   if (amountFields.includes(field)) {
     return formatAmount(value as number | null);
   }
+  if (countFields.includes(field)) return formatCount(value as number | null);
   return dateFields.includes(field) ? formatDate(value as string | null) : formatText(value as string | null);
 };
 
@@ -221,6 +229,12 @@ const tintedIn = (params: URLSearchParams) => {
   // Read back loudest first rather than in the order the address happens to list them, and anything that is not a
   // level is not one.
   return filterLevels.filter((level) => named.includes(level));
+};
+
+/** Read calendar dates without a timezone conversion; ignore malformed dates in shared links. */
+const dateIn = (params: URLSearchParams, key: string) => {
+  const value = params.get(key);
+  return value && /^\d{4}-\d{2}-\d{2}$/.test(value) && isValid(parseISO(value)) ? value : '';
 };
 
 const orderKey = (order: ReconciliationOrder) => `${order.order.source}-${order.order.orderId}`;
@@ -347,6 +361,8 @@ function ReconciliationOrders() {
   const matching = useBankMatching();
   const matchingOpen = searchParams.get(matchKey) === matchValue;
   const selectedMonth = monthIn(searchParams);
+  const dateFrom = dateIn(searchParams, 'dateFrom') || `${selectedMonth}-01`;
+  const dateTo = dateIn(searchParams, 'dateTo') || format(endOfMonth(monthDate(selectedMonth)), 'yyyy-MM-dd');
   // Colouring is not filtering: this decides how the rows that are shown read, not which rows those are.
   const tintedLevels = tintedIn(searchParams);
   const [selectedOrder, setSelectedOrder] = useState<ReconciliationOrder | null>(null);
@@ -397,7 +413,7 @@ function ReconciliationOrders() {
     reconciliationOrdersLoading,
     reconciliationOrdersRefreshing,
     reloadReconciliationOrders
-  } = useGetReconciliationOrders(selectedMonth);
+  } = useGetReconciliationOrders(dateFrom, dateTo);
 
   useEffect(() => {
     const cardTop = cardTopRef.current;
@@ -478,20 +494,6 @@ function ReconciliationOrders() {
   const saveColumns = () => setStoredColumns({ order: columnOrder, shown: shownColumns });
 
   const columnsSaved = shownColumns.join(',') === remembered.shown.join(',') && columnOrder.join(',') === remembered.order.join(',');
-
-  /** Moves to the month `next` names. */
-  const goToMonth = (next: (from: string) => string) => updateParams((params) => params.set('month', next(monthIn(params))));
-
-  const handleMonthChange = (month: string) => goToMonth(() => month);
-
-  // The screen is read a month at a time, so the neighbouring months are a click rather than a trip to the picker.
-  // Ahead of this month there is nothing to collect, so the step forward stops there.
-  const stepMonth = (months: number) =>
-    goToMonth((from) => {
-      const stepped = monthDate(from);
-      stepped.setMonth(stepped.getMonth() + months);
-      return monthOf(stepped);
-    });
 
   const handleGenerateInvoice = async (order: ReconciliationOrder) => {
     setGeneratingOrder(orderKey(order));
@@ -722,6 +724,24 @@ function ReconciliationOrders() {
 
   const shownOrders = collectedOrders.filter((order) => facets.every((facet) => matches(order, facet)));
 
+  // Sum every numeric field over the displayed orders. Money is added in cents so decimal addition cannot introduce
+  // fractions of a cent; item and lot counts are added as whole numbers. A field nobody reported stays absent.
+  const totals = Object.fromEntries(
+    numericFields.map((field) => {
+      const isAmount = amountFields.includes(field);
+      let total = 0;
+      let collected = false;
+      shownOrders.forEach((order) => {
+        const value = valueAt(order, field);
+        if (typeof value === 'number' && Number.isFinite(value)) {
+          total += isAmount ? Math.round(value * 100) : value;
+          collected = true;
+        }
+      });
+      return [field, collected ? (isAmount ? total / 100 : total) : null];
+    })
+  );
+
   const optionLabel = (facet: OrderFacet, value: string) =>
     value === unstated ? intl.formatMessage({ id: 'reconciliation-filter-unstated' }) : facet.label(value);
 
@@ -799,11 +819,18 @@ function ReconciliationOrders() {
       next.forEach((kept) => params.append(facetKey, kept));
     }, true);
 
+  const applyPeriod = (from: string, to: string, view: 'month' | 'year' | 'range') =>
+    updateParams((params) => {
+      params.set('periodView', view);
+      params.set('dateFrom', from);
+      params.set('dateTo', to);
+      params.set('month', from.slice(0, 7));
+    });
+
   const clearFilters = () => updateParams((params) => facets.forEach((facet) => params.delete(facet.key)), true);
 
-  // The month being read is the table's title, walked by the arrows either side of it and picked outright by the
-  // title itself, which opens a picker of its own rather than the browser's.
-  const monthTitle = (
+  // The applied date range stays visible in the table header while its selectors are edited above it.
+  const periodTitle = (
     <Stack component="span" direction="row" useFlexGap sx={{ gap: 1.5, alignItems: 'center' }}>
       {/* Only while the panel is away, and at the end of the bar the panel comes back to: open, the panel is its own
           close button, and a button here that turned it off would be a second answer to a question it already
@@ -821,33 +848,19 @@ function ReconciliationOrders() {
           </IconButton>
         </Tooltip>
       )}
-      <Stack component="span" direction="row" useFlexGap sx={{ gap: 0.5, alignItems: 'center' }}>
-        <Tooltip title={intl.formatMessage({ id: 'reconciliation-month-previous' })} arrow>
-          <IconButton
-            size="small"
-            color="secondary"
-            aria-label={intl.formatMessage({ id: 'reconciliation-month-previous' })}
-            onClick={() => stepMonth(-1)}
-          >
-            <ArrowLeft2 size={16} />
-          </IconButton>
-        </Tooltip>
-        <MonthPicker value={selectedMonth} max={currentMonth()} onChange={handleMonthChange} />
-        <Tooltip title={intl.formatMessage({ id: 'reconciliation-month-next' })} arrow>
-          <span>
-            <IconButton
-              size="small"
-              color="secondary"
-              // Nothing has happened yet in a month that has not started.
-              disabled={selectedMonth >= currentMonth()}
-              aria-label={intl.formatMessage({ id: 'reconciliation-month-next' })}
-              onClick={() => stepMonth(1)}
-            >
-              <ArrowRight2 size={16} />
-            </IconButton>
-          </span>
-        </Tooltip>
-      </Stack>
+      <DatePeriodPicker
+        allowRange
+        from={dateFrom}
+        to={dateTo}
+        view={
+          searchParams.get('periodView') === 'year'
+            ? 'year'
+            : searchParams.get('periodView') === 'month' || !searchParams.has('dateFrom')
+              ? 'month'
+              : 'range'
+        }
+        onApply={applyPeriod}
+      />
       {/* Level with the month rather than under it, and only once a month has been collected: until then there is
           nothing to have shown a part of. It is the first thing a narrow screen gives up, the month and the buttons
           being the two the bar is for. */}
@@ -946,12 +959,10 @@ function ReconciliationOrders() {
             {generationError && <Alert severity="error">{generationError}</Alert>}
             {generationMessage && <Alert severity="success">{generationMessage}</Alert>}
 
-            {/* The month is what the table is of, so it is the table's own title rather than a bar of its own above
-                it. The count beside it and the buttons at its end are what the same one-line bar has room for, and
-                the bar stays under the app header so the month can still be changed from the foot of a long one. */}
+            {/* The applied range, counts and report actions stay visible while the orders scroll. */}
             <MainCard
               content={false}
-              title={monthTitle}
+              title={periodTitle}
               secondary={monthActions}
               // The bar draws its own bottom edge, the card's divider being a sibling that would scroll out from
               // under it.
@@ -960,8 +971,7 @@ function ReconciliationOrders() {
                 // The table scrolls with the page, so nothing between it and the page may clip: a scrolling ancestor
                 // would catch the sticky head and hold it inside the card instead of under the app header.
                 overflow: 'visible',
-                // A month long enough to scroll is a month whose picker must still be reachable at the bottom of it,
-                // so the bar sticks under the app header and the table's head stops under the bar.
+                // Keep the applied range above the table's sticky headings.
                 '& .MuiCardHeader-root': {
                   position: 'sticky',
                   // The same rest the panel beside it comes to, so the two stop level rather than one under the other.
@@ -1010,7 +1020,7 @@ function ReconciliationOrders() {
                 },
                 // The card cannot clip what overflows it, the sticky head being the reason, so the last row rounds
                 // its own outer corners rather than filling the card's.
-                '& tbody .MuiTableRow-root:last-of-type .MuiTableCell-root': {
+                '& tfoot .MuiTableRow-root:last-of-type .MuiTableCell-root': {
                   '&:first-of-type': { borderBottomLeftRadius: CARD_RADIUS },
                   '&:last-of-type': { borderBottomRightRadius: CARD_RADIUS }
                 }
@@ -1091,7 +1101,7 @@ function ReconciliationOrders() {
                             return (
                               <TableCell
                                 key={field}
-                                align={amountFields.includes(field) ? 'right' : 'left'}
+                                align={numericFields.includes(field) ? 'right' : 'left'}
                                 // The heading is what a column is moved by, dragged or with the arrow keys, so it
                                 // says so rather than reading as a word that happens to answer the keyboard.
                                 aria-label={intl.formatMessage({ id: 'reconciliation-column-move' }, { column: fieldLabel(field) })}
@@ -1187,7 +1197,7 @@ function ReconciliationOrders() {
                               {shownColumns.map((field) => (
                                 <TableCell
                                   key={field}
-                                  align={amountFields.includes(field) ? 'right' : 'left'}
+                                  align={numericFields.includes(field) ? 'right' : 'left'}
                                   sx={{
                                     ...(bandStarts.has(field) && bandEdge),
                                     ...(dateFields.includes(field) && { whiteSpace: 'nowrap' })
@@ -1209,6 +1219,38 @@ function ReconciliationOrders() {
                           );
                         })}
                       </TableBody>
+                      <TableFooter sx={{ bgcolor: 'transparent', border: 0 }}>
+                        <TableRow
+                          sx={{
+                            '& .MuiTableCell-root': {
+                              bgcolor: 'secondary.lighter',
+                              color: 'text.primary',
+                              fontWeight: 600,
+                              fontSize: '0.875rem',
+                              textTransform: 'none',
+                              whiteSpace: 'nowrap',
+                              borderTop: (theme) => `2px solid ${theme.palette.divider}`
+                            }
+                          }}
+                        >
+                          <TableCell component="th" scope="row">
+                            {intl.formatMessage({ id: 'reconciliation-total' })}
+                          </TableCell>
+                          {shownColumns.map((field) => (
+                            <TableCell
+                              key={field}
+                              align={numericFields.includes(field) ? 'right' : 'left'}
+                              sx={{ ...(bandStarts.has(field) && bandEdge) }}
+                            >
+                              {amountFields.includes(field)
+                                ? formatAmount(totals[field])
+                                : countFields.includes(field)
+                                  ? formatCount(totals[field])
+                                  : null}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      </TableFooter>
                     </Table>
                   </TableContainer>
                 ) : (

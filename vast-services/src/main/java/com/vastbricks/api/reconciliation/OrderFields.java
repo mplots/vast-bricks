@@ -31,6 +31,12 @@ public class OrderFields {
     private String buyer;
     private String buyerUsername;
 
+    /** Total individual items ordered, as reported by the marketplace. */
+    private Integer itemCount;
+
+    /** Number of order lots, as reported by the marketplace. */
+    private Integer lotCount;
+
     /**
      * How the order was paid: one name per payment provider, or the marketplace's own wording for a method no
      * provider is known for.

@@ -30,6 +30,8 @@ export interface ReconciliationOrderFields {
   orderDate: string | null;
   buyer: string;
   buyerUsername: string | null;
+  itemCount: number | null;
+  lotCount: number | null;
   /** How the order was paid, in the provider's own wording. */
   paymentMethod: string | null;
   /** How the order is treated for tax, derived from what the marketplace reported. */
@@ -113,7 +115,9 @@ export interface ReconciliationOrder {
 }
 
 export interface ReconciliationOrdersPage {
-  selectedMonth: string;
+  selectedMonth: string | null;
+  from: string;
+  to: string;
   /** Every field an order carries and where it came from, in the order the orders expose them. */
   fields: ReconciliationFieldDescriptor[];
   orders: ReconciliationOrder[];

@@ -3,14 +3,14 @@ package com.vastbricks.api.reconciliation.payment;
 import com.stripe.model.BalanceTransaction;
 import com.vastbricks.api.client.stripe.StripeBalanceClient;
 import com.vastbricks.api.reconciliation.Source;
-import java.time.YearMonth;
+import com.vastbricks.api.reconciliation.ReconciliationPeriod;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 /**
- * Fetches the Stripe balance transactions of the month. The window asked for is {@link PaymentWindow}, which reaches
- * past the month at both ends because Stripe dates a transaction at the capture of its charge rather than at the
+ * Fetches the Stripe balance transactions around the selected order dates. The window asked for is {@link PaymentWindow}, which reaches
+ * past the selected dates at both ends because Stripe dates a transaction at the capture of its charge rather than at the
  * order; the client follows Stripe's paging, and nothing here filters or interprets what came back.
  *
  * <p>It declares Stripe's own model rather than a carrier, because it assembles nothing beyond the paging the client
@@ -29,8 +29,8 @@ class SourceStripePayments implements Source<BalanceTransaction> {
     }
 
     @Override
-    public List<BalanceTransaction> fetch(YearMonth month) {
-        var window = PaymentWindow.of(month);
+    public List<BalanceTransaction> fetch(ReconciliationPeriod period) {
+        var window = PaymentWindow.of(period);
         return stripeBalanceClient.listBalanceTransactions(window.from(), window.to());
     }
 }

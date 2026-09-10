@@ -9,7 +9,7 @@ import com.vastbricks.api.client.brickowl.BrickOwlClientException;
 import com.vastbricks.api.client.brickowl.BrickOwlOrder;
 import com.vastbricks.api.client.brickowl.BrickOwlOrderListItem;
 import java.time.LocalDate;
-import java.time.YearMonth;
+import com.vastbricks.api.reconciliation.ReconciliationPeriod;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -19,8 +19,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 /**
- * Fetches the BrickOwl orders of the month. The list endpoint cannot be filtered and carries no amounts, so the month
- * is filtered client-side and each order's detail is requested in batches; every batch starts before the first is
+ * Fetches BrickOwl orders in the selected date range. The list endpoint cannot be filtered and carries no amounts,
+ * so the source filters the dates and each order's detail is requested in batches; every batch starts before the first is
  * joined. Pairing the batch responses back onto their requests is BrickOwl's batch protocol, so it happens here
  * rather than in the mapper.
  */
@@ -38,8 +38,8 @@ class SourceBrickOwlOrders implements Source<SourcedBrickOwlOrder> {
     }
 
     @Override
-    public List<SourcedBrickOwlOrder> fetch(YearMonth month) {
-        var listedOrders = findListedOrders(month);
+    public List<SourcedBrickOwlOrder> fetch(ReconciliationPeriod period) {
+        var listedOrders = findListedOrders(period);
         if (listedOrders.isEmpty()) {
             return List.of();
         }
@@ -64,9 +64,9 @@ class SourceBrickOwlOrders implements Source<SourcedBrickOwlOrder> {
         }
     }
 
-    private List<BrickOwlOrderListItem> findListedOrders(YearMonth month) {
+    private List<BrickOwlOrderListItem> findListedOrders(ReconciliationPeriod period) {
         return brickOwlClient.listOrders().stream()
-                .filter(order -> order.getOrderDate() != null && YearMonth.from(order.getOrderDate()).equals(month))
+                .filter(order -> order.getOrderDate() != null && period.contains(order.getOrderDate().toLocalDate()))
                 .toList();
     }
 

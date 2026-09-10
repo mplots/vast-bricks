@@ -3,7 +3,6 @@ package com.vastbricks.api.reconciliation;
 import com.vastbricks.api.reconciliation.ReconciliationPayload.ReconciliationOrderResult;
 import com.vastbricks.api.reconciliation.rule.ReconciliationFailure;
 import com.vastbricks.api.reconciliation.rule.Rule;
-import java.time.YearMonth;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -13,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 /**
- * Reconciles one month in three stages: the sources fetch every provider, the mappers build the single reconciled
+ * Reconciles one date range in three stages: the sources fetch every provider, the mappers build the single reconciled
  * order list out of what they fetched, and the rules judge each collected order. Adding a provider adds a source and a
  * mapper, adding a check adds a rule, and neither touches this orchestration.
  *
@@ -50,16 +49,16 @@ class ReconciliationService {
         this.rules = rules;
     }
 
-    List<ReconciliationOrderResult> findOrders(YearMonth month) {
-        return reconcile(map(source(month)));
+    List<ReconciliationOrderResult> findOrders(ReconciliationPeriod period) {
+        return reconcile(map(source(period)));
     }
 
     /** Sourcing: every provider is fetched, all of them in parallel. */
-    private SourcedData source(YearMonth month) {
+    private SourcedData source(ReconciliationPeriod period) {
         try (var tasks = new ParallelTasks()) {
             // Every source starts before the first result is joined, so no provider waits for another.
             var fetches = new LinkedHashMap<Class<?>, Supplier<? extends List<?>>>();
-            sources.forEach((type, source) -> fetches.put(type, tasks.start(() -> fetch(source, month))));
+            sources.forEach((type, source) -> fetches.put(type, tasks.start(() -> fetch(source, period))));
 
             var sourced = new LinkedHashMap<Class<?>, List<?>>();
             fetches.forEach((type, fetch) -> sourced.put(type, fetch.get()));
@@ -88,11 +87,11 @@ class ReconciliationService {
      * the request answers with whichever failure is joined first, so a provider that failed alongside that one would
      * otherwise leave no trace at all; this is also the only place that knows which source a failure came out of.
      */
-    private List<?> fetch(Source<?> source, YearMonth month) {
+    private List<?> fetch(Source<?> source, ReconciliationPeriod period) {
         try {
-            return source.fetch(month);
+            return source.fetch(period);
         } catch (RuntimeException exception) {
-            log.error("Reconciliation source {} failed for {}", source.getClass().getSimpleName(), month, exception);
+            log.error("Reconciliation source {} failed for {}", source.getClass().getSimpleName(), period, exception);
             throw exception;
         }
     }

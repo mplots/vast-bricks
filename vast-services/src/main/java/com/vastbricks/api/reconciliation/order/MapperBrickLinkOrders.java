@@ -37,6 +37,8 @@ class MapperBrickLinkOrders implements OrderMapper<SourcedBrickLinkOrder> {
                 .orderUrl(OrderLinks.brickLink(orderId))
                 .orderDate(order.getOrderDate())
                 .buyer(order.getBuyer())
+                .itemCount(order.getTotalItems())
+                .lotCount(order.getTotalLots())
                 .paymentMethod(ReconciliationPaymentMethod.normalize(order.getPaymentType()))
                 .taxType(OrderTaxTypes.of(order))
                 .facilitatorTax(ReconciliationAmount.normalize(FacilitatorTaxes.of(order)))

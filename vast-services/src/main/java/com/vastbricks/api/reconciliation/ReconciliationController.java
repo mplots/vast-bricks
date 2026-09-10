@@ -10,6 +10,7 @@ import com.vastbricks.api.reconciliation.ReconciliationPayload.ReconciliationFie
 import com.vastbricks.api.reconciliation.ReconciliationPayload.ReconciliationOrdersResponse;
 import java.util.Arrays;
 import java.time.YearMonth;
+import java.time.LocalDate;
 import java.util.List;
 import java.time.format.DateTimeParseException;
 import lombok.RequiredArgsConstructor;
@@ -33,13 +34,43 @@ class ReconciliationController {
     private final ReconciliationService reconciliationService;
 
     @GetMapping("/orders")
-    ReconciliationOrdersResponse listOrders(@RequestParam("month") String month) {
-        var selectedMonth = parseMonth(month);
+    ReconciliationOrdersResponse listOrders(
+            @RequestParam(value = "month", required = false) String month,
+            @RequestParam(value = "from", required = false) String from,
+            @RequestParam(value = "to", required = false) String to
+    ) {
+        var period = parsePeriod(month, from, to);
         return new ReconciliationOrdersResponse(
-                selectedMonth.toString(),
+                month,
+                period.getFrom().toString(),
+                period.getTo().toString(),
                 fieldRoster(),
-                reconciliationService.findOrders(selectedMonth)
+                reconciliationService.findOrders(period)
         );
+    }
+
+    /** Keep existing month links working while explicit ranges become the report's input. */
+    private ReconciliationPeriod parsePeriod(String month, String from, String to) {
+        if (month != null) {
+            if (from != null || to != null) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Use either month or from and to");
+            }
+            var selectedMonth = parseMonth(month);
+            return new ReconciliationPeriod(selectedMonth.atDay(1), selectedMonth.atEndOfMonth());
+        }
+        if (from == null || to == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Both from and to are required");
+        }
+        try {
+            if (!from.matches("\\d{4}-\\d{2}-\\d{2}") || !to.matches("\\d{4}-\\d{2}-\\d{2}")) {
+                throw new IllegalArgumentException("from and to must use YYYY-MM-DD format");
+            }
+            return new ReconciliationPeriod(LocalDate.parse(from), LocalDate.parse(to));
+        } catch (DateTimeParseException exception) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "from and to must be valid YYYY-MM-DD dates");
+        } catch (IllegalArgumentException exception) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, exception.getMessage());
+        }
     }
 
     /** The field roster, which is the same for every month: the declared fields, in the order they are declared. */

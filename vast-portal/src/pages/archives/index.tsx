@@ -1,8 +1,7 @@
-import { FormEvent, useState } from 'react';
+import { useState } from 'react';
 
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import IconButton from '@mui/material/IconButton';
 import Skeleton from '@mui/material/Skeleton';
@@ -14,13 +13,13 @@ import TableContainer from '@mui/material/TableContainer';
 import TableFooter from '@mui/material/TableFooter';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { CloseCircle, MinusCirlce, TickCircle } from 'iconsax-reactjs';
 
 import { downloadMissingArchives, useGetArchives } from 'api/archives';
 import MainCard from 'components/MainCard';
+import PeriodHeaderPicker from 'components/period/PeriodHeaderPicker';
 import type { AccountingOrder, AccountingSummary } from 'types/accounting';
 import type { VatInvoiceArchiveStatus } from 'types/archives';
 
@@ -190,16 +189,10 @@ function SummaryRow({ summary }: { summary: AccountingSummary }) {
 
 export default function ArchivesPage() {
   const initialMonth = previousMonth();
-  const [selectedMonth, setSelectedMonth] = useState(initialMonth);
   const [requestedMonth, setRequestedMonth] = useState(initialMonth);
   const [downloadingOrder, setDownloadingOrder] = useState<string | null>(null);
   const [downloadError, setDownloadError] = useState<string | null>(null);
   const { archives, archivesError, archivesLoading, reloadArchives } = useGetArchives(requestedMonth);
-
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setRequestedMonth(selectedMonth);
-  };
 
   const handleDownload = async (orderId: string) => {
     setDownloadingOrder(orderId);
@@ -216,32 +209,24 @@ export default function ArchivesPage() {
 
   return (
     <Stack spacing={3}>
-      <MainCard title="Archives" contentSX={{ p: { xs: 2, sm: 3 } }}>
-        <Stack
-          component="form"
-          direction={{ xs: 'column', sm: 'row' }}
-          spacing={2}
-          alignItems={{ xs: 'stretch', sm: 'flex-end' }}
-          onSubmit={handleSubmit}
-        >
-          <TextField
-            label="Order month"
-            name="month"
-            type="month"
-            value={selectedMonth}
-            onChange={(event) => setSelectedMonth(event.target.value)}
-            slotProps={{ inputLabel: { shrink: true }, htmlInput: { pattern: '[0-9]{4}-[0-9]{2}' } }}
-          />
-          <Button type="submit" variant="contained" size="large" disabled={!selectedMonth}>
-            Show orders
-          </Button>
-          {archives && (
-            <Box sx={{ alignSelf: { sm: 'center' }, ml: { sm: 'auto !important' }, color: 'text.secondary' }}>
-              {archives.orders.length} {archives.orders.length === 1 ? 'BrickLink order' : 'BrickLink orders'}
-            </Box>
-          )}
-        </Stack>
-      </MainCard>
+      <MainCard
+        content={false}
+        title={
+          <Stack direction="row" sx={{ alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
+            <Typography variant="h5">Archives</Typography>
+            <PeriodHeaderPicker value={requestedMonth} onChange={setRequestedMonth} allowYear={false} />
+          </Stack>
+        }
+        secondary={
+          <>
+            {archives && (
+              <Box sx={{ alignSelf: { sm: 'center' }, ml: { sm: 'auto !important' }, color: 'text.secondary' }}>
+                {archives.orders.length} {archives.orders.length === 1 ? 'BrickLink order' : 'BrickLink orders'}
+              </Box>
+            )}
+          </>
+        }
+      />
 
       {archivesLoading && <Skeleton variant="rounded" height={420} />}
 

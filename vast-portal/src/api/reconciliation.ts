@@ -7,12 +7,12 @@ import { fetcher } from 'utils/axios';
 
 const endpoint = '/api/private/reconciliation/orders';
 
-export function useGetReconciliationOrders(month: string) {
+export function useGetReconciliationOrders(from: string, to: string) {
   const requestKey = useMemo(() => {
-    if (!month) return null;
-    const searchParams = new URLSearchParams({ month });
+    if (!from || !to || from > to) return null;
+    const searchParams = new URLSearchParams({ from, to });
     return `${endpoint}?${searchParams.toString()}`;
-  }, [month]);
+  }, [from, to]);
 
   const { data, error, isLoading, isValidating, mutate } = useSWR<ReconciliationOrdersPage>(requestKey, fetcher, {
     revalidateIfStale: false,

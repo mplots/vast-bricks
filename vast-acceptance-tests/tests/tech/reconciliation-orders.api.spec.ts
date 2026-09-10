@@ -148,6 +148,8 @@ test("lists BrickLink reconciliation orders for the selected month", async ({
   expect(response.headers()["content-type"]).toContain("application/json");
   await expect(response.json()).resolves.toEqual({
     selectedMonth: "2026-08",
+    from: "2026-08-01",
+    to: "2026-08-31",
     // The field roster rides with every month and is asserted on its own below.
     fields: expect.any(Array),
     orders: [
@@ -160,6 +162,8 @@ test("lists BrickLink reconciliation orders for the selected month", async ({
           orderDate: "2026-08-31",
           buyer: "another buyer",
           buyerUsername: "another-buyer-username",
+          itemCount: null,
+          lotCount: null,
           paymentMethod: "Bank Transfer",
           taxType: null,
           facilitatorTax: null,
@@ -196,6 +200,8 @@ test("lists BrickLink reconciliation orders for the selected month", async ({
           orderDate: "2026-08-30",
           buyer: "some buyer",
           buyerUsername: "some-buyer-username",
+          itemCount: null,
+          lotCount: null,
           paymentMethod: "Stripe",
           taxType: "domestic",
           facilitatorTax: null,
@@ -285,6 +291,8 @@ test("lists BrickOwl reconciliation orders for the selected month", async ({
   expect(response.headers()["content-type"]).toContain("application/json");
   await expect(response.json()).resolves.toEqual({
     selectedMonth: "2026-08",
+    from: "2026-08-01",
+    to: "2026-08-31",
     // The field roster rides with every month and is asserted on its own below.
     fields: expect.any(Array),
     orders: [
@@ -297,6 +305,8 @@ test("lists BrickOwl reconciliation orders for the selected month", async ({
           orderDate: "2026-08-11",
           buyer: "Test Buyer Beta",
           buyerUsername: "test_beta",
+          itemCount: null,
+          lotCount: null,
           paymentMethod: null,
           taxType: null,
           facilitatorTax: null,
@@ -333,6 +343,8 @@ test("lists BrickOwl reconciliation orders for the selected month", async ({
           orderDate: "2026-08-10",
           buyer: "Test Buyer Alpha",
           buyerUsername: "test_alpha",
+          itemCount: null,
+          lotCount: null,
           paymentMethod: "PayPal",
           // BrickOwl names a tax scheme only for a registration of its own, so a scheme with a rate is a taxed
           // export.
@@ -470,6 +482,8 @@ test("lists BrickOwl reconciliation orders that span several batch requests", as
       orderDate: "2026-08-10",
       buyer: "Bulk Buyer 1",
       buyerUsername: "bulk_1",
+      itemCount: null,
+      lotCount: null,
       paymentMethod: null,
       taxType: null,
       facilitatorTax: null,
@@ -572,6 +586,8 @@ test("returns no reconciliation orders when no provider reports orders", async (
   expect(response.status(), await response.text()).toBe(200);
   await expect(response.json()).resolves.toEqual({
     selectedMonth: "2026-08",
+    from: "2026-08-01",
+    to: "2026-08-31",
     // The field roster rides with every month and is asserted on its own below.
     fields: expect.any(Array),
     orders: [],
@@ -600,6 +616,8 @@ test("reports every order field with the source that stated it", async ({
     { name: "order.orderDate", source: "order" },
     { name: "order.buyer", source: "order" },
     { name: "order.buyerUsername", source: "order" },
+    { name: "order.itemCount", source: "order" },
+    { name: "order.lotCount", source: "order" },
     { name: "order.paymentMethod", source: "order" },
     { name: "order.taxType", source: "order" },
     { name: "order.facilitatorTax", source: "order" },
@@ -2819,4 +2837,37 @@ test("collects no refund from a BrickOwl order whose refund total is zero", asyn
   expect(body.orders[0].order.refundedAmount).toBeNull();
   expect(body.orders[0].gateway.refundedAmount).toBeNull();
   expect(body.orders[0].failures).toEqual([]);
+});
+
+test("collects marketplace item and lot counts, preserving zero and missing counts", async ({ request, settings }, testInfo) => {
+  await mockReconciliationOrders(settings, request, testInfo, {
+    month: "2026-08",
+    brickLink: {
+      fullNameOrdersXml: `<?xml version="1.0" encoding="UTF-8"?><ORDERS>
+        <ORDER><ORDERID>99000001</ORDERID><ORDERDATE>8/10/2026</ORDERDATE>
+          <BUYER>Test Buyer Alpha</BUYER><ORDERITEMS>1234</ORDERITEMS><ORDERLOTS>56</ORDERLOTS>
+          <ITEM><ITEMID>3001</ITEMID><QTY>3</QTY><PRICE>1.00</PRICE></ITEM>
+        </ORDER>
+        <ORDER><ORDERID>99000002</ORDERID><ORDERDATE>8/10/2026</ORDERDATE>
+          <ORDERITEMS>0</ORDERITEMS><ORDERLOTS>0</ORDERLOTS>
+        </ORDER>
+        <ORDER><ORDERID>99000003</ORDERID><ORDERDATE>8/10/2026</ORDERDATE></ORDER>
+      </ORDERS>`,
+    },
+    brickOwl: [
+      { orderId: "7500001", orderDate: "1786320000", view: { total_quantity: "987", total_lots: "43" } },
+      { orderId: "7500002", orderDate: "1786320000", view: { total_quantity: "0", total_lots: "0" } },
+      { orderId: "7500003", orderDate: "1786320000", view: {} },
+    ],
+  });
+  const response = await request.get("/api/private/reconciliation/orders?month=2026-08");
+  expect(response.status(), await response.text()).toBe(200);
+  const body = await response.json();
+  for (const [id, itemCount, lotCount] of [
+    ["99000001", 1234, 56], ["99000002", 0, 0], ["99000003", null, null],
+    ["7500001", 987, 43], ["7500002", 0, 0], ["7500003", null, null],
+  ]) {
+    expect(body.orders.find((order: { order: { orderId: string } }) => order.order.orderId === id)?.order)
+      .toMatchObject({ itemCount, lotCount });
+  }
 });

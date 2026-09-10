@@ -16,7 +16,10 @@ final class ReconciliationPayload {
     @AllArgsConstructor
     public static final class ReconciliationOrdersResponse {
 
+        /** Present for compatibility when the caller selects a month. */
         private final String selectedMonth;
+        private final String from;
+        private final String to;
 
         /**
          * Every field an order carries and the source that stated it, in the order the orders expose them. It rides

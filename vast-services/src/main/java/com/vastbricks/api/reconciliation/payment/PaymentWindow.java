@@ -1,13 +1,13 @@
 package com.vastbricks.api.reconciliation.payment;
 
 import java.time.Instant;
-import java.time.YearMonth;
+import com.vastbricks.api.reconciliation.ReconciliationPeriod;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 
 /**
- * The period the payment providers are asked for when a month is reconciled. Both providers date their transactions
- * in UTC, so the month is a UTC window; it is padded at both ends because a payment is not dated where its order is.
+ * The period the payment providers are asked for when a date range is reconciled. Both providers date their transactions
+ * in UTC, so the selected dates form a UTC window; it is padded at both ends because a payment is not dated where its order is.
  *
  * <p>Stripe dates a balance transaction at the capture of the charge, which a marketplace may take days after the
  * buyer authorized it, so an order placed on the last of the month is commonly paid on the first of the next. The
@@ -32,10 +32,10 @@ final class PaymentWindow {
         this.to = to;
     }
 
-    static PaymentWindow of(YearMonth month) {
+    static PaymentWindow of(ReconciliationPeriod period) {
         return new PaymentWindow(
-                month.atDay(1).atStartOfDay().toInstant(ZoneOffset.UTC).minus(PAD_DAYS, ChronoUnit.DAYS),
-                month.atEndOfMonth().atTime(23, 59, 59).toInstant(ZoneOffset.UTC).plus(PAD_DAYS, ChronoUnit.DAYS)
+                period.getFrom().atStartOfDay().toInstant(ZoneOffset.UTC).minus(PAD_DAYS, ChronoUnit.DAYS),
+                period.getTo().atTime(23, 59, 59).toInstant(ZoneOffset.UTC).plus(PAD_DAYS, ChronoUnit.DAYS)
         );
     }
 

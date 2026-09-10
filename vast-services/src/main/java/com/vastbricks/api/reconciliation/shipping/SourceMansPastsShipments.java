@@ -3,7 +3,7 @@ package com.vastbricks.api.reconciliation.shipping;
 import com.vastbricks.api.client.manspasts.MansPastsClient;
 import com.vastbricks.api.client.manspasts.MansPastsShipment;
 import com.vastbricks.api.reconciliation.Source;
-import java.time.YearMonth;
+import com.vastbricks.api.reconciliation.ReconciliationPeriod;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -40,7 +40,7 @@ class SourceMansPastsShipments implements Source<MansPastsShipment> {
     }
 
     @Override
-    public List<MansPastsShipment> fetch(YearMonth month) {
+    public List<MansPastsShipment> fetch(ReconciliationPeriod period) {
         return mansPastsClient.listShipments(REGISTER_PAGE);
     }
 }
