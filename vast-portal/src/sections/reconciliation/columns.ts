@@ -20,6 +20,7 @@ export const orderFields = [
   'order.itemCount',
   'order.lotCount',
   'order.paymentMethod',
+  'order.currency',
   'order.taxType',
   'order.facilitatorTax',
   'order.subTotal',
@@ -59,6 +60,7 @@ export const columnFields: string[] = [
   'order.itemCount',
   'order.lotCount',
   'order.paymentMethod',
+  'order.currency',
   'order.grandTotal',
   'order.facilitatorTax',
   'order.refundedAmount',
@@ -76,8 +78,8 @@ export const columnFields: string[] = [
  * been found for it — which is the whole question being answered while an entry is being tied to it.
  *
  * <p>A set of its own because a pane is half a screen. The table fits the width it is given rather than being held
- * open, so the month's own thirteen columns in half a screen are thirteen columns of wrapped headings and no room
- * for what is under them. It is only where the split opens: the address still carries the columns, so a reader who
+ * open, so the month's full set of columns in half a screen becomes wrapped headings with no room for what is under
+ * them. It is only where the split opens: the address still carries the columns, so a reader who
  * asks for more keeps them, and the column panel is where they ask.
  */
 export const matchingFields: string[] = [
@@ -88,6 +90,8 @@ export const matchingFields: string[] = [
   // How the order was paid, which in a split beside a bank statement is the column that says whether this order is
   // one the statement could have paid at all.
   'order.paymentMethod',
+  // Kept beside the payment method so it can be compared directly with the statement entry's currency.
+  'order.currency',
   'order.grandTotal',
   'gateway.paidAmount'
 ];

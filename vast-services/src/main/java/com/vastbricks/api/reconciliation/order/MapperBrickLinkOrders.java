@@ -5,6 +5,7 @@ import com.vastbricks.api.reconciliation.OrderMapper;
 import com.vastbricks.api.reconciliation.OrderFields;
 import com.vastbricks.api.reconciliation.ReconciledOrder;
 import com.vastbricks.api.reconciliation.ReconciliationAmount;
+import com.vastbricks.api.reconciliation.ReconciliationCurrency;
 import com.vastbricks.api.reconciliation.ReconciliationPaymentMethod;
 import com.vastbricks.api.tax.FacilitatorTaxes;
 import com.vastbricks.api.tax.OrderTaxTypes;
@@ -40,6 +41,7 @@ class MapperBrickLinkOrders implements OrderMapper<SourcedBrickLinkOrder> {
                 .itemCount(order.getTotalItems())
                 .lotCount(order.getTotalLots())
                 .paymentMethod(ReconciliationPaymentMethod.normalize(order.getPaymentType()))
+                .currency(ReconciliationCurrency.normalize(order.getPaymentCurrencyCode()))
                 .taxType(OrderTaxTypes.of(order))
                 .facilitatorTax(ReconciliationAmount.normalize(FacilitatorTaxes.of(order)))
                 .subTotal(ReconciliationAmount.normalize(order.getTotal()))

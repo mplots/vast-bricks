@@ -181,6 +181,10 @@ here as they are provided; do not invent unspecified behavior prematurely.
   frontend over the orders currently shown after filtering. Totals follow the
   visible column order, add money in cents and counts as whole numbers, and
   leave a wholly unreported column absent.
+- The selected reconciliation report can be downloaded as CSV. The download
+  uses the selected date range and all frontend row filters, with the visible
+  columns in their selected order. Headers identify each field's source;
+  numeric values remain numeric and missing values are empty cells.
 - The table's columns are chosen and ordered by the reader, from a panel down
   the right of the table that stays shut until it is asked for. Every collected
   order field can be a column; the screen opens with the subset it has always
@@ -223,8 +227,8 @@ here as they are provided; do not invent unspecified behavior prematurely.
   from the BrickStore XML export and BrickOwl orders from the BrickOwl API for
   the selected month. Each collected order carries its marketplace source
   (`BrickLink` or `BrickOwl`), order ID, order date, buyer, buyer username,
-  payment method, tax type, facilitator tax, sub-total, grand total, refunded
-  amount, shipping charged, gateway paid amount, gateway facilitator tax,
+  payment method, payment currency, tax type, facilitator tax, sub-total, grand
+  total, refunded amount, shipping charged, gateway paid amount, gateway facilitator tax,
   gateway refunded amount, shipping cost, and target invoice, together with its
   rule failures and the links to the order
   and its payment, each exposed beside the field it rides on. Add further fields
@@ -305,6 +309,10 @@ here as they are provided; do not invent unspecified behavior prematurely.
   `ReconciliationPaymentMethod`, which the category packages see alongside
   `ReconciliationAmount`. Its fragments do not overlap, so the mapping needs no
   order to be unambiguous.
+- The order currency is the currency the buyer paid in: BrickLink's
+  `PAYCURRENCYCODE` and BrickOwl's `payment_currency`. It is trimmed and
+  normalized to an uppercase ISO 4217 code in the mapping stage, exposed as
+  `order.currency`, shown as a report column, and available as a UI filter.
 - The tax type is how the order is treated for tax. It is not reconciliation's
   own vocabulary, so it lives in the shared `tax` feature and is only collected
   here; see "Order tax type feature requirements". The mapping stage derives it
@@ -461,9 +469,9 @@ here as they are provided; do not invent unspecified behavior prematurely.
   order being two hundred fetches a month against the handful of orders a refund
   plausibly belongs to, so a partial refund on an order of another status stays
   uncollected. The page states the refund in the order's own currency, which is
-  not collected: no collected order carries one, and the amount is compared with
-  the payment's as a number, as the payment matching's own amount key already
-  is. BrickOwl states it as `refund_total` on the order itself, so it is
+  collected as `order.currency`; the amount is still compared with the
+  payment's as a number, as the payment matching's own amount key already is.
+  BrickOwl states it as `refund_total` on the order itself, so it is
   collected in the mapping stage with the order's other amounts; the field is
   written as `0.00` rather than omitted where nothing came back, so a zero is
   the marketplace reporting no refund and is collected as no amount at all.
@@ -534,9 +542,10 @@ here as they are provided; do not invent unspecified behavior prematurely.
   username the payment states outright.
 - The amount-and-day fallback compares the payment against the order's grand
   total, which is in the store's base currency, while the payment is in the
-  currency it was taken in. The collected order carries no currency, so the two
-  are compared as numbers. That is correct while both are the same currency and
-  is worth revisiting when a payment in another currency has to reconcile.
+  currency it was taken in. Although the collected order now carries its payment
+  currency, the two amounts are still compared as numbers. That is correct while
+  both are the same currency and is worth revisiting when a payment in another
+  currency has to reconcile.
 - An order the marketplace says was settled by bank transfer is paid through the
   bank, which is the one party to an order no provider exposes, so its payment is
   read out of the statement entries a person imported rather than asked of
@@ -912,8 +921,8 @@ here as they are provided; do not invent unspecified behavior prematurely.
   offered. Orders that answered a facet with nothing are one option of it, so
   they stay reachable rather than being dropped by a facet they cannot answer.
 - The current facets are the marketplace source, the reconciliation level, the
-  tax type and the payment method. Adding a filter is adding a facet to the
-  screen's list: it states how an order answers it and how that answer reads,
+  tax type, payment method and payment currency. Adding a filter is adding a
+  facet to the screen's list: it states how an order answers it and how that answer reads,
   and the options, their counts and the narrowing follow. `FilterFacets` is the
   shared panel body and knows nothing about orders.
 - The source facet lists the marketplaces an order can be collected from,

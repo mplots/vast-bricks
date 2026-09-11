@@ -28,7 +28,7 @@ import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { endOfMonth, format, isValid, parseISO } from 'date-fns';
-import { FilterSearch, Kanban, Link21, ReceiptAdd, Refresh } from 'iconsax-reactjs';
+import { DocumentDownload, FilterSearch, Kanban, Link21, ReceiptAdd, Refresh } from 'iconsax-reactjs';
 import { useIntl } from 'react-intl';
 import { useSearchParams } from 'react-router-dom';
 
@@ -36,6 +36,7 @@ import { useSearchParams } from 'react-router-dom';
 import { generateInvoice } from 'api/accounting';
 import { useGetReconciliationOrders } from 'api/reconciliation';
 import hasTextSelection from 'utils/textSelection';
+import { downloadCsv, type CsvValue } from 'utils/csv';
 import IconButton from 'components/@extended/IconButton';
 import ColumnPicker from 'components/ColumnPicker';
 import FilterFacets, { type FilterFacet, type FilterSelection } from 'components/FilterFacets';
@@ -706,6 +707,12 @@ function ReconciliationOrders() {
       valueOf: (order) => order.order.paymentMethod,
       // Collected as the marketplace worded it, so the wording is already the label.
       label: (value) => value
+    },
+    {
+      key: 'currency',
+      valueOf: (order) => order.order.currency,
+      // ISO currency codes are already the compact labels the table and filter need.
+      label: (value) => value
     }
   ];
 
@@ -723,6 +730,21 @@ function ReconciliationOrders() {
   };
 
   const shownOrders = collectedOrders.filter((order) => facets.every((facet) => matches(order, facet)));
+
+  const downloadReport = () => {
+    downloadCsv(`reconciliation-${dateFrom}-${dateTo}.csv`, [
+      shownColumns.map((field) => `${sourceLabel(fieldSource(field))}: ${fieldLabel(field)}`),
+      ...shownOrders.map((order) =>
+        shownColumns.map((field): CsvValue => {
+          const value = valueAt(order, field);
+          if (value == null) return null;
+          if (field === 'order.taxType') return fieldValue(order, field);
+          // Keep numbers numeric and dates in ISO form for sorting and calculations in a spreadsheet.
+          return value as CsvValue;
+        })
+      )
+    ]);
+  };
 
   // Sum every numeric field over the displayed orders. Money is added in cents so decimal addition cannot introduce
   // fractions of a cent; item and lot counts are added as whole numbers. A field nobody reported stays absent.
@@ -877,6 +899,20 @@ function ReconciliationOrders() {
   // says what it is in its tooltip and its label.
   const monthActions = (
     <Stack direction="row" useFlexGap sx={{ gap: 0.5, alignItems: 'center' }}>
+      <Tooltip title={intl.formatMessage({ id: 'reconciliation-download-csv' })} arrow>
+        <span>
+          <IconButton
+            variant="light"
+            color="secondary"
+            disabled={!reconciliationOrders || reconciliationOrdersRefreshing || !!reconciliationOrdersError || !shownColumns.length}
+            aria-label={intl.formatMessage({ id: 'reconciliation-download-csv' })}
+            onClick={downloadReport}
+            sx={toolButtonSx}
+          >
+            <DocumentDownload size={18} />
+          </IconButton>
+        </span>
+      </Tooltip>
       {/* The way into the split, where this screen is read beside the bank statement to tie an order the bank paid
           to the entry that paid it. It rides in the address as everything else this screen reads does, so the split
           survives a reload and can be handed to someone as the link it is. */}

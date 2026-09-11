@@ -43,6 +43,9 @@ public class OrderFields {
      */
     private String paymentMethod;
 
+    /** Currency the buyer paid in, as an ISO 4217 code reported by the marketplace. */
+    private String currency;
+
     /** How the order is treated for tax, derived from what the marketplace reported. */
     private OrderTaxType taxType;
 
@@ -62,9 +65,9 @@ public class OrderFields {
      * office's: one is what the order collected for shipping and the other is what shipping it cost. Nothing compares
      * them yet.
      *
-     * <p>Stated as the marketplace stated it, in the currency it stated it in, as the sub-total above is: no order
-     * carries a currency, and the grand total is the one amount either marketplace gives in the store's base
-     * currency.
+     * <p>Stated as the marketplace stated it, in the currency it stated it in, as the sub-total above is. The order's
+     * currency says what the buyer paid in; the grand total is the one amount either marketplace gives in the
+     * store's base currency.
      */
     private BigDecimal shippingCost;
 

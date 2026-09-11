@@ -34,6 +34,8 @@ export interface ReconciliationOrderFields {
   lotCount: number | null;
   /** How the order was paid, in the provider's own wording. */
   paymentMethod: string | null;
+  /** Currency the buyer paid in, as an ISO 4217 code reported by the marketplace. */
+  currency: string | null;
   /** How the order is treated for tax, derived from what the marketplace reported. */
   taxType: OrderTaxType | null;
   /** What the marketplace collected on the order as tax facilitator, or `null` when it collected none. */

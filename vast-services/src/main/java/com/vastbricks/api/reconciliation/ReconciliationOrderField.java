@@ -34,6 +34,7 @@ public enum ReconciliationOrderField {
     ORDER_ITEM_COUNT("order.itemCount", ORDER),
     ORDER_LOT_COUNT("order.lotCount", ORDER),
     ORDER_PAYMENT_METHOD("order.paymentMethod", ORDER),
+    ORDER_CURRENCY("order.currency", ORDER),
     ORDER_TAX_TYPE("order.taxType", ORDER),
     ORDER_FACILITATOR_TAX("order.facilitatorTax", ORDER),
     ORDER_SUB_TOTAL("order.subTotal", ORDER),

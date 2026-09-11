@@ -10,7 +10,6 @@ import { Add } from 'iconsax-reactjs';
 
 import IconButton from 'components/@extended/IconButton';
 import MainCard from 'components/MainCard';
-import SimpleBar from 'components/third-party/SimpleBar';
 import { HEADER_HEIGHT } from 'config';
 import useConfig from 'hooks/useConfig';
 
@@ -187,6 +186,9 @@ export default function SidePanel({ anchor, open, onClose, children }: SidePanel
           position: 'relative',
           boxShadow: 'none',
           [edge]: 0,
+          overflowY: 'auto',
+          scrollbarWidth: 'none',
+          '&::-webkit-scrollbar': { display: 'none' },
           // A long table scrolls past the panel rather than away from it. The docked drawer stretches to the row's
           // height, which is what gives the sticky paper room to travel.
           ...(!downLG && {
@@ -196,8 +198,7 @@ export default function SidePanel({ anchor, open, onClose, children }: SidePanel
             marginTop: paneGap,
             position: 'sticky',
             top: stickyTop(),
-            maxHeight: `calc(100vh - ${stickyTop(24)})`,
-            overflowY: 'auto'
+            maxHeight: `calc(100dvh - ${stickyTop(24)})`
           })
         }
       })}
@@ -207,8 +208,9 @@ export default function SidePanel({ anchor, open, onClose, children }: SidePanel
       ModalProps={{ keepMounted: true }}
       onClose={onClose}
     >
-      <MainCard border={!downLG} content={false}>
-        {downLG ? <SimpleBar sx={{ height: `calc(100vh - ${HEADER_HEIGHT}px)` }}>{content}</SimpleBar> : content}
+      {/* Keep the card's full content height so the drawer scrolls instead of shrinking and clipping its filters. */}
+      <MainCard border={!downLG} content={false} sx={{ flexShrink: 0 }}>
+        {content}
       </MainCard>
     </Drawer>
   );

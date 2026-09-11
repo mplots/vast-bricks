@@ -97,6 +97,7 @@ test("lists BrickLink reconciliation orders for the selected month", async ({
     <ORDERTOTAL>0.43</ORDERTOTAL>
     <ORDERSHIPPING>3.00</ORDERSHIPPING>
     <BASECURRENCYCODE>EUR</BASECURRENCYCODE>
+    <PAYCURRENCYCODE> usd </PAYCURRENCYCODE>
     <BASEGRANDTOTAL>3.435</BASEGRANDTOTAL>
     <PAYMENTTYPE>Credit/Debit (Powered by Stripe)</PAYMENTTYPE>
     <LOCATION>Latvia, Riga</LOCATION>
@@ -165,6 +166,7 @@ test("lists BrickLink reconciliation orders for the selected month", async ({
           itemCount: null,
           lotCount: null,
           paymentMethod: "Bank Transfer",
+          currency: null,
           taxType: null,
           facilitatorTax: null,
           subTotal: 3,
@@ -203,6 +205,7 @@ test("lists BrickLink reconciliation orders for the selected month", async ({
           itemCount: null,
           lotCount: null,
           paymentMethod: "Stripe",
+          currency: "USD",
           taxType: "domestic",
           facilitatorTax: null,
           subTotal: 0.43,
@@ -256,6 +259,7 @@ test("lists BrickOwl reconciliation orders for the selected month", async ({
           sub_total: "2.70",
           ship_total: "2.50",
           payment_method_type: "paypal",
+          payment_currency: "gbp",
           base_order_total: "5.20",
           billing_country_code: "LV",
           tax_scheme_id: "1",
@@ -308,6 +312,7 @@ test("lists BrickOwl reconciliation orders for the selected month", async ({
           itemCount: null,
           lotCount: null,
           paymentMethod: null,
+          currency: null,
           taxType: null,
           facilitatorTax: null,
           subTotal: 6,
@@ -346,6 +351,7 @@ test("lists BrickOwl reconciliation orders for the selected month", async ({
           itemCount: null,
           lotCount: null,
           paymentMethod: "PayPal",
+          currency: "GBP",
           // BrickOwl names a tax scheme only for a registration of its own, so a scheme with a rate is a taxed
           // export.
           taxType: "export-taxable",
@@ -485,6 +491,7 @@ test("lists BrickOwl reconciliation orders that span several batch requests", as
       itemCount: null,
       lotCount: null,
       paymentMethod: null,
+      currency: null,
       taxType: null,
       facilitatorTax: null,
       subTotal: 1,
@@ -619,6 +626,7 @@ test("reports every order field with the source that stated it", async ({
     { name: "order.itemCount", source: "order" },
     { name: "order.lotCount", source: "order" },
     { name: "order.paymentMethod", source: "order" },
+    { name: "order.currency", source: "order" },
     { name: "order.taxType", source: "order" },
     { name: "order.facilitatorTax", source: "order" },
     { name: "order.subTotal", source: "order" },

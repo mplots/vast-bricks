@@ -6,6 +6,7 @@ import com.vastbricks.api.reconciliation.OrderMapper;
 import com.vastbricks.api.reconciliation.OrderFields;
 import com.vastbricks.api.reconciliation.ReconciledOrder;
 import com.vastbricks.api.reconciliation.ReconciliationAmount;
+import com.vastbricks.api.reconciliation.ReconciliationCurrency;
 import com.vastbricks.api.reconciliation.ReconciliationPaymentMethod;
 import com.vastbricks.api.tax.FacilitatorTaxes;
 import com.vastbricks.api.tax.OrderTaxTypes;
@@ -41,6 +42,7 @@ class MapperBrickOwlOrders implements OrderMapper<SourcedBrickOwlOrder> {
                 .itemCount(order.getTotalQuantity())
                 .lotCount(order.getTotalLots())
                 .paymentMethod(ReconciliationPaymentMethod.normalize(order.getPaymentMethodType()))
+                .currency(ReconciliationCurrency.normalize(order.getPaymentCurrency()))
                 .taxType(OrderTaxTypes.of(order))
                 .facilitatorTax(ReconciliationAmount.normalize(FacilitatorTaxes.of(order)))
                 .subTotal(ReconciliationAmount.normalize(order.getSubTotal()))
