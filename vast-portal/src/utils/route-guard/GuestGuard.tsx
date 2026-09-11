@@ -11,18 +11,20 @@ import { GuardProps } from 'types/auth';
 // ==============================|| GUEST GUARD ||============================== //
 
 export default function GuestGuard({ children }: GuardProps) {
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, needsTenantSelection } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
     if (isLoggedIn) {
-      navigate(location?.state?.from ? location?.state?.from : APP_DEFAULT_PATH, {
+      // An account with more than one tenant picks one before landing anywhere it asked to go.
+      const destination = needsTenantSelection ? '/select-tenant' : location?.state?.from ? location?.state?.from : APP_DEFAULT_PATH;
+      navigate(destination, {
         state: { from: '' },
         replace: true
       });
     }
-  }, [isLoggedIn, navigate, location]);
+  }, [isLoggedIn, needsTenantSelection, navigate, location]);
 
   return children;
 }

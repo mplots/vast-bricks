@@ -23,6 +23,13 @@ public final class AuthPayload {
     }
 
     @Getter
+    @Setter
+    @NoArgsConstructor
+    public static final class SwitchTenantRequest {
+        private String tenantCode;
+    }
+
+    @Getter
     @AllArgsConstructor
     public static final class LoginResponse {
         private String serviceToken;
@@ -38,6 +45,8 @@ public final class AuthPayload {
     public static final class UserResponse {
         private UserProfile user;
         private TenantSummary tenant;
+        /** Every tenant the caller may serve, so a session resumed from a stored token can still offer a switch. */
+        private List<TenantSummary> tenants;
     }
 
     @Getter

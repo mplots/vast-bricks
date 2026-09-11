@@ -29,10 +29,9 @@ class SettingsOverrideMethodInterceptor implements MethodInterceptor {
         }
 
         SettingGetter getter = settingGetter.get();
-        if (settingFieldInjector.hasEnvironmentValue(getter.getSettingKey())) {
-            return invocation.proceed();
-        }
 
+        // A tenant's own override is what "database override" is for, so it wins over the environment default too -
+        // otherwise a managed env var would make a setting the annotation calls overridable not actually so.
         Optional<String> override = settingsOverrideService.getObject()
                 .findConfiguredOverride(getter.getSettingKey(), getter.isSecret());
         if (override.isEmpty()) {

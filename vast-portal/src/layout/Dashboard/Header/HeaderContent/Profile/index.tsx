@@ -19,6 +19,7 @@ import Box from '@mui/material/Box';
 // project-imports
 import ProfileTab from './ProfileTab';
 import SettingTab from './SettingTab';
+import SwitchTenantDialog from './SwitchTenantDialog';
 import Avatar from 'components/@extended/Avatar';
 import IconButton from 'components/@extended/IconButton';
 import Transitions from 'components/@extended/Transitions';
@@ -76,7 +77,8 @@ export default function ProfilePage() {
   const theme = useTheme();
   const navigate = useNavigate();
 
-  const { logout, user } = useAuth();
+  const { logout, user, tenant, tenants } = useAuth();
+  const [switchTenantOpen, setSwitchTenantOpen] = useState(false);
   const handleLogout = async () => {
     try {
       await logout();
@@ -160,7 +162,7 @@ export default function ProfilePage() {
                           <Stack>
                             <Typography variant="subtitle1">{user?.name}</Typography>
                             <Typography variant="body2" color="secondary">
-                              UI/UX Designer
+                              {tenant?.name}
                             </Typography>
                           </Stack>
                         </Stack>
@@ -182,7 +184,17 @@ export default function ProfilePage() {
                     </Tabs>
                   </Box>
                   <TabPanel value={value} index={0} dir={theme.direction}>
-                    <ProfileTab handleLogout={handleLogout} />
+                    <ProfileTab
+                      handleLogout={handleLogout}
+                      onSwitchTenant={
+                        (tenants?.length ?? 0) > 1
+                          ? () => {
+                              setSwitchTenantOpen(true);
+                              setOpen(false);
+                            }
+                          : undefined
+                      }
+                    />
                   </TabPanel>
                   <TabPanel value={value} index={1} dir={theme.direction}>
                     <SettingTab />
@@ -193,6 +205,7 @@ export default function ProfilePage() {
           </Transitions>
         )}
       </Popper>
+      <SwitchTenantDialog open={switchTenantOpen} onClose={() => setSwitchTenantOpen(false)} />
     </Box>
   );
 }

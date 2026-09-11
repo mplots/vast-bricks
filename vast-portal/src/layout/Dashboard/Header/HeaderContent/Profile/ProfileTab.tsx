@@ -5,15 +5,16 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 
 // assets
-import { Card, Edit2, Logout, Profile, Profile2User } from 'iconsax-reactjs';
+import { ArrowSwapHorizontal, Card, Edit2, Logout, Profile, Profile2User } from 'iconsax-reactjs';
 
 // ==============================|| HEADER PROFILE - PROFILE TAB ||============================== //
 
 interface Props {
   handleLogout: () => void;
+  onSwitchTenant?: () => void;
 }
 
-export default function ProfileTab({ handleLogout }: Props) {
+export default function ProfileTab({ handleLogout, onSwitchTenant }: Props) {
   return (
     <List component="nav" sx={{ p: 0, '& .MuiListItemIcon-root': { minWidth: 32 } }}>
       <ListItemButton>
@@ -41,6 +42,14 @@ export default function ProfileTab({ handleLogout }: Props) {
         </ListItemIcon>
         <ListItemText primary="Billing" />
       </ListItemButton>
+      {onSwitchTenant && (
+        <ListItemButton onClick={onSwitchTenant}>
+          <ListItemIcon>
+            <ArrowSwapHorizontal variant="Bulk" size={18} />
+          </ListItemIcon>
+          <ListItemText primary="Switch Tenant" />
+        </ListItemButton>
+      )}
       <ListItemButton onClick={handleLogout}>
         <ListItemIcon>
           <Logout variant="Bulk" size={18} />

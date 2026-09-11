@@ -1,4 +1,4 @@
-import { Timer1 } from 'iconsax-reactjs';
+import { Setting2, Timer1 } from 'iconsax-reactjs';
 
 import { NavItemType } from 'types/menu';
 
@@ -14,6 +14,13 @@ const operationsMenu: NavItemType = {
       type: 'item',
       url: '/jobs',
       icon: Timer1
+    },
+    {
+      id: 'vast-settings',
+      title: 'vast-settings',
+      type: 'item',
+      url: '/settings',
+      icon: Setting2
     }
   ]
 };

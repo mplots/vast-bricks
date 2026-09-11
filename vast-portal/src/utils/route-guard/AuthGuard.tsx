@@ -10,7 +10,7 @@ import { GuardProps } from 'types/auth';
 // ==============================|| AUTH GUARD ||============================== //
 
 export default function AuthGuard({ children }: GuardProps) {
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, needsTenantSelection } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -22,8 +22,11 @@ export default function AuthGuard({ children }: GuardProps) {
         },
         replace: true
       });
+    } else if (needsTenantSelection) {
+      // Reaching a dashboard URL directly, before a multi-tenant login has picked one, sends them to pick first.
+      navigate('/select-tenant', { replace: true });
     }
-  }, [isLoggedIn, navigate, location]);
+  }, [isLoggedIn, needsTenantSelection, navigate, location]);
 
   return children;
 }

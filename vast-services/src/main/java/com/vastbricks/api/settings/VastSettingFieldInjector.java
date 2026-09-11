@@ -25,19 +25,6 @@ class VastSettingFieldInjector {
         ReflectionUtils.doWithFields(target.getClass(), field -> injectField(target, field));
     }
 
-    boolean hasEnvironmentValue(String settingKey) {
-        if (!(environment instanceof ConfigurableEnvironment configurableEnvironment)) {
-            return hasText(environment.getProperty(settingKey));
-        }
-
-        for (PropertySource<?> propertySource : configurableEnvironment.getPropertySources()) {
-            if (propertySource.containsProperty(settingKey) && hasText(propertySource.getProperty(settingKey))) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     private void injectField(Object target, Field field) {
         VastSetting setting = field.getAnnotation(VastSetting.class);
         if (setting == null) {
@@ -54,7 +41,7 @@ class VastSettingFieldInjector {
         ReflectionUtils.setField(field, target, converted);
     }
 
-    private String environmentValue(String settingKey) {
+    String environmentValue(String settingKey) {
         if (!(environment instanceof ConfigurableEnvironment configurableEnvironment)) {
             return environment.getProperty(settingKey);
         }

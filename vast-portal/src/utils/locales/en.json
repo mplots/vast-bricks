@@ -348,5 +348,15 @@
   "job-bricklink-order-archive": "BrickLink order archive",
   "job-tally-archived": "archived",
   "job-tally-unchanged": "unchanged",
-  "job-tally-failed": "failed"
+  "job-tally-failed": "failed",
+  "vast-settings": "Settings",
+  "vast-settings-error": "The settings could not be read.",
+  "vast-settings-none": "No setting is registered.",
+  "vast-settings-save": "Save changes",
+  "vast-settings-save-error": "The settings could not be saved.",
+  "vast-settings-saved": "Settings saved.",
+  "vast-settings-secret-set": "Already set — leave blank to keep it",
+  "vast-settings-secret-unset": "Not set",
+  "vast-settings-reset": "Reset to default",
+  "vast-settings-reset-error": "The setting could not be reset."
 }

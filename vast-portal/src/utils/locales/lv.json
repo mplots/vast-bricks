@@ -348,5 +348,15 @@
   "job-bricklink-order-archive": "BrickLink pasūtījumu arhīvs",
   "job-tally-archived": "arhivēti",
   "job-tally-unchanged": "nemainīti",
-  "job-tally-failed": "neizdevās"
+  "job-tally-failed": "neizdevās",
+  "vast-settings": "Iestatījumi",
+  "vast-settings-error": "Neizdevās nolasīt iestatījumus.",
+  "vast-settings-none": "Nav reģistrēts neviens iestatījums.",
+  "vast-settings-save": "Saglabāt izmaiņas",
+  "vast-settings-save-error": "Neizdevās saglabāt iestatījumus.",
+  "vast-settings-saved": "Iestatījumi saglabāti.",
+  "vast-settings-secret-set": "Jau iestatīts — atstājiet tukšu, lai saglabātu",
+  "vast-settings-secret-unset": "Nav iestatīts",
+  "vast-settings-reset": "Atjaunot noklusējumu",
+  "vast-settings-reset-error": "Neizdevās atjaunot iestatījumu."
 }

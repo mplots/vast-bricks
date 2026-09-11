@@ -14,10 +14,16 @@ public class VastSettingsWriter {
     private final SettingsEncryption settingsEncryption;
     private final TenantAccess tenantAccess;
 
+    /** Stores the value for the tenant this request serves, encrypted only when the setting is marked secret. */
+    @Transactional
+    public void store(String settingKey, String settingValue, boolean secret) {
+        storeValue(settingKey, secret ? settingsEncryption.encrypt(settingValue) : settingValue);
+    }
+
     /** Stores the value for the tenant this request serves. */
     @Transactional
     public void storeSecret(String settingKey, String settingValue) {
-        storeValue(settingKey, settingsEncryption.encrypt(settingValue));
+        store(settingKey, settingValue, true);
     }
 
     /**
@@ -37,10 +43,19 @@ public class VastSettingsWriter {
         Long previous = TenantContext.currentTenantId().orElse(null);
         TenantContext.setTenantId(tenantId);
         try {
-            storeValue(settingKey, settingsEncryption.encrypt(settingValue));
+            store(settingKey, settingValue, true);
         } finally {
             TenantContext.setTenantId(previous);
         }
+    }
+
+    /** Clears the tenant's own override, so the setting falls back to the environment or its compile-time default. */
+    @Transactional
+    public void remove(String settingKey) {
+        if (TenantContext.currentTenantId().isEmpty()) {
+            throw new SettingsOverrideException("No tenant is bound to remove setting overrides for.");
+        }
+        settingsOverrideRepository.deleteBySettingKey(settingKey);
     }
 
     private void storeValue(String settingKey, String settingValue) {

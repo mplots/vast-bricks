@@ -1,7 +1,7 @@
 import { expect, test } from '../support/api-test';
 import { findSettingOverride } from '../support/vast-db';
 
-test('tenant overrides annotation defaults but not environment values', async ({
+test('tenant overrides take effect over both annotation defaults and environment values', async ({
   request,
   settings,
 }) => {
@@ -28,9 +28,11 @@ test('tenant overrides annotation defaults but not environment values', async ({
   const overriddenResponse = await request.get('/api/private/settings/health');
   expect(overriddenResponse.ok()).toBe(true);
 
+  // databaseOverride is what lets a tenant override an environment-managed default, not only the annotation's own
+  // compile-time one - otherwise it would only ever win against a value nothing bothered to configure.
   await expect(overriddenResponse.json()).resolves.toEqual({
     value: 'tenant-health-value',
-    environmentValue: 'managed-health-env-value',
+    environmentValue: 'tenant-env-value',
     databaseOnlyValue: 'tenant-database-only-value',
     secretValue: '',
   });

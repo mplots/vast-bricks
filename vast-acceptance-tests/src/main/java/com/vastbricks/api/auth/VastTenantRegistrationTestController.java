@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -59,6 +60,14 @@ class VastTenantRegistrationTestController {
         );
     }
 
+    /** A second (or third...) tenant for an already-registered user, to set up a switch-tenant scenario. */
+    @PostMapping("/{userId}/memberships")
+    Map<String, Object> addMembership(@PathVariable("userId") Long userId, @RequestBody AdditionalTenantRequest request) {
+        TenantView tenant = tenantProvisioning.create(request.getTenantCode(), request.getTenantName());
+        tenantProvisioning.addMember(userId, tenant.getId());
+        return Map.of("tenant", Map.of("id", tenant.getId(), "code", tenant.getCode(), "name", tenant.getName()));
+    }
+
     @Getter
     @Setter
     @NoArgsConstructor
@@ -69,5 +78,13 @@ class VastTenantRegistrationTestController {
         private String password;
         private String name;
         private String role;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    static class AdditionalTenantRequest {
+        private String tenantCode;
+        private String tenantName;
     }
 }

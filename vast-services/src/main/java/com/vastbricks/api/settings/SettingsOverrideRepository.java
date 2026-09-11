@@ -10,4 +10,6 @@ interface SettingsOverrideRepository extends JpaRepository<SettingsOverride, Lon
     // No tenant in the signature on purpose: Hibernate adds it from the entity's @TenantId. A tenant named here
     // would be a second, forgettable answer to a question already answered.
     Optional<SettingsOverride> findBySettingKey(String settingKey);
+
+    void deleteBySettingKey(String settingKey);
 }
