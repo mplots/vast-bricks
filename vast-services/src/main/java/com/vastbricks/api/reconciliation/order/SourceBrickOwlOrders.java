@@ -31,6 +31,7 @@ class SourceBrickOwlOrders implements Source<SourcedBrickOwlOrder> {
     private static final String ORDER_ENDPOINT = "order/view";
 
     private final BrickOwlClient brickOwlClient;
+    private final BrickOwlStoreSettings brickOwlStoreSettings;
 
     @Override
     public Class<SourcedBrickOwlOrder> type() {
@@ -39,7 +40,12 @@ class SourceBrickOwlOrders implements Source<SourcedBrickOwlOrder> {
 
     @Override
     public List<SourcedBrickOwlOrder> fetch(ReconciliationPeriod period) {
-        var listedOrders = findListedOrders(period);
+        var boundedPeriod = period.boundedBy(brickOwlStoreSettings.getOpenDate(), brickOwlStoreSettings.getCloseDate());
+        if (boundedPeriod.isEmpty()) {
+            return List.of();
+        }
+
+        var listedOrders = findListedOrders(boundedPeriod.get());
         if (listedOrders.isEmpty()) {
             return List.of();
         }

@@ -34,6 +34,7 @@ class SourceBrickLinkOrders implements Source<SourcedBrickLinkOrder> {
     private static final String CANCELLED = "cancelled";
 
     private final BrickStoreClient brickStoreClient;
+    private final BrickLinkStoreSettings brickLinkStoreSettings;
 
     @Override
     public Class<SourcedBrickLinkOrder> type() {
@@ -42,10 +43,15 @@ class SourceBrickLinkOrders implements Source<SourcedBrickLinkOrder> {
 
     @Override
     public List<SourcedBrickLinkOrder> fetch(ReconciliationPeriod period) {
+        var boundedPeriod = period.boundedBy(brickLinkStoreSettings.getOpenDate(), brickLinkStoreSettings.getCloseDate());
+        if (boundedPeriod.isEmpty()) {
+            return List.of();
+        }
+
         var exported = brickStoreClient.listOrders(BrickStoreOrderExportRequest.forDateRange(
                 BrickStoreOrderType.RECEIVED,
-                period.getFrom(),
-                period.getTo(),
+                boundedPeriod.get().getFrom(),
+                boundedPeriod.get().getTo(),
                 true
         ));
 
