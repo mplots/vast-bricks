@@ -1,6 +1,6 @@
 package com.vastbricks.api.client.brickstore;
 
-import com.vastbricks.api.settings.VastSettingsWriter;
+import com.vastbricks.api.setup.settings.VastSettingsWriter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

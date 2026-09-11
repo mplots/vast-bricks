@@ -1,7 +1,7 @@
 package com.vastbricks.api.orderarchive;
 
-import com.vastbricks.api.settings.DatabaseBackedSettings;
-import com.vastbricks.api.settings.VastSetting;
+import com.vastbricks.api.setup.settings.DatabaseBackedSettings;
+import com.vastbricks.api.setup.settings.VastSetting;
 import lombok.Getter;
 import org.springframework.stereotype.Component;
 

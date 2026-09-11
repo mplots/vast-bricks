@@ -83,6 +83,11 @@ to Java backend code only; do not create another frontend application.
 
 ## Rewrite coding guidelines
 
+- Less code is always better than more. Before writing a helper, use what is
+  already there: Lombok, Spring, Jackson, and Apache Commons Lang
+  (`StringUtils` and friends) are on the classpath, and pulling in a mature
+  library beats hand-rolling its equivalent. The same applies to the frontend:
+  prefer an existing MUI component or a maintained package over a bespoke one.
 - Structure rewritten backend code by vertical feature packages, not by broad
   technical layers. Prefer packages such as `requirements`, `inventory`, or
   `pricing` that contain that feature's controllers, services, models,
@@ -101,21 +106,6 @@ to Java backend code only; do not create another frontend application.
   are internal implementation details and must not be exposed to other
   features.
 - Do not use Java records in rewrite code. Prefer regular classes.
-- Keep all of a feature's HTTP request and response DTOs in one Java file, a
-  `<Feature>Payload` class named after the feature package: `InvoicePayload`,
-  `OrderFinancialsPayload`, `ReconciliationPayload`. Declare every request and
-  response inside it as a `public static final` class, together with the nested
-  objects those payloads are built from, for example
-  `OrderFinancialsPayload.ReportedOrderFinancials`. Do not give a request or
-  response its own file, and do not nest them in a controller.
-- The payload class is a container only: give it a private constructor and no
-  behavior. Declare it package-private, and public only when code outside the
-  feature package uses it, as with a public controller's payloads.
-- This covers the types that shape this API's own request and response bodies.
-  A model, enum, or value type used by the feature's services, sources, or
-  rules beyond a single payload keeps its own file, and so do the payloads of
-  outbound clients to external APIs under `com.vastbricks.api.client`; do not
-  move either into the payload class to satisfy the rule.
 - Use Lombok in rewrite Java code for repetitive boilerplate such as getters,
   setters, constructors, builders, `equals`, and `hashCode` when it keeps the
   code clearer.
@@ -329,16 +319,28 @@ looks like. Read it, and never commit it.
   against a running application. Browser UI acceptance tests are out of scope.
 - Acceptance tests must exercise public HTTP behavior rather than call Java
   implementation classes.
-- Acceptance tests are organized into two types, each its own Playwright project
-  and directory under `vast-acceptance-tests/tests`:
-  - **tech tests** (`tests/tech`) drive the real API endpoints and their
-    providers end to end. They own transport concerns: status codes, error
-    responses, authentication, and content negotiation.
-  - **logic tests** (`tests/logic`) address one component through the test-only
-    `/api/test/**` endpoints and assert its business behavior in isolation.
-  Shared fixtures stay in `tests/support` and serve both types.
-- Put a scenario in the type that matches how it reaches the code, not the
-  feature it covers. One feature normally has tests of both types.
+- Acceptance tests are organized into three types, each its own Playwright
+  project and directory under `vast-acceptance-tests/tests`:
+  - **feature tests** (`tests/features`) cover one feature's own public
+    surface: its CRUD and the assertions that say the feature does its job.
+    They are the answer to "does this feature work at all", and they stay
+    proportionate — most features need only a handful, and a small feature
+    needs very few.
+  - **tech tests** (`tests/tech`) cover the technical machinery underneath
+    rather than any one feature's business surface: authentication and
+    login/logout, Tor, transport concerns such as status codes, error
+    responses, and content negotiation.
+  - **logic tests** (`tests/logic`) go into the corner cases in depth,
+    addressing one component through the test-only `/api/test/**` endpoints
+    and asserting its business behavior in isolation.
+  Shared fixtures stay in `tests/support` and serve all three types.
+- Put a scenario in the type that matches what it is asking about: the
+  feature's surface, the machinery under it, or one component's corner cases.
+  A feature normally has tests of more than one type, and the feature tests are
+  the ones written first.
+- Tests written before this split are not all sorted into it yet. Put new
+  scenarios in the right type; do not rearrange the existing ones as a side
+  errand.
 - Components that no public endpoint exposes are tested through minimal
   test-only controllers in `vast-acceptance-tests`, mapped under `/api/test/**`.
   A test controller lives in the same package as the code it exercises so that

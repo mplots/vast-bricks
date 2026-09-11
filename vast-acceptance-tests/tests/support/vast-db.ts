@@ -2,7 +2,7 @@ import { Client } from 'pg';
 import { createCipheriv, randomBytes } from 'node:crypto';
 
 const databaseIdentifierPattern = /^[A-Za-z_][A-Za-z0-9_]*$/;
-const settingsEncryptionKeyEnv = 'VAST_SETTINGS_ENCRYPTION_KEY';
+const setupEncryptionKeyEnv = 'VAST_SETUP_ENCRYPTION_KEY';
 export const vastTestPassword = 'vast-playwright-password';
 const vastTestPasswordHash = '$2y$12$7UNCtzivmQcahGUhaeNGueQ4MNwka2uvb0YUyxF9b25Xhy8CmusVy';
 
@@ -93,14 +93,14 @@ export async function findSettingOverride(tenantId: number, settingKey: string):
 }
 
 function encryptSettingValue(plaintext: string): string {
-  const encodedKey = process.env[settingsEncryptionKeyEnv];
+  const encodedKey = process.env[setupEncryptionKeyEnv];
   if (!encodedKey) {
-    throw new Error(`${settingsEncryptionKeyEnv} is required to write secret setting overrides.`);
+    throw new Error(`${setupEncryptionKeyEnv} is required to write secret setting overrides.`);
   }
 
   const key = Buffer.from(encodedKey, 'base64');
   if (key.length !== 32) {
-    throw new Error(`${settingsEncryptionKeyEnv} must be a base64-encoded 32-byte key.`);
+    throw new Error(`${setupEncryptionKeyEnv} must be a base64-encoded 32-byte key.`);
   }
 
   const iv = randomBytes(12);

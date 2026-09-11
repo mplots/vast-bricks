@@ -17,7 +17,13 @@ export default defineConfig({
     }
   },
   projects: [
-    // Tech tests drive the real API endpoints and their providers end to end.
+    // Feature tests cover one feature's own public surface: its CRUD and the assertions that say it works.
+    {
+      name: 'features',
+      testDir: './tests/features',
+      testMatch: /.*\.api\.spec\.ts/
+    },
+    // Tech tests cover the technical machinery underneath: authentication, Tor, transport and content negotiation.
     {
       name: 'tech',
       testDir: './tests/tech',

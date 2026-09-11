@@ -24,8 +24,9 @@ export async function runTestCommand(args) {
     "--prefix",
     "vast-acceptance-tests",
     "run",
-    testScript(options),
+    "test:api",
     "--",
+    ...options.types.map((type) => `--project=${type}`),
     ...options.matchers,
   ];
   const wireMockPlan = wireMockPlaywrightPlan();
@@ -36,7 +37,7 @@ export async function runTestCommand(args) {
       ACCEPTANCE_PLAYWRIGHT_WORKERS: String(wireMockPlan.workers),
       ACCEPTANCE_WIREMOCK_HOSTS: wireMockPlan.hosts.join(","),
       ACCEPTANCE_WIREMOCK_MODE: wireMockPlan.mode,
-      VAST_SETTINGS_ENCRYPTION_KEY: process.env.VAST_SETTINGS_ENCRYPTION_KEY
+      VAST_SETUP_ENCRYPTION_KEY: process.env.VAST_SETUP_ENCRYPTION_KEY
         ?? "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=",
     },
     stdio: "inherit",
@@ -48,24 +49,12 @@ export async function runTestCommand(args) {
   return result.status ?? 1;
 }
 
-// Selects the npm script matching the requested acceptance test type.
-function testScript({ tech, logic }) {
-  if (tech && !logic) {
-    return "test:tech";
-  }
-  if (logic && !tech) {
-    return "test:logic";
-  }
-  return "test:api";
-}
-
 function parseOptions(args) {
   const options = {
     build: false,
     cleanBuild: false,
     help: false,
-    tech: false,
-    logic: false,
+    types: [],
     matchers: [],
   };
 
@@ -75,10 +64,12 @@ function parseOptions(args) {
     } else if (arg === "--clean-build" || arg === "-cb") {
       options.build = true;
       options.cleanBuild = true;
+    } else if (arg === "--features" || arg === "--feature") {
+      options.types.push("features");
     } else if (arg === "--tech") {
-      options.tech = true;
+      options.types.push("tech");
     } else if (arg === "--logic") {
-      options.logic = true;
+      options.types.push("logic");
     } else if (arg === "--help" || arg === "-h") {
       options.help = true;
     } else if (arg.startsWith("-")) {
@@ -99,12 +90,14 @@ function printHelp() {
 Runs Playwright API acceptance tests from vast-acceptance-tests.
 
 Test types:
-  tech    Drive the real API endpoints and their providers end to end
-  logic   Address one component through the test-only /api/test endpoints
+  features  One feature's own surface: its CRUD and the assertions that say it works
+  tech      The machinery underneath: authentication, Tor, transport, content negotiation
+  logic     One component's corner cases through the test-only /api/test endpoints
 
-Both types run when neither --tech nor --logic is given.
+Every type runs when none is named.
 
 Options:
+  --features            Run only the feature tests
   --tech                Run only the tech tests
   --logic               Run only the logic tests
   --build, -b           Rebuild and restart managed vast-api-test before testing
@@ -120,7 +113,7 @@ Environment:
   VAST_DB_PASSWORD      PostgreSQL password for DB-backed setup, default bricks
   VAST_DB_SCHEMA        Vast schema for DB-backed setup, default vast
   VAST_AUTH_JWT_SECRET  JWT signing secret, supplied automatically for the managed test service
-  VAST_SETTINGS_ENCRYPTION_KEY
+  VAST_SETUP_ENCRYPTION_KEY
                        Base64 32-byte key for encrypted secret settings`);
 }
 

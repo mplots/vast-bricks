@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "test": "playwright test",
-    "test:api": "playwright test --project=tech --project=logic",
+    "test:api": "playwright test",
+    "test:features": "playwright test --project=features",
     "test:tech": "playwright test --project=tech",
     "test:logic": "playwright test --project=logic"
   },

@@ -107,9 +107,9 @@ function writeSettings(service, tenantId) {
  * A secret is stored the way the application reads it back, so the key it is encrypted under is the runtime's own.
  */
 function encrypt(service, plaintext) {
-  const key = Buffer.from(service.env.VAST_SETTINGS_ENCRYPTION_KEY ?? "", "base64");
+  const key = Buffer.from(service.env.VAST_SETUP_ENCRYPTION_KEY ?? "", "base64");
   if (key.length !== 32) {
-    throw new Error(`${service.name} declares no 32-byte VAST_SETTINGS_ENCRYPTION_KEY to encrypt a secret with`);
+    throw new Error(`${service.name} declares no 32-byte VAST_SETUP_ENCRYPTION_KEY to encrypt a secret with`);
   }
 
   const iv = randomBytes(12);

@@ -44,7 +44,7 @@ export const managedServices = [
       VAST_HEALTH_SETTING_ENV_VALUE: "managed-health-env-value",
       VAST_BRICKSTORE_TOR_ENABLED: "false",
       VAST_AUTH_JWT_SECRET: "vast-playwright-auth-secret-must-be-at-least-32-bytes",
-      VAST_SETTINGS_ENCRYPTION_KEY: "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=",
+      VAST_SETUP_ENCRYPTION_KEY: "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=",
     },
     build: {
       command: "mvn",
