@@ -68,8 +68,9 @@ export async function listServices(names) {
       port: String(service.port),
       runtime: service.dockerComposeService ? "docker" : "native",
       ownership,
-      // The health URL is the page worth opening for every HTTP service, so the list stays copy-and-click.
-      url: service.healthUrl ?? "-",
+      // A service with known dev credentials gets a URL that signs the browser straight in, since that is the page
+      // actually worth opening; everything else falls back to its plain health URL, copy-and-click either way.
+      url: (health.healthy && service.loginUrl?.()) || service.healthUrl || "-",
       detail: health.detail,
     });
     allHealthy &&= health.healthy;

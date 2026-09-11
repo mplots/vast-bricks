@@ -1,11 +1,18 @@
 import { readdirSync } from "node:fs";
 import { resolve, sep } from "node:path";
 
-import { ensureMockedTenant } from "./mocked-tenant.mjs";
+import { ensureMockedTenant, mockedTenantEmail, mockedTenantPassword } from "./mocked-tenant.mjs";
 import { vastApiEnvFile } from "./env-file.mjs";
 import { repoRoot } from "./paths.mjs";
 
 const viteExecutable = resolve(repoRoot, "vast-portal", "node_modules", ".bin", process.platform === "win32" ? "vite.cmd" : "vite");
+
+// Basic-auth credentials in a URL still make the browser send them on a direct navigation, even though it now hides
+// them from the address bar afterward - so a URL shaped like this lands the browser signed into the portal already,
+// via vast-services' GET /api/account/basic-login.
+function loginUrlFor(port, email, password) {
+  return `http://${encodeURIComponent(email)}:${encodeURIComponent(password)}@127.0.0.1:${port}/api/account/basic-login`;
+}
 
 export const managedServices = [
   {
@@ -79,6 +86,8 @@ export const managedServices = [
     name: "vast-portal",
     port: 3100,
     healthUrl: "http://127.0.0.1:3100/",
+    // The seeded local admin from R__local_admin.sql - local dev only, never the credential of a real deployment.
+    loginUrl: () => loginUrlFor(3100, "info@vastbricks.com", "admin"),
     dependency: {
       path: viteExecutable,
       install: {
@@ -108,6 +117,9 @@ export const managedServices = [
     name: "vast-portal-test",
     port: 3101,
     healthUrl: "http://127.0.0.1:3101/",
+    // The wiremock tenant's credentials are already public within this repo (mocked-tenant.mjs), so this one always
+    // gets a login URL.
+    loginUrl: () => loginUrlFor(3101, mockedTenantEmail, mockedTenantPassword),
     dependency: {
       path: viteExecutable,
       install: {
