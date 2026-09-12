@@ -16,6 +16,7 @@ import { useIntl } from 'react-intl';
 import IconButton from 'components/@extended/IconButton';
 import ProviderLogo from 'components/logos/ProviderLogo';
 import MainCard from 'components/MainCard';
+import { operatingPeriodLabel } from './operatingPeriodLabel';
 import type { ProviderAccountItem } from 'types/providerAccount';
 
 type Props = {
@@ -91,12 +92,19 @@ export default function SortableAccountCard({ account, providerLabelId, onEdit, 
           </ListItem>
         </List>
         <Divider sx={{ my: 1.5 }} />
-        <Chip
-          label={intl.formatMessage({ id: account.enabled ? 'provider-accounts-enabled' : 'provider-accounts-disabled' })}
-          color={account.enabled ? 'success' : 'default'}
-          variant="light"
-          size="small"
-        />
+        {/* A card that says nothing about its periods would hide a filter on everything this account reads, so they
+            are named here rather than counted: a card saying "2 periods" still has to be opened to be read. */}
+        <Stack direction="row" sx={{ flexWrap: 'wrap', gap: 1 }}>
+          <Chip
+            label={intl.formatMessage({ id: account.enabled ? 'provider-accounts-enabled' : 'provider-accounts-disabled' })}
+            color={account.enabled ? 'success' : 'default'}
+            variant="light"
+            size="small"
+          />
+          {account.operatingPeriods?.map((period, index) => (
+            <Chip key={index} label={operatingPeriodLabel(intl, period)} variant="light" size="small" />
+          ))}
+        </Stack>
       </MainCard>
     </Grid>
   );

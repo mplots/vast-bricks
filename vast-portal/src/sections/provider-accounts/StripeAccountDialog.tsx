@@ -13,8 +13,11 @@ import Switch from '@mui/material/Switch';
 import TextField from '@mui/material/TextField';
 import { useIntl } from 'react-intl';
 
+import OperatingPeriodsEditor from './OperatingPeriodsEditor';
+import { hasOverlappingPeriods } from './operatingPeriodOverlap';
 import SecretTextField from './SecretTextField';
 import { createProviderAccount, getProviderAccount, updateProviderAccount } from 'api/providerAccounts';
+import type { OperatingPeriod } from 'types/providerAccount';
 import type { StripeAccountConfig } from 'types/stripeAccount';
 
 type Props = {
@@ -28,10 +31,11 @@ type Props = {
 type FormState = {
   name: string;
   secretKey: string;
+  operatingPeriods: OperatingPeriod[];
   enabled: boolean;
 };
 
-const emptyForm: FormState = { name: '', secretKey: '', enabled: true };
+const emptyForm: FormState = { name: '', secretKey: '', operatingPeriods: [], enabled: true };
 
 /**
  * The Stripe account's own screen, with its own fields: no other provider's form shares this component, and
@@ -58,7 +62,12 @@ export default function StripeAccountDialog({ providerAccountId, open, onClose, 
     setLoading(true);
     getProviderAccount<StripeAccountConfig>(providerAccountId)
       .then((providerAccount) => {
-        setForm({ name: providerAccount.name, secretKey: '', enabled: providerAccount.enabled });
+        setForm({
+          name: providerAccount.name,
+          secretKey: '',
+          operatingPeriods: providerAccount.operatingPeriods ?? [],
+          enabled: providerAccount.enabled
+        });
         setStoredSecretLength(providerAccount.config.secretKeyLength);
       })
       .catch((loadError) => {
@@ -73,9 +82,19 @@ export default function StripeAccountDialog({ providerAccountId, open, onClose, 
     try {
       const config: StripeAccountConfig = { provider: 'STRIPE', secretKey: form.secretKey, secretKeyLength: 0 };
       if (providerAccountId === null) {
-        await createProviderAccount({ name: form.name, enabled: form.enabled, config });
+        await createProviderAccount({
+          name: form.name,
+          enabled: form.enabled,
+          operatingPeriods: form.operatingPeriods,
+          config
+        });
       } else {
-        await updateProviderAccount(providerAccountId, { name: form.name, enabled: form.enabled, config });
+        await updateProviderAccount(providerAccountId, {
+          name: form.name,
+          enabled: form.enabled,
+          operatingPeriods: form.operatingPeriods,
+          config
+        });
       }
       onSaved();
     } catch (saveError) {
@@ -86,7 +105,7 @@ export default function StripeAccountDialog({ providerAccountId, open, onClose, 
   };
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
       <DialogTitle>
         {intl.formatMessage({
           id: providerAccountId === null ? 'provider-accounts-stripe-new-title' : 'provider-accounts-stripe-edit-title'
@@ -114,6 +133,10 @@ export default function StripeAccountDialog({ providerAccountId, open, onClose, 
               onChange={(value) => setForm((prev) => ({ ...prev, secretKey: value }))}
               storedLength={storedSecretLength}
             />
+            <OperatingPeriodsEditor
+              value={form.operatingPeriods}
+              onChange={(operatingPeriods) => setForm((prev) => ({ ...prev, operatingPeriods }))}
+            />
             <FormControlLabel
               control={
                 <Switch checked={form.enabled} onChange={(event) => setForm((prev) => ({ ...prev, enabled: event.target.checked }))} />
@@ -125,7 +148,11 @@ export default function StripeAccountDialog({ providerAccountId, open, onClose, 
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>{intl.formatMessage({ id: 'provider-accounts-cancel' })}</Button>
-        <Button variant="contained" onClick={handleSave} disabled={loading || saving || !form.name}>
+        <Button
+          variant="contained"
+          onClick={handleSave}
+          disabled={loading || saving || !form.name || hasOverlappingPeriods(form.operatingPeriods)}
+        >
           {intl.formatMessage({ id: 'provider-accounts-save' })}
         </Button>
       </DialogActions>

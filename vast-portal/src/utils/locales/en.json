@@ -422,5 +422,16 @@
   "provider-accounts-field-token-value": "Token Value",
   "provider-accounts-field-token-secret": "Token Secret",
   "provider-accounts-field-brickstore-token": "BrickStore Token",
-  "provider-accounts-field-api-key": "API Key"
+  "provider-accounts-field-api-key": "API Key",
+  "provider-accounts-operating-periods": "Operating periods",
+  "provider-accounts-operating-periods-hint": "Only data dated inside these periods is taken into account. Leave the list empty to use everything this account holds.",
+  "provider-accounts-operating-periods-add": "Add period",
+  "provider-accounts-operating-periods-from": "From",
+  "provider-accounts-operating-periods-to": "To",
+  "provider-accounts-operating-periods-note": "Note",
+  "provider-accounts-operating-periods-remove": "Remove period",
+  "provider-accounts-operating-periods-overlap": "Periods must not overlap.",
+  "provider-accounts-operating-periods-close-above": "Give the period above an end date first.",
+  "provider-accounts-operating-periods-since": "From {date}",
+  "provider-accounts-operating-periods-until": "Until {date}"
 }

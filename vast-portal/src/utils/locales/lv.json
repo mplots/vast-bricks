@@ -422,5 +422,16 @@
   "provider-accounts-field-token-value": "Token Value",
   "provider-accounts-field-token-secret": "Token Secret",
   "provider-accounts-field-brickstore-token": "BrickStore Token",
-  "provider-accounts-field-api-key": "API Key"
+  "provider-accounts-field-api-key": "API Key",
+  "provider-accounts-operating-periods": "Darbības periodi",
+  "provider-accounts-operating-periods-hint": "Vērā tiek ņemti tikai dati šajos periodos. Atstājiet sarakstu tukšu, lai izmantotu visus šī konta datus.",
+  "provider-accounts-operating-periods-add": "Pievienot periodu",
+  "provider-accounts-operating-periods-from": "No",
+  "provider-accounts-operating-periods-to": "Līdz",
+  "provider-accounts-operating-periods-note": "Piezīme",
+  "provider-accounts-operating-periods-remove": "Noņemt periodu",
+  "provider-accounts-operating-periods-overlap": "Periodi nedrīkst pārklāties.",
+  "provider-accounts-operating-periods-close-above": "Vispirms norādiet beigu datumu periodam virs šī.",
+  "provider-accounts-operating-periods-since": "No {date}",
+  "provider-accounts-operating-periods-until": "Līdz {date}"
 }

@@ -13,9 +13,12 @@ import Switch from '@mui/material/Switch';
 import TextField from '@mui/material/TextField';
 import { useIntl } from 'react-intl';
 
+import OperatingPeriodsEditor from './OperatingPeriodsEditor';
+import { hasOverlappingPeriods } from './operatingPeriodOverlap';
 import SecretTextField from './SecretTextField';
 import { createProviderAccount, getProviderAccount, updateProviderAccount } from 'api/providerAccounts';
 import type { BrickOwlAccountConfig } from 'types/brickOwlAccount';
+import type { OperatingPeriod } from 'types/providerAccount';
 
 type Props = {
   /** Provider account id to edit, or null to create a new one. */
@@ -25,9 +28,9 @@ type Props = {
   onSaved: () => void;
 };
 
-type FormState = { name: string; apiKey: string; enabled: boolean };
+type FormState = { name: string; apiKey: string; operatingPeriods: OperatingPeriod[]; enabled: boolean };
 
-const emptyForm: FormState = { name: '', apiKey: '', enabled: true };
+const emptyForm: FormState = { name: '', apiKey: '', operatingPeriods: [], enabled: true };
 
 /**
  * The BrickOwl account's own screen, with its own fields: no other provider's form shares this component, and this
@@ -54,7 +57,12 @@ export default function BrickOwlAccountDialog({ providerAccountId, open, onClose
     setLoading(true);
     getProviderAccount<BrickOwlAccountConfig>(providerAccountId)
       .then((providerAccount) => {
-        setForm({ name: providerAccount.name, apiKey: '', enabled: providerAccount.enabled });
+        setForm({
+          name: providerAccount.name,
+          apiKey: '',
+          operatingPeriods: providerAccount.operatingPeriods ?? [],
+          enabled: providerAccount.enabled
+        });
         setStoredSecretLength(providerAccount.config.apiKeyLength);
       })
       .catch((loadError) => {
@@ -69,9 +77,19 @@ export default function BrickOwlAccountDialog({ providerAccountId, open, onClose
     try {
       const config: BrickOwlAccountConfig = { provider: 'BRICK_OWL', apiKey: form.apiKey, apiKeyLength: 0 };
       if (providerAccountId === null) {
-        await createProviderAccount({ name: form.name, enabled: form.enabled, config });
+        await createProviderAccount({
+          name: form.name,
+          enabled: form.enabled,
+          operatingPeriods: form.operatingPeriods,
+          config
+        });
       } else {
-        await updateProviderAccount(providerAccountId, { name: form.name, enabled: form.enabled, config });
+        await updateProviderAccount(providerAccountId, {
+          name: form.name,
+          enabled: form.enabled,
+          operatingPeriods: form.operatingPeriods,
+          config
+        });
       }
       onSaved();
     } catch (saveError) {
@@ -82,7 +100,7 @@ export default function BrickOwlAccountDialog({ providerAccountId, open, onClose
   };
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
       <DialogTitle>
         {intl.formatMessage({
           id: providerAccountId === null ? 'provider-accounts-brickowl-new-title' : 'provider-accounts-brickowl-edit-title'
@@ -110,6 +128,10 @@ export default function BrickOwlAccountDialog({ providerAccountId, open, onClose
               onChange={(value) => setForm((prev) => ({ ...prev, apiKey: value }))}
               storedLength={storedSecretLength}
             />
+            <OperatingPeriodsEditor
+              value={form.operatingPeriods}
+              onChange={(operatingPeriods) => setForm((prev) => ({ ...prev, operatingPeriods }))}
+            />
             <FormControlLabel
               control={
                 <Switch checked={form.enabled} onChange={(event) => setForm((prev) => ({ ...prev, enabled: event.target.checked }))} />
@@ -121,7 +143,11 @@ export default function BrickOwlAccountDialog({ providerAccountId, open, onClose
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>{intl.formatMessage({ id: 'provider-accounts-cancel' })}</Button>
-        <Button variant="contained" onClick={handleSave} disabled={loading || saving || !form.name}>
+        <Button
+          variant="contained"
+          onClick={handleSave}
+          disabled={loading || saving || !form.name || hasOverlappingPeriods(form.operatingPeriods)}
+        >
           {intl.formatMessage({ id: 'provider-accounts-save' })}
         </Button>
       </DialogActions>
