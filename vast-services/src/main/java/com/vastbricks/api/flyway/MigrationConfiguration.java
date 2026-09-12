@@ -1,16 +1,19 @@
 package com.vastbricks.api.flyway;
 
+import com.vastbricks.api.setup.SetupEncryption;
 import javax.sql.DataSource;
 import org.springframework.boot.autoconfigure.orm.jpa.EntityManagerFactoryDependsOnPostProcessor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 
 @Configuration(proxyBeanMethods = false)
 public class MigrationConfiguration {
 
     @Bean(initMethod = "migrate")
-    VastDatabaseMigration vastDatabaseMigration(DataSource dataSource, FlywaySettings settings) {
-        return new VastDatabaseMigration(dataSource, settings);
+    VastDatabaseMigration vastDatabaseMigration(
+            DataSource dataSource, FlywaySettings settings, Environment environment, SetupEncryption encryption) {
+        return new VastDatabaseMigration(dataSource, settings, environment, encryption);
     }
 
     /**

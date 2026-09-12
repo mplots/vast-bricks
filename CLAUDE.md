@@ -222,11 +222,11 @@ a scoping rule for settings, and only incidentally one for tables.
   key. It names its tenant outright through `VAST_LEGACY_TENANT_CODE` and fails
   when that tenant does not exist, rather than falling back to one. It is the
   only such caller and it goes when `vb-portal-api` does.
-- The `default` tenant is seeded in `db/vast/migration/data`, which is excluded
-  from production builds, because a tenant is a real store: production creates
-  the ones it actually has, deliberately. The seed exists so the local
-  administrator has something to serve, since a login with no membership is
-  refused.
+- The `vastbricks` and `personal` tenants are seeded in
+  `db/vast/migration/data`, which is excluded from production builds, because a
+  tenant is a real store: production creates the ones it actually has,
+  deliberately. The seed exists so the local administrator has something to
+  serve, since a login with no membership is refused.
 - There is no settings-profile header. A profile named one set of provider
   credentials and was chosen by an unauthenticated request header, which is the
   tenant question answered by whoever asked; the tenant replaced it. Each
@@ -240,6 +240,15 @@ a scoping rule for settings, and only incidentally one for tables.
   the pairing. Setting one up is setup, not subject matter, so a test does not
   reach into the database to do it. Teardown deletes the tenant, and the cascade
   takes everything that tenant wrote with it.
+- Never test against the seeded `vastbricks` and `personal` tenants, and never
+  sign in as the local administrator to reach them. They are the developer's own
+  stores: their settings overrides name real marketplace, gateway and accounting
+  accounts, so a scenario that reaches one stops testing the rewrite and starts
+  calling somebody's shop. This covers manual probing with `curl` as much as it
+  covers a committed test — a tenant of one's own costs a single request. The
+  seeded `wiremock` tenant is not the exception either: it exists so a browser
+  can be pointed at `vast-portal-test`, and a scenario that borrows it is a
+  scenario sharing settings with every other one that does.
 - The tenant is what isolates a scenario, so tests run in parallel without
   coordinating: each sees only its own rows, including counts.
 - The isolation guardrails are acceptance tests, not Java ones. They cover
@@ -272,6 +281,28 @@ a scoping rule for settings, and only incidentally one for tables.
 - Database credentials and connection settings may point both runtimes at the
   same PostgreSQL server/database, but new objects remain isolated in the new
   schema.
+- Local development data lives in `db/vast/migration/data`, which is excluded
+  from production builds. It reaches the environment through Flyway
+  placeholders that the scripts themselves declare: `VastDatabaseMigration`
+  scans them for `${NAME}`, answers each from the environment, and answers
+  `${NAME_ENCRYPTED}` with the same value as ciphertext under the runtime's key,
+  since a secret is stored encrypted and SQL cannot encrypt. A seed that starts
+  using another credential therefore changes no Java. A name the environment
+  does not answer resolves to an empty string rather than failing the migration,
+  so a seed skips what it cannot configure instead of writing a blank credential.
+- Keep the seed in SQL rather than a Flyway Java migration. What keeps it out of
+  production is the resource exclusion on that directory, and a compiled
+  migration class would ride into the deployable JAR and seed a real deployment
+  from its own environment.
+- A repeatable `R__` migration is the place for that even though its values come
+  from outside the script: Flyway checksums a repeatable migration after
+  replacing its placeholders, so a rotated credential re-runs it instead of
+  being ignored until the file itself is edited. Seed by inserting what is
+  missing and rewriting nothing — a secret re-encrypted under a fresh nonce each
+  start means the seed runs most starts, and a row the portal owns once it
+  exists has to survive them. Do not rename a seed script once it has run:
+  Flyway knows a repeatable migration by its description, and a renamed one
+  reads as a deleted one, which fails validation until someone repairs it.
 
 ## Real data
 

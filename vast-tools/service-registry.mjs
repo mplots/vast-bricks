@@ -86,7 +86,7 @@ export const managedServices = [
     name: "vast-portal",
     port: 3100,
     healthUrl: "http://127.0.0.1:3100/",
-    // The seeded local admin from R__local_admin.sql - local dev only, never the credential of a real deployment.
+    // The seeded local admin from R__insert_local_admin_user.sql - local dev only, never the credential of a real deployment.
     loginUrl: () => loginUrlFor(3100, "info@vastbricks.com", "admin"),
     dependency: {
       path: viteExecutable,
