@@ -69,6 +69,26 @@ final class StripePayments {
     }
 
     /**
+     * What Stripe charged for taking the payment, normalized like every other collected amount, or {@code null} when
+     * it charged nothing.
+     *
+     * <p>Everything the transaction was charged except the marketplace's application fee: that one is the facilitator
+     * tax going back to whoever owes it and is reported as such above, while the processing fee, and the VAT some
+     * countries charge on it, are what taking the payment cost. Reading it as "the rest of the fee" rather than as
+     * {@code stripe_fee} alone keeps a fee type Stripe adds later inside the total rather than silently outside it.
+     */
+    static BigDecimal feeAmount(BalanceTransaction transaction) {
+        if (transaction.getFeeDetails() == null) {
+            return null;
+        }
+        var fees = transaction.getFeeDetails().stream()
+                .filter(fee -> !APPLICATION_FEE.equalsIgnoreCase(fee.getType()) && fee.getAmount() != null)
+                .map(fee -> BigDecimal.valueOf(fee.getAmount()))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        return fees.signum() == 0 ? null : ReconciliationAmount.normalize(fees.movePointLeft(2));
+    }
+
+    /**
      * What was refunded out of the payment, as a positive amount normalized like every other collected amount, or
      * {@code null} when nothing was refunded. It is read from the charge's own running total, which Stripe keeps
      * whole rather than per refund, so one partial refund, several of them and a full refund are all one figure.

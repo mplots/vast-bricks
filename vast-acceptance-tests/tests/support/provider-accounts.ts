@@ -18,15 +18,14 @@ export type ProviderAccount = {
   provider: string;
   enabled: boolean;
   config: Record<string, unknown>;
-  operatingPeriods: OperatingPeriod[];
 };
 
-/** One stretch of an account's data that counts. Either date null is that side unbounded; no periods restricts
- * nothing. Unlike a secret it is read back in full, so a scenario can compare what it sent. */
+/** The one stretch of a store account's data that counts, part of the config of the marketplaces that have one.
+ * Either date null is that side unbounded; no period restricts nothing. Unlike a secret it is read back in full, so a
+ * scenario can compare what it sent. */
 export type OperatingPeriod = {
   from: string | null;
   to: string | null;
-  note: string | null;
 };
 
 export type PayPalConfig = {
@@ -50,11 +49,13 @@ export type BrickLinkConfig = {
   tokenValue: string;
   tokenSecret: string;
   brickStoreToken: string;
+  operatingPeriod?: OperatingPeriod | null;
 };
 
 export type BrickOwlConfig = {
   provider: 'BRICK_OWL';
   apiKey: string;
+  operatingPeriod?: OperatingPeriod | null;
 };
 
 export function payPalConfig(overrides: Partial<PayPalConfig> = {}): PayPalConfig {
@@ -120,7 +121,7 @@ export function brickOwlConfig(overrides: Partial<BrickOwlConfig> = {}): BrickOw
 /** Configures a provider account for the tenant being served. It is enabled unless the scenario says otherwise. */
 export async function createProviderAccount(
   request: APIRequestContext,
-  providerAccount: { name: string; enabled?: boolean; config: unknown; operatingPeriods?: OperatingPeriod[] },
+  providerAccount: { name: string; enabled?: boolean; config: unknown },
 ): Promise<ProviderAccount> {
   const response = await request.post(providerAccountsEndpoint, {
     data: { enabled: true, ...providerAccount },
@@ -136,7 +137,7 @@ export async function createProviderAccount(
 export async function updateProviderAccount(
   request: APIRequestContext,
   id: number,
-  providerAccount: { name: string; enabled: boolean; config: unknown; operatingPeriods?: OperatingPeriod[] },
+  providerAccount: { name: string; enabled: boolean; config: unknown },
 ): Promise<ProviderAccount> {
   const response = await request.put(`${providerAccountsEndpoint}/${id}`, { data: providerAccount });
   expect(response.ok(), await response.text()).toBe(true);

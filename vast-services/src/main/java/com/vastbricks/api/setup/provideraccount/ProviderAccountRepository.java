@@ -15,4 +15,11 @@ interface ProviderAccountRepository extends JpaRepository<ProviderAccount, Long>
     Optional<ProviderAccount> findFirstByOrderBySortOrderDesc();
 
     Optional<ProviderAccount> findByNameIgnoreCase(String name);
+
+    /** Whether the tenant already holds an account with this provider, which is all that most providers may have. */
+    boolean existsByProvider(Provider provider);
+
+    /** The tenant's account with this provider. First by arrangement, which for the providers that allow only one
+     * account is simply that one. */
+    Optional<ProviderAccount> findFirstByProviderOrderBySortOrderAsc(Provider provider);
 }

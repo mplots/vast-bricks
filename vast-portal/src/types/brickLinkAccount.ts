@@ -1,3 +1,5 @@
+import type { OperatingPeriod } from './providerAccount';
+
 /**
  * BrickLink's own config shape - the {@code config} of a provider account whose provider is {@code 'BRICK_LINK'}.
  *
@@ -18,4 +20,6 @@ export interface BrickLinkAccountConfig {
   tokenValueLength: number;
   tokenSecretLength: number;
   brickStoreTokenLength: number;
+  /** The stretch of this store's orders that count, null for all of them. Not a secret: it is read back as written. */
+  operatingPeriod: OperatingPeriod | null;
 }

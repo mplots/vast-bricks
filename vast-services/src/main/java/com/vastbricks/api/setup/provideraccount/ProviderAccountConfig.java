@@ -26,6 +26,18 @@ interface ProviderAccountConfig {
 
     Provider provider();
 
+    /**
+     * The stretch of this account's data that counts, null when this provider has no such notion - which is every
+     * provider but the marketplaces a store's own orders come from.
+     *
+     * <p>Deliberately not a {@code get...} accessor: it is answered by the config's own field where there is one, and
+     * a bean property here would write {@code operatingPeriod: null} into the stored and returned JSON of every
+     * provider that has no field for it.
+     */
+    default OperatingPeriod operatingPeriod() {
+        return null;
+    }
+
     /** Returns this config ready to persist: secret fields are encrypted, and a secret left blank keeps whatever
      * {@code existing} already had stored instead of erasing it. {@code existing} is null when creating. */
     ProviderAccountConfig prepareForStorage(SetupEncryption encryption, ProviderAccountConfig existing);

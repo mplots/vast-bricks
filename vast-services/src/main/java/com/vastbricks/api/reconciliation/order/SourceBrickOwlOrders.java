@@ -10,6 +10,7 @@ import com.vastbricks.api.client.brickowl.BrickOwlOrder;
 import com.vastbricks.api.client.brickowl.BrickOwlOrderListItem;
 import java.time.LocalDate;
 import com.vastbricks.api.reconciliation.ReconciliationPeriod;
+import com.vastbricks.api.setup.provideraccount.Provider;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +32,7 @@ class SourceBrickOwlOrders implements Source<SourcedBrickOwlOrder> {
     private static final String ORDER_ENDPOINT = "order/view";
 
     private final BrickOwlClient brickOwlClient;
-    private final BrickOwlStoreSettings brickOwlStoreSettings;
+    private final StoreOperatingPeriod storeOperatingPeriod;
 
     @Override
     public Class<SourcedBrickOwlOrder> type() {
@@ -40,7 +41,7 @@ class SourceBrickOwlOrders implements Source<SourcedBrickOwlOrder> {
 
     @Override
     public List<SourcedBrickOwlOrder> fetch(ReconciliationPeriod period) {
-        var boundedPeriod = period.boundedBy(brickOwlStoreSettings.getOpenDate(), brickOwlStoreSettings.getCloseDate());
+        var boundedPeriod = storeOperatingPeriod.narrow(Provider.BRICK_OWL, period);
         if (boundedPeriod.isEmpty()) {
             return List.of();
         }

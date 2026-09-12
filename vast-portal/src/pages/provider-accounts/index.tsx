@@ -48,6 +48,10 @@ const PROVIDER_LABELS: Record<Provider, string> = {
 /** Every provider offered from the add-menu, in the order it is offered. */
 const PROVIDERS: Provider[] = ['BRICK_LINK', 'BRICK_OWL', 'LATVIJAS_PASTS', 'MANA_KABATA', 'PAYPAL', 'STRIPE'];
 
+/** The providers a tenant can hold more than one account with - the payment gateways, and only them. Every other
+ * provider is a party dealt with once, and the server refuses a second account with it. */
+const MULTIPLE_ACCOUNT_PROVIDERS: Provider[] = ['PAYPAL', 'STRIPE'];
+
 /**
  * The provider accounts screen: every account a tenant has configured, whatever the provider.
  *
@@ -102,6 +106,10 @@ export default function ProviderAccountsPage() {
       setReorderError(intl.formatMessage({ id: 'provider-accounts-reorder-error' }));
     }
   };
+
+  /** Whether the add-menu still offers this provider: one already configured is offered again only by a gateway. */
+  const canAdd = (provider: Provider) =>
+    MULTIPLE_ACCOUNT_PROVIDERS.includes(provider) || !accounts.some((account) => account.provider === provider);
 
   const closeDialog = () => setActiveDialog(null);
   const closeAddMenu = () => setAddMenuAnchor(null);
@@ -159,6 +167,7 @@ export default function ProviderAccountsPage() {
         {PROVIDERS.map((provider) => (
           <MenuItem
             key={provider}
+            disabled={!canAdd(provider)}
             onClick={() => {
               setActiveDialog({ provider, id: null });
               closeAddMenu();
@@ -167,7 +176,10 @@ export default function ProviderAccountsPage() {
             <ListItemIcon>
               <ProviderLogo provider={provider} size={24} />
             </ListItemIcon>
-            <ListItemText>{intl.formatMessage({ id: PROVIDER_LABELS[provider] })}</ListItemText>
+            <ListItemText
+              primary={intl.formatMessage({ id: PROVIDER_LABELS[provider] })}
+              secondary={canAdd(provider) ? undefined : intl.formatMessage({ id: 'provider-accounts-already-configured' })}
+            />
           </MenuItem>
         ))}
       </Menu>

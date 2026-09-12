@@ -59,6 +59,7 @@ class MapperStripeBrickLinkPayments implements DetailMapper<BalanceTransaction> 
             );
             if (order != null && paid.add(order)) {
                 order.getGateway().setPaidAmount(StripePayments.paidAmount(transaction));
+                order.getGateway().setFeeAmount(StripePayments.feeAmount(transaction));
                 order.getGateway().setFacilitatorTax(StripePayments.facilitatorTax(transaction));
                 order.getGateway().setRefundedAmount(StripePayments.refundedAmount(transaction));
                 order.getGateway().setPaymentUrl(paymentLinks.stripe(StripePayments.paymentReference(transaction)));

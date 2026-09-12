@@ -43,6 +43,7 @@ public enum ReconciliationOrderField {
     ORDER_REFUNDED_AMOUNT("order.refundedAmount", ORDER),
 
     GATEWAY_PAID_AMOUNT("gateway.paidAmount", GATEWAY),
+    GATEWAY_FEE_AMOUNT("gateway.feeAmount", GATEWAY),
     GATEWAY_FACILITATOR_TAX("gateway.facilitatorTax", GATEWAY),
     GATEWAY_REFUNDED_AMOUNT("gateway.refundedAmount", GATEWAY),
 

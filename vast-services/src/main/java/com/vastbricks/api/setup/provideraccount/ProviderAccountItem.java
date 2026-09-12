@@ -3,7 +3,6 @@ package com.vastbricks.api.setup.provideraccount;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -31,9 +30,4 @@ class ProviderAccountItem {
     @NotNull
     @Valid
     private ProviderAccountConfig config;
-
-    /** Replaced outright by a save, like {@code name} and {@code enabled} - absent or empty clears them. A period
-     * holds no secret, so unlike {@code config} it is read back in full and there is nothing that cannot be
-     * resubmitted. */
-    private List<OperatingPeriod> operatingPeriods;
 }

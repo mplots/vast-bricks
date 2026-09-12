@@ -14,12 +14,9 @@ import TextField from '@mui/material/TextField';
 import { useIntl } from 'react-intl';
 
 import CredentialSectionHeader from './CredentialSectionHeader';
-import OperatingPeriodsEditor from './OperatingPeriodsEditor';
-import { hasOverlappingPeriods } from './operatingPeriodOverlap';
 import SecretTextField from './SecretTextField';
 import { createProviderAccount, getProviderAccount, updateProviderAccount } from 'api/providerAccounts';
 import type { LatvijasPastsAccountConfig } from 'types/latvijasPastsAccount';
-import type { OperatingPeriod } from 'types/providerAccount';
 
 type Props = {
   /** Provider account id to edit, or null to create a new one. */
@@ -46,7 +43,6 @@ export default function LatvijasPastsAccountDialog({ providerAccountId, open, on
   const intl = useIntl();
   const [name, setName] = useState('');
   const [enabled, setEnabled] = useState(true);
-  const [operatingPeriods, setOperatingPeriods] = useState<OperatingPeriod[]>([]);
   const [secrets, setSecrets] = useState<Secrets>(emptySecrets);
   const [storedLengths, setStoredLengths] = useState<Lengths>(noLengths);
   const [loading, setLoading] = useState(false);
@@ -62,7 +58,6 @@ export default function LatvijasPastsAccountDialog({ providerAccountId, open, on
     if (providerAccountId === null) {
       setName('');
       setEnabled(true);
-      setOperatingPeriods([]);
       setStoredLengths(noLengths);
       return;
     }
@@ -72,7 +67,6 @@ export default function LatvijasPastsAccountDialog({ providerAccountId, open, on
         const config = providerAccount.config;
         setName(providerAccount.name);
         setEnabled(providerAccount.enabled);
-        setOperatingPeriods(providerAccount.operatingPeriods ?? []);
         setStoredLengths({
           apiUser: config.apiUserLength,
           apiKey: config.apiKeyLength,
@@ -101,9 +95,9 @@ export default function LatvijasPastsAccountDialog({ providerAccountId, open, on
         passwordLength: 0
       };
       if (providerAccountId === null) {
-        await createProviderAccount({ name, enabled, operatingPeriods, config });
+        await createProviderAccount({ name, enabled, config });
       } else {
-        await updateProviderAccount(providerAccountId, { name, enabled, operatingPeriods, config });
+        await updateProviderAccount(providerAccountId, { name, enabled, config });
       }
       onSaved();
     } catch (saveError) {
@@ -163,7 +157,6 @@ export default function LatvijasPastsAccountDialog({ providerAccountId, open, on
               onChange={(value) => setSecret('password', value)}
               storedLength={storedLengths.password}
             />
-            <OperatingPeriodsEditor value={operatingPeriods} onChange={setOperatingPeriods} />
             <FormControlLabel
               control={<Switch checked={enabled} onChange={(event) => setEnabled(event.target.checked)} />}
               label={intl.formatMessage({ id: 'provider-accounts-field-enabled' })}
@@ -173,7 +166,7 @@ export default function LatvijasPastsAccountDialog({ providerAccountId, open, on
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>{intl.formatMessage({ id: 'provider-accounts-cancel' })}</Button>
-        <Button variant="contained" onClick={handleSave} disabled={loading || saving || !name || hasOverlappingPeriods(operatingPeriods)}>
+        <Button variant="contained" onClick={handleSave} disabled={loading || saving || !name}>
           {intl.formatMessage({ id: 'provider-accounts-save' })}
         </Button>
       </DialogActions>

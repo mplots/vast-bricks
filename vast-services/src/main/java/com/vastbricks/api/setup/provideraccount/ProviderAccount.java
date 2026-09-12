@@ -10,8 +10,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -52,13 +50,6 @@ class ProviderAccount {
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(nullable = false)
     private ProviderAccountConfig config;
-
-    /** The periods of this account's data that count, empty for all of it. Provider-agnostic, so it sits here
-     * rather than in a provider's own {@link ProviderAccountConfig}; jsonb like {@code config}, because it is only
-     * ever read and replaced together with the account it belongs to. */
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "operating_periods", nullable = false)
-    private List<OperatingPeriod> operatingPeriods = new ArrayList<>();
 
     @Column(nullable = false)
     private boolean enabled;

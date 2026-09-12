@@ -14,12 +14,9 @@ import Switch from '@mui/material/Switch';
 import TextField from '@mui/material/TextField';
 import { useIntl } from 'react-intl';
 
-import OperatingPeriodsEditor from './OperatingPeriodsEditor';
-import { hasOverlappingPeriods } from './operatingPeriodOverlap';
 import SecretTextField from './SecretTextField';
 import { createProviderAccount, getProviderAccount, updateProviderAccount } from 'api/providerAccounts';
 import type { PayPalAccountConfig, PayPalMode } from 'types/payPalAccount';
-import type { OperatingPeriod } from 'types/providerAccount';
 
 type Props = {
   /** Provider account id to edit, or null to create a new one. */
@@ -34,7 +31,6 @@ type FormState = {
   clientId: string;
   clientSecret: string;
   mode: PayPalMode;
-  operatingPeriods: OperatingPeriod[];
   enabled: boolean;
 };
 
@@ -43,7 +39,6 @@ const emptyForm: FormState = {
   clientId: '',
   clientSecret: '',
   mode: 'SANDBOX',
-  operatingPeriods: [],
   enabled: true
 };
 
@@ -78,7 +73,6 @@ export default function PayPalAccountDialog({ providerAccountId, open, onClose, 
           clientId: config.clientId,
           clientSecret: '',
           mode: config.mode,
-          operatingPeriods: providerAccount.operatingPeriods ?? [],
           enabled: providerAccount.enabled
         });
         setStoredSecretLength(config.clientSecretLength);
@@ -104,14 +98,12 @@ export default function PayPalAccountDialog({ providerAccountId, open, onClose, 
         await createProviderAccount({
           name: form.name,
           enabled: form.enabled,
-          operatingPeriods: form.operatingPeriods,
           config
         });
       } else {
         await updateProviderAccount(providerAccountId, {
           name: form.name,
           enabled: form.enabled,
-          operatingPeriods: form.operatingPeriods,
           config
         });
       }
@@ -169,10 +161,6 @@ export default function PayPalAccountDialog({ providerAccountId, open, onClose, 
               <MenuItem value="SANDBOX">{intl.formatMessage({ id: 'provider-accounts-field-mode-sandbox' })}</MenuItem>
               <MenuItem value="LIVE">{intl.formatMessage({ id: 'provider-accounts-field-mode-live' })}</MenuItem>
             </TextField>
-            <OperatingPeriodsEditor
-              value={form.operatingPeriods}
-              onChange={(operatingPeriods) => setForm((prev) => ({ ...prev, operatingPeriods }))}
-            />
             <FormControlLabel
               control={
                 <Switch checked={form.enabled} onChange={(event) => setForm((prev) => ({ ...prev, enabled: event.target.checked }))} />
@@ -184,11 +172,7 @@ export default function PayPalAccountDialog({ providerAccountId, open, onClose, 
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>{intl.formatMessage({ id: 'provider-accounts-cancel' })}</Button>
-        <Button
-          variant="contained"
-          onClick={handleSave}
-          disabled={loading || saving || !form.name || hasOverlappingPeriods(form.operatingPeriods)}
-        >
+        <Button variant="contained" onClick={handleSave} disabled={loading || saving || !form.name}>
           {intl.formatMessage({ id: 'provider-accounts-save' })}
         </Button>
       </DialogActions>

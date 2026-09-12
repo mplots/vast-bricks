@@ -16,7 +16,7 @@ import { useIntl } from 'react-intl';
 import IconButton from 'components/@extended/IconButton';
 import ProviderLogo from 'components/logos/ProviderLogo';
 import MainCard from 'components/MainCard';
-import { operatingPeriodLabel } from './operatingPeriodLabel';
+import { accountOperatingPeriod, operatingPeriodLabel } from './operatingPeriod';
 import type { ProviderAccountItem } from 'types/providerAccount';
 
 type Props = {
@@ -35,6 +35,7 @@ type Props = {
  */
 export default function SortableAccountCard({ account, providerLabelId, onEdit, onDelete }: Props) {
   const intl = useIntl();
+  const operatingPeriod = accountOperatingPeriod(account);
   const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({
     id: account.id!
   });
@@ -92,8 +93,8 @@ export default function SortableAccountCard({ account, providerLabelId, onEdit, 
           </ListItem>
         </List>
         <Divider sx={{ my: 1.5 }} />
-        {/* A card that says nothing about its periods would hide a filter on everything this account reads, so they
-            are named here rather than counted: a card saying "2 periods" still has to be opened to be read. */}
+        {/* A card that said nothing about its period would hide a filter on everything this account reads, so it is
+            named here rather than merely marked as set. */}
         <Stack direction="row" sx={{ flexWrap: 'wrap', gap: 1 }}>
           <Chip
             label={intl.formatMessage({ id: account.enabled ? 'provider-accounts-enabled' : 'provider-accounts-disabled' })}
@@ -101,9 +102,7 @@ export default function SortableAccountCard({ account, providerLabelId, onEdit, 
             variant="light"
             size="small"
           />
-          {account.operatingPeriods?.map((period, index) => (
-            <Chip key={index} label={operatingPeriodLabel(intl, period)} variant="light" size="small" />
-          ))}
+          {operatingPeriod && <Chip label={operatingPeriodLabel(intl, operatingPeriod)} variant="light" size="small" />}
         </Stack>
       </MainCard>
     </Grid>

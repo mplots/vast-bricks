@@ -13,12 +13,9 @@ import Switch from '@mui/material/Switch';
 import TextField from '@mui/material/TextField';
 import { useIntl } from 'react-intl';
 
-import OperatingPeriodsEditor from './OperatingPeriodsEditor';
-import { hasOverlappingPeriods } from './operatingPeriodOverlap';
 import SecretTextField from './SecretTextField';
 import { createProviderAccount, getProviderAccount, updateProviderAccount } from 'api/providerAccounts';
 import type { ManaKabataAccountConfig } from 'types/manaKabataAccount';
-import type { OperatingPeriod } from 'types/providerAccount';
 
 type Props = {
   /** Provider account id to edit, or null to create a new one. */
@@ -28,9 +25,9 @@ type Props = {
   onSaved: () => void;
 };
 
-type FormState = { name: string; apiToken: string; operatingPeriods: OperatingPeriod[]; enabled: boolean };
+type FormState = { name: string; apiToken: string; enabled: boolean };
 
-const emptyForm: FormState = { name: '', apiToken: '', operatingPeriods: [], enabled: true };
+const emptyForm: FormState = { name: '', apiToken: '', enabled: true };
 
 /**
  * The Mana Kabata account's own screen, with its own fields: no other provider's form shares this component, and this
@@ -60,7 +57,6 @@ export default function ManaKabataAccountDialog({ providerAccountId, open, onClo
         setForm({
           name: providerAccount.name,
           apiToken: '',
-          operatingPeriods: providerAccount.operatingPeriods ?? [],
           enabled: providerAccount.enabled
         });
         setStoredSecretLength(providerAccount.config.apiTokenLength);
@@ -80,14 +76,12 @@ export default function ManaKabataAccountDialog({ providerAccountId, open, onClo
         await createProviderAccount({
           name: form.name,
           enabled: form.enabled,
-          operatingPeriods: form.operatingPeriods,
           config
         });
       } else {
         await updateProviderAccount(providerAccountId, {
           name: form.name,
           enabled: form.enabled,
-          operatingPeriods: form.operatingPeriods,
           config
         });
       }
@@ -128,10 +122,6 @@ export default function ManaKabataAccountDialog({ providerAccountId, open, onClo
               onChange={(value) => setForm((prev) => ({ ...prev, apiToken: value }))}
               storedLength={storedSecretLength}
             />
-            <OperatingPeriodsEditor
-              value={form.operatingPeriods}
-              onChange={(operatingPeriods) => setForm((prev) => ({ ...prev, operatingPeriods }))}
-            />
             <FormControlLabel
               control={
                 <Switch checked={form.enabled} onChange={(event) => setForm((prev) => ({ ...prev, enabled: event.target.checked }))} />
@@ -143,11 +133,7 @@ export default function ManaKabataAccountDialog({ providerAccountId, open, onClo
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>{intl.formatMessage({ id: 'provider-accounts-cancel' })}</Button>
-        <Button
-          variant="contained"
-          onClick={handleSave}
-          disabled={loading || saving || !form.name || hasOverlappingPeriods(form.operatingPeriods)}
-        >
+        <Button variant="contained" onClick={handleSave} disabled={loading || saving || !form.name}>
           {intl.formatMessage({ id: 'provider-accounts-save' })}
         </Button>
       </DialogActions>

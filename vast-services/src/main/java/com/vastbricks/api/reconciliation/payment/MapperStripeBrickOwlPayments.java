@@ -50,6 +50,7 @@ class MapperStripeBrickOwlPayments implements DetailMapper<BalanceTransaction> {
             for (var order : orders.find(Marketplace.BRICK_OWL, orderId)) {
                 if (paid.add(order)) {
                     order.getGateway().setPaidAmount(paidAmount);
+                    order.getGateway().setFeeAmount(StripePayments.feeAmount(transaction));
                     order.getGateway().setFacilitatorTax(StripePayments.facilitatorTax(transaction));
                     order.getGateway().setRefundedAmount(StripePayments.refundedAmount(transaction));
                     order.getGateway().setPaymentUrl(paymentLinks.stripe(StripePayments.paymentReference(transaction)));

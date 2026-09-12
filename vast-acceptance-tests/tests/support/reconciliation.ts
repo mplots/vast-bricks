@@ -78,6 +78,8 @@ export type StripeTransactionMock = {
   type?: string;
   /** Application fee the marketplace deducted, in minor units. This is what it took as tax facilitator. */
   applicationFee?: number;
+  /** Stripe's own processing fee, in minor units. This is what taking the payment cost the store. */
+  stripeFee?: number;
   /** Payment intent of the charge behind the transaction, which is what a payment link addresses. */
   paymentIntent?: string | null;
   /**
@@ -104,6 +106,8 @@ export type PayPalTransactionMock = {
   transactionId?: string;
   /** Transaction this one was raised against; a partner fee names the payment the marketplace took it out of. */
   referenceId?: string;
+  /** What PayPal charged for taking the payment, as PayPal states it: a deduction, so negative. */
+  feeAmount?: string;
 };
 
 /** One accounting invoice Manakabata holds. It names its order in the note the `invoice` feature writes. */
@@ -319,15 +323,15 @@ async function mockBrickOwl(
     },
   });
 
-  const requestedOrders = orders.filter(
-    (order) => {
-      if (period) {
-        const date = new Date(Number(order.orderDate) * 1000).toISOString().slice(0, 10);
-        return date >= period.from && date <= period.to;
-      }
-      return month === undefined || orderMonth(order.orderDate) === month;
-    },
-  );
+  const requestedOrders = orders.filter((order) => {
+    if (period) {
+      const date = new Date(Number(order.orderDate) * 1000)
+        .toISOString()
+        .slice(0, 10);
+      return date >= period.from && date <= period.to;
+    }
+    return month === undefined || orderMonth(order.orderDate) === month;
+  });
   for (const batch of brickOwlBatches(requestedOrders)) {
     await addBrickOwlBatchMapping(wireMock, batch, "order/view", (order) => ({
       order_id: order.orderId,
@@ -428,9 +432,10 @@ function stripeBalanceTransaction(
     status: "available",
     currency: "eur",
     amount: transaction.amount,
-    fee: transaction.applicationFee ?? 0,
-    fee_details:
-      transaction.applicationFee === undefined
+    fee: (transaction.applicationFee ?? 0) + (transaction.stripeFee ?? 0),
+    // Stripe lists every deduction here, its own and the marketplace's, and tells them apart by type alone.
+    fee_details: [
+      ...(transaction.applicationFee === undefined
         ? []
         : [
             {
@@ -440,8 +445,22 @@ function stripeBalanceTransaction(
               description: "BrickLink Payment Connector application fee",
               type: "application_fee",
             },
-          ],
-    net: transaction.amount - (transaction.applicationFee ?? 0),
+          ]),
+      ...(transaction.stripeFee === undefined
+        ? []
+        : [
+            {
+              amount: transaction.stripeFee,
+              currency: "eur",
+              description: "Stripe processing fees",
+              type: "stripe_fee",
+            },
+          ]),
+    ],
+    net:
+      transaction.amount -
+      (transaction.applicationFee ?? 0) -
+      (transaction.stripeFee ?? 0),
     description: transaction.description,
   };
 }
@@ -488,7 +507,10 @@ function payPalTransaction(
       transaction_initiation_date:
         transaction.initiatedAt ?? "2026-08-30T05:24:15Z",
       transaction_amount: { currency_code: "EUR", value: transaction.amount },
-      fee_amount: { currency_code: "EUR", value: "-0.96" },
+      fee_amount: {
+        currency_code: "EUR",
+        value: transaction.feeAmount ?? "-0.96",
+      },
       transaction_status: "S",
       invoice_id: transaction.invoiceId ?? null,
     },

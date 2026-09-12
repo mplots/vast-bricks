@@ -6,6 +6,7 @@ import com.vastbricks.api.client.brickstore.BrickStoreOrderExportRequest;
 import com.vastbricks.api.client.brickstore.BrickStoreOrderType;
 import com.vastbricks.api.reconciliation.Source;
 import com.vastbricks.api.reconciliation.ReconciliationPeriod;
+import com.vastbricks.api.setup.provideraccount.Provider;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Component;
 class SourceBrickLinkUsernames implements Source<SourcedBrickLinkUsername> {
 
     private final BrickStoreClient brickStoreClient;
+    private final StoreOperatingPeriod storeOperatingPeriod;
 
     @Override
     public Class<SourcedBrickLinkUsername> type() {
@@ -28,10 +30,17 @@ class SourceBrickLinkUsernames implements Source<SourcedBrickLinkUsername> {
 
     @Override
     public List<SourcedBrickLinkUsername> fetch(ReconciliationPeriod period) {
+        // The same export as the orders, so it is asked for the same narrowed period: a username of an order this
+        // tenant may not reconcile is a username it has no order to put on.
+        var boundedPeriod = storeOperatingPeriod.narrow(Provider.BRICK_LINK, period);
+        if (boundedPeriod.isEmpty()) {
+            return List.of();
+        }
+
         var orders = brickStoreClient.listOrders(BrickStoreOrderExportRequest.forDateRange(
                 BrickStoreOrderType.RECEIVED,
-                period.getFrom(),
-                period.getTo(),
+                boundedPeriod.get().getFrom(),
+                boundedPeriod.get().getTo(),
                 false
         ));
         return orders.stream()

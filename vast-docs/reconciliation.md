@@ -22,26 +22,40 @@ here as they are provided; do not invent unspecified behavior prematurely.
   beside the title. Reconciliation, bank statements, Stripe, PayPal, Accounting,
   and Archives share this header control. Each screen offers only the period
   shapes its backend supports; Accounting and Archives remain month-only.
-- Custom ranges use one calendar. Once both dates are set, clicking near an
-  endpoint adjusts that endpoint and preserves the other; midpoint ties keep
-  editing the last-adjusted endpoint. Hovering previews the same change that a
-  click commits. Navigating months preserves the selection, and Start over is
-  the explicit way to clear it and pick a fresh range. A pending end date leaves
-  the chosen start visible in the summary. Keyboard arrows move by day/week,
-  Page Up/Down by month (with Shift, by year), and Home/End within the week.
+- Custom ranges are drawn in days, whole months or whole years, whichever the
+  range is actually stated in: a quarter is two clicks on a grid of months
+  rather than a search for the last day of one. Months and years open on the
+  same grid as the single-period views and pick the same way the day calendar
+  does; a month range opens on the first of its start month and closes on the
+  last of its end month, a year range on 1 January and 31 December, so what is
+  applied is still a pair of dates. Reopening the picker shows the units the
+  applied range was drawn in, and switching units widens the range it already
+  has rather than clearing it.
+- However they are drawn, both ends are edited the same way. Once both are set,
+  clicking near an endpoint adjusts that endpoint and preserves the other;
+  midpoint ties keep editing the last-adjusted endpoint, and an end dragged past
+  the other turns the range around rather than emptying it. Hovering previews the
+  same change that a click commits. Navigating preserves the selection, and Start
+  over is the explicit way to clear it and pick a fresh range. A pending end date
+  leaves the chosen start visible in the summary. In the day calendar, keyboard
+  arrows move by day/week, Page Up/Down by month (with Shift, by year), and
+  Home/End within the week.
 - Every reconciliation source receives the selected date range. BrickLink exports
   use its bounds, and BrickOwl filters its list before requesting order details.
   Payment windows retain seven days of padding at both ends, and bank transfers
   retain seven days before and ninety days after the selected range. The API
   continues accepting `month` for existing callers, or `from` and `to` together;
   missing, invalid, reversed, or mixed inputs are rejected.
-- A tenant's BrickLink and BrickOwl stores each carry their own `OPEN_DATE` and
-  `CLOSE_DATE` settings, narrowing that range further for that store's order
-  source only: an order dated before the store opened or after it closed did
-  not happen for it, regardless of what the other store's dates say. Either
-  date left unset leaves that side unbounded. A selected range entirely outside
-  one store's operating dates returns no orders from that source, rather than
-  asking its provider about a period that could not contain any.
+- A tenant's BrickLink and BrickOwl provider accounts each state an operating
+  period, and it narrows that range further for that store's order source only:
+  an order dated outside the period did not happen for this tenant, regardless
+  of what the other store's period says. Either end left unstated leaves that
+  side unbounded, and an account stating no period at all - or a tenant holding
+  no account with that store - restricts nothing. A selected range entirely
+  outside one store's operating period returns no orders from that source,
+  rather than asking its provider about a period that could not contain any.
+  Two tenants sharing one store's login are told apart by exactly this: the
+  same credentials under periods that do not overlap.
 - The purpose of the screen is to identify discrepancies for an order across
   the systems involved in commerce, payment, shipping, accounting, and store
   synchronization.
@@ -106,8 +120,9 @@ here as they are provided; do not invent unspecified behavior prematurely.
   the selected month. Each collected order carries its marketplace source
   (`BrickLink` or `BrickOwl`), order ID, order date, buyer, buyer username,
   payment method, payment currency, tax type, facilitator tax, sub-total, grand
-  total, refunded amount, shipping charged, gateway paid amount, gateway facilitator tax,
-  gateway refunded amount, shipping cost, and target invoice, together with its
+  total, refunded amount, shipping charged, gateway paid amount, gateway fee,
+  gateway facilitator tax, gateway refunded amount, shipping cost, and target
+  invoice, together with its
   rule failures and the links to the order
   and its payment, each exposed beside the field it rides on. Add further fields
   and providers incrementally as their processing requirements are supplied.
@@ -334,9 +349,25 @@ here as they are provided; do not invent unspecified behavior prematurely.
 - The paid amount is what the payment provider took for the order, gross of its
   own fees: Stripe's balance transaction `amount` in minor units divided by 100,
   and PayPal's `transaction_amount`, both normalized like every other collected
-  amount. The provider's fee and net are not collected. A refund does not reduce
-  it: the payment did take what it took, and what came back afterwards is the
-  refunded amount rather than a shortfall in what was paid.
+  amount. The provider's net is not collected, its fee is the field below. A
+  refund does not reduce the paid amount: the payment did take what it took, and
+  what came back afterwards is the refunded amount rather than a shortfall in
+  what was paid.
+- The gateway fee is what the provider charged for taking that payment, as a
+  positive amount: everything Stripe deducted from the balance transaction
+  except the marketplace's `application_fee` — the processing fee and the VAT
+  some countries charge on it — and PayPal's `fee_amount`, which PayPal states
+  as the deduction it is and which is reported as what was taken. Reading
+  Stripe's as the rest of the fee rather than as `stripe_fee` alone keeps a fee
+  type Stripe adds later inside the total rather than silently outside it.
+  Nothing was charged where nothing was taken, so an order with no payment
+  matched to it carries no fee rather than a zero.
+- The fee is the store's own cost of being paid. It is not deducted from the
+  target invoice, which is what the buyer is invoiced for: the buyer paid the
+  grand total whatever the provider charged the store to receive it. It is
+  reported apart from the facilitator tax for the same reason — both are taken
+  out of one payment, but one is the provider's charge and the other is the
+  marketplace's tax going back to whoever owes it.
 - The refunded amount is what the marketplace reports was refunded to the buyer
   on the order, as a positive amount, or nothing where it reports none. The
   BrickLink export names no refund at all, so it is read off the order detail

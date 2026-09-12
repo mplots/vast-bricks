@@ -14,8 +14,8 @@ import TextField from '@mui/material/TextField';
 import { useIntl } from 'react-intl';
 
 import CredentialSectionHeader from './CredentialSectionHeader';
-import OperatingPeriodsEditor from './OperatingPeriodsEditor';
-import { hasOverlappingPeriods } from './operatingPeriodOverlap';
+import { noOperatingPeriod } from './operatingPeriod';
+import OperatingPeriodFields from './OperatingPeriodFields';
 import SecretTextField from './SecretTextField';
 import { createProviderAccount, getProviderAccount, updateProviderAccount } from 'api/providerAccounts';
 import type { BrickLinkAccountConfig } from 'types/brickLinkAccount';
@@ -58,7 +58,7 @@ export default function BrickLinkAccountDialog({ providerAccountId, open, onClos
   const intl = useIntl();
   const [name, setName] = useState('');
   const [enabled, setEnabled] = useState(true);
-  const [operatingPeriods, setOperatingPeriods] = useState<OperatingPeriod[]>([]);
+  const [operatingPeriod, setOperatingPeriod] = useState<OperatingPeriod>(noOperatingPeriod);
   const [secrets, setSecrets] = useState<Secrets>(emptySecrets);
   const [storedLengths, setStoredLengths] = useState<Lengths>(noLengths);
   const [loading, setLoading] = useState(false);
@@ -74,7 +74,7 @@ export default function BrickLinkAccountDialog({ providerAccountId, open, onClos
     if (providerAccountId === null) {
       setName('');
       setEnabled(true);
-      setOperatingPeriods([]);
+      setOperatingPeriod(noOperatingPeriod);
       setStoredLengths(noLengths);
       return;
     }
@@ -84,7 +84,7 @@ export default function BrickLinkAccountDialog({ providerAccountId, open, onClos
         const config = providerAccount.config;
         setName(providerAccount.name);
         setEnabled(providerAccount.enabled);
-        setOperatingPeriods(providerAccount.operatingPeriods ?? []);
+        setOperatingPeriod(config.operatingPeriod ?? noOperatingPeriod);
         setStoredLengths({
           consumerKey: config.consumerKeyLength,
           consumerSecret: config.consumerSecretLength,
@@ -112,12 +112,13 @@ export default function BrickLinkAccountDialog({ providerAccountId, open, onClos
         consumerSecretLength: 0,
         tokenValueLength: 0,
         tokenSecretLength: 0,
-        brickStoreTokenLength: 0
+        brickStoreTokenLength: 0,
+        operatingPeriod
       };
       if (providerAccountId === null) {
-        await createProviderAccount({ name, enabled, operatingPeriods, config });
+        await createProviderAccount({ name, enabled, config });
       } else {
-        await updateProviderAccount(providerAccountId, { name, enabled, operatingPeriods, config });
+        await updateProviderAccount(providerAccountId, { name, enabled, config });
       }
       onSaved();
     } catch (saveError) {
@@ -174,7 +175,7 @@ export default function BrickLinkAccountDialog({ providerAccountId, open, onClos
               onChange={(value) => setSecret('brickStoreToken', value)}
               storedLength={storedLengths.brickStoreToken}
             />
-            <OperatingPeriodsEditor value={operatingPeriods} onChange={setOperatingPeriods} />
+            <OperatingPeriodFields value={operatingPeriod} onChange={setOperatingPeriod} />
             <FormControlLabel
               control={<Switch checked={enabled} onChange={(event) => setEnabled(event.target.checked)} />}
               label={intl.formatMessage({ id: 'provider-accounts-field-enabled' })}
@@ -184,7 +185,7 @@ export default function BrickLinkAccountDialog({ providerAccountId, open, onClos
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>{intl.formatMessage({ id: 'provider-accounts-cancel' })}</Button>
-        <Button variant="contained" onClick={handleSave} disabled={loading || saving || !name || hasOverlappingPeriods(operatingPeriods)}>
+        <Button variant="contained" onClick={handleSave} disabled={loading || saving || !name}>
           {intl.formatMessage({ id: 'provider-accounts-save' })}
         </Button>
       </DialogActions>

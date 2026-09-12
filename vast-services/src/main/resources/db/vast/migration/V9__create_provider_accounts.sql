@@ -5,7 +5,6 @@ CREATE TABLE provider_accounts
     name              VARCHAR(200) NOT NULL,
     provider          VARCHAR(50)  NOT NULL,
     config            JSONB        NOT NULL DEFAULT '{}'::jsonb,
-    operating_periods JSONB        NOT NULL DEFAULT '[]'::jsonb,
     enabled           BOOLEAN      NOT NULL DEFAULT true,
     sort_order        INTEGER      NOT NULL DEFAULT 0,
     created_at        TIMESTAMPTZ  NOT NULL DEFAULT now(),
@@ -19,9 +18,7 @@ COMMENT ON TABLE provider_accounts IS
 COMMENT ON COLUMN provider_accounts.provider IS
     'The external party this account is held with, e.g. PAYPAL. Each provider has its own config shape.';
 COMMENT ON COLUMN provider_accounts.config IS
-    'Provider-specific configuration, including credentials. Secret fields are individually AES-GCM encrypted (see SettingsEncryption) before being stored, so the value in this column is never a plaintext secret.';
-COMMENT ON COLUMN provider_accounts.operating_periods IS
-    'The periods of this account''s data the platform takes into account, as a JSON array of {"from","to","note"}. Either date may be null for unbounded, and both ends are inclusive. Stored sorted and non-overlapping. An empty array is no restriction: everything this account holds is in scope.';
+    'Provider-specific configuration, including credentials and whatever else that provider has - a marketplace config also carries the operating period bounding the orders that count. Secret fields are individually AES-GCM encrypted (see SettingsEncryption) before being stored, so the value in this column is never a plaintext secret.';
 COMMENT ON COLUMN provider_accounts.enabled IS
     'Whether this account is active. A tenant can keep credentials configured but temporarily disabled.';
 COMMENT ON COLUMN provider_accounts.sort_order IS

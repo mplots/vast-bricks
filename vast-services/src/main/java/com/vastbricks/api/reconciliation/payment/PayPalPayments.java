@@ -46,6 +46,22 @@ final class PayPalPayments {
         return amount == null ? null : ReconciliationAmount.normalize(amount.getValue());
     }
 
+    /**
+     * What PayPal charged for taking the payment, as a positive amount normalized like every other collected amount,
+     * or {@code null} when it charged none. PayPal states it as a deduction, so it arrives negative and is reported
+     * as what was taken rather than as what it did to the balance.
+     *
+     * <p>It is PayPal's own fee and nothing the marketplace took: a facilitator tax comes back to the marketplace as
+     * a partner fee of its own, which is why that is read from {@link PayPalPartnerFees} rather than from here.
+     */
+    static BigDecimal feeAmount(PayPalTransaction transaction) {
+        var fee = transaction.getTransactionInfo().getFeeAmount();
+        if (fee == null || fee.getValue() == null || fee.getValue().signum() == 0) {
+            return null;
+        }
+        return ReconciliationAmount.normalize(fee.getValue().abs());
+    }
+
     /** The payment this transaction is, as PayPal's own transaction views address one. */
     static String paymentReference(PayPalTransaction transaction) {
         return transaction.getTransactionInfo().getTransactionId();

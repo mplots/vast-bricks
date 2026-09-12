@@ -50,6 +50,7 @@ class MapperPayPalBrickOwlPayments implements DetailMapper<PayPalTransaction> {
             for (var order : orders.find(Marketplace.BRICK_OWL, invoiceId)) {
                 if (PayPalPayments.PAID_THROUGH_PAYPAL.test(order) && paid.add(order)) {
                     order.getGateway().setPaidAmount(paidAmount);
+                    order.getGateway().setFeeAmount(PayPalPayments.feeAmount(transaction));
                     order.getGateway().setFacilitatorTax(partnerFees.takenFrom(transaction));
                     order.getGateway().setPaymentUrl(paymentLinks.payPal(PayPalPayments.paymentReference(transaction)));
                 }

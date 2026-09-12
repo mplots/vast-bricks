@@ -13,7 +13,8 @@ import lombok.Setter;
  * token because the API does not report everything the pages do. A tenant holds one BrickLink store, so splitting
  * these across two provider accounts would only ask the same store to be configured twice.
  *
- * <p>Every field here is a credential, so a view reports lengths and nothing else.
+ * <p>Every credential here is reported by its length and nothing else. The operating period is not one, so it is
+ * read back as it was written.
  */
 @Getter
 @Setter
@@ -43,9 +44,17 @@ class BrickLinkAccountConfig implements ProviderAccountConfig {
 
     private int brickStoreTokenLength;
 
+    /** The stretch of this store's orders that count, null for all of them. */
+    private OperatingPeriod operatingPeriod;
+
     @Override
     public Provider provider() {
         return Provider.BRICK_LINK;
+    }
+
+    @Override
+    public OperatingPeriod operatingPeriod() {
+        return operatingPeriod;
     }
 
     @Override
@@ -59,6 +68,7 @@ class BrickLinkAccountConfig implements ProviderAccountConfig {
         stored.tokenValue = encryption.encryptOrKeep(tokenValue, previous.tokenValue);
         stored.tokenSecret = encryption.encryptOrKeep(tokenSecret, previous.tokenSecret);
         stored.brickStoreToken = encryption.encryptOrKeep(brickStoreToken, previous.brickStoreToken);
+        stored.operatingPeriod = OperatingPeriod.checked(operatingPeriod);
         return stored;
     }
 
@@ -70,6 +80,7 @@ class BrickLinkAccountConfig implements ProviderAccountConfig {
         view.tokenValueLength = encryption.decryptedLength(tokenValue);
         view.tokenSecretLength = encryption.decryptedLength(tokenSecret);
         view.brickStoreTokenLength = encryption.decryptedLength(brickStoreToken);
+        view.operatingPeriod = operatingPeriod;
         return view;
     }
 }

@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/** BrickOwl's own config: a single secret API key. */
+/** BrickOwl's own config: a single secret API key, and the stretch of the store's orders that count. */
 @Getter
 @Setter
 @NoArgsConstructor
@@ -17,9 +17,17 @@ class BrickOwlAccountConfig implements ProviderAccountConfig {
     /** Populated only on a view, alongside a null {@link #apiKey}: how long one is, not what it is. */
     private int apiKeyLength;
 
+    /** The stretch of this store's orders that count, null for all of them. */
+    private OperatingPeriod operatingPeriod;
+
     @Override
     public Provider provider() {
         return Provider.BRICK_OWL;
+    }
+
+    @Override
+    public OperatingPeriod operatingPeriod() {
+        return operatingPeriod;
     }
 
     @Override
@@ -28,6 +36,7 @@ class BrickOwlAccountConfig implements ProviderAccountConfig {
 
         BrickOwlAccountConfig stored = new BrickOwlAccountConfig();
         stored.apiKey = encryption.encryptOrKeep(apiKey, previous.apiKey);
+        stored.operatingPeriod = OperatingPeriod.checked(operatingPeriod);
         return stored;
     }
 
@@ -35,6 +44,7 @@ class BrickOwlAccountConfig implements ProviderAccountConfig {
     public ProviderAccountConfig forView(SetupEncryption encryption) {
         BrickOwlAccountConfig view = new BrickOwlAccountConfig();
         view.apiKeyLength = encryption.decryptedLength(apiKey);
+        view.operatingPeriod = operatingPeriod;
         return view;
     }
 }

@@ -14,6 +14,8 @@ import Stack from '@mui/material/Stack';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import DateRangeCalendar from 'components/period/DateRangeCalendar';
+import PeriodRangeGrid, { rangeUnitOf } from 'components/period/PeriodRangeGrid';
+import type { RangeUnit } from 'components/period/rangeSelection';
 import { endOfMonth, endOfYear, format, isValid, parseISO, startOfMonth, startOfYear } from 'date-fns';
 import { useIntl } from 'react-intl';
 
@@ -35,12 +37,15 @@ export default function DatePeriodPicker({ from, to, view, onApply, allowRange =
   const [shownYear, setShownYear] = useState(() => parseISO(from).getFullYear());
   const [draftFrom, setDraftFrom] = useState<Date | null>(() => parseISO(from));
   const [draftTo, setDraftTo] = useState<Date | null>(() => parseISO(to));
+  // Which units a custom range is drawn in. Read off the applied range, so one drawn in months reopens in months.
+  const [rangeUnit, setRangeUnit] = useState<RangeUnit>(() => rangeUnitOf(parseISO(from), parseISO(to)));
 
   useEffect(() => {
     setShownYear(parseISO(from).getFullYear());
     setDraftView(view);
     setDraftFrom(parseISO(from));
     setDraftTo(parseISO(to));
+    setRangeUnit(rangeUnitOf(parseISO(from), parseISO(to)));
   }, [from, to, view]);
 
   const selectPeriod = (period: string) => {
@@ -57,6 +62,9 @@ export default function DatePeriodPicker({ from, to, view, onApply, allowRange =
     draftFrom <= draftTo &&
     draftFrom.getFullYear() >= 1900 &&
     draftTo.getFullYear() <= 2099;
+
+  // Which end a half-drawn range is still waiting for, said in the units it is being drawn in.
+  const pickHint = (bound: 'start' | 'end') => (rangeUnit === 'day' ? `period-pick-${bound}` : `period-${rangeUnit}s-pick-${bound}`);
 
   const selectedDate = draftFrom && isValid(draftFrom) ? draftFrom : parseISO(from);
   const currentYear = new Date().getFullYear();
@@ -107,6 +115,7 @@ export default function DatePeriodPicker({ from, to, view, onApply, allowRange =
             setDraftView(view);
             setDraftFrom(parseISO(from));
             setDraftTo(parseISO(to));
+            setRangeUnit(rangeUnitOf(parseISO(from), parseISO(to)));
             setAnchor(event.currentTarget);
           }}
         >
@@ -194,6 +203,33 @@ export default function DatePeriodPicker({ from, to, view, onApply, allowRange =
             </ToggleButtonGroup>
           </Box>
           <Stack sx={{ p: 2.5, gap: 2, minHeight: 264 }}>
+            {draftView === 'range' && (
+              <Stack direction="row" sx={{ justifyContent: 'center' }}>
+                {/* Named for a screen reader only: three buttons reading Days, Months and Years say what they are. */}
+                <ToggleButtonGroup
+                  exclusive
+                  size="small"
+                  value={rangeUnit}
+                  aria-label={intl.formatMessage({ id: 'period-range-unit' })}
+                  onChange={(_event, picked: RangeUnit | null) => {
+                    if (!picked || picked === rangeUnit) return;
+                    setRangeUnit(picked);
+                    // The range keeps the days it has: a month grid reads them as the months they fall in, and
+                    // applying widens them to whole ones, so switching never quietly moves either end.
+                    if (picked !== 'day' && draftFrom && draftTo && isValid(draftFrom) && isValid(draftTo)) {
+                      setDraftFrom(picked === 'year' ? startOfYear(draftFrom) : startOfMonth(draftFrom));
+                      setDraftTo(picked === 'year' ? endOfYear(draftTo) : endOfMonth(draftTo));
+                    }
+                  }}
+                >
+                  {(['day', 'month', 'year'] as const).map((unit) => (
+                    <ToggleButton key={unit} value={unit} sx={{ px: 1.25, py: 0.25, textTransform: 'none' }}>
+                      {intl.formatMessage({ id: `period-range-unit-${unit}` })}
+                    </ToggleButton>
+                  ))}
+                </ToggleButtonGroup>
+              </Stack>
+            )}
             {draftView !== 'range' ? (
               <>
                 <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
@@ -246,8 +282,17 @@ export default function DatePeriodPicker({ from, to, view, onApply, allowRange =
                   })}
                 </Box>
               </>
-            ) : (
+            ) : rangeUnit === 'day' ? (
               <DateRangeCalendar from={draftFrom} to={draftTo} onFromChange={setDraftFrom} onToChange={setDraftTo} />
+            ) : (
+              <PeriodRangeGrid
+                key={rangeUnit}
+                unit={rangeUnit}
+                from={draftFrom}
+                to={draftTo}
+                onFromChange={setDraftFrom}
+                onToChange={setDraftTo}
+              />
             )}
           </Stack>
           <Divider />
@@ -260,8 +305,8 @@ export default function DatePeriodPicker({ from, to, view, onApply, allowRange =
                 {valid
                   ? `${intl.formatDate(draftFrom, { day: 'numeric', month: 'short', year: 'numeric' })} – ${intl.formatDate(draftTo, { day: 'numeric', month: 'short', year: 'numeric' })}`
                   : draftView === 'range' && draftFrom && !draftTo
-                    ? `${intl.formatDate(draftFrom, { day: 'numeric', month: 'short', year: 'numeric' })} – ${intl.formatMessage({ id: 'period-pick-end' })}`
-                    : intl.formatMessage({ id: draftView === 'range' && !draftFrom ? 'period-pick-start' : 'period-select-valid' })}
+                    ? `${intl.formatDate(draftFrom, { day: 'numeric', month: 'short', year: 'numeric' })} – ${intl.formatMessage({ id: pickHint('end') })}`
+                    : intl.formatMessage({ id: draftView === 'range' && !draftFrom ? pickHint('start') : 'period-select-valid' })}
               </Typography>
             </Stack>
             <Button

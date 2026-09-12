@@ -13,8 +13,8 @@ import Switch from '@mui/material/Switch';
 import TextField from '@mui/material/TextField';
 import { useIntl } from 'react-intl';
 
-import OperatingPeriodsEditor from './OperatingPeriodsEditor';
-import { hasOverlappingPeriods } from './operatingPeriodOverlap';
+import { noOperatingPeriod } from './operatingPeriod';
+import OperatingPeriodFields from './OperatingPeriodFields';
 import SecretTextField from './SecretTextField';
 import { createProviderAccount, getProviderAccount, updateProviderAccount } from 'api/providerAccounts';
 import type { BrickOwlAccountConfig } from 'types/brickOwlAccount';
@@ -28,9 +28,9 @@ type Props = {
   onSaved: () => void;
 };
 
-type FormState = { name: string; apiKey: string; operatingPeriods: OperatingPeriod[]; enabled: boolean };
+type FormState = { name: string; apiKey: string; operatingPeriod: OperatingPeriod; enabled: boolean };
 
-const emptyForm: FormState = { name: '', apiKey: '', operatingPeriods: [], enabled: true };
+const emptyForm: FormState = { name: '', apiKey: '', operatingPeriod: noOperatingPeriod, enabled: true };
 
 /**
  * The BrickOwl account's own screen, with its own fields: no other provider's form shares this component, and this
@@ -60,7 +60,7 @@ export default function BrickOwlAccountDialog({ providerAccountId, open, onClose
         setForm({
           name: providerAccount.name,
           apiKey: '',
-          operatingPeriods: providerAccount.operatingPeriods ?? [],
+          operatingPeriod: providerAccount.config.operatingPeriod ?? noOperatingPeriod,
           enabled: providerAccount.enabled
         });
         setStoredSecretLength(providerAccount.config.apiKeyLength);
@@ -75,19 +75,22 @@ export default function BrickOwlAccountDialog({ providerAccountId, open, onClose
     setSaving(true);
     setError(null);
     try {
-      const config: BrickOwlAccountConfig = { provider: 'BRICK_OWL', apiKey: form.apiKey, apiKeyLength: 0 };
+      const config: BrickOwlAccountConfig = {
+        provider: 'BRICK_OWL',
+        apiKey: form.apiKey,
+        apiKeyLength: 0,
+        operatingPeriod: form.operatingPeriod
+      };
       if (providerAccountId === null) {
         await createProviderAccount({
           name: form.name,
           enabled: form.enabled,
-          operatingPeriods: form.operatingPeriods,
           config
         });
       } else {
         await updateProviderAccount(providerAccountId, {
           name: form.name,
           enabled: form.enabled,
-          operatingPeriods: form.operatingPeriods,
           config
         });
       }
@@ -128,9 +131,9 @@ export default function BrickOwlAccountDialog({ providerAccountId, open, onClose
               onChange={(value) => setForm((prev) => ({ ...prev, apiKey: value }))}
               storedLength={storedSecretLength}
             />
-            <OperatingPeriodsEditor
-              value={form.operatingPeriods}
-              onChange={(operatingPeriods) => setForm((prev) => ({ ...prev, operatingPeriods }))}
+            <OperatingPeriodFields
+              value={form.operatingPeriod}
+              onChange={(operatingPeriod) => setForm((prev) => ({ ...prev, operatingPeriod }))}
             />
             <FormControlLabel
               control={
@@ -143,11 +146,7 @@ export default function BrickOwlAccountDialog({ providerAccountId, open, onClose
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>{intl.formatMessage({ id: 'provider-accounts-cancel' })}</Button>
-        <Button
-          variant="contained"
-          onClick={handleSave}
-          disabled={loading || saving || !form.name || hasOverlappingPeriods(form.operatingPeriods)}
-        >
+        <Button variant="contained" onClick={handleSave} disabled={loading || saving || !form.name}>
           {intl.formatMessage({ id: 'provider-accounts-save' })}
         </Button>
       </DialogActions>

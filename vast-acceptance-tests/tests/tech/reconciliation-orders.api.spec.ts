@@ -176,6 +176,7 @@ test("lists BrickLink reconciliation orders for the selected month", async ({
         },
         gateway: {
           paidAmount: null,
+          feeAmount: null,
           facilitatorTax: null,
           refundedAmount: null,
           paymentUrl: null,
@@ -216,6 +217,7 @@ test("lists BrickLink reconciliation orders for the selected month", async ({
         },
         gateway: {
           paidAmount: null,
+          feeAmount: null,
           facilitatorTax: null,
           refundedAmount: null,
           paymentUrl: null,
@@ -322,6 +324,7 @@ test("lists BrickOwl reconciliation orders for the selected month", async ({
         },
         gateway: {
           paidAmount: null,
+          feeAmount: null,
           facilitatorTax: null,
           refundedAmount: null,
           paymentUrl: null,
@@ -364,6 +367,7 @@ test("lists BrickOwl reconciliation orders for the selected month", async ({
         },
         gateway: {
           paidAmount: null,
+          feeAmount: null,
           facilitatorTax: null,
           refundedAmount: null,
           paymentUrl: null,
@@ -501,6 +505,7 @@ test("lists BrickOwl reconciliation orders that span several batch requests", as
     },
     gateway: {
       paidAmount: null,
+      feeAmount: null,
       facilitatorTax: null,
       refundedAmount: null,
       paymentUrl: null,
@@ -634,6 +639,7 @@ test("reports every order field with the source that stated it", async ({
     { name: "order.grandTotal", source: "order" },
     { name: "order.refundedAmount", source: "order" },
     { name: "gateway.paidAmount", source: "gateway" },
+    { name: "gateway.feeAmount", source: "gateway" },
     { name: "gateway.facilitatorTax", source: "gateway" },
     { name: "gateway.refundedAmount", source: "gateway" },
     { name: "shipment.totalAmount", source: "shipment" },
@@ -2214,7 +2220,10 @@ async function storedEntries(request: APIRequestContext) {
     "/api/private/bank-statements/entries?period=2026-09",
   );
   expect(response.status(), await response.text()).toBe(200);
-  return (await response.json()).entries as Array<{ id: number; entryReference: string }>;
+  return (await response.json()).entries as Array<{
+    id: number;
+    entryReference: string;
+  }>;
 }
 
 async function reconciled(request: APIRequestContext) {
@@ -2383,8 +2392,13 @@ test("names the bank entries an order was settled by, however they were matched"
     }),
   );
   const stored = await storedEntries(request);
-  const mapped = stored.find((entry) => entry.entryReference === "2026090200000007-1");
-  await request.put(`/api/private/bank-statements/entries/${mapped!.id}/mapping`, { data: { mapping: "7500001" } });
+  const mapped = stored.find(
+    (entry) => entry.entryReference === "2026090200000007-1",
+  );
+  await request.put(
+    `/api/private/bank-statements/entries/${mapped!.id}/mapping`,
+    { data: { mapping: "7500001" } },
+  );
 
   const body = await reconciled(request);
 
@@ -2847,7 +2861,10 @@ test("collects no refund from a BrickOwl order whose refund total is zero", asyn
   expect(body.orders[0].failures).toEqual([]);
 });
 
-test("collects marketplace item and lot counts, preserving zero and missing counts", async ({ request, settings }, testInfo) => {
+test("collects marketplace item and lot counts, preserving zero and missing counts", async ({
+  request,
+  settings,
+}, testInfo) => {
   await mockReconciliationOrders(settings, request, testInfo, {
     month: "2026-08",
     brickLink: {
@@ -2863,19 +2880,36 @@ test("collects marketplace item and lot counts, preserving zero and missing coun
       </ORDERS>`,
     },
     brickOwl: [
-      { orderId: "7500001", orderDate: "1786320000", view: { total_quantity: "987", total_lots: "43" } },
-      { orderId: "7500002", orderDate: "1786320000", view: { total_quantity: "0", total_lots: "0" } },
+      {
+        orderId: "7500001",
+        orderDate: "1786320000",
+        view: { total_quantity: "987", total_lots: "43" },
+      },
+      {
+        orderId: "7500002",
+        orderDate: "1786320000",
+        view: { total_quantity: "0", total_lots: "0" },
+      },
       { orderId: "7500003", orderDate: "1786320000", view: {} },
     ],
   });
-  const response = await request.get("/api/private/reconciliation/orders?month=2026-08");
+  const response = await request.get(
+    "/api/private/reconciliation/orders?month=2026-08",
+  );
   expect(response.status(), await response.text()).toBe(200);
   const body = await response.json();
   for (const [id, itemCount, lotCount] of [
-    ["99000001", 1234, 56], ["99000002", 0, 0], ["99000003", null, null],
-    ["7500001", 987, 43], ["7500002", 0, 0], ["7500003", null, null],
+    ["99000001", 1234, 56],
+    ["99000002", 0, 0],
+    ["99000003", null, null],
+    ["7500001", 987, 43],
+    ["7500002", 0, 0],
+    ["7500003", null, null],
   ]) {
-    expect(body.orders.find((order: { order: { orderId: string } }) => order.order.orderId === id)?.order)
-      .toMatchObject({ itemCount, lotCount });
+    expect(
+      body.orders.find(
+        (order: { order: { orderId: string } }) => order.order.orderId === id,
+      )?.order,
+    ).toMatchObject({ itemCount, lotCount });
   }
 });

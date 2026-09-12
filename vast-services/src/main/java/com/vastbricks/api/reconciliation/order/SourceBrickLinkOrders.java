@@ -8,6 +8,7 @@ import com.vastbricks.api.client.brickstore.BrickStoreOrderType;
 import com.vastbricks.api.reconciliation.ParallelTasks;
 import com.vastbricks.api.reconciliation.Source;
 import com.vastbricks.api.reconciliation.ReconciliationPeriod;
+import com.vastbricks.api.setup.provideraccount.Provider;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -34,7 +35,7 @@ class SourceBrickLinkOrders implements Source<SourcedBrickLinkOrder> {
     private static final String CANCELLED = "cancelled";
 
     private final BrickStoreClient brickStoreClient;
-    private final BrickLinkStoreSettings brickLinkStoreSettings;
+    private final StoreOperatingPeriod storeOperatingPeriod;
 
     @Override
     public Class<SourcedBrickLinkOrder> type() {
@@ -43,7 +44,7 @@ class SourceBrickLinkOrders implements Source<SourcedBrickLinkOrder> {
 
     @Override
     public List<SourcedBrickLinkOrder> fetch(ReconciliationPeriod period) {
-        var boundedPeriod = period.boundedBy(brickLinkStoreSettings.getOpenDate(), brickLinkStoreSettings.getCloseDate());
+        var boundedPeriod = storeOperatingPeriod.narrow(Provider.BRICK_LINK, period);
         if (boundedPeriod.isEmpty()) {
             return List.of();
         }

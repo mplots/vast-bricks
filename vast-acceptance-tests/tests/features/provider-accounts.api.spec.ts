@@ -110,7 +110,9 @@ test("a BrickLink account carries both of the store's credential sets, and measu
     consumerSecretLength: config.consumerSecret.length,
     tokenValueLength: config.tokenValue.length,
     tokenSecretLength: config.tokenSecret.length,
-    brickStoreTokenLength: config.brickStoreToken.length
+    brickStoreTokenLength: config.brickStoreToken.length,
+    // A store's operating period lives with the store's own credentials, and is stated by no other provider.
+    operatingPeriod: null
   });
 });
 
@@ -139,7 +141,12 @@ test("a BrickOwl account is its own shape, and none of BrickLink's fields", asyn
   const created = await createProviderAccount(request, { name: 'Shop BrickOwl', config });
 
   expect(created).toMatchObject({ provider: 'BRICK_OWL' });
-  expect(created.config).toEqual({ provider: 'BRICK_OWL', apiKey: null, apiKeyLength: config.apiKey.length });
+  expect(created.config).toEqual({
+    provider: 'BRICK_OWL',
+    apiKey: null,
+    apiKeyLength: config.apiKey.length,
+    operatingPeriod: null
+  });
 });
 
 test('accounts are listed in the order they were made, and a new one joins the end', async ({ request }) => {
@@ -248,89 +255,100 @@ test('a Mana Kabata account is its own shape, and none of Latvijas Pasts fields'
   expect(created.config).toEqual({ provider: 'MANA_KABATA', apiToken: null, apiTokenLength: config.apiToken.length });
 });
 
-test('an account is created with operating periods and reads them back in order', async ({ request }) => {
-  // Given newest first, and the last one still running - the order they are typed in is not the order they happened.
+test('a store account is created with an operating period and reads it back with its config', async ({ request }) => {
+  const operatingPeriod: OperatingPeriod = { from: '2019-03-01', to: '2022-12-31' };
   const created = await createProviderAccount(request, {
     name: 'Shop BrickLink',
-    config: brickLinkConfig(),
-    operatingPeriods: [
-      { from: '2023-06-01', to: null, note: 'business' },
-      { from: '2019-03-01', to: '2022-12-31', note: 'personal, before switching to business' },
-    ],
+    config: brickLinkConfig({ operatingPeriod }),
   });
 
-  const inOrder: OperatingPeriod[] = [
-    { from: '2019-03-01', to: '2022-12-31', note: 'personal, before switching to business' },
-    { from: '2023-06-01', to: null, note: 'business' },
-  ];
-  expect(created.operatingPeriods).toEqual(inOrder);
-  expect((await readProviderAccount(request, created.id)).operatingPeriods).toEqual(inOrder);
-  expect((await listProviderAccounts(request))[0].operatingPeriods).toEqual(inOrder);
+  expect(created.config).toMatchObject({ operatingPeriod });
+  expect((await readProviderAccount(request, created.id)).config).toMatchObject({ operatingPeriod });
+  expect((await listProviderAccounts(request))[0].config).toMatchObject({ operatingPeriod });
 });
 
-test('an account with no operating periods is unrestricted', async ({ request }) => {
-  const created = await createProviderAccount(request, { name: 'Shop Stripe', config: stripeConfig() });
-
-  // Empty, never null: an account that has said nothing about its dates takes everything it holds.
-  expect(created.operatingPeriods).toEqual([]);
-  expect((await readProviderAccount(request, created.id)).operatingPeriods).toEqual([]);
-});
-
-test('an operating period may be open at either end, and one may end where the next begins', async ({ request }) => {
-  const periods: OperatingPeriod[] = [
-    { from: null, to: '2019-12-31', note: 'before the store was a store' },
-    // Touching, not overlapping - the day after the one above, which is the distinction being drawn.
-    { from: '2020-01-01', to: null, note: null },
-  ];
-
-  const created = await createProviderAccount(request, {
+test('an operating period may be open at either end, and a store may state none at all', async ({ request }) => {
+  // Still selling: an unstated end is not a missing half of a range, it is a store that has not closed.
+  const ongoing = await createProviderAccount(request, {
     name: 'Shop BrickOwl',
-    config: brickOwlConfig(),
-    operatingPeriods: periods,
+    config: brickOwlConfig({ operatingPeriod: { from: '2020-01-01', to: null } }),
   });
+  expect(ongoing.config).toMatchObject({ operatingPeriod: { from: '2020-01-01', to: null } });
 
-  expect(created.operatingPeriods).toEqual(periods);
+  // Null, never an empty period: a store that has said nothing about its dates takes every order it holds.
+  const unrestricted = await createProviderAccount(request, { name: 'Shop BrickLink', config: brickLinkConfig() });
+  expect(unrestricted.config).toMatchObject({ operatingPeriod: null });
 });
 
-test('saving an account without its operating periods clears them', async ({ request }) => {
+test('a store account saved with neither date keeps no operating period', async ({ request }) => {
   const created = await createProviderAccount(request, {
-    name: 'Shop PayPal',
-    config: payPalConfig(),
-    operatingPeriods: [{ from: '2023-06-01', to: null, note: null }],
+    name: 'Shop BrickLink',
+    config: brickLinkConfig({ operatingPeriod: { from: '2023-06-01', to: null } }),
   });
 
-  // A period is not a secret: the save replaces them the way it replaces the name, so saying nothing says none.
-  const updated = await updateProviderAccount(request, created.id, {
+  // A period is not a secret: a blank one is cleared rather than kept, so a form with both pickers emptied says
+  // exactly what a store that never stated a period says.
+  const cleared = await updateProviderAccount(request, created.id, {
     name: created.name,
     enabled: true,
-    config: payPalConfig({ clientSecret: '' }),
+    config: brickLinkConfig({
+      consumerKey: '',
+      consumerSecret: '',
+      tokenValue: '',
+      tokenSecret: '',
+      brickStoreToken: '',
+      operatingPeriod: { from: null, to: null },
+    }),
   });
 
-  expect(updated.operatingPeriods).toEqual([]);
+  expect(cleared.config).toMatchObject({ operatingPeriod: null });
 });
 
-test('a reversed, overlapping or dateless operating period is refused, and the stored ones stay', async ({ request }) => {
-  const stored: OperatingPeriod[] = [{ from: '2019-03-01', to: '2022-12-31', note: null }];
+test('a reversed operating period is refused, and the stored one stays', async ({ request }) => {
+  const operatingPeriod: OperatingPeriod = { from: '2019-03-01', to: '2022-12-31' };
   const created = await createProviderAccount(request, {
-    name: 'Shop Stripe',
-    config: stripeConfig(),
-    operatingPeriods: stored,
+    name: 'Shop BrickOwl',
+    config: brickOwlConfig({ operatingPeriod }),
   });
 
-  const refuse = async (operatingPeriods: OperatingPeriod[]) => {
-    const response = await request.put(`${providerAccountsEndpoint}/${created.id}`, {
-      data: { name: created.name, enabled: true, config: stripeConfig({ secretKey: '' }), operatingPeriods },
+  const response = await request.put(`${providerAccountsEndpoint}/${created.id}`, {
+    data: {
+      name: created.name,
+      enabled: true,
+      config: brickOwlConfig({ apiKey: '', operatingPeriod: { from: '2024-06-01', to: '2024-01-01' } }),
+    },
+  });
+  expect(response.ok(), await response.text()).toBe(false);
+  expect((await readProviderAccount(request, created.id)).config).toMatchObject({ operatingPeriod });
+});
+
+test('a second account is refused for every provider but the payment gateways', async ({ request }) => {
+  // A store, a postal contract and an accounting login are each a party a tenant deals with once, so a second
+  // account with one of them would be the same party configured twice.
+  for (const config of [brickLinkConfig(), brickOwlConfig(), latvijasPastsConfig(), manaKabataConfig()]) {
+    await createProviderAccount(request, { name: `First ${config.provider}`, config });
+
+    const second = await request.post(providerAccountsEndpoint, {
+      data: { name: `Second ${config.provider}`, enabled: true, config },
     });
-    expect(response.ok(), await response.text()).toBe(false);
-  };
+    expect(second.ok(), await second.text()).toBe(false);
+  }
 
-  await refuse([{ from: '2024-06-01', to: '2024-01-01', note: null }]);
-  await refuse([
-    { from: '2019-03-01', to: '2022-12-31', note: null },
-    { from: '2022-12-31', to: '2024-01-01', note: null },
+  // A store collects through as many gateway accounts as it has opened, and which one an order was paid into is a
+  // fact about that order.
+  await createProviderAccount(request, { name: 'Shop PayPal', config: payPalConfig() });
+  await createProviderAccount(request, { name: 'Second PayPal', config: payPalConfig() });
+  await createProviderAccount(request, { name: 'Shop Stripe', config: stripeConfig() });
+  await createProviderAccount(request, { name: 'Second Stripe', config: stripeConfig() });
+
+  expect((await listProviderAccounts(request)).map((account) => account.provider).sort()).toEqual([
+    'BRICK_LINK',
+    'BRICK_OWL',
+    'LATVIJAS_PASTS',
+    'MANA_KABATA',
+    'PAYPAL',
+    'PAYPAL',
+    'STRIPE',
+    'STRIPE',
   ]);
-  // Nothing at either end says exactly what no periods says, so it is a half-filled row rather than a meaning.
-  await refuse([{ from: null, to: null, note: 'everything' }]);
-
-  expect((await readProviderAccount(request, created.id)).operatingPeriods).toEqual(stored);
 });

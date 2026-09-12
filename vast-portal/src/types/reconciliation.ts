@@ -59,6 +59,12 @@ export interface ReconciliationOrderFields {
 export interface ReconciliationGatewayFields {
   /** What the provider took for the order, before its own fees. It is also what says a payment was matched at all. */
   paidAmount: number | null;
+  /**
+   * What the provider charged for taking the payment, or `null` when it charged none. It is the store's own cost of
+   * being paid rather than anything the buyer or the marketplace owes, which is why it stands apart from the
+   * facilitator tax deducted from the same payment.
+   */
+  feeAmount: number | null;
   /** What the payment shows the marketplace took as tax facilitator, or `null` when it shows none. */
   facilitatorTax: number | null;
   /** What the provider shows has been refunded out of the payment to date, or `null` when it shows none. */

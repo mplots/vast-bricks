@@ -82,6 +82,7 @@ const amountFields: string[] = [
   'order.grandTotal',
   'order.refundedAmount',
   'gateway.paidAmount',
+  'gateway.feeAmount',
   'gateway.facilitatorTax',
   'gateway.refundedAmount',
   'shipment.totalAmount',

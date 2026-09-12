@@ -27,6 +27,16 @@ public class GatewayFields {
     private BigDecimal paidAmount;
 
     /**
+     * What the payment provider charged for taking the payment, as a positive amount, or {@code null} when it charged
+     * none and when no payment was matched to the order.
+     *
+     * <p>The provider's own fee and nothing the marketplace took: what the marketplace took back as tax facilitator
+     * is the field below, and the two are deducted from the same payment for different reasons and by different
+     * parties. It is what the order cost to collect, which the store bears and the buyer never sees.
+     */
+    private BigDecimal feeAmount;
+
+    /**
      * What the payment provider reports the marketplace took out of the payment as tax facilitator, or {@code null}
      * when the payment states none or no payment was matched to the order.
      */

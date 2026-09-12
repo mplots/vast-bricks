@@ -36,9 +36,14 @@ class ProviderAccountService {
         }
 
         ProviderAccountConfig stored = request.getConfig().prepareForStorage(settingsEncryption, null);
-        ProviderAccount providerAccount = new ProviderAccount(request.getName(), stored.provider(), stored);
+        Provider provider = stored.provider();
+        if (!provider.allowsMultipleAccounts() && providerAccountRepository.existsByProvider(provider)) {
+            throw new ProviderAccountException(
+                    "A " + provider + " account is already configured, and only one can be.");
+        }
+
+        ProviderAccount providerAccount = new ProviderAccount(request.getName(), provider, stored);
         providerAccount.setEnabled(request.isEnabled());
-        providerAccount.setOperatingPeriods(OperatingPeriod.normalized(request.getOperatingPeriods()));
         providerAccount.setSortOrder(nextSortOrder());
         return toItem(providerAccountRepository.save(providerAccount));
     }
@@ -53,7 +58,6 @@ class ProviderAccountService {
 
         providerAccount.setName(request.getName());
         providerAccount.setEnabled(request.isEnabled());
-        providerAccount.setOperatingPeriods(OperatingPeriod.normalized(request.getOperatingPeriods()));
         providerAccount.setConfig(request.getConfig().prepareForStorage(settingsEncryption, providerAccount.getConfig()));
         return toItem(providerAccountRepository.save(providerAccount));
     }
@@ -104,7 +108,6 @@ class ProviderAccountService {
         item.setName(providerAccount.getName());
         item.setProvider(providerAccount.getProvider());
         item.setEnabled(providerAccount.isEnabled());
-        item.setOperatingPeriods(List.copyOf(providerAccount.getOperatingPeriods()));
         item.setConfig(providerAccount.getConfig().forView(settingsEncryption));
         return item;
     }

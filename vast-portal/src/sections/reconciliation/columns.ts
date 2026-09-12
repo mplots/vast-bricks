@@ -28,6 +28,7 @@ export const orderFields = [
   'order.grandTotal',
   'order.refundedAmount',
   'gateway.paidAmount',
+  'gateway.feeAmount',
   'gateway.facilitatorTax',
   'gateway.refundedAmount',
   'shipment.totalAmount',
@@ -47,8 +48,10 @@ export const orderFields = [
 // accounts of one refund that a rule holds against each other, so a disagreement between them is a thing to see at a
 // glance instead of a failure to go looking for; only the gateway's takes part in the subtraction that follows.
 //
-// What the payment paid and what it shows the marketplace took come last together, so they read as one account of
-// the payment rather than interrupting that subtraction.
+// What the payment paid, what the gateway charged for taking it and what it shows the marketplace took come last
+// together, so they read as one account of the payment rather than interrupting that subtraction. The gateway's fee
+// is what the store paid to be paid: it is nobody's to invoice and nothing to compare against the order, so it sits
+// with the payment it was deducted from rather than among the amounts the target invoice is worked out of.
 //
 // The accounting invoice's own three amounts are choosable but not shown: nothing compares them against the order
 // yet, so a reader who wants to see what an order was invoiced for asks for them.
@@ -67,6 +70,7 @@ export const columnFields: string[] = [
   'gateway.refundedAmount',
   'calculated.targetInvoice',
   'gateway.paidAmount',
+  'gateway.feeAmount',
   'gateway.facilitatorTax',
   // What the post office charged comes after the payment's own account of the order: it is a third account of the
   // same order rather than part of the subtraction the amounts before it make.

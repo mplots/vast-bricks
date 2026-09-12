@@ -10,6 +10,7 @@ import { ArrowLeft2, ArrowRight2 } from 'iconsax-reactjs';
 import { useIntl } from 'react-intl';
 
 import IconButton from 'components/@extended/IconButton';
+import { rangeBandSx, rangeCellSx } from 'components/period/rangeCell';
 import { selectRangeDate, type RangeEdge } from 'components/period/rangeSelection';
 
 interface Props {
@@ -126,16 +127,7 @@ export default function DateRangeCalendar({ from, to, onFromChange, onToChange }
             dateValue(date) <= dateValue(preview.to);
           const selected = from !== null && to !== null && dateValue(date) >= dateValue(from) && dateValue(date) <= dateValue(to);
           return (
-            <Box
-              key={date.toISOString()}
-              sx={{
-                bgcolor: inside ? 'primary.lighter' : 'transparent',
-                borderTopLeftRadius: previewStart ? 8 : 0,
-                borderBottomLeftRadius: previewStart ? 8 : 0,
-                borderTopRightRadius: previewEnd ? 8 : 0,
-                borderBottomRightRadius: previewEnd ? 8 : 0
-              }}
-            >
+            <Box key={date.toISOString()} sx={rangeBandSx(inside, previewStart, previewEnd)}>
               <Button
                 fullWidth
                 ref={(button) => {
@@ -155,16 +147,8 @@ export default function DateRangeCalendar({ from, to, onFromChange, onToChange }
                 disabled={date.getFullYear() < 1900 || date.getFullYear() > 2099}
                 onClick={() => pick(date)}
                 sx={{
-                  minWidth: 0,
-                  height: 36,
-                  p: 0,
-                  borderRadius: 1,
-                  bgcolor: start || end ? 'primary.main' : 'transparent',
-                  color: start || end ? 'primary.contrastText' : isSameMonth(date, month) ? 'text.primary' : 'text.disabled',
-                  outline: hovered && (previewStart || previewEnd) ? '2px solid' : undefined,
-                  outlineColor: 'primary.main',
-                  outlineOffset: -2,
-                  '&:hover': { bgcolor: start || end ? 'primary.dark' : 'primary.lighter' }
+                  ...rangeCellSx(start || end, Boolean(hovered) && (previewStart || previewEnd), !isSameMonth(date, month)),
+                  height: 36
                 }}
               >
                 {date.getDate()}
