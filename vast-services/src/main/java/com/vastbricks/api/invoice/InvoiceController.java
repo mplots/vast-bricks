@@ -43,7 +43,7 @@ class  InvoiceController {
             BrickStoreClientException.class,
             BrickOwlClientException.class
     })
-    ProblemDetail handleDataSourceException(RuntimeException exception) {
+    ProblemDetail handleProviderException(RuntimeException exception) {
         log.error("Invoice generation failed: {}", exception.getMessage());
         var problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_GATEWAY, exception.getMessage());
         problem.setTitle("Invoice generation failed");

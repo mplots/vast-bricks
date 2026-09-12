@@ -98,7 +98,7 @@ here as they are provided; do not invent unspecified behavior prematurely.
   shown as whole-number columns and in order details. Missing counts remain
   absent rather than being inferred from item lines; a reported zero stays zero.
 
-- The screen is backed entirely by live data sources. Reconciliation records,
+- The screen is backed entirely by live provider data. Reconciliation records,
   provider responses, and reconciliation results are not stored in the Vast
   database.
 - The reconciliation order list currently collects received BrickLink orders
@@ -892,13 +892,13 @@ here as they are provided; do not invent unspecified behavior prematurely.
     rule reports both of its failures at `error`: money that was not found, or
     that does not add up, is something to fix.
 
-### Data-source boundaries and current clients
+### Sourcing boundaries and current clients
 
 - The sourcing and mapping boundaries are common to every reconciliation
   category, so adding another payment, accounting, shipping, order, or
   synchronization provider is a source plus a mapper and must not require
   redesigning the reconciliation feature.
-- A low-level API client is not necessarily a reconciliation data source by
+- A low-level API client is not necessarily a reconciliation source by
   itself. A source implementation may combine multiple clients of one provider
   and expose what they returned through the common sourcing boundary.
 - Conversely, one provider may need several sources. Split independent calls of

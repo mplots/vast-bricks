@@ -1,10 +1,36 @@
-import type { DataSourceProvider } from 'types/dataSource';
+import { useId } from 'react';
 
-type Mark = { viewBox: string; paths: { fill: string; d: string }[] };
+import type { Provider } from 'types/providerAccount';
 
-/** Each provider's own mark: PayPal's from gilbarbara/logos, Stripe's from Simple Icons - both CC0, both drawn in
- * the brand's own colours, each in its own coordinate system. A new provider adds one entry here. */
-const MARKS: Record<DataSourceProvider, Mark> = {
+import brickLinkMark from 'assets/images/providers/bricklink.png';
+import brickOwlMark from 'assets/images/providers/brickowl.png';
+import latvijasPastsMark from 'assets/images/providers/latvijaspasts.png';
+import manaKabataMark from 'assets/images/providers/manakabata.png';
+
+/** A mark drawn here, in the brand's own colours and its own coordinate system. */
+type VectorMark = { viewBox: string; paths: { fill: string; d: string }[] };
+
+/** A marketplace's own published app icon. {@code fullBleed} says the artwork carries its own background and so
+ * fills the tile, rather than sitting inset on the white one. */
+type ImageMark = { src: string; fullBleed?: boolean };
+
+type Mark = VectorMark | ImageMark;
+
+/**
+ * Each provider's own mark: PayPal's from gilbarbara/logos and Stripe's from Simple Icons - both CC0, both drawn
+ * as paths. BrickLink's and BrickOwl's are each marketplace's own published app icon, used as published rather
+ * than traced, because both are letterforms and shading that a redrawing only approximates. A new provider adds
+ * one entry here, either kind.
+ */
+const MARKS: Record<Provider, Mark> = {
+  // Cyan tile with the white BL letterform - it carries its own background, so it fills the tile.
+  BRICK_LINK: { src: brickLinkMark, fullBleed: true },
+  // A grey brick with owl eyes, on transparency, so it sits on the white tile like the drawn marks do.
+  BRICK_OWL: { src: brickOwlMark },
+  // The pink dove on its own blue square, so it fills the tile.
+  LATVIJAS_PASTS: { src: latvijasPastsMark, fullBleed: true },
+  // The orange pocket mark on white, so it sits on the white tile.
+  MANA_KABATA: { src: manaKabataMark },
   PAYPAL: {
     viewBox: '0 0 256 302',
     paths: [
@@ -37,9 +63,29 @@ const MARKS: Record<DataSourceProvider, Mark> = {
   }
 };
 
-/** One provider's logo on a white tile, so it reads the same on a card, in a menu, or against any background. */
-export default function ProviderLogo({ provider, size = 40 }: { provider: DataSourceProvider; size?: number }) {
+/** One provider's logo on a white tile, so it reads the same on a card, in a menu, or against any background -
+ * except a mark that brings its own background, which fills the tile instead. */
+export default function ProviderLogo({ provider, size = 40 }: { provider: Provider; size?: number }) {
   const mark = MARKS[provider];
+  const clipId = useId();
+
+  if ('src' in mark) {
+    return (
+      <svg width={size} height={size} viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+        <clipPath id={clipId}>
+          <circle cx="20" cy="20" r="20" />
+        </clipPath>
+        {mark.fullBleed ? (
+          <image href={mark.src} x="0" y="0" width="40" height="40" clipPath={`url(#${clipId})`} preserveAspectRatio="xMidYMid slice" />
+        ) : (
+          <>
+            <circle cx="20" cy="20" r="20" fill="#ffffff" stroke="rgba(0,0,0,0.08)" />
+            <image href={mark.src} x="6" y="6" width="28" height="28" preserveAspectRatio="xMidYMid meet" />
+          </>
+        )}
+      </svg>
+    );
+  }
 
   return (
     <svg width={size} height={size} viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">

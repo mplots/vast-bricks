@@ -16,10 +16,10 @@ const setupMenu: NavItemType = {
       icon: Setting2
     },
     {
-      id: 'data-sources',
-      title: 'data-sources',
+      id: 'provider-accounts',
+      title: 'provider-accounts',
       type: 'item',
-      url: '/data-sources',
+      url: '/provider-accounts',
       icon: Data
     }
   ]

@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
  * AES-256-GCM encryption for secret values that must be stored at rest, keyed by {@code VAST_SETUP_ENCRYPTION_KEY}.
  *
  * <p>Lives at the root of the Setup feature rather than inside {@code settings} because both of its subfeatures use
- * it: a {@code @VastSetting(secret = true)} override and a data source's own credential encrypt with this same key
+ * it: a {@code @VastSetting(secret = true)} override and a provider account's own credential encrypt with this same key
  * rather than each inventing its own.
  */
 @Component

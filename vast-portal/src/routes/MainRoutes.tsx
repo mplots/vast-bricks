@@ -29,7 +29,7 @@ const StripeTransactionsPage = Loadable(lazy(() => import('pages/stripe-transact
 const PayPalTransactionsPage = Loadable(lazy(() => import('pages/paypal-transactions')));
 const JobsPage = Loadable(lazy(() => import('pages/jobs')));
 const VastSettingsPage = Loadable(lazy(() => import('pages/vast-settings')));
-const DataSourcesPage = Loadable(lazy(() => import('pages/data-sources')));
+const ProviderAccountsPage = Loadable(lazy(() => import('pages/provider-accounts')));
 
 // ==============================|| MAIN ROUTES ||============================== //
 
@@ -93,8 +93,8 @@ const MainRoutes = {
           element: <VastSettingsPage />
         },
         {
-          path: 'data-sources',
-          element: <DataSourcesPage />
+          path: 'provider-accounts',
+          element: <ProviderAccountsPage />
         }
       ]
     },

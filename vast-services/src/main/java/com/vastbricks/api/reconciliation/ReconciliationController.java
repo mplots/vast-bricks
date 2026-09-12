@@ -89,7 +89,7 @@ class ReconciliationController {
             StripeClientException.class
     })
     @ResponseStatus(HttpStatus.BAD_GATEWAY)
-    String handleDataSourceException(RuntimeException exception) {
+    String handleProviderException(RuntimeException exception) {
         // What went wrong was logged with its stack where the source failed; this says which failure the request
         // answered with, since several providers may have failed for one request.
         log.error("Reconciliation failed: {}", exception.getMessage());
