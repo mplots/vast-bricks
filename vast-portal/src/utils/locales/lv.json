@@ -355,7 +355,7 @@
   "job-runs-error": "Izpildes neizdevās nolasīt.",
   "job-trigger-schedule": "pēc grafika",
   "job-trigger-manual": "manuāli",
-  "job-bricklink-order-archive": "BrickLink pasūtījumu arhīvs",
+  "job-order-archive": "Pasūtījumu arhīvs",
   "job-tally-archived": "arhivēti",
   "job-tally-unchanged": "nemainīti",
   "job-tally-failed": "neizdevās",

@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 /**
- * Archives the store's BrickLink orders nightly.
+ * Archives the store's marketplace orders nightly.
  *
  * <p>The whole of registering a job: a bean implementing {@link Job}, in the feature package of the work it does.
  * It runs for the tenant bound to the thread, which the schedule fires for every store and the portal for one.
@@ -20,7 +20,7 @@ class OrderArchiveJob implements Job {
 
     @Override
     public String code() {
-        return "bricklink-order-archive";
+        return "order-archive";
     }
 
     @Override

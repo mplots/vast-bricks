@@ -6,9 +6,13 @@ import type { SettingsOverrides } from './api-test';
 import type { WireMockApi } from './wiremock';
 
 /**
- * The protocol the order archive's two providers speak, so a scenario states the orders it is about and nothing of
- * how BrickLink is reached. Both halves of BrickLink are involved: the published store API states the order, and the
- * pages a signed-in store sees hold the accounting export and the VAT invoice.
+ * The protocol the order archive's providers speak, so a scenario states the orders it is about and nothing of how
+ * either marketplace is reached. Both halves of BrickLink are involved: the published store API states the order, and
+ * the pages a signed-in store sees hold the accounting export and the VAT invoice. BrickOwl states an order through
+ * its batch endpoint and nothing else, which is why an archived BrickOwl order is one file rather than three.
+ *
+ * <p>BrickOwl is configured whether or not a scenario has orders there, because a store that holds no BrickOwl key
+ * at all is a different scenario from a store whose BrickOwl has nothing to archive.
  */
 
 export const brickStoreSessionToken = 'order-archive-session-token';
@@ -18,6 +22,18 @@ export type ArchivedOrder = {
   dateStatusChanged: string;
   status?: string;
   vatCollectedByBrickLink?: boolean;
+};
+
+/**
+ * A BrickOwl order to archive. `updatedTime` is stated to BrickOwl's API with an offset and read back without one,
+ * so it is also the moment the archived file is named after.
+ */
+export type ArchivedBrickOwlOrder = {
+  orderId: string;
+  updatedTime: string;
+  status?: string;
+  /** BrickOwl answering the batch entry for this order with a refusal rather than with the order. */
+  refused?: boolean;
 };
 
 /** A minimal but real PDF, because the client refuses a VAT invoice that is not one. */
@@ -41,12 +57,25 @@ function order(archived: ArchivedOrder) {
   };
 }
 
+/** What BrickOwl's order/view answers with, which is also what the archive writes. */
+export function brickOwlOrder(archived: ArchivedBrickOwlOrder) {
+  return {
+    order_id: archived.orderId,
+    updated_time: `${archived.updatedTime}+00:00`,
+    order_time: `${archived.updatedTime}+00:00`,
+    status: archived.status ?? 'Shipped',
+    base_currency: 'EUR',
+    base_order_total: '12.34',
+  };
+}
+
 export async function mockOrderArchive(
   wireMock: WireMockApi,
   settings: SettingsOverrides,
-  options: { orders: ArchivedOrder[]; baseDirectory: string },
+  options: { orders: ArchivedOrder[]; brickOwlOrders?: ArchivedBrickOwlOrder[]; baseDirectory: string },
 ) {
   await settings.set('VAST_ORDER_ARCHIVE_DIR', options.baseDirectory);
+  await mockBrickOwl(wireMock, settings, options.brickOwlOrders ?? []);
 
   await settings.set('VAST_BRICKLINK_BASE_URL', `${wireMock.baseUrl}/api/store/v1/`);
   await settings.setSecret('VAST_BRICKLINK_CONSUMER_KEY', 'test-bricklink-consumer-key');
@@ -87,6 +116,37 @@ export async function mockOrderArchive(
     response: {
       headers: { 'Content-Type': 'application/pdf' },
       base64Body: vatInvoicePdf.toString('base64'),
+    },
+  });
+}
+
+async function mockBrickOwl(wireMock: WireMockApi, settings: SettingsOverrides, orders: ArchivedBrickOwlOrder[]) {
+  await settings.set('VAST_BRICKOWL_BASE_URL', wireMock.baseUrl);
+  await settings.setSecret('VAST_BRICKOWL_API_KEY', 'order-archive-brickowl-api-key');
+
+  await wireMock.addMethodHostMapping('GET', '/v1/order/list', {
+    // BrickOwl's list states the date in seconds since the epoch, and says nothing about when the order last changed.
+    response: {
+      json: orders.map((archived) => ({
+        order_id: archived.orderId,
+        order_date: String(Date.parse(`${archived.updatedTime}+00:00`) / 1000),
+      })),
+    },
+  });
+  if (orders.length === 0) {
+    return;
+  }
+
+  // The archive asks for every listed order in one batch, in the order they were listed, and BrickOwl answers each
+  // request under the number it went out as.
+  await wireMock.addMethodHostMapping('POST', '/v1/bulk/batch', {
+    request: { bodyPatterns: [{ contains: encodeURIComponent('order/view') }] },
+    response: {
+      json: orders.map((archived, index) =>
+        archived.refused
+          ? { req_num: index + 1, code: 404, body: [] }
+          : { req_num: index + 1, code: 200, body: brickOwlOrder(archived) },
+      ),
     },
   });
 }

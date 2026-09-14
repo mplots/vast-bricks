@@ -355,7 +355,7 @@
   "job-runs-error": "The runs could not be read.",
   "job-trigger-schedule": "on schedule",
   "job-trigger-manual": "by hand",
-  "job-bricklink-order-archive": "BrickLink order archive",
+  "job-order-archive": "Order archive",
   "job-tally-archived": "archived",
   "job-tally-unchanged": "unchanged",
   "job-tally-failed": "failed",

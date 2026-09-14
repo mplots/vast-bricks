@@ -7,22 +7,24 @@ import { expect, test } from '../support/api-test';
 import {
   accountingExportXml,
   archiveBaseDirectory,
+  brickOwlOrder,
   mockOrderArchive,
   vatInvoicePdf,
+  type ArchivedBrickOwlOrder,
   type ArchivedOrder,
 } from '../support/order-archive';
 import { WireMockApi, wireMockMode } from '../support/wiremock';
 
 /**
- * The BrickLink order archive, run as the jobs screen runs it.
+ * The order archive, run as the jobs screen runs it.
  *
- * <p>What these are about is what the archive is for: the store keeps its own copy of what BrickLink held, one set
- * of files per state an order was in, and running the job again does not fetch what is already on disk.
+ * <p>What these are about is what the archive is for: the store keeps its own copy of what its marketplaces held,
+ * one set of files per state an order was in, and running the job again does not fetch what is already on disk.
  */
 
 test.describe.configure({ mode: wireMockMode() });
 
-const job = 'bricklink-order-archive';
+const job = 'order-archive';
 
 const plainOrder: ArchivedOrder = { orderId: 32100011, dateStatusChanged: '2026-09-05T10:11:12.000Z' };
 const vatOrder: ArchivedOrder = {
@@ -30,6 +32,8 @@ const vatOrder: ArchivedOrder = {
   dateStatusChanged: '2026-09-06T08:09:10.000Z',
   vatCollectedByBrickLink: true,
 };
+
+const owlOrder: ArchivedBrickOwlOrder = { orderId: '19200031', updatedTime: '2026-09-07T11:12:13' };
 
 type Run = { outcome: string; tally: Record<string, number>; failure: string | null };
 
@@ -51,6 +55,10 @@ async function statusOf(request: APIRequestContext) {
 
 function archived(base: string, tenantCode: string, order: ArchivedOrder, kind: string, extension: string) {
   return join(base, tenantCode, `${kind}-${order.orderId}-${order.dateStatusChanged}.${extension}`);
+}
+
+function archivedBrickOwl(base: string, tenantCode: string, order: ArchivedBrickOwlOrder) {
+  return join(base, tenantCode, `brickowl-api-${order.orderId}-${order.updatedTime}.json`);
 }
 
 test('the archive job is registered, on the schedule it declares', async ({ request }) => {
@@ -110,10 +118,14 @@ test('an order already on disk is left alone when the job runs again', async ({ 
   const wireMock = WireMockApi.forTest(request, testInfo);
   await wireMock.reset();
   const base = archiveBaseDirectory();
-  await mockOrderArchive(wireMock, settings, { orders: [plainOrder, vatOrder], baseDirectory: base });
+  await mockOrderArchive(wireMock, settings, {
+    orders: [plainOrder, vatOrder],
+    brickOwlOrders: [owlOrder],
+    baseDirectory: base,
+  });
 
-  expect((await runArchive(request)).tally).toEqual({ archived: 2, unchanged: 0, failed: 0 });
-  expect((await runArchive(request)).tally).toEqual({ archived: 0, unchanged: 2, failed: 0 });
+  expect((await runArchive(request)).tally).toEqual({ archived: 3, unchanged: 0, failed: 0 });
+  expect((await runArchive(request)).tally).toEqual({ archived: 0, unchanged: 3, failed: 0 });
 });
 
 test('an order that could not be archived is counted without failing the whole run', async ({
@@ -156,4 +168,66 @@ test('BrickLink refusing the request fails the run rather than reading as a stor
   expect(run.outcome).toBe('failed');
   expect(run.failure).toContain('BAD_OAUTH_REQUEST');
   expect(run.failure).toContain('TOKEN_IP_MISMATCHED');
+});
+
+test('a BrickOwl order is archived as BrickOwl stated it', async ({ request, settings, authentication }, testInfo) => {
+  const wireMock = WireMockApi.forTest(request, testInfo);
+  await wireMock.reset();
+  const base = archiveBaseDirectory();
+  await mockOrderArchive(wireMock, settings, { orders: [], brickOwlOrders: [owlOrder], baseDirectory: base });
+
+  const run = await runArchive(request);
+  expect(run.outcome).toBe('succeeded');
+  expect(run.tally).toEqual({ archived: 1, unchanged: 0, failed: 0 });
+
+  const file = archivedBrickOwl(base, authentication.tenant.code, owlOrder);
+  expect(existsSync(file), `${file} should have been written`).toBe(true);
+  // Exactly what BrickOwl sent, not a model of it written back out.
+  expect(JSON.parse(readFileSync(file, 'utf8'))).toEqual(brickOwlOrder(owlOrder));
+});
+
+test('a BrickOwl order the batch would not state is counted without failing the run', async ({
+  request,
+  settings,
+  authentication,
+}, testInfo) => {
+  const wireMock = WireMockApi.forTest(request, testInfo);
+  await wireMock.reset();
+  const base = archiveBaseDirectory();
+  const lost: ArchivedBrickOwlOrder = { orderId: '19200032', updatedTime: '2026-09-07T14:15:16', refused: true };
+  await mockOrderArchive(wireMock, settings, { orders: [], brickOwlOrders: [owlOrder, lost], baseDirectory: base });
+
+  const run = await runArchive(request);
+  expect(run.outcome).toBe('succeeded');
+  // One order BrickOwl has lost is not the batch it was asked for in.
+  expect(run.tally).toEqual({ archived: 1, unchanged: 0, failed: 1 });
+  expect(existsSync(archivedBrickOwl(base, authentication.tenant.code, owlOrder))).toBe(true);
+  expect(existsSync(archivedBrickOwl(base, authentication.tenant.code, lost))).toBe(false);
+});
+
+test('BrickLink refusing the request does not stop the BrickOwl orders being archived', async ({
+  request,
+  settings,
+  authentication,
+}, testInfo) => {
+  const wireMock = WireMockApi.forTest(request, testInfo);
+  await wireMock.reset();
+  const base = archiveBaseDirectory();
+  await mockOrderArchive(wireMock, settings, {
+    orders: [plainOrder],
+    brickOwlOrders: [owlOrder],
+    baseDirectory: base,
+  });
+  await wireMock.addMethodHostMapping('GET', '/api/store/v1/orders', {
+    priority: 1,
+    response: { json: { meta: { code: 401, message: 'BAD_OAUTH_REQUEST', description: 'TOKEN_IP_MISMATCHED' } } },
+  });
+
+  const run = await runArchive(request);
+  // The run still fails, because a store that cannot be read must not read as a store with no orders.
+  expect(run.outcome).toBe('failed');
+  expect(run.failure).toContain('BAD_OAUTH_REQUEST');
+  // BrickOwl is a different store's worth of orders, and a BrickLink token nobody has noticed expiring must not
+  // quietly stop it being archived.
+  expect(existsSync(archivedBrickOwl(base, authentication.tenant.code, owlOrder))).toBe(true);
 });
