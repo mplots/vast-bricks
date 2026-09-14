@@ -22,7 +22,7 @@ type Run = {
   failure: string | null;
 };
 
-type JobStatus = { code: string; cron: string | null; running: boolean; lastRun: Run | null };
+type JobStatus = { code: string; cron: string | null; after: string | null; running: boolean; lastRun: Run | null };
 
 async function jobs(request: APIRequestContext): Promise<JobStatus[]> {
   const response = await request.get('/api/private/jobs');
@@ -207,4 +207,70 @@ test("one tenant cannot stop another tenant's run", async ({ request, otherTenan
   const release = await request.post('/api/test/jobs/release');
   expect(release.status(), await release.text()).toBeLessThan(300);
   expect((await settled(request)).outcome).toBe('succeeded');
+});
+
+/**
+ * A job whose input is another job's output follows it rather than declaring an hour of its own, which would be a
+ * second statement of when that input is ready and would drift the first time the leader ran long.
+ */
+
+const followerJob = 'test-follower-job';
+
+/**
+ * Waits for the follower's own run to have been started and finished.
+ *
+ * <p>Not {@link settled}, which reads a job that has never run as one that has settled: the whole question here is
+ * whether a run appeared at all, so a missing one must keep the poll waiting rather than end it.
+ */
+async function followed(request: APIRequestContext): Promise<Run> {
+  await expect
+    .poll(async () => (await statusOf(request, followerJob)).lastRun?.outcome, { timeout: 15_000 })
+    .toBe('succeeded');
+  return (await statusOf(request, followerJob)).lastRun as Run;
+}
+
+test('a job that follows another declares so, and no cron of its own', async ({ request }) => {
+  const follower = (await jobs(request)).find((job) => job.code === followerJob);
+
+  expect(follower?.after).toBe(testJob);
+  expect(follower?.cron).toBeNull();
+});
+
+test('a follower runs once the job it follows has finished', async ({ request }) => {
+  await behave(request, 'succeed');
+  expect((await trigger(request)).status()).toBe(202);
+
+  const leader = await settled(request);
+  expect(leader.outcome).toBe('succeeded');
+
+  const run = await followed(request);
+  expect(run.tally.ran).toBe(1);
+  // Under the trigger the leader ran under, so a nightly leader is followed nightly and a run someone started by
+  // hand is followed by hand.
+  expect(run.triggeredBy).toBe('manual');
+});
+
+test('a follower runs after a leader that failed', async ({ request }) => {
+  // A leader that failed may have got through most of its work before it stopped, and that work is the input.
+  await behave(request, 'fail');
+  expect((await trigger(request)).status()).toBe(202);
+
+  expect((await settled(request)).outcome).toBe('failed');
+  expect((await followed(request)).tally.ran).toBe(1);
+});
+
+test('a follower does not run after a leader someone stopped', async ({ request }) => {
+  await started(request);
+  expect((await cancel(request)).status()).toBe(202);
+  expect((await settled(request)).outcome).toBe('cancelled');
+
+  // Asserting the absence of a run by waiting for it not to appear would only ever be a guess at how long to wait.
+  // So the leader is run again, properly this time, and the follower is asked how many times it has run: the
+  // stopped run having chained would make this its second.
+  await behave(request, 'succeed');
+  expect((await trigger(request)).status()).toBe(202);
+  expect((await settled(request)).outcome).toBe('succeeded');
+
+  // A stopped run is an intervention rather than a finished one, so the chain stopped with it.
+  expect((await followed(request)).tally.ran).toBe(1);
 });

@@ -263,7 +263,8 @@ public class OrderArchive {
             throw new IllegalStateException("BrickOwl order " + orderId + " states no time it last changed");
         }
 
-        Path path = directory.resolve("brickowl-api-" + part(orderId) + "-" + part(changed.toString()) + ".json");
+        Path path = directory.resolve(
+                OrderSource.BRICKOWL.prefix() + "-api-" + part(orderId) + "-" + part(changed.toString()) + ".json");
         if (Files.exists(path)) {
             return false;
         }
@@ -313,11 +314,12 @@ public class OrderArchive {
 
     private static ArchivePaths pathsOf(Path directory, long orderId, String changed) {
         String moment = part(changed);
+        String name = OrderSource.BRICKLINK.prefix() + "-";
         return new ArchivePaths(
                 changed,
-                directory.resolve("bricklink-api-" + orderId + "-" + moment + ".json"),
-                directory.resolve("bricklink-accounting-" + orderId + "-" + moment + ".xml"),
-                directory.resolve("bricklink-detail-" + orderId + "-" + moment + ".html"));
+                directory.resolve(name + "api-" + orderId + "-" + moment + ".json"),
+                directory.resolve(name + "accounting-" + orderId + "-" + moment + ".xml"),
+                directory.resolve(name + "detail-" + orderId + "-" + moment + ".html"));
     }
 
     /** A provider's own wording, reduced to what a file name may be made of. */

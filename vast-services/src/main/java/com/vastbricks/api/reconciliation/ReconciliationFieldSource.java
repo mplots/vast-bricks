@@ -29,6 +29,9 @@ public enum ReconciliationFieldSource {
     /** What the accounting system holds for the order: the invoice that was written for it. */
     ACCOUNTING("accounting"),
 
+    /** What the orders table holds for the order: the copy the import job stored out of the order archive. */
+    STORED("stored"),
+
     /** Derived from the collected fields rather than stated by anyone. */
     CALCULATED("calculated");
 

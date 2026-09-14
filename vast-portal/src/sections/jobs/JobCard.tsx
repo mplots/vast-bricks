@@ -57,9 +57,19 @@ export default function JobCard({
             <Typography variant="h5">{intl.formatMessage({ id: `job-${job.code}`, defaultMessage: job.code })}</Typography>
             <Stack direction="row" spacing={0.75} alignItems="center" color="text.secondary">
               <Calendar size={14} />
+              {/* A job says when it runs in one of three ways: on its own clock, after another job, or only when
+                  someone asks. A follower named by its own code would be the one thing on this screen not worded
+                  for a reader, so it is named the way its card is titled. */}
               {job.cron ? (
                 <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
                   {job.cron}
+                </Typography>
+              ) : job.after ? (
+                <Typography variant="body2">
+                  {intl.formatMessage(
+                    { id: 'job-after' },
+                    { job: intl.formatMessage({ id: `job-${job.after}`, defaultMessage: job.after }) }
+                  )}
                 </Typography>
               ) : (
                 <Typography variant="body2">{intl.formatMessage({ id: 'job-manual-only' })}</Typography>

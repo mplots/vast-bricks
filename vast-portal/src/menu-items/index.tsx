@@ -4,6 +4,7 @@ import samplePage from './sample-page';
 import support from './support';
 import productsMenu from './products';
 import accountingMenu from './accounting';
+import ordersMenu from './orders';
 import reconciliationMenu from './reconciliation';
 import operationsMenu from './operations';
 import setupMenu from './setup';
@@ -14,7 +15,7 @@ import { NavItemType } from 'types/menu';
 // ==============================|| MENU ITEMS ||============================== //
 
 const menuItems: { items: NavItemType[] } = {
-  items: [reconciliationMenu, productsMenu, accountingMenu, operationsMenu, setupMenu, samplePage, pages, support]
+  items: [ordersMenu, reconciliationMenu, productsMenu, accountingMenu, operationsMenu, setupMenu, samplePage, pages, support]
 };
 
 export default menuItems;

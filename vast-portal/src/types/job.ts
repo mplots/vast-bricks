@@ -21,6 +21,9 @@ export interface Job {
   code: string;
   /** The cron it fires on, or null for a job that only runs when someone asks for it. */
   cron: string | null;
+
+  /** The code of the job it follows, or null for a job nothing starts on its own. */
+  after: string | null;
   running: boolean;
   lastRun: JobRun | null;
 }

@@ -7,8 +7,11 @@ package com.vastbricks.api.reconciliation.order;
  * <p>Each marketplace addresses an order by the same id the reconciled order was collected under, so nothing beyond
  * the id is needed and no marketplace has to be asked. Unlike a payment link, this needs no configuration and no
  * reference the mapping had to keep, so it is a plain derivation rather than a component.
+ *
+ * <p>Public because the orders screen shows the same link on the same id. Where an order lives is a fact about the
+ * marketplace rather than about reconciling it, and two copies of these addresses would drift.
  */
-final class OrderLinks {
+public final class OrderLinks {
 
     /** The BrickLink order view, asked to show the checklist, the weight and what remains, as the store opens it. */
     private static final String BRICK_LINK_ORDER =
@@ -20,12 +23,12 @@ final class OrderLinks {
     }
 
     /** Where BrickLink shows this order, or {@code null} when the order was collected without an id. */
-    static String brickLink(String orderId) {
+    public static String brickLink(String orderId) {
         return orderId == null ? null : BRICK_LINK_ORDER.formatted(orderId);
     }
 
     /** Where BrickOwl shows this order, or {@code null} when the order was collected without an id. */
-    static String brickOwl(String orderId) {
+    public static String brickOwl(String orderId) {
         return orderId == null ? null : BRICK_OWL_ORDER.formatted(orderId);
     }
 }

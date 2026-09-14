@@ -65,6 +65,22 @@ public class BrickLinkClient {
         });
     }
 
+    /**
+     * The order stated by a document this client once wrote to the archive.
+     *
+     * <p>Here rather than in the caller because this is BrickLink's wire format, envelope and all, and a feature
+     * reading an archived file has no other reason to know it - the same reason {@link BrickLinkOrderDocument}
+     * carries the order beside the JSON it was read from.
+     */
+    public BrickLinkOrder readOrder(String json) {
+        BrickLinkResponse<BrickLinkOrder> response =
+                read(json, new TypeReference<BrickLinkResponse<BrickLinkOrder>>() { }, "an archived order");
+        if (response.getData() == null) {
+            throw new BrickLinkClientException("An archived BrickLink order states no data");
+        }
+        return response.getData();
+    }
+
     private String get(String path) {
         URI uri = resolve(path);
         try {

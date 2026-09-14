@@ -73,7 +73,7 @@ class JobService {
         JobRun opened = reserveAndOpen(job, tenantId, JobTrigger.MANUAL);
 
         Supplier<Void> work = TenantContext.propagate(DebugContext.propagate(() -> {
-            execute(job, tenantId, opened.getId());
+            execute(job, tenantId, opened.getId(), JobTrigger.MANUAL);
             return null;
         }));
         executor.submit(work::get);
@@ -135,7 +135,7 @@ class JobService {
         TenantContext.setTenantId(tenant.getId());
         try {
             JobRun opened = reserveAndOpen(job, tenant.getId(), JobTrigger.SCHEDULE);
-            execute(job, tenant.getId(), opened.getId());
+            execute(job, tenant.getId(), opened.getId(), JobTrigger.SCHEDULE);
         } catch (JobAlreadyRunningException exception) {
             log.info("Scheduled job {} skipped for tenant {}: it is already running", job.code(), tenant.getCode());
         } catch (RuntimeException exception) {
@@ -196,23 +196,26 @@ class JobService {
         }
     }
 
-    private void execute(Job job, Long tenantId, Long runId) {
+    private void execute(Job job, Long tenantId, Long runId, JobTrigger trigger) {
         String key = key(job.code(), tenantId);
         RunningJob entry = running.get(key);
         if (entry != null) {
             // The thread to interrupt, known only now: the row was opened on whichever thread asked for the run.
             entry.worker = Thread.currentThread();
         }
+        boolean cancelled;
         try {
             JobTally tally = job.run();
             JobTally stated = tally == null ? JobTally.empty() : tally;
-            if (stopped(entry)) {
+            cancelled = stopped(entry);
+            if (cancelled) {
                 runs.cancelled(runId, stated);
             } else {
                 runs.succeeded(runId, stated);
             }
         } catch (Exception exception) {
-            if (stopped(entry)) {
+            cancelled = stopped(entry);
+            if (cancelled) {
                 // What a stopped job threw on its way out is the stopping, not a failure of its own, so it is
                 // neither kept as a diagnostic nor logged as one.
                 runs.cancelled(runId, JobTally.empty());
@@ -224,6 +227,42 @@ class JobService {
             }
         } finally {
             running.remove(key);
+        }
+        if (!cancelled) {
+            startFollowers(job, tenantId, trigger);
+        }
+    }
+
+    /**
+     * Starts whatever jobs declare they follow this one, for the same tenant and under the same trigger.
+     *
+     * <p>After the leader's run has been written down and its single-flight entry released, so a follower that
+     * turns out to be the leader itself - which nothing declares, but nothing prevents either - is refused rather
+     * than deadlocked. Each follower goes on its own thread: it is a job's run like any other, and the leader's is
+     * already over.
+     *
+     * <p>A follower that will not start is this follower's problem and nobody else's. It is logged and the next one
+     * still gets its turn, the same way one tenant's failure to start a scheduled run is not the other tenants'.
+     */
+    private void startFollowers(Job leader, Long tenantId, JobTrigger trigger) {
+        for (Job follower : jobs) {
+            if (!follower.after().filter(leader.code()::equals).isPresent()) {
+                continue;
+            }
+            try {
+                JobRun opened = reserveAndOpen(follower, tenantId, trigger);
+                Supplier<Void> work = TenantContext.propagate(DebugContext.propagate(() -> {
+                    execute(follower, tenantId, opened.getId(), trigger);
+                    return null;
+                }));
+                executor.submit(work::get);
+            } catch (JobAlreadyRunningException exception) {
+                log.info("Job {} was not started after {} for tenant {}: it is already running",
+                        follower.code(), leader.code(), tenantId);
+            } catch (RuntimeException exception) {
+                log.error("Job {} could not be started after {} for tenant {}",
+                        follower.code(), leader.code(), tenantId, exception);
+            }
         }
     }
 
@@ -241,7 +280,12 @@ class JobService {
 
     private JobResponse statusOf(Job job, Long tenantId) {
         RunResponse last = runs.latest(job.code()).map(this::responseOf).orElse(null);
-        return new JobResponse(job.code(), job.cron().orElse(null), running.containsKey(key(job.code(), tenantId)), last);
+        return new JobResponse(
+                job.code(),
+                job.cron().orElse(null),
+                job.after().orElse(null),
+                running.containsKey(key(job.code(), tenantId)),
+                last);
     }
 
     private Job job(String code) {

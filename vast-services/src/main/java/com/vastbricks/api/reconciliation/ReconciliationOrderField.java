@@ -5,6 +5,7 @@ import static com.vastbricks.api.reconciliation.ReconciliationFieldSource.CALCUL
 import static com.vastbricks.api.reconciliation.ReconciliationFieldSource.GATEWAY;
 import static com.vastbricks.api.reconciliation.ReconciliationFieldSource.ORDER;
 import static com.vastbricks.api.reconciliation.ReconciliationFieldSource.SHIPMENT;
+import static com.vastbricks.api.reconciliation.ReconciliationFieldSource.STORED;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
@@ -52,6 +53,22 @@ public enum ReconciliationOrderField {
     ACCOUNTING_SUB_TOTAL("accounting.subTotal", ACCOUNTING),
     ACCOUNTING_VAT("accounting.vat", ACCOUNTING),
     ACCOUNTING_GRAND_TOTAL("accounting.grandTotal", ACCOUNTING),
+
+    // The stored copy of the marketplace's own account, field for field with the order's above: the two carry one
+    // name under two sources, which is what lets a rule hold them against each other and a failure cite both.
+    STORED_ORDER_DATE("stored.orderDate", STORED),
+    STORED_BUYER("stored.buyer", STORED),
+    STORED_BUYER_USERNAME("stored.buyerUsername", STORED),
+    STORED_ITEM_COUNT("stored.itemCount", STORED),
+    STORED_LOT_COUNT("stored.lotCount", STORED),
+    STORED_PAYMENT_METHOD("stored.paymentMethod", STORED),
+    STORED_CURRENCY("stored.currency", STORED),
+    STORED_TAX_TYPE("stored.taxType", STORED),
+    STORED_FACILITATOR_TAX("stored.facilitatorTax", STORED),
+    STORED_SUB_TOTAL("stored.subTotal", STORED),
+    STORED_SHIPPING_COST("stored.shippingCost", STORED),
+    STORED_GRAND_TOTAL("stored.grandTotal", STORED),
+    STORED_REFUNDED_AMOUNT("stored.refundedAmount", STORED),
 
     CALCULATED_TARGET_INVOICE("calculated.targetInvoice", CALCULATED);
 

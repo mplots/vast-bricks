@@ -214,6 +214,17 @@ public class BrickStoreClient {
         return orderId.trim();
     }
 
+    /**
+     * The refund stated by an order detail page this client once wrote to the archive.
+     *
+     * <p>Here rather than in the caller because this is the page's own wording, and a feature reading an archived
+     * copy of it has no other reason to know it. Null where the page states no refund, which is BrickLink saying no
+     * money came back.
+     */
+    public BrickStoreOrderRefund readOrderRefund(String html) {
+        return parseOrderRefund(html);
+    }
+
     private BrickStoreOrderRefund parseOrderRefund(String html) {
         var matcher = TOTAL_REFUNDED.matcher(html);
         if (!matcher.find()) {
@@ -367,6 +378,16 @@ public class BrickStoreClient {
         if (!"X".equalsIgnoreCase(request.getViewType())) {
             throw new IllegalArgumentException("viewType must be X for an XML order export");
         }
+    }
+
+    /**
+     * The orders stated by an accounting export this client once wrote to the archive.
+     *
+     * <p>Here rather than in the caller because this is the export's own format, and a feature reading an archived
+     * file has no other reason to know it.
+     */
+    public List<BrickStoreOrder> readOrderExport(byte[] xml) {
+        return parseOrderExport(xml);
     }
 
     private List<BrickStoreOrder> parseOrderExport(byte[] xml) {

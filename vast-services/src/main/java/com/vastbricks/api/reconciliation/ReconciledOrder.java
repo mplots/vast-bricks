@@ -17,7 +17,7 @@ import lombok.Getter;
  * <p>A source nothing is collected from yet has no group here.
  */
 @Getter
-@JsonPropertyOrder({"order", "gateway", "shipment", "accounting", "calculated"})
+@JsonPropertyOrder({"order", "gateway", "shipment", "accounting", "stored", "calculated"})
 public class ReconciledOrder {
 
     /** What the marketplace reported about the order itself, which the rest is reconciled against. */
@@ -31,6 +31,9 @@ public class ReconciledOrder {
 
     /** What the accounting system holds for the order: the invoice that was written for it. */
     private final AccountingFields accounting = new AccountingFields();
+
+    /** What the orders table holds for the order, which is the marketplace's account as the archive kept it. */
+    private final StoredFields stored = new StoredFields();
 
     private ReconciledOrder(OrderFields order) {
         this.order = order;

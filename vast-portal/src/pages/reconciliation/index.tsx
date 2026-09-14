@@ -28,12 +28,10 @@ import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { endOfMonth, format, isValid, parseISO } from 'date-fns';
-import { DocumentDownload, FilterSearch, Kanban, Link21, ReceiptAdd, Refresh } from 'iconsax-reactjs';
+import { DocumentDownload, FilterSearch, Kanban, Link21, Refresh } from 'iconsax-reactjs';
 import { useIntl } from 'react-intl';
 import { useSearchParams } from 'react-router-dom';
 
-// The invoice endpoint lives under the accounting namespace and is shared with the accounting screen.
-import { generateInvoice } from 'api/accounting';
 import { useGetReconciliationOrders } from 'api/reconciliation';
 import hasTextSelection from 'utils/textSelection';
 import { downloadCsv, type CsvValue } from 'utils/csv';
@@ -89,11 +87,16 @@ const amountFields: string[] = [
   'accounting.subTotal',
   'accounting.vat',
   'accounting.grandTotal',
-  'calculated.targetInvoice'
+  'calculated.targetInvoice',
+  'stored.facilitatorTax',
+  'stored.subTotal',
+  'stored.shippingCost',
+  'stored.grandTotal',
+  'stored.refundedAmount'
 ];
-const countFields = ['order.itemCount', 'order.lotCount'];
+const countFields = ['order.itemCount', 'order.lotCount', 'stored.itemCount', 'stored.lotCount'];
 const numericFields = [...amountFields, ...countFields];
-const dateFields: string[] = ['order.orderDate'];
+const dateFields: string[] = ['order.orderDate', 'stored.orderDate'];
 
 // A field path is not a name a message can interpolate — an ICU argument carries no dot — so a failure hands its
 // values over under the path's segments joined up: `order.refundedAmount` is `{orderRefundedAmount}`.
@@ -183,7 +186,7 @@ type OrderFacet = {
 const unstated = '\u0000unstated';
 
 // Each marketplace keeps its own chip color, as the accounting screen colors it.
-const sourceColor = (source: string): ChipProps['color'] => (source === 'BrickOwl' ? 'secondary' : 'primary');
+const sourceColor = (source: string): ChipProps['color'] => (source === 'BrickOwl' ? 'warning' : 'primary');
 
 /** The marketplaces orders are collected from, spelled as the backend labels them and listed as it names them. */
 const marketplaces = ['BrickLink', 'BrickOwl'] as const;
@@ -369,9 +372,6 @@ function ReconciliationOrders() {
   const tintedLevels = tintedIn(searchParams);
   const [selectedOrder, setSelectedOrder] = useState<ReconciliationOrder | null>(null);
   const [selectedFailure, setSelectedFailure] = useState<string | null>(null);
-  const [generatingOrder, setGeneratingOrder] = useState<string | null>(null);
-  const [generationError, setGenerationError] = useState<string | null>(null);
-  const [generationMessage, setGenerationMessage] = useState<string | null>(null);
   const { container } = useConfig();
   const downLG = useMediaQuery((theme) => theme.breakpoints.down('lg'));
   // At rest the title bar is the card's rounded top and must round with it; stuck, the card's top is gone and a
@@ -497,22 +497,6 @@ function ReconciliationOrders() {
 
   const columnsSaved = shownColumns.join(',') === remembered.shown.join(',') && columnOrder.join(',') === remembered.order.join(',');
 
-  const handleGenerateInvoice = async (order: ReconciliationOrder) => {
-    setGeneratingOrder(orderKey(order));
-    setGenerationError(null);
-    setGenerationMessage(null);
-    try {
-      const result = await generateInvoice(order.order.orderId, order.order.source);
-      setGenerationMessage(
-        intl.formatMessage({ id: 'reconciliation-invoice-generated' }, { invoiceNumber: result.invoiceNumber, name: result.name })
-      );
-    } catch (error) {
-      setGenerationError(error instanceof Error ? error.message : intl.formatMessage({ id: 'reconciliation-invoice-error' }));
-    } finally {
-      setGeneratingOrder(null);
-    }
-  };
-
   const openOrder = (order: ReconciliationOrder) => {
     setSelectedOrder(order);
     // Select the first shown failure so the highlighted fields are visible without a click.
@@ -606,10 +590,11 @@ function ReconciliationOrders() {
   // The backend words nothing, so the tax type arrives as a code and is worded here, as a failure code is. Every
   // other field is already the value it reads as.
   const fieldValue = (order: ReconciliationOrder, field: string) => {
-    if (field !== 'order.taxType') {
+    if (field !== 'order.taxType' && field !== 'stored.taxType') {
       return formatFieldValue(order, field);
     }
-    return order.order.taxType ? intl.formatMessage({ id: `order-tax-type-${order.order.taxType}` }) : '—';
+    const taxType = field === 'order.taxType' ? order.order.taxType : order.stored.taxType;
+    return taxType ? taxTypeName(taxType) : '—';
   };
 
   // Two fields name something the provider also shows: the order id names the order and the payment method names
@@ -657,7 +642,13 @@ function ReconciliationOrders() {
       { id: `reconciliation-failure-${failure.code}` },
       {
         ...Object.fromEntries(failure.fields.map((field) => [placeholderName(field), fieldValue(order, field)])),
-        fields: failure.fields.map(fieldLabel).join(', ')
+        fields: failure.fields.map(fieldLabel).join(', '),
+        // A rule that cites a different pair of fields on every order - the stored copy disagreeing about one of
+        // them - has no path a message could name in advance, so the first field's own label and the two values
+        // it cited travel under fixed names too.
+        field: failure.fields.length ? fieldLabel(failure.fields[0]) : '',
+        collected: failure.fields.length ? fieldValue(order, failure.fields[0]) : '',
+        stored: failure.fields.length > 1 ? fieldValue(order, failure.fields[1]) : ''
       }
     );
 
@@ -993,9 +984,6 @@ function ReconciliationOrders() {
 
         <Main open={filtersOpen} columns={columnsOpen} container={container}>
           <Stack spacing={2} sx={{ mt: paneGap }}>
-            {generationError && <Alert severity="error">{generationError}</Alert>}
-            {generationMessage && <Alert severity="success">{generationMessage}</Alert>}
-
             {/* The applied range, counts and report actions stay visible while the orders scroll. */}
             <MainCard
               content={false}
@@ -1195,26 +1183,6 @@ function ReconciliationOrders() {
                               {/* The row opens the detail dialog, so the action cell must not bubble its click. */}
                               <TableCell sx={{ width: 92, whiteSpace: 'nowrap' }} onClick={(event) => event.stopPropagation()}>
                                 <Stack direction="row" spacing={0.75} alignItems="center">
-                                  <Tooltip title={intl.formatMessage({ id: 'reconciliation-generate-invoice' })} arrow>
-                                    <span>
-                                      <IconButton
-                                        size="small"
-                                        color="primary"
-                                        disabled={generatingOrder === orderKey(order)}
-                                        aria-label={intl.formatMessage(
-                                          { id: 'reconciliation-generate-invoice-for' },
-                                          { source: order.order.source, orderId: order.order.orderId }
-                                        )}
-                                        onClick={() => handleGenerateInvoice(order)}
-                                      >
-                                        {generatingOrder === orderKey(order) ? (
-                                          <CircularProgress size={18} color="inherit" />
-                                        ) : (
-                                          <ReceiptAdd size={20} color="currentColor" />
-                                        )}
-                                      </IconButton>
-                                    </span>
-                                  </Tooltip>
                                   {/* The type is a mark here and a word in the detail view, so the icon never says it
                                 alone: its label is the same wording the detail view shows. */}
                                   {order.order.taxType && (

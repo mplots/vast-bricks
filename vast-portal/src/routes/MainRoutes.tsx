@@ -23,6 +23,7 @@ const ContactUS = Loadable(lazy(() => import('pages/contact-us')));
 const ProductsPage = Loadable(lazy(() => import('pages/products')));
 const AccountingPage = Loadable(lazy(() => import('pages/accounting')));
 const ArchivesPage = Loadable(lazy(() => import('pages/archives')));
+const OrdersPage = Loadable(lazy(() => import('pages/orders')));
 const ReconciliationPage = Loadable(lazy(() => import('pages/reconciliation')));
 const BankStatementsPage = Loadable(lazy(() => import('pages/bank-statements')));
 const StripeTransactionsPage = Loadable(lazy(() => import('pages/stripe-transactions')));
@@ -59,6 +60,12 @@ const MainRoutes = {
         {
           path: 'archives',
           element: <ArchivesPage />
+        },
+        {
+          path: 'orders',
+          element: <OrdersPage />,
+          // A range of orders is a wide table beside a filter panel, and the range over it already names the page.
+          handle: { fullWidth: true, heading: false } satisfies PageLayout
         },
         {
           path: 'reconciliation',

@@ -92,6 +92,20 @@ public class BrickOwlClient {
         return List.copyOf(documents);
     }
 
+    /**
+     * The order stated by a document this client once wrote to the archive.
+     *
+     * <p>Here rather than in the caller because this is BrickOwl's wire format, zoneless moments and all, and a
+     * feature reading an archived file has no other reason to know it.
+     */
+    public BrickOwlOrder readOrder(String json) {
+        try {
+            return OBJECT_MAPPER.readValue(json, BrickOwlOrder.class);
+        } catch (Exception exception) {
+            throw new BrickOwlClientException("Could not read an archived BrickOwl order", exception);
+        }
+    }
+
     /** Which order a batch response is about: {@code req_num} counts the requests in the order they were sent. */
     private static String requested(List<String> orderIds, BrickOwlBatchResponse response) {
         Integer requestNumber = response.getRequestNumber();

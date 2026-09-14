@@ -34,6 +34,9 @@ final class JobPayload {
         /** The cron it fires on, or null for a job that only runs when someone asks for it. */
         private final String cron;
 
+        /** The code of the job it follows, or null for a job nothing starts on its own. */
+        private final String after;
+
         /** Whether it is working for the tenant asking. Another tenant's run of the same job is not this. */
         private final boolean running;
 

@@ -13,7 +13,7 @@ export interface ReconciliationFailure {
 }
 
 /** Which account of the order stated a field. Reconciliation holds these against each other. */
-export type ReconciliationFieldSource = 'order' | 'gateway' | 'shipment' | 'accounting' | 'calculated';
+export type ReconciliationFieldSource = 'order' | 'gateway' | 'shipment' | 'accounting' | 'stored' | 'calculated';
 
 /** One field an order carries, named as the orders expose it and attributed to the source that stated it. */
 export interface ReconciliationFieldDescriptor {
@@ -113,11 +113,39 @@ export interface ReconciliationCalculatedFields {
   targetInvoice: number | null;
 }
 
+/**
+ * What the orders table holds for the order: the copy the import job stored out of the order archive.
+ *
+ * <p>Every field carries the name of an order field, as the gateway's facilitator tax does: one quantity claimed
+ * twice, which is what the rules holding them against each other are for. This is the marketplace's own account
+ * read live on one side and read off the store's archive on the other, and the two agreeing is the question.
+ *
+ * <p>All `null` on an order nothing was stored for, which `present` is what tells apart from a stored row that
+ * states nulls of its own.
+ */
+export interface ReconciliationStoredFields {
+  present: boolean;
+  orderDate: string | null;
+  buyer: string | null;
+  buyerUsername: string | null;
+  itemCount: number | null;
+  lotCount: number | null;
+  paymentMethod: string | null;
+  currency: string | null;
+  taxType: OrderTaxType | null;
+  facilitatorTax: number | null;
+  subTotal: number | null;
+  shippingCost: number | null;
+  grandTotal: number | null;
+  refundedAmount: number | null;
+}
+
 export interface ReconciliationOrder {
   order: ReconciliationOrderFields;
   gateway: ReconciliationGatewayFields;
   shipment: ReconciliationShipmentFields;
   accounting: ReconciliationAccountingFields;
+  stored: ReconciliationStoredFields;
   calculated: ReconciliationCalculatedFields;
   failures: ReconciliationFailure[];
 }

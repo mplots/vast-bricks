@@ -29,6 +29,23 @@ public interface Job {
         return Optional.empty();
     }
 
+    /**
+     * The code of the job this one follows, or empty for a job nothing starts on its own.
+     *
+     * <p>For work whose input is another job's output: a cron of its own would be a second statement of when that
+     * input is ready, and the two would drift the first time the leader took longer than the gap between them. The
+     * follower starts for the same tenant, under the same trigger the leader ran under, once the leader's run has
+     * been written down - so a nightly archive is followed by a nightly import, and a person running the archive by
+     * hand gets the import by hand too.
+     *
+     * <p>A leader that failed is still followed: it may have got through most of its work before it stopped, and
+     * that work is the follower's input. A leader someone stopped by hand is not, a stopped run being an
+     * intervention rather than a finished one. A follower declaring a cron as well is scheduled by both.
+     */
+    default Optional<String> after() {
+        return Optional.empty();
+    }
+
     /** Runs for the bound tenant and returns what it came to. Throwing is how a run fails. */
     JobTally run();
 }
