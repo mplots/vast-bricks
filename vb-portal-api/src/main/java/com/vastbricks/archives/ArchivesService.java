@@ -27,9 +27,9 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 @Slf4j
 public class ArchivesService {
-    private static final Pattern API_ARCHIVE = Pattern.compile("^api-(\\d+)-.+\\.json$");
-    private static final Pattern ACCOUNTING_ARCHIVE = Pattern.compile("^accounting-(\\d+)-.+\\.xml$");
-    private static final Pattern VAT_INVOICE_ARCHIVE = Pattern.compile("^vat-invoice-(\\d+)-.+\\.pdf$");
+    private static final Pattern API_ARCHIVE = Pattern.compile("^bricklink-api-(\\d+)-.+\\.json$");
+    private static final Pattern ACCOUNTING_ARCHIVE = Pattern.compile("^bricklink-accounting-(\\d+)-.+\\.xml$");
+    private static final Pattern VAT_INVOICE_ARCHIVE = Pattern.compile("^bricklink-vat-invoice-(\\d+)-.+\\.pdf$");
 
     private final AccountingService accountingService;
     private final OrderArchive orderArchive;

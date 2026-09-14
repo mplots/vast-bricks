@@ -110,15 +110,24 @@ public class BrickStoreClient {
      * zero. One recorded operation covers the session this page needs as well as the page itself.
      */
     public BrickStoreOrderRefund getOrderRefund(String orderId) {
-        if (orderId == null || orderId.isBlank()) {
-            throw new IllegalArgumentException("orderId is required");
-        }
-        var id = orderId.trim();
+        var id = requiredOrderId(orderId);
         return capture.record(
                 PROVIDER,
                 List.of(configuredClientToken()),
                 () -> parseOrderRefund(getOrderDetail(id))
         );
+    }
+
+    /**
+     * The order's detail page as BrickLink served it, unparsed.
+     *
+     * <p>The same page {@link #getOrderRefund(String)} reads the refund out of. Handed over whole because what an
+     * archive keeps is what the provider sent: the refund is the one line of the page this client happens to need
+     * today, and a copy that kept only that would be a copy of this client's reading rather than of BrickLink's page.
+     */
+    public String getOrderDetailHtml(String orderId) {
+        var id = requiredOrderId(orderId);
+        return capture.record(PROVIDER, List.of(configuredClientToken()), () -> getOrderDetail(id));
     }
 
     /**
@@ -129,10 +138,7 @@ public class BrickStoreClient {
      * with a status that says nothing was wrong.
      */
     public byte[] downloadVatInvoice(String orderId) {
-        if (orderId == null || orderId.isBlank()) {
-            throw new IllegalArgumentException("orderId is required");
-        }
-        var id = orderId.trim();
+        var id = requiredOrderId(orderId);
         return capture.record(
                 PROVIDER,
                 List.of(configuredClientToken()),
@@ -199,6 +205,13 @@ public class BrickStoreClient {
             );
         }
         return response.body == null ? "" : new String(response.body, StandardCharsets.UTF_8);
+    }
+
+    private static String requiredOrderId(String orderId) {
+        if (orderId == null || orderId.isBlank()) {
+            throw new IllegalArgumentException("orderId is required");
+        }
+        return orderId.trim();
     }
 
     private BrickStoreOrderRefund parseOrderRefund(String html) {

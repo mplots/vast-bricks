@@ -31,11 +31,13 @@ import org.springframework.stereotype.Component;
 /**
  * Keeps the store's own copy of what its marketplaces held for an order.
  *
- * <p>Every file is named after the moment the order last changed, so an order that changes again is archived again
- * beside its earlier state rather than over it. BrickLink states three: its API record of the order, the accounting
- * export a store sees under its own account, and, where BrickLink collected the VAT, the invoice it issued for it.
- * BrickOwl states one, its own record of the order, since it offers nothing answering to the other two. An order
- * whose files are already there is left alone, which is what makes running this nightly cheap.
+ * <p>Every file is named {@code marketplace-kind-orderId-moment}: the marketplace first, because one directory
+ * holds both stores and an order id says nothing about which of them issued it, and the moment the order last
+ * changed last, so an order that changes again is archived again beside its earlier state rather than over it.
+ * BrickLink states three kinds: its API record of the order, the accounting export a store sees under its own
+ * account, and the order detail page that account is shown. BrickOwl states one, its own record of the order, since
+ * it offers nothing answering to the others. An order whose files are already there is left alone, which is what
+ * makes running this nightly cheap.
  */
 @Component
 @RequiredArgsConstructor
@@ -58,9 +60,11 @@ public class OrderArchive {
         // listed at all still fails the run, once both have had their turn.
         RuntimeException brickLinkFailure = failureOf("BrickLink", () -> archiveBrickLinkOrders(directory, tally));
         RuntimeException brickOwlFailure = failureOf("BrickOwl", () -> archiveBrickOwlOrders(directory, tally));
-        if (Thread.currentThread().isInterrupted()) {
-            log.info("Order archive stopped after {} order(s)", tally.archived + tally.unchanged + tally.failed);
-        }
+        // One line a run, not one an order: a run that catches a whole store's history up writes as many orders as
+        // the store has ever had, and which of them it was is the tally's business and a debug line's.
+        log.info("Order archive {}: {} archived, {} unchanged, {} failed",
+                Thread.currentThread().isInterrupted() ? "stopped" : "finished",
+                tally.archived, tally.unchanged, tally.failed);
         if (brickLinkFailure != null && brickOwlFailure != null) {
             throw new OrderArchiveException(
                     brickLinkFailure.getMessage() + "; " + brickOwlFailure.getMessage(), brickLinkFailure);
@@ -99,9 +103,7 @@ public class OrderArchive {
                 continue;
             }
             try {
-                if (isArchived(directory, order.getOrderId(), order.getDateStatusChanged(), order)) {
-                    tally.unchanged++;
-                } else if (archive(directory, order)) {
+                if (archive(directory, order)) {
                     tally.archived++;
                 } else {
                     tally.unchanged++;
@@ -176,49 +178,77 @@ public class OrderArchive {
         if (orderId <= 0) {
             throw new IllegalArgumentException("orderId must be positive");
         }
-        return archive(directory(), null, brickLink.getOrder(orderId));
+        // Asked for by id and nothing else, so there is no listing to say what state the order is in: it says itself.
+        return archive(directory(), orderId, brickLink.getOrder(orderId));
     }
 
+    /**
+     * Archives one listed order, asking BrickLink for the order itself only when its own record is what is missing.
+     *
+     * <p>The list states {@code date_status_changed} for every order, which is the moment the archive names its files
+     * after, so whether this state of the order is already on disk is answerable without a request. Reading the order
+     * to find that out is what made a nightly run cost one request an order rather than one listing.
+     */
     private boolean archive(Path directory, BrickLinkOrder listed) {
-        return archive(directory, listed, brickLink.getOrder(listed.getOrderId()));
-    }
-
-    private boolean archive(Path directory, BrickLinkOrder listed, BrickLinkOrderDocument document) {
-        BrickLinkOrder order = document.getOrder();
-        long orderId = order.getOrderId() != null ? order.getOrderId() : listed.getOrderId();
-        String changed = stated(order.getDateStatusChanged(), listed == null ? null : listed.getDateStatusChanged());
+        long orderId = listed.getOrderId();
+        String changed = stated(listed.getDateStatusChanged());
         if (changed == null) {
-            throw new IllegalStateException("BrickLink order " + orderId + " states no date_status_changed");
+            // BrickLink not answering as it does, rather than a state of its own: the order is read for its moment.
+            return archive(directory, orderId, brickLink.getOrder(orderId));
         }
 
         ArchivePaths paths = pathsOf(directory, orderId, changed);
-            boolean vatInvoiceIssued = Boolean.TRUE.equals(order.getVatCollectedByBrickLink());
-        if (paths.complete(vatInvoiceIssued)) {
+        if (paths.complete()) {
             return false;
         }
+        return write(directory, paths, orderId, Files.exists(paths.getApi()) ? null : brickLink.getOrder(orderId));
+    }
 
+    private boolean archive(Path directory, long orderId, BrickLinkOrderDocument document) {
+        String changed = stated(document.getOrder().getDateStatusChanged());
+        if (changed == null) {
+            throw new IllegalStateException("BrickLink order " + orderId + " states no date_status_changed");
+        }
+        ArchivePaths paths = pathsOf(directory, orderId, changed);
+        return !paths.complete() && write(directory, paths, orderId, document);
+    }
+
+    /**
+     * Writes whatever of the order's archive is missing, fetching only that.
+     *
+     * <p>A null document is the order's own record already being on disk, which is the common case for an order one
+     * of the pages could not be had for: what is fetched is that page, and not the order a second time.
+     */
+    private boolean write(Path directory, ArchivePaths paths, long orderId, BrickLinkOrderDocument document) {
+        var written = new ArrayList<String>();
         try {
             Files.createDirectories(directory);
             // Fetched before anything is written, so a provider that will not answer leaves no half-archived order.
             byte[] accounting = Files.exists(paths.getAccounting()) ? null : exportOf(orderId);
-            byte[] vatInvoice = vatInvoiceIssued && !Files.exists(paths.getVatInvoice())
-                    ? brickStore.downloadVatInvoice(String.valueOf(orderId))
-                    : null;
+            String detail = Files.exists(paths.getDetail()) ? null : brickStore.getOrderDetailHtml(String.valueOf(orderId));
 
-            if (!Files.exists(paths.getApi())) {
+            if (document != null && !Files.exists(paths.getApi())) {
                 Files.writeString(paths.getApi(), document.getJson(), StandardCharsets.UTF_8, StandardOpenOption.CREATE_NEW);
+                written.add("api");
             }
             if (accounting != null) {
                 Files.write(paths.getAccounting(), accounting, StandardOpenOption.CREATE_NEW);
+                written.add("accounting");
             }
-            if (vatInvoice != null) {
-                Files.write(paths.getVatInvoice(), vatInvoice, StandardOpenOption.CREATE_NEW);
+            if (detail != null) {
+                Files.writeString(paths.getDetail(), detail, StandardCharsets.UTF_8, StandardOpenOption.CREATE_NEW);
+                written.add("detail");
             }
         } catch (IOException exception) {
             throw new OrderArchiveException("Could not write the archive of BrickLink order " + orderId, exception);
         }
 
-        log.info("Archived BrickLink order {} as it stood at {}", orderId, changed);
+        if (written.isEmpty()) {
+            return false;
+        }
+        // Which files, because an order that was archived in full reads very differently from a whole store's worth
+        // of orders that were each missing one page: the second is a catch-up, and says so.
+        log.info("Archived BrickLink order {} as it stood at {}: {}", orderId, paths.getChanged(), String.join(", ", written));
         return true;
     }
 
@@ -265,13 +295,6 @@ public class OrderArchive {
                 BrickStoreOrderExportRequest.forOrderId(BrickStoreOrderType.RECEIVED, String.valueOf(orderId)));
     }
 
-    private boolean isArchived(Path directory, long orderId, String changed, BrickLinkOrder listed) {
-        if (changed == null || changed.isBlank()) {
-            return false;
-        }
-        return pathsOf(directory, orderId, changed).complete(Boolean.TRUE.equals(listed.getVatCollectedByBrickLink()));
-    }
-
     /**
      * The tenant's own archive directory, under the configured base.
      *
@@ -291,9 +314,10 @@ public class OrderArchive {
     private static ArchivePaths pathsOf(Path directory, long orderId, String changed) {
         String moment = part(changed);
         return new ArchivePaths(
-                directory.resolve("api-" + orderId + "-" + moment + ".json"),
-                directory.resolve("accounting-" + orderId + "-" + moment + ".xml"),
-                directory.resolve("vat-invoice-" + orderId + "-" + moment + ".pdf"));
+                changed,
+                directory.resolve("bricklink-api-" + orderId + "-" + moment + ".json"),
+                directory.resolve("bricklink-accounting-" + orderId + "-" + moment + ".xml"),
+                directory.resolve("bricklink-detail-" + orderId + "-" + moment + ".html"));
     }
 
     /** A provider's own wording, reduced to what a file name may be made of. */
@@ -301,26 +325,25 @@ public class OrderArchive {
         return value.trim().replaceAll("[^A-Za-z0-9._:+-]", "-");
     }
 
-    private static String stated(String preferred, String fallback) {
-        if (preferred != null && !preferred.isBlank()) {
-            return preferred.trim();
-        }
-        return fallback == null || fallback.isBlank() ? null : fallback.trim();
+    private static String stated(String value) {
+        return value == null || value.isBlank() ? null : value.trim();
     }
 
-    /** What one order's archive is written to. */
+    /** What one order's archive is written to, and the moment it is the archive of. */
     @Getter
     @AllArgsConstructor
     private static final class ArchivePaths {
 
-        private final Path api;
-        private final Path accounting;
-        private final Path vatInvoice;
+        private final String changed;
 
-        boolean complete(boolean vatInvoiceIssued) {
-            return Files.exists(api)
-                    && Files.exists(accounting)
-                    && (!vatInvoiceIssued || Files.exists(vatInvoice));
+        private final Path api;
+
+        private final Path accounting;
+
+        private final Path detail;
+
+        boolean complete() {
+            return Files.exists(api) && Files.exists(accounting) && Files.exists(detail);
         }
     }
 

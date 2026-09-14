@@ -115,7 +115,7 @@ class BricklinkShippingRequestService {
             var archiveDirectory = archiveDirectory();
             Files.createDirectories(archiveDirectory);
             var path = archiveDirectory.resolve(
-                "vat-invoice-" + order.getData().getOrderId() + "-" + safeFilenamePart(dateStatusChanged.toString()) + ".pdf"
+                "bricklink-vat-invoice-" + order.getData().getOrderId() + "-" + safeFilenamePart(dateStatusChanged.toString()) + ".pdf"
             );
             if (!Files.exists(path)) {
                 Files.write(path, request.getVatInvoicePdf(), StandardOpenOption.CREATE_NEW);

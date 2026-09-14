@@ -27,8 +27,4 @@ public class BrickLinkOrder {
     private String dateStatusChanged;
 
     private String status;
-
-    /** Whether BrickLink collected the VAT, and therefore whether it issued a VAT invoice for the order. */
-    @JsonProperty("vat_collected_by_bl")
-    private Boolean vatCollectedByBrickLink;
 }

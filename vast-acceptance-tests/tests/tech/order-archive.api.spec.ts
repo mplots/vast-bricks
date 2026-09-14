@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import type { APIRequestContext } from '@playwright/test';
@@ -9,7 +9,8 @@ import {
   archiveBaseDirectory,
   brickOwlOrder,
   mockOrderArchive,
-  vatInvoicePdf,
+  orderDetailHtml,
+  vatInvoicePath,
   type ArchivedBrickOwlOrder,
   type ArchivedOrder,
 } from '../support/order-archive';
@@ -54,11 +55,16 @@ async function statusOf(request: APIRequestContext) {
 }
 
 function archived(base: string, tenantCode: string, order: ArchivedOrder, kind: string, extension: string) {
-  return join(base, tenantCode, `${kind}-${order.orderId}-${order.dateStatusChanged}.${extension}`);
+  return join(base, tenantCode, `bricklink-${kind}-${order.orderId}-${order.dateStatusChanged}.${extension}`);
 }
 
 function archivedBrickOwl(base: string, tenantCode: string, order: ArchivedBrickOwlOrder) {
   return join(base, tenantCode, `brickowl-api-${order.orderId}-${order.updatedTime}.json`);
+}
+
+/** How many times BrickLink was asked for the order itself, as opposed to for the list it appears in. */
+async function detailRequests(wireMock: WireMockApi, order: ArchivedOrder) {
+  return (await wireMock.findMethodHostRequests('GET', `/api/store/v1/orders/${order.orderId}`)).length;
 }
 
 test('the archive job is registered, on the schedule it declares', async ({ request }) => {
@@ -93,11 +99,15 @@ test('an order is archived as BrickLink stated it, under the tenant of the store
     data: { order_id: plainOrder.orderId, date_status_changed: plainOrder.dateStatusChanged },
   });
   expect(readFileSync(accountingFile, 'utf8')).toBe(accountingExportXml(plainOrder.orderId));
-  // No VAT collected by BrickLink means no invoice was issued, so none is asked for.
+  // The detail page is kept whole, as BrickLink served it, not as the refund this store reads out of it.
+  expect(readFileSync(archived(base, code, plainOrder, 'detail', 'html'), 'utf8')).toBe(
+    orderDetailHtml(plainOrder.orderId),
+  );
+  // An archived order is those three files and nothing else.
   expect(existsSync(archived(base, code, plainOrder, 'vat-invoice', 'pdf'))).toBe(false);
 });
 
-test('an order BrickLink collected the VAT on is archived with the invoice it issued', async ({
+test('an order BrickLink collected the VAT on is archived without asking for the invoice it issued', async ({
   request,
   settings,
   authentication,
@@ -109,9 +119,35 @@ test('an order BrickLink collected the VAT on is archived with the invoice it is
 
   expect((await runArchive(request)).tally).toEqual({ archived: 1, unchanged: 0, failed: 0 });
 
-  const invoice = archived(base, authentication.tenant.code, vatOrder, 'vat-invoice', 'pdf');
-  expect(existsSync(invoice), `${invoice} should have been written`).toBe(true);
-  expect(readFileSync(invoice)).toEqual(vatInvoicePdf);
+  // The VAT invoice is BrickLink's to serve and it would not, so the archive stopped asking. What makes this worth
+  // asserting is what an invoice it kept waiting for used to cost: an order was never complete, so every run read it
+  // from the API again.
+  expect(await wireMock.findMethodHostRequests('GET', vatInvoicePath)).toHaveLength(0);
+  expect(existsSync(archived(base, authentication.tenant.code, vatOrder, 'vat-invoice', 'pdf'))).toBe(false);
+  expect(existsSync(archived(base, authentication.tenant.code, vatOrder, 'api', 'json'))).toBe(true);
+  expect(existsSync(archived(base, authentication.tenant.code, vatOrder, 'accounting', 'xml'))).toBe(true);
+  expect(existsSync(archived(base, authentication.tenant.code, vatOrder, 'detail', 'html'))).toBe(true);
+});
+
+test('an archived order is not read from the API again, whoever collected its VAT', async ({
+  request,
+  settings,
+}, testInfo) => {
+  const wireMock = WireMockApi.forTest(request, testInfo);
+  await wireMock.reset();
+  await mockOrderArchive(wireMock, settings, {
+    orders: [plainOrder, vatOrder],
+    baseDirectory: archiveBaseDirectory(),
+  });
+
+  expect((await runArchive(request)).tally).toEqual({ archived: 2, unchanged: 0, failed: 0 });
+  expect(await detailRequests(wireMock, plainOrder)).toBe(1);
+  expect(await detailRequests(wireMock, vatOrder)).toBe(1);
+
+  // The list states when each order last changed, so a second run answers from disk without asking for either order.
+  expect((await runArchive(request)).tally).toEqual({ archived: 0, unchanged: 2, failed: 0 });
+  expect(await detailRequests(wireMock, plainOrder)).toBe(1);
+  expect(await detailRequests(wireMock, vatOrder)).toBe(1);
 });
 
 test('an order already on disk is left alone when the job runs again', async ({ request, settings }, testInfo) => {
@@ -230,4 +266,32 @@ test('BrickLink refusing the request does not stop the BrickOwl orders being arc
   // BrickOwl is a different store's worth of orders, and a BrickLink token nobody has noticed expiring must not
   // quietly stop it being archived.
   expect(existsSync(archivedBrickOwl(base, authentication.tenant.code, owlOrder))).toBe(true);
+});
+
+test('an order missing only its detail page has that page fetched, and not the order again', async ({
+  request,
+  settings,
+  authentication,
+}, testInfo) => {
+  const wireMock = WireMockApi.forTest(request, testInfo);
+  await wireMock.reset();
+  const base = archiveBaseDirectory();
+  await mockOrderArchive(wireMock, settings, { orders: [plainOrder], baseDirectory: base });
+
+  // An order archived before the detail page was part of an archive: its other two files are already on disk. This
+  // is every order archived until now, so what it costs to catch them up is what this scenario is about.
+  mkdirSync(join(base, authentication.tenant.code), { recursive: true });
+  writeFileSync(archived(base, authentication.tenant.code, plainOrder, 'api', 'json'), '{"data":{}}');
+  writeFileSync(
+    archived(base, authentication.tenant.code, plainOrder, 'accounting', 'xml'),
+    accountingExportXml(plainOrder.orderId),
+  );
+
+  expect((await runArchive(request)).tally).toEqual({ archived: 1, unchanged: 0, failed: 0 });
+
+  const detailFile = archived(base, authentication.tenant.code, plainOrder, 'detail', 'html');
+  expect(readFileSync(detailFile, 'utf8')).toBe(orderDetailHtml(plainOrder.orderId));
+  // What was already archived is left as it was, and BrickLink is not asked for the order it already holds.
+  expect(readFileSync(archived(base, authentication.tenant.code, plainOrder, 'api', 'json'), 'utf8')).toBe('{"data":{}}');
+  expect(await detailRequests(wireMock, plainOrder)).toBe(0);
 });

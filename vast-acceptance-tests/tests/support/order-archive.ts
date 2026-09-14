@@ -8,8 +8,8 @@ import type { WireMockApi } from './wiremock';
 /**
  * The protocol the order archive's providers speak, so a scenario states the orders it is about and nothing of how
  * either marketplace is reached. Both halves of BrickLink are involved: the published store API states the order, and
- * the pages a signed-in store sees hold the accounting export and the VAT invoice. BrickOwl states an order through
- * its batch endpoint and nothing else, which is why an archived BrickOwl order is one file rather than three.
+ * the pages a signed-in store sees hold the accounting export and the order detail page. BrickOwl states an order
+ * through its batch endpoint and nothing else, which is why an archived BrickOwl order is one file rather than three.
  *
  * <p>BrickOwl is configured whether or not a scenario has orders there, because a store that holds no BrickOwl key
  * at all is a different scenario from a store whose BrickOwl has nothing to archive.
@@ -36,11 +36,16 @@ export type ArchivedBrickOwlOrder = {
   refused?: boolean;
 };
 
-/** A minimal but real PDF, because the client refuses a VAT invoice that is not one. */
-export const vatInvoicePdf = Buffer.from('%PDF-1.4\n1 0 obj\n<<>>\nendobj\ntrailer\n<<>>\n%%EOF\n', 'utf8');
+/** Where BrickLink serves the VAT invoice it issued. The archive no longer asks for it, and scenarios say so. */
+export const vatInvoicePath = '/_file/orders/vat_invoice.file';
 
 export function accountingExportXml(orderId: number): string {
   return `<?xml version="1.0" encoding="UTF-8"?><ORDERS><ORDER><ORDERID>${orderId}</ORDERID></ORDER></ORDERS>`;
+}
+
+/** The order detail page, as small as a page can be and still be the page: the archive keeps it whole and unread. */
+export function orderDetailHtml(orderId: number): string {
+  return `<html><body><h1>Order #${orderId}</h1><p>Total refunded: <strong>EUR&nbsp;1.50</strong></p></body></html>`;
 }
 
 /** A directory of this scenario's own, since the archive is written to the filesystem the service runs on. */
@@ -111,13 +116,14 @@ export async function mockOrderArchive(
         body: accountingExportXml(archived.orderId),
       },
     });
+    await wireMock.addMethodHostMapping('GET', '/orderDetail.asp', {
+      request: { queryParameters: { ID: { equalTo: String(archived.orderId) } } },
+      response: {
+        headers: { 'Content-Type': 'text/html; charset=UTF-8' },
+        body: orderDetailHtml(archived.orderId),
+      },
+    });
   }
-  await wireMock.addMethodHostMapping('GET', '/_file/orders/vat_invoice.file', {
-    response: {
-      headers: { 'Content-Type': 'application/pdf' },
-      base64Body: vatInvoicePdf.toString('base64'),
-    },
-  });
 }
 
 async function mockBrickOwl(wireMock: WireMockApi, settings: SettingsOverrides, orders: ArchivedBrickOwlOrder[]) {
