@@ -28,8 +28,11 @@ type Run = {
   failure: string | null;
 };
 
-async function runImport(request: APIRequestContext): Promise<Run> {
-  const started = await request.post(`/api/private/jobs/${job}/run`);
+async function runImport(
+  request: APIRequestContext,
+  query = "",
+): Promise<Run> {
+  const started = await request.post(`/api/private/jobs/${job}/run${query}`);
   expect(started.status(), await started.text()).toBe(202);
 
   await expect
@@ -132,8 +135,8 @@ test("a BrickLink order is imported as BrickLink stated it", async ({
   );
   expect(order.lotCount).toBe(7);
   expect(order.itemCount).toBe(42);
-  // Both names of the buyer, each off the file that actually states it: BrickLink names a buyer by their account
-  // in the export, and states the person only on the address the order is shipped to.
+  // Both names of the buyer off BrickLink's own record of the order: buyer_name is the account, and the person is
+  // the address it was shipped to.
   expect(order.buyer).toBe("Marta Ozola");
   expect(order.buyerUsername).toBe("brickfan_marta");
   // Unified across the marketplaces' wordings, so an order paid the same way reads the same on both screens.
@@ -448,8 +451,8 @@ test("the accounting export is preferred over BrickLink's own record of the orde
   expect(Number(order.grandTotal)).toBe(31.4);
   expect(order.paymentMethod).toBe("PayPal");
   expect(order.currency).toBe("EUR");
-  // The buyer is not a preference between the two files but a fact split across them: the export states the
-  // account and only the API record states the person, so each is read from the file that has it.
+  // Both names of the buyer off the order's own record, which is the one file that states each of them
+  // unambiguously: the export's single BUYER element is whichever the request that fetched it asked for.
   expect(order.buyerUsername).toBe("brickfan_marta");
   expect(order.buyer).toBe("Marta Ozola");
 });
@@ -466,8 +469,7 @@ test("a field the accounting export leaves blank falls back to BrickLink's own r
     buyerName: "brickfan_marta",
     shippedTo: "Marta Ozola",
   });
-  // An export stating no payment method and no buyer account, which is the case the API record answers for: it
-  // states the same account under a name of its own.
+  // An export stating no payment method, which is the case the API record answers for.
   writeBrickLinkAccounting(directory, {
     orderId: 32100107,
     archivedAt: "2026-03-15T08:00:00.000Z",
@@ -484,8 +486,7 @@ test("a field the accounting export leaves blank falls back to BrickLink's own r
   });
 
   const order = (await importedOrders(request))[0]!;
-  // The export named no account, so the API record's own is used instead - and the person it names is unaffected,
-  // that half of the buyer never having come from the export at all.
+  // Neither name of the buyer comes from the export, so a blank BUYER costs nothing.
   expect(order.buyerUsername).toBe("brickfan_marta");
   expect(order.buyer).toBe("Marta Ozola");
   // The API record's own payment method, the export having stated none.
@@ -655,4 +656,92 @@ test("a BrickOwl time stated with an offset is stored as the moment it names", a
   const order = (await importedOrders(request))[0]!;
   // 23:25 in London is 22:25 in UTC, and the day it was placed on is the day either way.
   expect(new Date(order.orderDate).toISOString()).toBe("2026-07-10T22:25:19.000Z");
+});
+
+test("an export naming the buyer by their real name is not stored as their username", async ({
+  request,
+  settings,
+  authentication,
+}) => {
+  const directory = await archive(settings, authentication.tenant.code);
+  writeBrickLinkOrder(directory, {
+    orderId: 32100109,
+    archivedAt: "2026-03-17T08:00:00.000Z",
+    buyerName: "brickfan_marta",
+    shippedTo: "Marta Ozola",
+  });
+  // BrickLink's export names the buyer by account or by person under the one BUYER element, according to how the
+  // request asked, and an archive holds files fetched under whatever that was at the time. An export that named
+  // the person used to be stored as the account, which put a name where every other account of the order has a
+  // username and made the order disagree with itself on every reconciliation afterwards.
+  writeBrickLinkAccounting(directory, {
+    orderId: 32100109,
+    archivedAt: "2026-03-17T08:00:00.000Z",
+    buyer: "Marta Ozola",
+  });
+
+  expect((await runImport(request)).tally).toEqual({
+    imported: 1,
+    updated: 0,
+    unchanged: 0,
+    failed: 0,
+  });
+
+  const order = (await importedOrders(request))[0]!;
+  expect(order.buyerUsername).toBe("brickfan_marta");
+  expect(order.buyer).toBe("Marta Ozola");
+});
+
+test("a forced run reads every archived order again, whether or not it has changed", async ({
+  request,
+  settings,
+  authentication,
+}) => {
+  const directory = await archive(settings, authentication.tenant.code);
+  writeBrickLinkArchive(directory, {
+    orderId: 32100110,
+    archivedAt: "2026-03-18T08:00:00.000Z",
+    buyerName: "brickfan_marta",
+    shippedTo: "Marta Ozola",
+  });
+
+  expect((await runImport(request)).tally).toEqual({
+    imported: 1,
+    updated: 0,
+    unchanged: 0,
+    failed: 0,
+  });
+  // The order has not changed since, so an ordinary run reads nothing: that is what makes running it nightly over a
+  // whole store's history cheap, and also what keeps a change in the reading of a file from reaching a stored row.
+  expect((await runImport(request)).tally).toEqual({
+    imported: 0,
+    updated: 0,
+    unchanged: 1,
+    failed: 0,
+  });
+
+  // Asked for outright, the same files are read again and the row written from them. It costs nothing at the
+  // marketplaces, the archive being the only thing the import reads.
+  expect((await runImport(request, "?force=true")).tally).toEqual({
+    imported: 0,
+    updated: 1,
+    unchanged: 0,
+    failed: 0,
+  });
+
+  const order = (await importedOrders(request))[0]!;
+  expect(order.buyerUsername).toBe("brickfan_marta");
+  expect(order.buyer).toBe("Marta Ozola");
+});
+
+test("the import job declares the force flag, and an unforced run is the default", async ({
+  request,
+}) => {
+  const response = await request.get(`/api/private/jobs/${job}`);
+  expect(response.status(), await response.text()).toBe(200);
+  const status = (await response.json()) as {
+    parameters: { name: string; type: string }[];
+  };
+
+  expect(status.parameters).toEqual([{ name: "force", type: "BOOLEAN" }]);
 });

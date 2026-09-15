@@ -4,6 +4,7 @@ import com.vastbricks.api.orderarchive.OrderSource;
 import com.vastbricks.api.reconciliation.DetailMapper;
 import com.vastbricks.api.reconciliation.Marketplace;
 import com.vastbricks.api.reconciliation.ReconciledOrders;
+import com.vastbricks.api.reconciliation.ReconciliationText;
 import com.vastbricks.api.reconciliation.StoredFields;
 import java.time.ZoneOffset;
 import java.util.List;
@@ -44,8 +45,10 @@ class MapperStoredOrders implements DetailMapper<SourcedStoredOrder> {
         // Stored as a moment and compared as a day, which is what the marketplace's own account states: BrickLink's
         // accounting export names a day and no time of day, so the moment is midnight UTC of the day it named.
         fields.setOrderDate(order.getOrderDate() == null ? null : order.getOrderDate().atZone(ZoneOffset.UTC).toLocalDate());
-        fields.setBuyer(order.getBuyer());
-        fields.setBuyerUsername(order.getBuyerUsername());
+        // Normalized like the collected side, so the two are compared on one spelling. The import trims what it
+        // writes, but a row written before it did would otherwise read as a drift that never happened.
+        fields.setBuyer(ReconciliationText.normalize(order.getBuyer()));
+        fields.setBuyerUsername(ReconciliationText.normalize(order.getBuyerUsername()));
         fields.setItemCount(order.getItemCount());
         fields.setLotCount(order.getLotCount());
         fields.setPaymentMethod(order.getPaymentMethod());

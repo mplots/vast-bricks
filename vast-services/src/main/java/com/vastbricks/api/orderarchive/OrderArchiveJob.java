@@ -1,6 +1,7 @@
 package com.vastbricks.api.orderarchive;
 
 import com.vastbricks.api.job.Job;
+import com.vastbricks.api.job.JobParameters;
 import com.vastbricks.api.job.JobTally;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +30,7 @@ class OrderArchiveJob implements Job {
     }
 
     @Override
-    public JobTally run() {
+    public JobTally run(JobParameters parameters) {
         OrderArchive.ArchiveTally tally = archive.archiveAll();
         return JobTally.empty()
                 .count("archived", tally.archived)

@@ -1,3 +1,5 @@
+import { endOfMonth, format, parseISO } from 'date-fns';
+
 import { currentMonth, monthDate, monthOf } from 'utils/month';
 
 /**
@@ -43,3 +45,27 @@ export const steppedPeriod = (period: string, steps: number) => {
   stepped.setMonth(stepped.getMonth() + steps);
   return monthOf(stepped);
 };
+
+/**
+ * Which shape a span was drawn in: a whole month, a whole year, or the days a reader chose for themselves. The third
+ * is what the shared picker adds over the two above, and screens read beside the reconciliation report offer it.
+ */
+export type PeriodRangeView = PeriodView | 'range';
+
+/**
+ * A span of days as the shared picker states one: both ends included, and how it was drawn.
+ *
+ * <p>A pair of days rather than the single string above, because a range is not writable as one — and the view is
+ * carried beside them rather than read back off them, since a range a reader happened to draw around a whole month
+ * is still a range they drew and reopens as one.
+ */
+export type PeriodRange = { from: string; to: string; view: PeriodRangeView };
+
+/** A month as the span of days it is. */
+export const monthRange = (month: string): PeriodRange => {
+  const firstDay = `${month}-01`;
+  return { from: firstDay, to: format(endOfMonth(parseISO(firstDay)), 'yyyy-MM-dd'), view: 'month' };
+};
+
+/** Where a screen that reads a period opens when nobody tells it otherwise: this month. */
+export const currentMonthRange = (): PeriodRange => monthRange(currentMonth());

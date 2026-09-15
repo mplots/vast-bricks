@@ -1,6 +1,7 @@
 package com.vastbricks.api.job;
 
 import com.vastbricks.api.tenancy.TenantContext;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -33,15 +34,25 @@ class VastTestJob implements Job {
         return Optional.empty();
     }
 
+    /** A flag that does nothing but come back in the tally, so a scenario can see what the run was asked for. */
+    static final String FLAG = "flag";
+
     @Override
-    public JobTally run() {
+    public List<JobParameter> parameters() {
+        return List.of(JobParameter.flag(FLAG));
+    }
+
+    @Override
+    public JobTally run(JobParameters parameters) {
         Behaviour behaviour = behaviourOf(TenantContext.currentTenantIdOrNone());
         long ran = behaviour.ran.incrementAndGet();
         behaviour.await();
         if (behaviour.failing) {
             throw new IllegalStateException("The test job was asked to fail");
         }
-        return JobTally.empty().count("ran", ran);
+        JobTally tally = JobTally.empty().count("ran", ran);
+        // Counted only when it was asked for, so an ordinary run's tally says nothing about a flag nobody set.
+        return parameters.flag(FLAG) ? tally.count("flagged", 1) : tally;
     }
 
     /**

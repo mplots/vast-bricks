@@ -37,11 +37,24 @@ final class JobPayload {
         /** The code of the job it follows, or null for a job nothing starts on its own. */
         private final String after;
 
+        /** What a person may ask this run for on top of what it does anyway, empty for a job that takes nothing. */
+        private final List<ParameterResponse> parameters;
+
         /** Whether it is working for the tenant asking. Another tenant's run of the same job is not this. */
         private final boolean running;
 
         /** How it last went for this tenant, or null if it has never run for them. */
         private final RunResponse lastRun;
+    }
+
+    /** One parameter a job accepts, so a screen knows what to offer and what control to draw for it. */
+    @Getter
+    @AllArgsConstructor
+    static final class ParameterResponse {
+
+        private final String name;
+
+        private final JobParameterType type;
     }
 
     @Getter

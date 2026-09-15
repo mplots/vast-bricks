@@ -366,6 +366,7 @@
   "job-outcome-failed": "Failed",
   "job-outcome-cancelled": "Stopped",
   "job-outcome-interrupted": "Interrupted",
+  "job-parameter-order-import-force": "Read every order again",
   "job-recent-runs": "Recent runs",
   "job-hide-runs": "Hide runs",
   "job-runs-none": "This job has not run for this store yet.",

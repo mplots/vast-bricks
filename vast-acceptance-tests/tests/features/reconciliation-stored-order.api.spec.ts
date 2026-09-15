@@ -104,6 +104,29 @@ test('a stored order that agrees with the marketplace reports nothing', async ({
   expect(order.failures.filter((failure: { code: string }) => failure.code === 'stored-field-mismatch')).toEqual([]);
 });
 
+/**
+ * The export pads what it writes — a name laid out to be readable in the XML, two spaces where somebody typed them,
+ * the non-breaking space a web page leaves behind — and the archive trims what it keeps. Compared as they arrived,
+ * the two accounts of one name disagree, and the report says so by showing the reader two values they cannot tell
+ * apart. Every collected name is normalized at the mapping instead, so the drift never reaches the rule and the
+ * screen shows a name rather than a name and its padding.
+ */
+test('a buyer name the marketplace padded is not read as a drift', async ({ request, settings, authentication }, testInfo) => {
+  await mockReconciliationOrders(
+    settings,
+    request,
+    testInfo,
+    collectedOrder({ buyer: '  Marta&#160; Ozola ', items: 7, total: '12.50' })
+  );
+  await storeOrder(request, settings, authentication.tenant.code, { shippedTo: 'Marta Ozola', items: 7, total: '12.50' });
+
+  const order = await reconciled(request);
+  // The spacing is the export's, not the buyer's, so neither side carries it into the report.
+  expect(order.order.buyer).toBe('Marta Ozola');
+  expect(order.stored.buyer).toBe('Marta Ozola');
+  expect(order.failures.filter((failure: { code: string }) => failure.code === 'stored-field-mismatch')).toEqual([]);
+});
+
 test('a field the stored order disagrees about is reported, naming both accounts of it', async ({
   request,
   settings,

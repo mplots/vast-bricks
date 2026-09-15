@@ -8,6 +8,7 @@ import com.vastbricks.api.reconciliation.ReconciledOrder;
 import com.vastbricks.api.reconciliation.ReconciliationAmount;
 import com.vastbricks.api.reconciliation.ReconciliationCurrency;
 import com.vastbricks.api.reconciliation.ReconciliationPaymentMethod;
+import com.vastbricks.api.reconciliation.ReconciliationText;
 import com.vastbricks.api.tax.FacilitatorTaxes;
 import com.vastbricks.api.tax.OrderTaxTypes;
 import java.math.BigDecimal;
@@ -37,8 +38,8 @@ class MapperBrickOwlOrders implements OrderMapper<SourcedBrickOwlOrder> {
                 .orderId(order.getOrderId())
                 .orderUrl(OrderLinks.brickOwl(order.getOrderId()))
                 .orderDate(sourced.getOrderDate())
-                .buyer(order.getBuyerName())
-                .buyerUsername(order.getCustomerUsername())
+                .buyer(ReconciliationText.normalize(order.getBuyerName()))
+                .buyerUsername(ReconciliationText.normalize(order.getCustomerUsername()))
                 .itemCount(order.getTotalQuantity())
                 .lotCount(order.getTotalLots())
                 .paymentMethod(ReconciliationPaymentMethod.normalize(order.getPaymentMethodType()))

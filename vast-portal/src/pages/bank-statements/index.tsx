@@ -27,13 +27,13 @@ import TableSummaryFooter, { type SummaryLine } from 'components/TableSummaryFoo
 import TableTextField from 'components/TableTextField';
 import ledgerTableSx from 'components/ledgerTable';
 import { settledBy, useBankMatching } from 'contexts/BankMatchingContext';
-import PeriodHeaderPicker from 'components/period/PeriodHeaderPicker';
+import DatePeriodPicker from 'components/period/DatePeriodPicker';
 import toolButtonSx from 'components/toolButton';
 import useConfig from 'hooks/useConfig';
 import BankStatementFilterDrawer from 'sections/bank-statements/BankStatementFilterDrawer';
 import { entryNarrowable, entrySearchColumns } from 'sections/bank-statements/narrowing';
 import { formatAmount, numericCell } from 'utils/amount';
-import { currentMonth } from 'utils/month';
+import { currentMonthRange, type PeriodRange } from 'utils/period';
 import { noNarrowing, shownRows, termsFor, toggled, type Narrowing } from 'utils/narrowing';
 import type { BankStatementCurrencySummary, BankStatementEntry, BankStatementImportResult } from 'types/bankStatement';
 
@@ -222,16 +222,21 @@ function MappingCell({
 }
 
 /**
- * @param initialPeriod where the screen opens, for a caller that knows which period is in question. The split beside
- * the reconciliation orders opens it on their month; the screen on its own opens on this one.
+ * @param initialPeriod where the screen opens, for a caller that knows which span is in question. The split beside
+ * the reconciliation orders opens it on the span those orders are being read in, whatever shape it was drawn in;
+ * the screen on its own opens on this month.
  */
-export default function BankStatementsPage({ initialPeriod }: { initialPeriod?: string } = {}) {
+export default function BankStatementsPage({ initialPeriod }: { initialPeriod?: PeriodRange } = {}) {
   const intl = useIntl();
   // What the two screens of a split hold in common. Inactive outside one, which leaves this screen as it was.
   const matching = useBankMatching();
-  // One string holds both what is being read and which view is reading it: `YYYY-MM` is a month, `YYYY` a year. The
-  // screen opens on this month, which is the period a statement is imported for.
-  const [selectedPeriod, setSelectedPeriod] = useState(initialPeriod || currentMonth());
+  // Both ends of what is being read, and which shape it was drawn in. The screen opens on this month, which is the
+  // period a statement is imported for — or, in the matching split, on the span the orders beside it are of, the two
+  // halves of one reading being worth setting together.
+  //
+  // It is only where it opens. A transfer is paid when a buyer gets around to it, so a reader stepping the entries
+  // off the orders' own span is the ordinary thing to do, which is what the picker in this bar is for.
+  const [selectedPeriod, setSelectedPeriod] = useState<PeriodRange>(initialPeriod ?? currentMonthRange());
   // Which entries of the period are being read: what was ticked, and what was searched for. It is held beside the
   // period, and for the same reason: this screen is read a period at a time rather than linked to, so what it is
   // showing is state of its own rather than an address the way the reconciliation screen's narrowing is.
@@ -400,7 +405,16 @@ export default function BankStatementsPage({ initialPeriod }: { initialPeriod?: 
           <SearchNormal1 size={18} />
         </IconButton>
       </Tooltip>
-      <PeriodHeaderPicker value={selectedPeriod} onChange={setSelectedPeriod} />
+      {/* The same selector the reconciliation report is read with, ranges and all: the entries are read against
+          those orders, and a span one screen can be set to and the other cannot is a split that cannot be lined
+          up. */}
+      <DatePeriodPicker
+        allowRange
+        from={selectedPeriod.from}
+        to={selectedPeriod.to}
+        view={selectedPeriod.view}
+        onApply={(from, to, view) => setSelectedPeriod({ from, to, view })}
+      />
       {/* Only once a period has been read: until then there is nothing to have shown a part of. It is the first
           thing a narrow screen gives up, the period and the buttons being what the bar is for. */}
       {bankStatementEntries && (

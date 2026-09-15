@@ -29,11 +29,11 @@ export default function JobsPage() {
   const [showingRuns, setShowingRuns] = useState<string[]>([]);
   const [actionError, setActionError] = useState<string | null>(null);
 
-  const act = async (code: string, action: (code: string) => Promise<unknown>, errorId: string) => {
+  const act = async (code: string, action: () => Promise<unknown>, errorId: string) => {
     setBusy(code);
     setActionError(null);
     try {
-      await action(code);
+      await action();
       await reloadJobs();
     } catch (error) {
       setActionError(error instanceof Error ? error.message : intl.formatMessage({ id: errorId }));
@@ -94,8 +94,8 @@ export default function JobsPage() {
                 job={job}
                 busy={busy === job.code}
                 showingRuns={showingRuns.includes(job.code)}
-                onRun={() => act(job.code, runJob, 'job-run-error')}
-                onStop={() => act(job.code, cancelJob, 'job-cancel-error')}
+                onRun={(parameters) => act(job.code, () => runJob(job.code, parameters), 'job-run-error')}
+                onStop={() => act(job.code, () => cancelJob(job.code), 'job-cancel-error')}
                 onToggleRuns={() => toggleRuns(job.code)}
               />
             </Grid>

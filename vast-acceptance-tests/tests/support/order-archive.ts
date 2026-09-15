@@ -2,7 +2,9 @@ import { mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-import type { SettingsOverrides } from './api-test';
+import type { APIRequestContext } from '@playwright/test';
+
+import { expect, type SettingsOverrides } from './api-test';
 import type { WireMockApi } from './wiremock';
 
 /**
@@ -20,8 +22,12 @@ export const brickStoreSessionToken = 'order-archive-session-token';
 export type ArchivedOrder = {
   orderId: number;
   dateStatusChanged: string;
+  /** When BrickLink says the order was placed, which is the date the store's operating period is read against. */
+  dateOrdered?: string;
   status?: string;
   vatCollectedByBrickLink?: boolean;
+  /** BrickLink having purged the detail page, as it does about six months after the order. */
+  detailPurged?: boolean;
 };
 
 /**
@@ -31,6 +37,8 @@ export type ArchivedOrder = {
 export type ArchivedBrickOwlOrder = {
   orderId: string;
   updatedTime: string;
+  /** When BrickOwl says the order was placed, which is the date the store's operating period is read against. */
+  orderDate?: string;
   status?: string;
   /** BrickOwl answering the batch entry for this order with a refusal rather than with the order. */
   refused?: boolean;
@@ -56,6 +64,7 @@ export function archiveBaseDirectory(): string {
 function order(archived: ArchivedOrder) {
   return {
     order_id: archived.orderId,
+    date_ordered: archived.dateOrdered ?? archived.dateStatusChanged,
     date_status_changed: archived.dateStatusChanged,
     status: archived.status ?? 'COMPLETED',
     vat_collected_by_bl: archived.vatCollectedByBrickLink ?? false,
@@ -77,10 +86,17 @@ export function brickOwlOrder(archived: ArchivedBrickOwlOrder) {
 export async function mockOrderArchive(
   wireMock: WireMockApi,
   settings: SettingsOverrides,
-  options: { orders: ArchivedOrder[]; brickOwlOrders?: ArchivedBrickOwlOrder[]; baseDirectory: string },
+  options: {
+    orders: ArchivedOrder[];
+    brickOwlOrders?: ArchivedBrickOwlOrder[];
+    /** The listed BrickOwl orders the archive is expected to ask for, where its operating period leaves some out. */
+    brickOwlOrdersArchived?: ArchivedBrickOwlOrder[];
+    baseDirectory: string;
+  },
 ) {
+  const brickOwlOrders = options.brickOwlOrders ?? [];
   await settings.set('VAST_ORDER_ARCHIVE_DIR', options.baseDirectory);
-  await mockBrickOwl(wireMock, settings, options.brickOwlOrders ?? []);
+  await mockBrickOwl(wireMock, settings, brickOwlOrders, options.brickOwlOrdersArchived ?? brickOwlOrders);
 
   await settings.set('VAST_BRICKLINK_BASE_URL', `${wireMock.baseUrl}/api/store/v1/`);
   await settings.setSecret('VAST_BRICKLINK_CONSUMER_KEY', 'test-bricklink-consumer-key');
@@ -118,15 +134,27 @@ export async function mockOrderArchive(
     });
     await wireMock.addMethodHostMapping('GET', '/orderDetail.asp', {
       request: { queryParameters: { ID: { equalTo: String(archived.orderId) } } },
-      response: {
-        headers: { 'Content-Type': 'text/html; charset=UTF-8' },
-        body: orderDetailHtml(archived.orderId),
-      },
+      response: archived.detailPurged
+        ? {
+            // What BrickLink answers once it has purged the order: a redirect to its own not-found, which is a
+            // different answer from the sign-in page it redirects an unauthenticated request to.
+            status: 302,
+            headers: { Location: 'notFound.asp?nf=order&mFolder=o&mSub=o' },
+          }
+        : {
+            headers: { 'Content-Type': 'text/html; charset=UTF-8' },
+            body: orderDetailHtml(archived.orderId),
+          },
     });
   }
 }
 
-async function mockBrickOwl(wireMock: WireMockApi, settings: SettingsOverrides, orders: ArchivedBrickOwlOrder[]) {
+async function mockBrickOwl(
+  wireMock: WireMockApi,
+  settings: SettingsOverrides,
+  orders: ArchivedBrickOwlOrder[],
+  batched: ArchivedBrickOwlOrder[],
+) {
   await settings.set('VAST_BRICKOWL_BASE_URL', wireMock.baseUrl);
   await settings.setSecret('VAST_BRICKOWL_API_KEY', 'order-archive-brickowl-api-key');
 
@@ -135,11 +163,11 @@ async function mockBrickOwl(wireMock: WireMockApi, settings: SettingsOverrides, 
     response: {
       json: orders.map((archived) => ({
         order_id: archived.orderId,
-        order_date: String(Date.parse(`${archived.updatedTime}+00:00`) / 1000),
+        order_date: String(Date.parse(`${archived.orderDate ?? archived.updatedTime}+00:00`) / 1000),
       })),
     },
   });
-  if (orders.length === 0) {
+  if (batched.length === 0) {
     return;
   }
 
@@ -148,11 +176,43 @@ async function mockBrickOwl(wireMock: WireMockApi, settings: SettingsOverrides, 
   await wireMock.addMethodHostMapping('POST', '/v1/bulk/batch', {
     request: { bodyPatterns: [{ contains: encodeURIComponent('order/view') }] },
     response: {
-      json: orders.map((archived, index) =>
+      json: batched.map((archived, index) =>
         archived.refused
           ? { req_num: index + 1, code: 404, body: [] }
           : { req_num: index + 1, code: 200, body: brickOwlOrder(archived) },
       ),
     },
   });
+}
+
+/** The job code the archive is registered and run under. */
+export const orderArchiveJob = 'order-archive';
+
+/** What the jobs screen shows of a run once it has stopped running. */
+export type ArchiveRun = { outcome: string; tally: Record<string, number>; failure: string | null };
+
+/** Runs the archive exactly as the jobs screen runs it, and waits for the run it started to finish. */
+export async function runArchive(request: APIRequestContext): Promise<ArchiveRun> {
+  const started = await request.post(`/api/private/jobs/${orderArchiveJob}/run`);
+  expect(started.status(), await started.text()).toBe(202);
+
+  await expect
+    .poll(async () => (await archiveStatus(request)).lastRun?.outcome, { timeout: 30_000 })
+    .not.toBe('running');
+  return (await archiveStatus(request)).lastRun as ArchiveRun;
+}
+
+export async function archiveStatus(request: APIRequestContext) {
+  const response = await request.get(`/api/private/jobs/${orderArchiveJob}`);
+  expect(response.status(), await response.text()).toBe(200);
+  return (await response.json()) as { lastRun: ArchiveRun | null };
+}
+
+/** Where one of an archived BrickLink order's files is written, named as the archive names it. */
+export function archivedFile(base: string, tenantCode: string, order: ArchivedOrder, kind: string, extension: string) {
+  return join(base, tenantCode, `bricklink-${kind}-${order.orderId}-${order.dateStatusChanged}.${extension}`);
+}
+
+export function archivedBrickOwlFile(base: string, tenantCode: string, order: ArchivedBrickOwlOrder) {
+  return join(base, tenantCode, `brickowl-api-${order.orderId}-${order.updatedTime}.json`);
 }

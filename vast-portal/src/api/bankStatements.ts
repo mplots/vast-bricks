@@ -4,16 +4,24 @@ import useSWR from 'swr';
 
 import type { BankStatementEntriesPage, BankStatementEntry, BankStatementImportResult } from 'types/bankStatement';
 import axiosServices, { fetcher } from 'utils/axios';
+import type { PeriodRange } from 'utils/period';
 
 const endpoint = '/api/private/bank-statements';
 
-/** The entries of a period — `YYYY-MM` for a month, `YYYY` for a year — together with what they came to. */
-export function useGetBankStatementEntries(period: string) {
+/**
+ * The entries booked between two days, both ends included, together with what they came to.
+ *
+ * <p>Asked for as a pair of days rather than as the month or year it may happen to be, because the screen's picker
+ * draws spans that are neither — the same spans the reconciliation report is read in, which a link into the matching
+ * split carries over. The endpoint still takes a whole month or year by name for a caller that has one; this one
+ * always has both ends in hand, so it says them.
+ */
+export function useGetBankStatementEntries({ from, to }: PeriodRange) {
   const requestKey = useMemo(() => {
-    if (!period) return null;
-    const searchParams = new URLSearchParams({ period });
+    if (!from || !to) return null;
+    const searchParams = new URLSearchParams({ from, to });
     return `${endpoint}/entries?${searchParams.toString()}`;
-  }, [period]);
+  }, [from, to]);
 
   const { data, error, isLoading, isValidating, mutate } = useSWR<BankStatementEntriesPage>(requestKey, fetcher, {
     revalidateIfStale: false,

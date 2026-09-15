@@ -53,6 +53,7 @@ import {
   type StoredColumns
 } from 'sections/reconciliation/columns';
 import { currentMonth, monthDate } from 'utils/month';
+import type { PeriodRange } from 'utils/period';
 import OrderTaxTypeIcon from 'components/OrderTaxTypeIcon';
 import ReconciliationColumnDrawer from 'sections/reconciliation/ReconciliationColumnDrawer';
 import DatePeriodPicker from 'components/period/DatePeriodPicker';
@@ -242,6 +243,25 @@ const dateIn = (params: URLSearchParams, key: string) => {
   return value && /^\d{4}-\d{2}-\d{2}$/.test(value) && isValid(parseISO(value)) ? value : '';
 };
 
+/**
+ * The span an address is asking for: both its ends and the shape it was drawn in.
+ *
+ * <p>Read in one place because two screens ask it. The table reads it to know what to collect and what to show in
+ * its picker, and the matching split reads it to open the bank statement beside it on the same span — and a split
+ * whose two halves worked out the address differently would be two readings rather than one.
+ *
+ * <p>An address naming no dates is a month, that being the shape every link written before ranges existed is in.
+ */
+const periodIn = (params: URLSearchParams): PeriodRange => {
+  const month = monthIn(params);
+  const stated = params.get('periodView');
+  return {
+    from: dateIn(params, 'dateFrom') || `${month}-01`,
+    to: dateIn(params, 'dateTo') || format(endOfMonth(monthDate(month)), 'yyyy-MM-dd'),
+    view: stated === 'year' ? 'year' : stated === 'month' || !params.has('dateFrom') ? 'month' : 'range'
+  };
+};
+
 const orderKey = (order: ReconciliationOrder) => `${order.order.source}-${order.order.orderId}`;
 
 /**
@@ -365,9 +385,7 @@ function ReconciliationOrders() {
   // What the screens of a split hold in common. Inactive outside one, which is what leaves this screen unchanged.
   const matching = useBankMatching();
   const matchingOpen = searchParams.get(matchKey) === matchValue;
-  const selectedMonth = monthIn(searchParams);
-  const dateFrom = dateIn(searchParams, 'dateFrom') || `${selectedMonth}-01`;
-  const dateTo = dateIn(searchParams, 'dateTo') || format(endOfMonth(monthDate(selectedMonth)), 'yyyy-MM-dd');
+  const { from: dateFrom, to: dateTo, view: periodView } = periodIn(searchParams);
   // Colouring is not filtering: this decides how the rows that are shown read, not which rows those are.
   const tintedLevels = tintedIn(searchParams);
   const [selectedOrder, setSelectedOrder] = useState<ReconciliationOrder | null>(null);
@@ -862,19 +880,7 @@ function ReconciliationOrders() {
           </IconButton>
         </Tooltip>
       )}
-      <DatePeriodPicker
-        allowRange
-        from={dateFrom}
-        to={dateTo}
-        view={
-          searchParams.get('periodView') === 'year'
-            ? 'year'
-            : searchParams.get('periodView') === 'month' || !searchParams.has('dateFrom')
-              ? 'month'
-              : 'range'
-        }
-        onApply={applyPeriod}
-      />
+      <DatePeriodPicker allowRange from={dateFrom} to={dateTo} view={periodView} onApply={applyPeriod} />
       {/* Level with the month rather than under it, and only once a month has been collected: until then there is
           nothing to have shown a part of. It is the first thing a narrow screen gives up, the month and the buttons
           being the two the bar is for. */}
@@ -1385,8 +1391,10 @@ function ReconciliationOrders() {
  */
 export default function ReconciliationPage() {
   const [searchParams] = useSearchParams();
-  const month = monthIn(searchParams);
   const asked = searchParams.get(matchKey) === matchValue;
+  // The span the orders are being read in, read off the address exactly as the table above reads it, so the two
+  // halves of the split open on one span however it was drawn.
+  const period = periodIn(searchParams);
 
   // The split wraps the orders whether or not it is open, so the orders are one mounted screen across the toggle.
   // Swapped in and out instead, they would come back with their panel already open, having never had a shut state
@@ -1396,10 +1404,13 @@ export default function ReconciliationPage() {
       <BankMatchingSplit
         open={asked}
         orders={<ReconciliationOrders />}
-        // The statement opens on the month the orders are of, that being the month whose transfers are in question.
+        // The statement opens on the span the orders are of, that being the span whose transfers are in question —
+        // a month, a year, or a range a reader drew, whichever the report is being read in.
+        //
         // It is only where it opens: a transfer is paid when a buyer gets around to it, so the period is the
-        // reader's to step from there, which is what the picker in its own bar is for.
-        entries={<BankStatementsPage initialPeriod={month} />}
+        // reader's to step from there, which is what the picker in its own bar is for. The entries are unmounted
+        // while the split is shut, so each opening seeds them afresh from wherever the report has since moved to.
+        entries={<BankStatementsPage initialPeriod={period} />}
       />
     </BankMatchingProvider>
   );

@@ -24,6 +24,7 @@ import javax.xml.stream.XMLInputFactory;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -31,6 +32,7 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 
 @Component
+@Slf4j
 public class BrickStoreClient {
 
     private static final String CLIENT_ID = "ca629c09-4d8c-45dc-8a6f-bfb2b058f720";
@@ -108,6 +110,9 @@ public class BrickStoreClient {
      * The order's refund as the BrickLink order detail page states it, or {@code null} where the page states none.
      * An order nothing was refunded on shows no refund section at all, which is a different fact from a refund of
      * zero. One recorded operation covers the session this page needs as well as the page itself.
+     *
+     * <p>Null too for an order whose page BrickLink has purged, which is six months after the order: there is then
+     * nothing left that could state a refund, and an order that old is long past being reconciled.
      */
     public BrickStoreOrderRefund getOrderRefund(String orderId) {
         var id = requiredOrderId(orderId);
@@ -124,6 +129,10 @@ public class BrickStoreClient {
      * <p>The same page {@link #getOrderRefund(String)} reads the refund out of. Handed over whole because what an
      * archive keeps is what the provider sent: the refund is the one line of the page this client happens to need
      * today, and a copy that kept only that would be a copy of this client's reading rather than of BrickLink's page.
+     *
+     * <p>Null where BrickLink has purged the page, which it does about six months after the order. An archive is
+     * exactly what is wanted for a page that will not exist much longer, and missing it is not a failure to archive
+     * the order: what can still be had is still had.
      */
     public String getOrderDetailHtml(String orderId) {
         var id = requiredOrderId(orderId);
@@ -199,12 +208,30 @@ public class BrickStoreClient {
             invalidateSessionToken(response.sessionToken);
             response = sendWithSession(token -> getOrderDetailPage(orderId, token));
         }
+        if (orderDetailPurged(response)) {
+            // Said once an order rather than thrown: BrickLink keeps this page for six months and then stops serving
+            // it, so every store has orders it will never answer for again, and asking is the only way to find out.
+            log.info("BrickLink no longer serves the detail page of order {}", orderId);
+            return null;
+        }
         if (response.statusCode < 200 || response.statusCode >= 300) {
             throw new BrickStoreClientException(
                     "BrickStore order detail failed with HTTP " + response.statusCode + redirectSuffix(response)
             );
         }
         return response.body == null ? "" : new String(response.body, StandardCharsets.UTF_8);
+    }
+
+    /**
+     * Whether BrickLink answered that it holds no such order rather than refusing the request.
+     *
+     * <p>BrickLink purges an order's detail page about six months after the order, and the page it redirects to then
+     * is its own "not found", which is a fact about the order and not a fault. A request it will not accept at all
+     * redirects to the sign-in page instead, which {@link #authenticationExpired} has already had its turn at.
+     */
+    private boolean orderDetailPurged(BrickStoreResponse response) {
+        var location = response.headers.getFirst(HttpHeaders.LOCATION);
+        return response.statusCode == 302 && location != null && location.contains("notFound.asp");
     }
 
     private static String requiredOrderId(String orderId) {
@@ -226,6 +253,9 @@ public class BrickStoreClient {
     }
 
     private BrickStoreOrderRefund parseOrderRefund(String html) {
+        if (html == null) {
+            return null;
+        }
         var matcher = TOTAL_REFUNDED.matcher(html);
         if (!matcher.find()) {
             return null;

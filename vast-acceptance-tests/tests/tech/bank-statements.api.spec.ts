@@ -283,3 +283,50 @@ test('a period that is neither a month nor a year is refused', async ({ request 
     expect(response.status(), `period=${period}`).toBe(400);
   }
 });
+
+/**
+ * The screen is read beside the reconciliation report, which has always taken an arbitrary span of days, so the
+ * entries can be asked for the same way. A month and a year keep their own parameter: most reading of a statement is
+ * still a month at a time, and every link written before ranges existed names one.
+ */
+test('entries can be asked for by a span of days', async ({ request }) => {
+  await importDocument(request, camt052({ entries: [postageEntry, paymentEntry] }));
+
+  const response = await request.get('/api/private/bank-statements/entries?from=2026-09-03&to=2026-09-10');
+
+  expect(response.status(), await response.text()).toBe(200);
+  const { entries } = await response.json();
+  // Both ends are included and the span is days rather than whole months: the postage on the 2nd is outside it.
+  expect(entries.map((entry: { entryReference: string }) => entry.entryReference)).toEqual([paymentEntry.reference]);
+});
+
+test('a span of days may cross the months its entries were imported in', async ({ request }) => {
+  await importDocument(request, camt052({ entries: [postageEntry, paymentEntry] }));
+
+  const response = await request.get('/api/private/bank-statements/entries?from=2026-08-15&to=2026-10-15');
+
+  expect(response.status(), await response.text()).toBe(200);
+  expect((await response.json()).entries).toHaveLength(2);
+});
+
+test('a span that is not a pair of days, or runs backwards, is refused', async ({ request }) => {
+  const spans = [
+    'from=2026-09-01',
+    'to=2026-09-30',
+    'from=2026-09&to=2026-09-30',
+    'from=2026-09-01&to=September',
+    'from=2026-09-30&to=2026-09-01',
+  ];
+  for (const span of spans) {
+    const response = await request.get(`/api/private/bank-statements/entries?${span}`);
+    expect(response.status(), span).toBe(400);
+  }
+});
+
+test('naming both a period and a span of days is refused', async ({ request }) => {
+  // Two answers to one question, so neither is picked for the caller: the report answers a month beside a range the
+  // same way.
+  const response = await request.get(`/api/private/bank-statements/entries?period=${month}&from=2026-09-01&to=2026-09-30`);
+
+  expect(response.status()).toBe(400);
+});

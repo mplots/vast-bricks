@@ -31,8 +31,11 @@ class VastTestFollowerJob implements Job {
     }
 
     @Override
-    public JobTally run() {
-        return JobTally.empty().count("ran", counter().incrementAndGet());
+    public JobTally run(JobParameters parameters) {
+        // What the leader was asked for was asked of the leader: a follower is always run with nothing stated, so
+        // this count is here to show that it is, and never appears.
+        JobTally tally = JobTally.empty().count("ran", counter().incrementAndGet());
+        return parameters.flag(VastTestJob.FLAG) ? tally.count("flagged", 1) : tally;
     }
 
     private AtomicLong counter() {

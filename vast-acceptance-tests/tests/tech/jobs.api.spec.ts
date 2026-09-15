@@ -22,7 +22,16 @@ type Run = {
   failure: string | null;
 };
 
-type JobStatus = { code: string; cron: string | null; after: string | null; running: boolean; lastRun: Run | null };
+type JobParameter = { name: string; type: string };
+
+type JobStatus = {
+  code: string;
+  cron: string | null;
+  after: string | null;
+  parameters: JobParameter[];
+  running: boolean;
+  lastRun: Run | null;
+};
 
 async function jobs(request: APIRequestContext): Promise<JobStatus[]> {
   const response = await request.get('/api/private/jobs');
@@ -41,8 +50,8 @@ async function behave(request: APIRequestContext, outcome: 'succeed' | 'fail' | 
   expect(response.status(), await response.text()).toBeLessThan(300);
 }
 
-async function trigger(request: APIRequestContext, code = testJob) {
-  return request.post(`/api/private/jobs/${code}/run`);
+async function trigger(request: APIRequestContext, code = testJob, query = '') {
+  return request.post(`/api/private/jobs/${code}/run${query}`);
 }
 
 async function cancel(request: APIRequestContext, code = testJob) {
@@ -273,4 +282,61 @@ test('a follower does not run after a leader someone stopped', async ({ request 
 
   // A stopped run is an intervention rather than a finished one, so the chain stopped with it.
   expect((await followed(request)).tally.ran).toBe(1);
+});
+
+/**
+ * What a run can be asked for on top of what the job does anyway.
+ *
+ * <p>A job declares its parameters and the trigger refuses anything else, which is what keeps a misspelled request
+ * from reading as a job that ignored it. A cron and a follower ask for nothing, ever.
+ */
+
+test('a job states the parameters it accepts, and one that takes none states an empty list', async ({ request }) => {
+  const listed = await jobs(request);
+
+  expect(listed.find((job) => job.code === testJob)?.parameters).toEqual([{ name: 'flag', type: 'BOOLEAN' }]);
+  expect(listed.find((job) => job.code === followerJob)?.parameters).toEqual([]);
+});
+
+test('a flag the run was asked for reaches the job', async ({ request }) => {
+  await behave(request, 'succeed');
+  expect((await trigger(request, testJob, '?flag=true')).status()).toBe(202);
+
+  expect((await settled(request)).tally).toEqual({ ran: 1, flagged: 1 });
+});
+
+test('a run nobody asked anything of reaches the job with nothing stated', async ({ request }) => {
+  await behave(request, 'succeed');
+  expect((await trigger(request)).status()).toBe(202);
+
+  // Not `flagged: 0`: the job was asked for nothing, and read its own default.
+  expect((await settled(request)).tally).toEqual({ ran: 1 });
+});
+
+test('a parameter the job does not declare is refused rather than ignored', async ({ request }) => {
+  await behave(request, 'succeed');
+
+  const response = await trigger(request, testJob, '?force=true');
+  expect(response.status(), await response.text()).toBe(400);
+  await expect(response.json()).resolves.toMatchObject({ detail: expect.stringContaining('force') });
+  // And the job never ran, so nothing happened that the caller did not ask for.
+  expect((await statusOf(request)).lastRun).toBeNull();
+});
+
+test('a flag stated as something other than true or false is refused', async ({ request }) => {
+  await behave(request, 'succeed');
+
+  const response = await trigger(request, testJob, '?flag=perhaps');
+  expect(response.status(), await response.text()).toBe(400);
+  await expect(response.json()).resolves.toMatchObject({ detail: expect.stringContaining('perhaps') });
+  expect((await statusOf(request)).lastRun).toBeNull();
+});
+
+test('a follower is run with nothing stated, whatever the leader was asked for', async ({ request }) => {
+  await behave(request, 'succeed');
+  expect((await trigger(request, testJob, '?flag=true')).status()).toBe(202);
+
+  expect((await settled(request)).tally).toEqual({ ran: 1, flagged: 1 });
+  // The leader's flag is the leader's: the same word rarely means the same thing to two jobs.
+  expect((await followed(request)).tally).toEqual({ ran: 1 });
 });

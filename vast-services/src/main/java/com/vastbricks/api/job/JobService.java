@@ -2,6 +2,7 @@ package com.vastbricks.api.job;
 
 import com.vastbricks.api.debug.DebugContext;
 import com.vastbricks.api.job.JobPayload.JobResponse;
+import com.vastbricks.api.job.JobPayload.ParameterResponse;
 import com.vastbricks.api.job.JobPayload.RunResponse;
 import com.vastbricks.api.tenancy.TenantContext;
 import com.vastbricks.api.tenancy.TenantRoster;
@@ -67,13 +68,14 @@ class JobService {
      * <p>The row is opened here rather than on the worker thread, so the caller is answered with a run that already
      * exists and a screen reloading immediately sees the job working.
      */
-    RunResponse trigger(String code) {
+    RunResponse trigger(String code, Map<String, String> stated) {
         Job job = job(code);
+        JobParameters parameters = checked(job, stated);
         Long tenantId = TenantContext.currentTenantIdOrNone();
         JobRun opened = reserveAndOpen(job, tenantId, JobTrigger.MANUAL);
 
         Supplier<Void> work = TenantContext.propagate(DebugContext.propagate(() -> {
-            execute(job, tenantId, opened.getId(), JobTrigger.MANUAL);
+            execute(job, tenantId, opened.getId(), JobTrigger.MANUAL, parameters);
             return null;
         }));
         executor.submit(work::get);
@@ -135,7 +137,8 @@ class JobService {
         TenantContext.setTenantId(tenant.getId());
         try {
             JobRun opened = reserveAndOpen(job, tenant.getId(), JobTrigger.SCHEDULE);
-            execute(job, tenant.getId(), opened.getId(), JobTrigger.SCHEDULE);
+            // A cron states nothing: what it fires is the job as the job would run itself.
+            execute(job, tenant.getId(), opened.getId(), JobTrigger.SCHEDULE, JobParameters.none());
         } catch (JobAlreadyRunningException exception) {
             log.info("Scheduled job {} skipped for tenant {}: it is already running", job.code(), tenant.getCode());
         } catch (RuntimeException exception) {
@@ -196,7 +199,7 @@ class JobService {
         }
     }
 
-    private void execute(Job job, Long tenantId, Long runId, JobTrigger trigger) {
+    private void execute(Job job, Long tenantId, Long runId, JobTrigger trigger, JobParameters parameters) {
         String key = key(job.code(), tenantId);
         RunningJob entry = running.get(key);
         if (entry != null) {
@@ -205,7 +208,7 @@ class JobService {
         }
         boolean cancelled;
         try {
-            JobTally tally = job.run();
+            JobTally tally = job.run(parameters);
             JobTally stated = tally == null ? JobTally.empty() : tally;
             cancelled = stopped(entry);
             if (cancelled) {
@@ -252,7 +255,9 @@ class JobService {
             try {
                 JobRun opened = reserveAndOpen(follower, tenantId, trigger);
                 Supplier<Void> work = TenantContext.propagate(DebugContext.propagate(() -> {
-                    execute(follower, tenantId, opened.getId(), trigger);
+                    // A follower is asked for nothing: what the leader was asked for was asked of the leader, and
+                    // the same word rarely means the same thing to two jobs.
+                    execute(follower, tenantId, opened.getId(), trigger, JobParameters.none());
                     return null;
                 }));
                 executor.submit(work::get);
@@ -284,8 +289,40 @@ class JobService {
                 job.code(),
                 job.cron().orElse(null),
                 job.after().orElse(null),
+                job.parameters().stream()
+                        .map(parameter -> new ParameterResponse(parameter.getName(), parameter.getType()))
+                        .toList(),
                 running.containsKey(key(job.code(), tenantId)),
                 last);
+    }
+
+    /**
+     * The parameters this run was asked for, refused where the job does not declare them.
+     *
+     * <p>Refused rather than ignored: a caller who misspells a parameter has asked for something and got the job's
+     * ordinary behaviour, and there is nothing in the run afterwards to show which they got.
+     */
+    private static JobParameters checked(Job job, Map<String, String> stated) {
+        if (stated == null || stated.isEmpty()) {
+            return JobParameters.none();
+        }
+        for (Map.Entry<String, String> asked : stated.entrySet()) {
+            JobParameter declared = job.parameters().stream()
+                    .filter(parameter -> parameter.getName().equals(asked.getKey()))
+                    .findFirst()
+                    .orElseThrow(() -> new JobParameterException(
+                            "Job " + job.code() + " takes no parameter named " + asked.getKey()));
+            if (declared.getType() == JobParameterType.BOOLEAN && !isBoolean(asked.getValue())) {
+                throw new JobParameterException(
+                        "Parameter " + declared.getName() + " of job " + job.code() + " is true or false, not "
+                                + asked.getValue());
+            }
+        }
+        return JobParameters.of(stated);
+    }
+
+    private static boolean isBoolean(String value) {
+        return "true".equalsIgnoreCase(value) || "false".equalsIgnoreCase(value);
     }
 
     private Job job(String code) {

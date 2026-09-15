@@ -1,9 +1,13 @@
+import { useState } from 'react';
+
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import Checkbox from '@mui/material/Checkbox';
 import Chip from '@mui/material/Chip';
 import CircularProgress from '@mui/material/CircularProgress';
 import Collapse from '@mui/material/Collapse';
 import Divider from '@mui/material/Divider';
+import FormControlLabel from '@mui/material/FormControlLabel';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { ArrowDown2, ArrowUp2, Calendar, Clock, Play, Stop } from 'iconsax-reactjs';
@@ -34,12 +38,16 @@ export default function JobCard({
   job: Job;
   busy: boolean;
   showingRuns: boolean;
-  onRun: () => void;
+  onRun: (parameters: Record<string, string>) => void;
   onStop: () => void;
   onToggleRuns: () => void;
 }) {
   const intl = useIntl();
   const lastRun = job.lastRun;
+  // What this reader has ticked, and nothing more: it is cleared by leaving the screen rather than remembered,
+  // because a flag that survived out of sight is one a later run is asked for without anyone meaning to.
+  const [asked, setAsked] = useState<Record<string, boolean>>({});
+  const flags = (job.parameters ?? []).filter((parameter) => parameter.type === 'BOOLEAN');
 
   return (
     // Equal height across a row, but nothing inside is stretched to fill it: one card opening its runs makes the
@@ -117,15 +125,47 @@ export default function JobCard({
 
         {/* Labelled buttons rather than icons: this is the one screen that does something to the backend rather
             than reading it, and a control that starts a nightly job by hand should say so in a word. */}
-        <Stack direction="row" spacing={1} alignItems="center">
+        <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap>
           {job.running ? (
             <Button variant="outlined" color="error" size="small" startIcon={<Stop size={16} />} disabled={busy} onClick={onStop}>
               {intl.formatMessage({ id: 'job-cancel' })}
             </Button>
           ) : (
-            <Button variant="contained" size="small" startIcon={<Play size={16} />} disabled={busy} onClick={onRun}>
-              {intl.formatMessage({ id: 'job-run' })}
-            </Button>
+            <>
+              <Button
+                variant="contained"
+                size="small"
+                startIcon={<Play size={16} />}
+                disabled={busy}
+                onClick={() => onRun(Object.fromEntries(flags.filter((flag) => asked[flag.name]).map((flag) => [flag.name, 'true'])))}
+              >
+                {intl.formatMessage({ id: 'job-run' })}
+              </Button>
+              {/* Beside the button that uses them rather than above the card, so what is ticked reads as part of
+                  this run. Only a run started by hand is ever asked for anything: the schedule states nothing. */}
+              {flags.map((flag) => (
+                <FormControlLabel
+                  key={flag.name}
+                  control={
+                    <Checkbox
+                      size="small"
+                      checked={asked[flag.name] ?? false}
+                      disabled={busy}
+                      onChange={(event) => setAsked((ticked) => ({ ...ticked, [flag.name]: event.target.checked }))}
+                    />
+                  }
+                  label={
+                    <Typography variant="body2">
+                      {intl.formatMessage({
+                        id: `job-parameter-${job.code}-${flag.name}`,
+                        defaultMessage: flag.name
+                      })}
+                    </Typography>
+                  }
+                  sx={{ mr: 0 }}
+                />
+              ))}
+            </>
           )}
           <Box sx={{ flexGrow: 1 }} />
           <Button

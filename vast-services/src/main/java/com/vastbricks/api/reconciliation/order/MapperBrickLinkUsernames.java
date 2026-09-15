@@ -3,6 +3,7 @@ package com.vastbricks.api.reconciliation.order;
 import com.vastbricks.api.reconciliation.DetailMapper;
 import com.vastbricks.api.reconciliation.Marketplace;
 import com.vastbricks.api.reconciliation.ReconciledOrders;
+import com.vastbricks.api.reconciliation.ReconciliationText;
 import java.util.List;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -21,7 +22,8 @@ class MapperBrickLinkUsernames implements DetailMapper<SourcedBrickLinkUsername>
     public void map(List<SourcedBrickLinkUsername> sourced, ReconciledOrders orders) {
         for (var username : sourced) {
             orders.find(Marketplace.BRICK_LINK, username.getOrderId())
-                    .forEach(order -> order.getOrder().setBuyerUsername(username.getBuyerUsername()));
+                    .forEach(order -> order.getOrder()
+                            .setBuyerUsername(ReconciliationText.normalize(username.getBuyerUsername())));
         }
     }
 }

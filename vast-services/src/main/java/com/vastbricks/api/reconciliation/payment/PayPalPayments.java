@@ -11,15 +11,17 @@ import java.util.function.Predicate;
 
 /**
  * What the PayPal payment mappers share: which transactions pay for an order, what one paid, and who paid it. What
- * the marketplace took back out of a payment as facilitator is not the payment's own to state, so it is read from the
- * month's partner fees instead; see {@link PayPalPartnerFees}.
+ * the marketplace took back out of a payment as facilitator, and what has since come back out of it, are not the
+ * payment's own to state, so each is read from a transaction of the month naming the payment instead; see
+ * {@link PayPalPartnerFees} and {@link PayPalRefunds}.
  */
 final class PayPalPayments {
 
     /**
      * The event code of a payment received. PayPal reports the marketplace's seller fees, currency conversions,
-     * refunds and bank withdrawals in the same list; none of those says what an order was paid, so they are sourced
-     * and left unmapped until requirements for them are supplied.
+     * refunds and bank withdrawals in the same list; none of those says what an order was paid. The fees and the
+     * refunds say what was taken back out of a payment, which is read against the payment they name; the rest are
+     * sourced and left unmapped until requirements for them are supplied.
      */
     private static final String PAYMENT_RECEIVED = "T0006";
 

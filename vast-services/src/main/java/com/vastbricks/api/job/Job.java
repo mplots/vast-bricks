@@ -1,5 +1,6 @@
 package com.vastbricks.api.job;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -46,6 +47,22 @@ public interface Job {
         return Optional.empty();
     }
 
-    /** Runs for the bound tenant and returns what it came to. Throwing is how a run fails. */
-    JobTally run();
+    /**
+     * The parameters this job accepts, empty for a job that takes none.
+     *
+     * <p>A run is normally asked for with nothing said, and a job that declares a parameter still has to work when
+     * nobody states it - a cron and a follower state nothing, ever. So a parameter is something a person asks for
+     * on top of what the job does anyway, never something it needs to run at all.
+     */
+    default List<JobParameter> parameters() {
+        return List.of();
+    }
+
+    /**
+     * Runs for the bound tenant and returns what it came to. Throwing is how a run fails.
+     *
+     * <p>The parameters are whatever this run was asked for, already checked against what this job declares, and
+     * empty for every run nobody asked anything of.
+     */
+    JobTally run(JobParameters parameters);
 }

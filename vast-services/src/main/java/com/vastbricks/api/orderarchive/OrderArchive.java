@@ -10,6 +10,9 @@ import com.vastbricks.api.client.brickowl.BrickOwlOrderListItem;
 import com.vastbricks.api.client.brickstore.BrickStoreClient;
 import com.vastbricks.api.client.brickstore.BrickStoreOrderExportRequest;
 import com.vastbricks.api.client.brickstore.BrickStoreOrderType;
+import com.vastbricks.api.setup.provideraccount.OperatingPeriod;
+import com.vastbricks.api.setup.provideraccount.Provider;
+import com.vastbricks.api.setup.provideraccount.ProviderAccounts;
 import com.vastbricks.api.tenancy.TenantContext;
 import com.vastbricks.api.tenancy.TenantRoster;
 import java.io.IOException;
@@ -17,7 +20,11 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.time.DateTimeException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -46,6 +53,7 @@ public class OrderArchive {
 
     private final OrderArchiveSettings settings;
     private final TenantRoster tenants;
+    private final ProviderAccounts providerAccounts;
     private final BrickLinkClient brickLink;
     private final BrickOwlClient brickOwl;
     private final BrickStoreClient brickStore;
@@ -90,6 +98,8 @@ public class OrderArchive {
     }
 
     private void archiveBrickLinkOrders(Path directory, ArchiveTally tally) {
+        OperatingPeriod operating = providerAccounts.operatingPeriod(Provider.BRICK_LINK);
+        int outside = 0;
         for (BrickLinkOrder order : brickLink.listOrders()) {
             // Stopping a run interrupts this thread, and every order is archived under a catch that would otherwise
             // read the interruption as one order that could not be archived and carry on through the rest. What has
@@ -100,6 +110,10 @@ public class OrderArchive {
             if (order == null || order.getOrderId() == null) {
                 log.warn("Skipped a BrickLink order the list named no order id for");
                 tally.failed++;
+                continue;
+            }
+            if (outside(operating, dateOf(order.getDateOrdered()))) {
+                outside++;
                 continue;
             }
             try {
@@ -114,6 +128,7 @@ public class OrderArchive {
                 log.error("Could not archive BrickLink order {}", order.getOrderId(), exception);
             }
         }
+        reportOutside("BrickLink", outside);
     }
 
     /**
@@ -129,15 +144,20 @@ public class OrderArchive {
             return;
         }
 
+        OperatingPeriod operating = providerAccounts.operatingPeriod(Provider.BRICK_OWL);
+        int outside = 0;
         var orderIds = new ArrayList<String>();
         for (BrickOwlOrderListItem listed : brickOwl.listOrders()) {
             if (listed == null || StringUtils.isBlank(listed.getOrderId())) {
                 log.warn("Skipped a BrickOwl order the list named no order id for");
                 tally.failed++;
+            } else if (outside(operating, dateOf(listed.getOrderDate()))) {
+                outside++;
             } else {
                 orderIds.add(listed.getOrderId());
             }
         }
+        reportOutside("BrickOwl", outside);
 
         for (int start = 0; start < orderIds.size(); start += BrickOwlClient.MAX_BATCH_REQUESTS) {
             if (Thread.currentThread().isInterrupted()) {
@@ -225,7 +245,8 @@ public class OrderArchive {
             Files.createDirectories(directory);
             // Fetched before anything is written, so a provider that will not answer leaves no half-archived order.
             byte[] accounting = Files.exists(paths.getAccounting()) ? null : exportOf(orderId);
-            String detail = Files.exists(paths.getDetail()) ? null : brickStore.getOrderDetailHtml(String.valueOf(orderId));
+            boolean detailWanted = !paths.detailArchived();
+            String detail = detailWanted ? brickStore.getOrderDetailHtml(String.valueOf(orderId)) : null;
 
             if (document != null && !Files.exists(paths.getApi())) {
                 Files.writeString(paths.getApi(), document.getJson(), StandardCharsets.UTF_8, StandardOpenOption.CREATE_NEW);
@@ -238,6 +259,14 @@ public class OrderArchive {
             if (detail != null) {
                 Files.writeString(paths.getDetail(), detail, StandardCharsets.UTF_8, StandardOpenOption.CREATE_NEW);
                 written.add("detail");
+            } else if (detailWanted) {
+                // BrickLink has purged the page and will not serve it again, so what the archive keeps of it is the
+                // fact that it is gone. Without this the order is never complete and every night asks once more.
+                Files.writeString(paths.getPurged(),
+                        "BrickLink no longer serves the detail page of order " + orderId
+                                + ". Noted " + LocalDateTime.now() + ".\n",
+                        StandardCharsets.UTF_8, StandardOpenOption.CREATE_NEW);
+                written.add("detail purged");
             }
         } catch (IOException exception) {
             throw new OrderArchiveException("Could not write the archive of BrickLink order " + orderId, exception);
@@ -291,9 +320,74 @@ public class OrderArchive {
                 order.getUpdatedTime(), order.getProcessedTime(), order.getIsoOrderTime(), order.getOrderTime());
     }
 
+    /**
+     * The order's accounting export, which BrickLink states for an order however old it is.
+     *
+     * <p>Asked for without real names, so its {@code BUYER} is the buyer's account. The export states one or the
+     * other and never both, and the account is the one that means the same thing here as everywhere else: it is what
+     * the marketplace's own record calls the buyer, what the live collection reads, and what a store looking an order
+     * up types in. The person behind it is on the order's own record, as the address it was shipped to.
+     *
+     * <p>An empty export is BrickLink saying this account has no such order, and an empty file would read ever after
+     * as an order whose accounting record is genuinely blank. Better one order counted as failed, loudly, tonight.
+     */
     private byte[] exportOf(long orderId) {
-        return brickStore.exportOrders(
-                BrickStoreOrderExportRequest.forOrderId(BrickStoreOrderType.RECEIVED, String.valueOf(orderId)));
+        byte[] exported = brickStore.exportOrders(
+                BrickStoreOrderExportRequest.forOrderId(BrickStoreOrderType.RECEIVED, String.valueOf(orderId), false));
+        if (exported.length == 0) {
+            throw new OrderArchiveException("BrickLink stated no accounting export for order " + orderId);
+        }
+        return exported;
+    }
+
+    /**
+     * Whether the order was placed outside the stretch the store's provider account says counts.
+     *
+     * <p>One marketplace login can hold orders that were never this tenant's - sold personally before the store was a
+     * business, or by whoever else holds the login - and two tenants sharing a login are told apart by nothing else.
+     * An archive of somebody else's orders is the same mistake as reconciling them, with the store's own copy of a
+     * buyer's name and address written under the wrong tenant's directory to show for it.
+     *
+     * <p>By the date the order was placed, which is the date it belonged to whoever was selling then, and which both
+     * listings state. An order the listing dates unreadably is archived rather than dropped: the archive is a copy,
+     * and a copy too many is a far smaller wrong than a missing one.
+     */
+    private static boolean outside(OperatingPeriod operating, LocalDate ordered) {
+        if (ordered == null) {
+            return false;
+        }
+        return (operating.getFrom() != null && ordered.isBefore(operating.getFrom()))
+                || (operating.getTo() != null && ordered.isAfter(operating.getTo()));
+    }
+
+    /**
+     * One line a run for the orders that were not this tenant's, not one an order.
+     *
+     * <p>They are no part of the tally: an order outside the operating period is another store's, and a run that
+     * counted it as unchanged would report the archive as holding orders it deliberately does not.
+     */
+    private static void reportOutside(String marketplace, int outside) {
+        if (outside > 0) {
+            log.info("Left {} {} order(s) dated outside the store's operating period to the store they belong to",
+                    outside, marketplace);
+        }
+    }
+
+    /** The date a marketplace's listing states an order was placed on, in UTC, or null where it states none it reads. */
+    private static LocalDate dateOf(String stated) {
+        if (StringUtils.isBlank(stated)) {
+            return null;
+        }
+        try {
+            return OffsetDateTime.parse(stated.trim()).withOffsetSameInstant(ZoneOffset.UTC).toLocalDate();
+        } catch (DateTimeException exception) {
+            log.warn("Could not read the date a marketplace stated an order was placed on: {}", stated);
+            return null;
+        }
+    }
+
+    private static LocalDate dateOf(LocalDateTime stated) {
+        return stated == null ? null : stated.toLocalDate();
     }
 
     /**
@@ -319,7 +413,10 @@ public class OrderArchive {
                 changed,
                 directory.resolve(name + "api-" + orderId + "-" + moment + ".json"),
                 directory.resolve(name + "accounting-" + orderId + "-" + moment + ".xml"),
-                directory.resolve(name + "detail-" + orderId + "-" + moment + ".html"));
+                directory.resolve(name + "detail-" + orderId + "-" + moment + ".html"),
+                // Its own kind rather than another detail file: what reads the archive tells one file from another by
+                // that word, and a note about the page filed as the page is a note that would be read as one.
+                directory.resolve(name + "purged-" + orderId + "-" + moment + ".txt"));
     }
 
     /** A provider's own wording, reduced to what a file name may be made of. */
@@ -344,8 +441,16 @@ public class OrderArchive {
 
         private final Path detail;
 
+        /** Where the archive notes that BrickLink has purged the detail page, beside where the page itself would be. */
+        private final Path purged;
+
+        /** The page, or the note saying there will never be one: either settles the detail half of this archive. */
+        boolean detailArchived() {
+            return Files.exists(detail) || Files.exists(purged);
+        }
+
         boolean complete() {
-            return Files.exists(api) && Files.exists(accounting) && Files.exists(detail);
+            return Files.exists(api) && Files.exists(accounting) && detailArchived();
         }
     }
 

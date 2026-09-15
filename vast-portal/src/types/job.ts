@@ -17,6 +17,17 @@ export interface JobRun {
   failure: string | null;
 }
 
+/**
+ * One thing a run can be asked for on top of what the job does anyway.
+ *
+ * <p>Declared by the job rather than known to this screen, so a job that gains one is offered without a change
+ * here. What it means is the job's own, which is why its wording is keyed by both the job and the parameter.
+ */
+export interface JobParameter {
+  name: string;
+  type: 'BOOLEAN';
+}
+
 export interface Job {
   code: string;
   /** The cron it fires on, or null for a job that only runs when someone asks for it. */
@@ -24,6 +35,9 @@ export interface Job {
 
   /** The code of the job it follows, or null for a job nothing starts on its own. */
   after: string | null;
+
+  /** What a run of it can be asked for, empty for a job that takes nothing. */
+  parameters: JobParameter[];
   running: boolean;
   lastRun: JobRun | null;
 }

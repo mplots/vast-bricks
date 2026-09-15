@@ -33,9 +33,9 @@ public class BrickLinkOrder {
     private String status;
 
     /**
-     * The buyer's account with BrickLink, not their name. The accounting export states the same thing: BrickLink
-     * names a buyer by their account wherever it names one, and the only place it states a person is the address an
-     * order is shipped to.
+     * The buyer's account with BrickLink, not their name, which is on the address an order is shipped to. This is
+     * the one place BrickLink states the account without being asked which of the two it should state: the
+     * accounting export names a buyer by account or by person under one element, according to the request.
      */
     @JsonProperty("buyer_name")
     private String buyerName;

@@ -75,8 +75,13 @@ class OrderImport {
     private final BrickOwlClient brickOwl;
     private final BrickStoreClient brickStore;
 
-    /** Imports the latest archived state of every order the bound tenant has archived, and says what that came to. */
-    ImportTally importAll() {
+    /**
+     * Imports the latest archived state of every order the bound tenant has archived, and says what that came to.
+     *
+     * <p>Forced, it reads every order again whether or not the archive holds a later state of it, which is how a
+     * change in the reading of a file reaches rows that were written under the old one.
+     */
+    ImportTally importAll(boolean force) {
         Path directory = archive.directory();
         var tally = new ImportTally();
 
@@ -88,7 +93,7 @@ class OrderImport {
                 break;
             }
             try {
-                tally.count(upsert(archived));
+                tally.count(upsert(archived, force));
             } catch (Exception exception) {
                 // One order that could not be imported is not a failed run: the rest of the archive still can be.
                 tally.failed++;
@@ -181,11 +186,12 @@ class OrderImport {
      * Stores an order's latest archived state, if the archive holds it later than the database does.
      *
      * <p>The files are read only once they are known to be worth reading: the common run is one over a store whose
-     * orders are all already stored as their latest state.
+     * orders are all already stored as their latest state. A forced run reads them anyway, which is the only way a
+     * row whose order has not changed since it was written is written again.
      */
-    private Outcome upsert(ArchivedOrder archived) throws IOException {
+    private Outcome upsert(ArchivedOrder archived, boolean force) throws IOException {
         Order stored = orders.findBySourceAndOrderId(archived.getSource(), archived.getOrderId()).orElse(null);
-        if (stored != null && !archived.getArchivedAt().isAfter(stored.getArchivedAt())) {
+        if (!force && stored != null && !archived.getArchivedAt().isAfter(stored.getArchivedAt())) {
             return Outcome.UNCHANGED;
         }
 
@@ -203,10 +209,9 @@ class OrderImport {
     /**
      * A BrickLink order, out of the accounting export first and its API record only for what the export leaves out.
      *
-     * <p>The export is the store's own account of the order, and it is the one that states the buyer by name; the
-     * API states the buyer's username and nothing else in its place. So every field is taken from the export where
-     * the export has it, and the API answers for the rest - which today is a buyer the export left blank, and
-     * whatever the export was never written for a given state of the order.
+     * <p>The export is the store's own account of the order, so every field is taken from it where it has one and
+     * the API record answers for the rest - which today is both names of the buyer, and whatever the export was
+     * never written for a given state of the order.
      */
     /*
      * A field the export states blank is a field the export does not have: BrickStore writes an empty element rather
@@ -227,14 +232,12 @@ class OrderImport {
                 () -> value(stated.get(), BrickLinkOrder::getUniqueCount)));
         order.setItemCount(preferring(exported == null ? null : exported.getTotalItems(),
                 () -> value(stated.get(), BrickLinkOrder::getTotalCount)));
-        // BrickLink names a buyer by their account wherever it names one - the accounting export does it whether or
-        // not the export was asked for real names - and the only place it states a person is the address the order
-        // is shipped to. So the account comes off the export, which is the file written per order, and the name off
-        // the API's own record. Two facts read from two files rather than one preferred over the other.
+        // Both names of the buyer off the order's own record, which states each of them unambiguously: buyer_name is
+        // the account and the shipping address is the person. The export states one or the other under a single
+        // BUYER element, according to how the request that fetched it was asked - so it cannot be read for either
+        // without knowing that, and an archive holds files fetched under whatever the request was at the time.
         order.setBuyer(StringUtils.trimToNull(shippedTo(stated.get())));
-        order.setBuyerUsername(preferring(
-                exported == null ? null : StringUtils.trimToNull(exported.getBuyer()),
-                () -> StringUtils.trimToNull(value(stated.get(), BrickLinkOrder::getBuyerName))));
+        order.setBuyerUsername(StringUtils.trimToNull(value(stated.get(), BrickLinkOrder::getBuyerName)));
         order.setPaymentMethod(ReconciliationPaymentMethod.normalize(
                 preferring(exported == null ? null : StringUtils.trimToNull(exported.getPaymentType()),
                         () -> payment(stated.get(), BrickLinkOrder.Payment::getMethod))));

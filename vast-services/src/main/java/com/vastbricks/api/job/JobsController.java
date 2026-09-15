@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 /**
  * The jobs screen: what jobs there are, how each one last went, and firing one by hand.
  *
@@ -50,10 +52,15 @@ class JobsController {
      *
      * <p>Answered with the run it opened rather than with the run's result: a job queries providers and can take
      * minutes, so the screen watches the run it is handed instead of holding the request open.
+     *
+     * <p>Whatever else is in the query string is what this run is asked for, checked against the parameters the job
+     * declares. A run asked for nothing is the ordinary case and the only one a cron or a follower ever makes.
      */
     @PostMapping("/{code}/run")
-    ResponseEntity<RunResponse> run(@PathVariable("code") String code) {
-        return ResponseEntity.accepted().body(jobs.trigger(code));
+    ResponseEntity<RunResponse> run(
+            @PathVariable("code") String code,
+            @RequestParam Map<String, String> parameters) {
+        return ResponseEntity.accepted().body(jobs.trigger(code, parameters));
     }
 
     /**
@@ -92,6 +99,13 @@ class JobsController {
     ProblemDetail handleNotRunning(JobNotRunningException exception) {
         var problem = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, exception.getMessage());
         problem.setTitle("Job not running");
+        return problem;
+    }
+
+    @ExceptionHandler(JobParameterException.class)
+    ProblemDetail handleParameter(JobParameterException exception) {
+        var problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, exception.getMessage());
+        problem.setTitle("Job parameter not accepted");
         return problem;
     }
 

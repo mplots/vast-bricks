@@ -56,9 +56,15 @@ export function useGetJobRuns(code: string | null, running: boolean) {
   );
 }
 
-/** Starts a job for the tenant being served, and returns the run it opened. */
-export async function runJob(code: string) {
-  const { data } = await axiosServices.post<JobRun>(`${endpoint}/${encodeURIComponent(code)}/run`);
+/**
+ * Starts a job for the tenant being served, and returns the run it opened.
+ *
+ * <p>Whatever the run was asked for goes in the query string, checked by the backend against what the job declares.
+ * A run asked for nothing is the ordinary case, and the only one the schedule ever makes.
+ */
+export async function runJob(code: string, parameters: Record<string, string> = {}) {
+  const query = new URLSearchParams(parameters).toString();
+  const { data } = await axiosServices.post<JobRun>(`${endpoint}/${encodeURIComponent(code)}/run${query ? `?${query}` : ''}`);
   return data;
 }
 

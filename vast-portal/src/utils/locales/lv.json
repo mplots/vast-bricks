@@ -366,6 +366,7 @@
   "job-outcome-failed": "Neizdevās",
   "job-outcome-cancelled": "Apturēts",
   "job-outcome-interrupted": "Pārtraukts",
+  "job-parameter-order-import-force": "Nolasīt visus pasūtījumus vēlreiz",
   "job-recent-runs": "Nesenās izpildes",
   "job-hide-runs": "Slēpt izpildes",
   "job-runs-none": "Šis darbs šim veikalam vēl nav izpildīts.",

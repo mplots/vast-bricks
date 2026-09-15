@@ -1,15 +1,17 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import type { APIRequestContext } from '@playwright/test';
-
 import { expect, test } from '../support/api-test';
 import {
   accountingExportXml,
   archiveBaseDirectory,
+  archivedBrickOwlFile,
+  archivedFile,
   brickOwlOrder,
   mockOrderArchive,
+  orderArchiveJob,
   orderDetailHtml,
+  runArchive,
   vatInvoicePath,
   type ArchivedBrickOwlOrder,
   type ArchivedOrder,
@@ -25,7 +27,7 @@ import { WireMockApi, wireMockMode } from '../support/wiremock';
 
 test.describe.configure({ mode: wireMockMode() });
 
-const job = 'order-archive';
+const job = orderArchiveJob;
 
 const plainOrder: ArchivedOrder = { orderId: 32100011, dateStatusChanged: '2026-09-05T10:11:12.000Z' };
 const vatOrder: ArchivedOrder = {
@@ -36,31 +38,8 @@ const vatOrder: ArchivedOrder = {
 
 const owlOrder: ArchivedBrickOwlOrder = { orderId: '19200031', updatedTime: '2026-09-07T11:12:13' };
 
-type Run = { outcome: string; tally: Record<string, number>; failure: string | null };
-
-async function runArchive(request: APIRequestContext): Promise<Run> {
-  const started = await request.post(`/api/private/jobs/${job}/run`);
-  expect(started.status(), await started.text()).toBe(202);
-
-  await expect
-    .poll(async () => (await statusOf(request)).lastRun?.outcome, { timeout: 30_000 })
-    .not.toBe('running');
-  return (await statusOf(request)).lastRun as Run;
-}
-
-async function statusOf(request: APIRequestContext) {
-  const response = await request.get(`/api/private/jobs/${job}`);
-  expect(response.status(), await response.text()).toBe(200);
-  return (await response.json()) as { lastRun: Run | null };
-}
-
-function archived(base: string, tenantCode: string, order: ArchivedOrder, kind: string, extension: string) {
-  return join(base, tenantCode, `bricklink-${kind}-${order.orderId}-${order.dateStatusChanged}.${extension}`);
-}
-
-function archivedBrickOwl(base: string, tenantCode: string, order: ArchivedBrickOwlOrder) {
-  return join(base, tenantCode, `brickowl-api-${order.orderId}-${order.updatedTime}.json`);
-}
+const archived = archivedFile;
+const archivedBrickOwl = archivedBrickOwlFile;
 
 /** How many times BrickLink was asked for the order itself, as opposed to for the list it appears in. */
 async function detailRequests(wireMock: WireMockApi, order: ArchivedOrder) {

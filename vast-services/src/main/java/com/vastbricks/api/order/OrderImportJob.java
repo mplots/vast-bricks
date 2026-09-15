@@ -1,7 +1,10 @@
 package com.vastbricks.api.order;
 
 import com.vastbricks.api.job.Job;
+import com.vastbricks.api.job.JobParameter;
+import com.vastbricks.api.job.JobParameters;
 import com.vastbricks.api.job.JobTally;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -29,9 +32,25 @@ class OrderImportJob implements Job {
         return Optional.of("order-archive");
     }
 
+    /**
+     * Whether to import every archived order rather than only the ones the archive holds a later state of.
+     *
+     * <p>The ordinary run reads a file only where its moment is later than the row's, which is what makes a nightly
+     * run over a whole store's history cheap. It also means a change in how a file is read reaches no row that has
+     * not changed since, so the store would have to wait for each order to move before it was read correctly. This
+     * is how a person says read it all again: it costs nothing at the marketplaces, the archive being the only
+     * thing the import reads.
+     */
+    static final String FORCE = "force";
+
     @Override
-    public JobTally run() {
-        OrderImport.ImportTally tally = orderImport.importAll();
+    public List<JobParameter> parameters() {
+        return List.of(JobParameter.flag(FORCE));
+    }
+
+    @Override
+    public JobTally run(JobParameters parameters) {
+        OrderImport.ImportTally tally = orderImport.importAll(parameters.flag(FORCE));
         return JobTally.empty()
                 .count("imported", tally.imported)
                 .count("updated", tally.updated)

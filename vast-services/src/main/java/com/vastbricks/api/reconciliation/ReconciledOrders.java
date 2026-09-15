@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -133,14 +134,13 @@ public final class ReconciledOrders {
     }
 
     /**
-     * A name as it is compared: trimmed, inner runs of whitespace collapsed, and lowercased, because the systems
-     * spell one person's name with different casing and spacing. {@code null} when there is no name to compare.
+     * A name as it is compared: normalized as every collected name is, and lowercased on top of that, because the
+     * systems spell one person's name with different casing as well as different spacing. {@code null} when there is
+     * no name to compare.
      */
     private static String comparable(String name) {
-        if (name == null || name.isBlank()) {
-            return null;
-        }
-        return name.trim().toLowerCase().replaceAll("\\s+", " ");
+        var normalized = ReconciliationText.normalize(name);
+        return normalized == null ? null : normalized.toLowerCase(Locale.ROOT);
     }
 
     private static String key(String source, String orderId) {

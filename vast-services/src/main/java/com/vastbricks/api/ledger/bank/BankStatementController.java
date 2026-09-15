@@ -49,11 +49,20 @@ class BankStatementController {
 
     /**
      * The entries of one period, and what they came to. The period is a month while mappings are being written
-     * against entries, and a year while a year is being looked over, so one parameter carries both forms.
+     * against entries, a year while a year is being looked over, and any span of days a reader drew for themselves,
+     * so {@code period} carries the first two forms and {@code from} and {@code to} carry the third.
+     *
+     * <p>Two ways of saying the same thing, as the reconciliation report has them, and for the same reason: this
+     * screen is read beside that report, whose span a link into the split carries over, and a month is still what
+     * this screen is normally read in. Naming both is refused rather than one silently winning.
      */
     @GetMapping("/entries")
-    EntriesResponse entries(@RequestParam("period") String period) {
-        return statements.entriesOf(periodOf(period));
+    EntriesResponse entries(
+            @RequestParam(value = "period", required = false) String period,
+            @RequestParam(value = "from", required = false) String from,
+            @RequestParam(value = "to", required = false) String to
+    ) {
+        return statements.entriesOf(periodOf(period, from, to));
     }
 
     @PutMapping(path = "/entries/{id}/mapping", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -64,9 +73,18 @@ class BankStatementController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No such bank statement entry"));
     }
 
-    private static BankStatementPeriod periodOf(String period) {
+    private static BankStatementPeriod periodOf(String period, String from, String to) {
         try {
-            return BankStatementPeriod.of(period);
+            if (period != null) {
+                if (from != null || to != null) {
+                    throw new IllegalArgumentException("Use either period or from and to");
+                }
+                return BankStatementPeriod.of(period);
+            }
+            if (from == null || to == null) {
+                throw new IllegalArgumentException("Both from and to are required");
+            }
+            return BankStatementPeriod.between(from, to);
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
         }
