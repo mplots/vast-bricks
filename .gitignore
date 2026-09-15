@@ -12,7 +12,5 @@ vb-portal-api/src/main/resources/db/migration/data
 vast-services/src/main/resources/db/vast/migration/data
 vast-portal-full-version
 vb-portal-full-version
-orders
-inventory
 vb-chrome-plugin-manspasts/credentials.json
 .run
