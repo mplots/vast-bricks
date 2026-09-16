@@ -21,12 +21,6 @@ public class OrderFields {
 
     private String source;
     private String orderId;
-
-    /**
-     * Where the marketplace shows this order, or {@code null} when it was collected without an id to address. The
-     * screen links the order id to it, as it links the payment method to the payment.
-     */
-    private String orderUrl;
     private LocalDate orderDate;
     private String buyer;
     private String buyerUsername;

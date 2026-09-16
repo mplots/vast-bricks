@@ -23,6 +23,7 @@ const ContactUS = Loadable(lazy(() => import('pages/contact-us')));
 const ProductsPage = Loadable(lazy(() => import('pages/products')));
 const AccountingPage = Loadable(lazy(() => import('pages/accounting')));
 const ArchivesPage = Loadable(lazy(() => import('pages/archives')));
+const DashboardPage = Loadable(lazy(() => import('pages/dashboard')));
 const OrdersPage = Loadable(lazy(() => import('pages/orders')));
 const ReconciliationPage = Loadable(lazy(() => import('pages/reconciliation')));
 const BankStatementsPage = Loadable(lazy(() => import('pages/bank-statements')));
@@ -60,6 +61,10 @@ const MainRoutes = {
         {
           path: 'archives',
           element: <ArchivesPage />
+        },
+        {
+          path: 'dashboard',
+          element: <DashboardPage />
         },
         {
           path: 'orders',

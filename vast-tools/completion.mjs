@@ -3,13 +3,14 @@ import { managedServices } from "./service-registry.mjs";
 export const completionLoadedEnvName = "VAST_COMPLETION_LOADED";
 
 export default function completions() {
-  const commands = "test t services svc ps logs completion help";
+  const commands = "test t services svc ps logs prod completion help";
   const serviceActions = "list start stop restart";
   const serviceNames = managedServices.map(({ name }) => name).join(" ");
   const startOptions = "--skip-build -sb --help -h";
   const restartOptions = "--skip-build -sb --clean-db --help -h";
   const testOptions = "--tech --logic --build -b --clean-build -cb --help -h";
   const logsOptions = "--follow -f --tail -t --help -h";
+  const prodActions = "async";
   const basicOptions = "--help -h";
 
   return `# This output is equivalent to vast-tools/completion.bash.
@@ -88,6 +89,14 @@ _vast_completion() {
         COMPREPLY=($(compgen -W "clear ${serviceNames}" -- "\${current}"))
       else
         COMPREPLY=()
+      fi
+      return
+      ;;
+    prod)
+      if [[ \${COMP_CWORD} -eq 2 && "\${current}" != -* ]]; then
+        COMPREPLY=($(compgen -W "${prodActions}" -- "\${current}"))
+      else
+        COMPREPLY=($(compgen -W "${basicOptions}" -- "\${current}"))
       fi
       return
       ;;

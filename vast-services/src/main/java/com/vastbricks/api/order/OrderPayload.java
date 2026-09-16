@@ -27,6 +27,35 @@ final class OrderPayload {
     }
 
     /**
+     * What a range of the store's orders came to by country, which the dashboard draws as a pie.
+     *
+     * <p>Counted here rather than on the screen because the screen wants the counts and not the orders: a year of a
+     * store's history is thousands of rows to send down to draw a dozen slices with.
+     */
+    @Getter
+    @AllArgsConstructor
+    static final class OrderCountriesResponse {
+
+        /** The range the orders were counted for, as the screen asked for it, exactly as a listing states it. */
+        private final String from;
+
+        private final String to;
+
+        private final List<CountryOrders> countries;
+    }
+
+    /** One country's share of a range: the code the orders were shipped under, and how many there were. */
+    @Getter
+    @AllArgsConstructor
+    static final class CountryOrders {
+
+        /** The two-letter country code, or null for the orders whose marketplace stated no country at all. */
+        private final String country;
+
+        private final long orders;
+    }
+
+    /**
      * An order as the screen reads it.
      *
      * <p>Every field the reconciliation report states about an order itself, under the same names, so the two
@@ -47,9 +76,6 @@ final class OrderPayload {
 
         private final String orderId;
 
-        /** Where the marketplace shows the order, which the screen hangs on the order id. */
-        private final String orderUrl;
-
         private final Instant orderDate;
 
         /** The buyer's own name. */
@@ -57,6 +83,9 @@ final class OrderPayload {
 
         /** The buyer's account with the marketplace, which is a different fact from their name. */
         private final String buyerUsername;
+
+        /** Where the order was shipped, as a two-letter country code. */
+        private final String country;
 
         private final Integer itemCount;
 
@@ -87,8 +116,8 @@ final class OrderPayload {
         private final Instant archivedAt;
 
         OrderResponse(Order order) {
-            this(order.getId(), order.getSource(), order.getOrderId(), order.getOrderUrl(), order.getOrderDate(),
-                    order.getBuyer(), order.getBuyerUsername(), order.getItemCount(), order.getLotCount(),
+            this(order.getId(), order.getSource(), order.getOrderId(), order.getOrderDate(),
+                    order.getBuyer(), order.getBuyerUsername(), order.getCountry(), order.getItemCount(), order.getLotCount(),
                     order.getPaymentMethod(), order.getCurrency(), order.getTaxType(), order.getFacilitatorTax(),
                     order.getSubTotal(), order.getShippingCost(), order.getGrandTotal(), order.getRefundedAmount(),
                     order.getArchivedAt());

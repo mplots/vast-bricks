@@ -487,6 +487,15 @@ looks like. Read it, and never commit it.
   override is encrypted with the runtime's own key, which SQL cannot do, and
   because the deployable runtime applies that same data to the same database.
 - `./vast ps` is the shortcut for `./vast services list`.
+- `./vast prod` reaches the production host. `./vast prod async` replaces the
+  local order archive with production's: it empties `VAST_ORDER_ARCHIVE_DIR`
+  (default `/tmp/vast-bricks/order-archive`) and copies the production archive
+  into it with `scp -r`. The copied files are a real store's own record of who
+  bought what, so they stay in `/tmp` and are never committed or pasted
+  anywhere.
+- An agent must never run a `./vast prod` subcommand without asking first, and
+  asking once does not carry to the next time. These commands touch the
+  deployment, and what they bring back is real customer data.
 - Runtime process state and logs belong under the ignored `.vast` directory.
   Service stop operations must affect only processes recorded and verified as
   owned by `./vast`; never terminate an arbitrary process solely because it

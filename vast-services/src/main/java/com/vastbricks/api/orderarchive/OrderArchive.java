@@ -353,11 +353,7 @@ public class OrderArchive {
      * and a copy too many is a far smaller wrong than a missing one.
      */
     private static boolean outside(OperatingPeriod operating, LocalDate ordered) {
-        if (ordered == null) {
-            return false;
-        }
-        return (operating.getFrom() != null && ordered.isBefore(operating.getFrom()))
-                || (operating.getTo() != null && ordered.isAfter(operating.getTo()));
+        return operating.excludes(ordered);
     }
 
     /**

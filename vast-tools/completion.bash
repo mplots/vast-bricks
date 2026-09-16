@@ -5,7 +5,7 @@ _vast_completion() {
   command="${COMP_WORDS[1]}"
 
   if [[ ${COMP_CWORD} -eq 1 ]]; then
-    COMPREPLY=($(compgen -W "test t services svc ps logs completion help" -- "${current}"))
+    COMPREPLY=($(compgen -W "test t services svc ps logs prod completion help" -- "${current}"))
     return
   fi
 
@@ -74,6 +74,14 @@ _vast_completion() {
       fi
       return
       ;;
+    prod)
+      if [[ ${COMP_CWORD} -eq 2 && "${current}" != -* ]]; then
+        COMPREPLY=($(compgen -W "async" -- "${current}"))
+      else
+        COMPREPLY=($(compgen -W "--help -h" -- "${current}"))
+      fi
+      return
+      ;;
     completion|help)
       COMPREPLY=()
       return
@@ -88,7 +96,7 @@ _vast_completion() {
       ;;
   esac
 
-  COMPREPLY=($(compgen -W "test t services svc ps logs completion help" -- "${current}"))
+  COMPREPLY=($(compgen -W "test t services svc ps logs prod completion help" -- "${current}"))
 }
 
 complete -F _vast_completion vast

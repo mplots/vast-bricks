@@ -10,7 +10,6 @@ CREATE TABLE orders
     tenant_id       BIGINT      NOT NULL REFERENCES tenants (id) ON DELETE CASCADE,
     source          VARCHAR(20) NOT NULL,
     order_id        VARCHAR(50) NOT NULL,
-    order_url       TEXT,
     order_date      TIMESTAMPTZ NOT NULL,
     buyer           VARCHAR(255),
     buyer_username  VARCHAR(255),
@@ -43,8 +42,6 @@ COMMENT ON COLUMN orders.source IS
     'The marketplace the order was placed on: BRICKLINK or BRICKOWL. An order id only identifies an order beside it.';
 COMMENT ON COLUMN orders.order_id IS
     'The marketplace''s own order id. Text rather than a number because BrickOwl states one and BrickLink the other, and neither is arithmetic.';
-COMMENT ON COLUMN orders.order_url IS
-    'Where the marketplace shows this order, derived from its id. Stored rather than derived on read so the row is a complete account of the order, as every other column is.';
 COMMENT ON COLUMN orders.buyer IS
     'The buyer''s own name. BrickLink states it only in the accounting export, which is one of the reasons that export is what the import reads first.';
 COMMENT ON COLUMN orders.buyer_username IS

@@ -3,6 +3,12 @@ import type { APIRequestContext } from "@playwright/test";
 import { expect, test } from "../support/api-test";
 import { archiveBaseDirectory } from "../support/order-archive";
 import {
+  brickLinkConfig,
+  brickOwlConfig,
+  createProviderAccount,
+  updateProviderAccount,
+} from "../support/provider-accounts";
+import {
   archiveDirectory,
   writeBrickLinkAccounting,
   writeBrickLinkArchive,
@@ -121,6 +127,7 @@ test("a BrickLink order is imported as BrickLink stated it", async ({
     imported: 1,
     updated: 0,
     unchanged: 0,
+    removed: 0,
     failed: 0,
   });
 
@@ -139,6 +146,9 @@ test("a BrickLink order is imported as BrickLink stated it", async ({
   // the address it was shipped to.
   expect(order.buyer).toBe("Marta Ozola");
   expect(order.buyerUsername).toBe("brickfan_marta");
+  // Off the shipping address too, which is the only place BrickLink states where an order went: the accounting
+  // export names `Latvia, Riga`, a country name and a city rather than the code the screen groups orders by.
+  expect(order.country).toBe("LV");
   // Unified across the marketplaces' wordings, so an order paid the same way reads the same on both screens.
   expect(order.paymentMethod).toBe("Stripe");
   expect(order.currency).toBe("EUR");
@@ -151,9 +161,6 @@ test("a BrickLink order is imported as BrickLink stated it", async ({
   expect(Number(order.grandTotal)).toBe(31.4);
   // Stated by neither of the other two files: the detail page is the only place BrickLink names a refund.
   expect(Number(order.refundedAmount)).toBe(1.5);
-  // The link the screen hangs on the order id, so the order is one click from the row.
-  expect(order.orderUrl).toContain("bricklink.com");
-  expect(order.orderUrl).toContain(String(32100101));
   // The moment the imported files are the archive of, which is what a later run compares against.
   expect(new Date(order.archivedAt).toISOString()).toBe(
     "2026-03-04T15:16:17.000Z",
@@ -186,6 +193,7 @@ test("a BrickOwl order is imported as BrickOwl stated it", async ({
     imported: 1,
     updated: 0,
     unchanged: 0,
+    removed: 0,
     failed: 0,
   });
 
@@ -199,6 +207,7 @@ test("a BrickOwl order is imported as BrickOwl stated it", async ({
   expect(order.itemCount).toBe(19);
   expect(order.buyer).toBe("Juris Berzins");
   expect(order.buyerUsername).toBe("owlfan_juris");
+  expect(order.country).toBe("LV");
   expect(order.paymentMethod).toBe("PayPal");
   expect(order.currency).toBe("EUR");
   expect(Number(order.subTotal)).toBe(10);
@@ -207,7 +216,37 @@ test("a BrickOwl order is imported as BrickOwl stated it", async ({
   // BrickOwl writes 0.00 on an order nothing came back on, which is the marketplace reporting no refund rather
   // than a refund of nothing - exactly as the reconciliation report reads it.
   expect(order.refundedAmount).toBeNull();
-  expect(order.orderUrl).toContain("brickowl.com");
+});
+
+test("the United Kingdom is stored the same whichever marketplace stated it", async ({
+  request,
+  settings,
+  authentication,
+}) => {
+  const directory = await archive(settings, authentication.tenant.code);
+  // The one country the two marketplaces spell differently. Stored as two codes it would read as two countries,
+  // and a screen grouping orders by country would show the same one twice.
+  writeBrickLinkArchive(directory, {
+    orderId: 32100202,
+    archivedAt: "2026-03-07T10:00:00.000Z",
+    shippedToCountry: "UK",
+  });
+  writeBrickOwlOrder(directory, {
+    orderId: "19200202",
+    archivedAt: "2026-03-07T10:00:00",
+    shipCountryCode: "GB",
+  });
+
+  expect((await runImport(request)).tally).toEqual({
+    imported: 2,
+    updated: 0,
+    unchanged: 0,
+    removed: 0,
+    failed: 0,
+  });
+
+  const orders = await importedOrders(request);
+  expect(orders.map((order) => order.country)).toEqual(["GB", "GB"]);
 });
 
 test("both marketplaces are imported, and an order is told from another by its source", async ({
@@ -230,6 +269,7 @@ test("both marketplaces are imported, and an order is told from another by its s
     imported: 2,
     updated: 0,
     unchanged: 0,
+    removed: 0,
     failed: 0,
   });
 
@@ -270,6 +310,7 @@ test("an order archived several times over is stored once, as it last stood", as
     imported: 1,
     updated: 0,
     unchanged: 0,
+    removed: 0,
     failed: 0,
   });
 
@@ -298,6 +339,7 @@ test("a newer archived state updates the order already stored", async ({
     imported: 1,
     updated: 0,
     unchanged: 0,
+    removed: 0,
     failed: 0,
   });
   expect((await importedOrders(request))[0]!.itemCount).toBe(10);
@@ -313,6 +355,7 @@ test("a newer archived state updates the order already stored", async ({
     imported: 0,
     updated: 1,
     unchanged: 0,
+    removed: 0,
     failed: 0,
   });
 
@@ -345,6 +388,7 @@ test("a run that finds nothing newer leaves the orders alone", async ({
     imported: 2,
     updated: 0,
     unchanged: 0,
+    removed: 0,
     failed: 0,
   });
   // The common nightly run, on a store whose orders have not changed: nothing is written at all.
@@ -352,6 +396,7 @@ test("a run that finds nothing newer leaves the orders alone", async ({
     imported: 0,
     updated: 0,
     unchanged: 2,
+    removed: 0,
     failed: 0,
   });
 });
@@ -369,6 +414,7 @@ test("a store that has never archived imports nothing, and that is not a failure
     imported: 0,
     updated: 0,
     unchanged: 0,
+    removed: 0,
     failed: 0,
   });
   expect(await importedOrders(request)).toHaveLength(0);
@@ -397,6 +443,7 @@ test("a file that is not a marketplace record of an order is not imported", asyn
     imported: 1,
     updated: 0,
     unchanged: 0,
+    removed: 0,
     failed: 0,
   });
   expect(await importedOrders(request)).toHaveLength(1);
@@ -437,6 +484,7 @@ test("the accounting export is preferred over BrickLink's own record of the orde
     imported: 1,
     updated: 0,
     unchanged: 0,
+    removed: 0,
     failed: 0,
   });
 
@@ -482,6 +530,7 @@ test("a field the accounting export leaves blank falls back to BrickLink's own r
     imported: 1,
     updated: 0,
     unchanged: 0,
+    removed: 0,
     failed: 0,
   });
 
@@ -516,6 +565,7 @@ test("an order archived without an accounting export is read from BrickLink's ow
     imported: 1,
     updated: 0,
     unchanged: 0,
+    removed: 0,
     failed: 0,
   });
 
@@ -556,6 +606,7 @@ test("the export of an order's latest state is read, not an earlier state's", as
     imported: 1,
     updated: 0,
     unchanged: 0,
+    removed: 0,
     failed: 0,
   });
 
@@ -582,6 +633,7 @@ test("a refund is read from the order detail page, which is the only file that s
     imported: 1,
     updated: 0,
     unchanged: 0,
+    removed: 0,
     failed: 0,
   });
   expect((await importedOrders(request))[0]!.refundedAmount).toBeNull();
@@ -596,6 +648,7 @@ test("a refund is read from the order detail page, which is the only file that s
     imported: 0,
     updated: 1,
     unchanged: 0,
+    removed: 0,
     failed: 0,
   });
   expect(Number((await importedOrders(request))[0]!.refundedAmount)).toBe(4.25);
@@ -623,6 +676,7 @@ test("an order archived without a detail page states no refund rather than faili
     imported: 1,
     updated: 0,
     unchanged: 0,
+    removed: 0,
     failed: 0,
   });
 
@@ -650,6 +704,7 @@ test("a BrickOwl time stated with an offset is stored as the moment it names", a
     imported: 1,
     updated: 0,
     unchanged: 0,
+    removed: 0,
     failed: 0,
   });
 
@@ -684,6 +739,7 @@ test("an export naming the buyer by their real name is not stored as their usern
     imported: 1,
     updated: 0,
     unchanged: 0,
+    removed: 0,
     failed: 0,
   });
 
@@ -709,6 +765,7 @@ test("a forced run reads every archived order again, whether or not it has chang
     imported: 1,
     updated: 0,
     unchanged: 0,
+    removed: 0,
     failed: 0,
   });
   // The order has not changed since, so an ordinary run reads nothing: that is what makes running it nightly over a
@@ -717,6 +774,7 @@ test("a forced run reads every archived order again, whether or not it has chang
     imported: 0,
     updated: 0,
     unchanged: 1,
+    removed: 0,
     failed: 0,
   });
 
@@ -726,6 +784,7 @@ test("a forced run reads every archived order again, whether or not it has chang
     imported: 0,
     updated: 1,
     unchanged: 0,
+    removed: 0,
     failed: 0,
   });
 
@@ -744,4 +803,179 @@ test("the import job declares the force flag, and an unforced run is the default
   };
 
   expect(status.parameters).toEqual([{ name: "force", type: "BOOLEAN" }]);
+});
+
+/**
+ * Which archived orders are this store's to hold, which the store states as an operating period on its provider
+ * account. The archive leaves such an order on the marketplace, and these are about the rows: an archive written
+ * before the store stated its period, or copied from elsewhere, holds orders the archive job would not write today.
+ */
+
+test("a BrickLink order placed before the store existed is not imported", async ({
+  request,
+  settings,
+  authentication,
+}) => {
+  const directory = await archive(settings, authentication.tenant.code);
+  await createProviderAccount(request, {
+    name: "Shop BrickLink",
+    config: brickLinkConfig({ operatingPeriod: { from: "2026-03-10", to: null } }),
+  });
+  // Sold by whoever held the login before this store did, and archived all the same: the file is on disk.
+  writeBrickLinkArchive(directory, {
+    orderId: 32100301,
+    archivedAt: "2026-03-05T08:00:00.000Z",
+    accounting: { orderDate: "3/1/2026" },
+  });
+  // The store's own, placed the day the period opens, which is inclusive.
+  writeBrickLinkArchive(directory, {
+    orderId: 32100302,
+    archivedAt: "2026-03-12T08:00:00.000Z",
+    accounting: { orderDate: "3/10/2026" },
+  });
+
+  // The order outside the period is no part of the tally, exactly as it is no part of the archive's: a run that
+  // counted it as unchanged would report the database as holding an order it deliberately does not.
+  expect((await runImport(request)).tally).toEqual({
+    imported: 1,
+    updated: 0,
+    unchanged: 0,
+    removed: 0,
+    failed: 0,
+  });
+
+  const orders = await importedOrders(request);
+  expect(orders.map((order) => order.orderId)).toEqual(["32100302"]);
+});
+
+test("a BrickOwl order placed after the store stopped selling is not imported", async ({
+  request,
+  settings,
+  authentication,
+}) => {
+  const directory = await archive(settings, authentication.tenant.code);
+  await createProviderAccount(request, {
+    name: "Shop BrickOwl",
+    config: brickOwlConfig({ operatingPeriod: { from: null, to: "2026-04-30" } }),
+  });
+  writeBrickOwlOrder(directory, {
+    orderId: "19200301",
+    archivedAt: "2026-04-21T10:11:12",
+    orderTime: "2026-04-30T23:00:00",
+  });
+  writeBrickOwlOrder(directory, {
+    orderId: "19200302",
+    archivedAt: "2026-05-03T10:11:12",
+    orderTime: "2026-05-02T10:11:12",
+  });
+
+  expect((await runImport(request)).tally).toEqual({
+    imported: 1,
+    updated: 0,
+    unchanged: 0,
+    removed: 0,
+    failed: 0,
+  });
+
+  const orders = await importedOrders(request);
+  // The last day of the period is in it: an order placed at any hour of it is the store's own.
+  expect(orders.map((order) => order.orderId)).toEqual(["19200301"]);
+});
+
+test("each marketplace is bounded by its own account's period", async ({
+  request,
+  settings,
+  authentication,
+}) => {
+  const directory = await archive(settings, authentication.tenant.code);
+  await createProviderAccount(request, {
+    name: "Shop BrickLink",
+    config: brickLinkConfig({ operatingPeriod: { from: "2026-03-10", to: null } }),
+  });
+  await createProviderAccount(request, {
+    name: "Shop BrickOwl",
+    config: brickOwlConfig({ operatingPeriod: null }),
+  });
+  writeBrickLinkArchive(directory, {
+    orderId: 32100311,
+    archivedAt: "2026-03-05T08:00:00.000Z",
+    accounting: { orderDate: "3/1/2026" },
+  });
+  // The same day on the other marketplace, whose account bounds nothing: one store can have started selling on each
+  // of them at a different time, and one period must not answer for both.
+  writeBrickOwlOrder(directory, {
+    orderId: "19200311",
+    archivedAt: "2026-03-05T08:00:00",
+    orderTime: "2026-03-01T08:00:00",
+  });
+
+  expect((await runImport(request)).tally).toEqual({
+    imported: 1,
+    updated: 0,
+    unchanged: 0,
+    removed: 0,
+    failed: 0,
+  });
+
+  const orders = await importedOrders(request);
+  expect(orders.map((order) => order.orderId)).toEqual(["19200311"]);
+});
+
+test("an order the store no longer says is its own is taken out of the orders it holds", async ({
+  request,
+  settings,
+  authentication,
+}) => {
+  const directory = await archive(settings, authentication.tenant.code);
+  const account = await createProviderAccount(request, {
+    name: "Shop BrickLink",
+    config: brickLinkConfig({ operatingPeriod: null }),
+  });
+  writeBrickLinkArchive(directory, {
+    orderId: 32100321,
+    archivedAt: "2026-03-05T08:00:00.000Z",
+    accounting: { orderDate: "3/1/2026" },
+  });
+  writeBrickLinkArchive(directory, {
+    orderId: 32100322,
+    archivedAt: "2026-03-12T08:00:00.000Z",
+    accounting: { orderDate: "3/10/2026" },
+  });
+
+  expect((await runImport(request)).tally).toEqual({
+    imported: 2,
+    updated: 0,
+    unchanged: 0,
+    removed: 0,
+    failed: 0,
+  });
+
+  // The store states when it started selling, which the earlier order is before. It was imported under no period at
+  // all, and nothing else would ever take it out again: the archive's files are still there, and the row stopped
+  // being read the moment it stopped being newer than what is on disk.
+  await updateProviderAccount(request, account.id, {
+    name: "Shop BrickLink",
+    enabled: true,
+    config: brickLinkConfig({ operatingPeriod: { from: "2026-03-10", to: null } }),
+  });
+
+  expect((await runImport(request)).tally).toEqual({
+    imported: 0,
+    updated: 0,
+    unchanged: 1,
+    removed: 1,
+    failed: 0,
+  });
+
+  const orders = await importedOrders(request);
+  expect(orders.map((order) => order.orderId)).toEqual(["32100322"]);
+
+  // And it stays gone: the run after it has nothing left to remove.
+  expect((await runImport(request)).tally).toEqual({
+    imported: 0,
+    updated: 0,
+    unchanged: 1,
+    removed: 0,
+    failed: 0,
+  });
 });

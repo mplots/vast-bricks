@@ -88,6 +88,10 @@ public class BrickLinkOrder {
     public static class Address {
 
         private Name name;
+
+        /** Where the parcel went, as a two-letter code. */
+        @JsonProperty("country_code")
+        private String countryCode;
     }
 
     /** The recipient, whom BrickLink states in parts and whole. */

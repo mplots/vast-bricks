@@ -35,6 +35,20 @@ public class OperatingPeriod {
     private LocalDate to;
 
     /**
+     * Whether a date falls outside the stretch that counts, and so belongs to whoever else held the login.
+     *
+     * <p>Both ends are inclusive, and an end left unstated bounds nothing on that side. A date that could not be read
+     * at all is not excluded: what reads a period is copying or storing what a marketplace already holds, and a copy
+     * too many is a far smaller wrong than a missing one.
+     */
+    public boolean excludes(LocalDate day) {
+        if (day == null) {
+            return false;
+        }
+        return (from != null && day.isBefore(from)) || (to != null && day.isAfter(to));
+    }
+
+    /**
      * The period as it is stored, or null when the account states none.
      *
      * <p>A period with neither date is none rather than a refusal: a screen that always shows the two pickers says

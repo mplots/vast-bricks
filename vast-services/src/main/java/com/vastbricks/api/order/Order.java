@@ -67,6 +67,10 @@ class Order {
     @Column(name = "buyer_username")
     private String buyerUsername;
 
+    /** The country the order was shipped to, as a two-letter code, or null where nothing archived states an address. */
+    @Column(length = 2)
+    private String country;
+
     /** How the order was paid, unified across the marketplaces' wordings. */
     @Column(name = "payment_method", length = 100)
     private String paymentMethod;
@@ -90,10 +94,6 @@ class Order {
     /** What the marketplace reports was refunded, or null where it reports none. */
     @Column(name = "refunded_amount", precision = 19, scale = 2)
     private BigDecimal refundedAmount;
-
-    /** Where the marketplace shows this order. */
-    @Column(name = "order_url")
-    private String orderUrl;
 
     /** What the order came to in the store's own currency, which {@link #currency} names. */
     @Column(name = "grand_total", precision = 19, scale = 2)

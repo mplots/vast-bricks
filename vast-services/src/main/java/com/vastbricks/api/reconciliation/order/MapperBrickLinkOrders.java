@@ -36,7 +36,6 @@ class MapperBrickLinkOrders implements OrderMapper<SourcedBrickLinkOrder> {
         return ReconciledOrder.of(OrderFields.builder()
                 .source(Marketplace.BRICK_LINK)
                 .orderId(orderId)
-                .orderUrl(OrderLinks.brickLink(orderId))
                 .orderDate(order.getOrderDate())
                 .buyer(ReconciliationText.normalize(order.getBuyer()))
                 .itemCount(order.getTotalItems())

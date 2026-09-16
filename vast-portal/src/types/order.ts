@@ -17,14 +17,14 @@ export interface StoreOrder {
   source: OrderSource;
   /** The marketplace's own order id. Text, because the two marketplaces number their orders differently. */
   orderId: string;
-  /** Where the marketplace shows the order, which the screen hangs on the order id. */
-  orderUrl: string | null;
   /** When the order was placed, as an instant. BrickLink's own account of it states a day and no time of day. */
   orderDate: string;
   /** The buyer's own name. */
   buyer: string | null;
   /** The buyer's account with the marketplace, which is a different fact from their name. */
   buyerUsername: string | null;
+  /** Where the order was shipped, as a two-letter country code. */
+  country: string | null;
   itemCount: number | null;
   lotCount: number | null;
   /** How the order was paid, unified across the marketplaces' wordings. */
@@ -48,4 +48,17 @@ export interface StoreOrdersPage {
   from: string;
   to: string;
   orders: StoreOrder[];
+}
+
+/** One country's share of a range of orders, as the dashboard reads it. */
+export interface OrderCountry {
+  /** The two-letter code the orders were shipped under, or `null` where the marketplace stated no country. */
+  country: string | null;
+  orders: number;
+}
+
+export interface OrderCountriesPage {
+  from: string;
+  to: string;
+  countries: OrderCountry[];
 }

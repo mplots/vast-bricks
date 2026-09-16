@@ -36,7 +36,6 @@ class MapperBrickOwlOrders implements OrderMapper<SourcedBrickOwlOrder> {
         return ReconciledOrder.of(OrderFields.builder()
                 .source(Marketplace.BRICK_OWL)
                 .orderId(order.getOrderId())
-                .orderUrl(OrderLinks.brickOwl(order.getOrderId()))
                 .orderDate(sourced.getOrderDate())
                 .buyer(ReconciliationText.normalize(order.getBuyerName()))
                 .buyerUsername(ReconciliationText.normalize(order.getCustomerUsername()))

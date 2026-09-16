@@ -12,7 +12,9 @@ import com.vastbricks.api.orderarchive.OrderSource;
 import com.vastbricks.api.reconciliation.ReconciliationAmount;
 import com.vastbricks.api.reconciliation.ReconciliationCurrency;
 import com.vastbricks.api.reconciliation.ReconciliationPaymentMethod;
-import com.vastbricks.api.reconciliation.order.OrderLinks;
+import com.vastbricks.api.setup.provideraccount.OperatingPeriod;
+import com.vastbricks.api.setup.provideraccount.Provider;
+import com.vastbricks.api.setup.provideraccount.ProviderAccounts;
 import com.vastbricks.api.tax.FacilitatorTaxes;
 import com.vastbricks.api.tax.OrderTaxTypes;
 import java.io.IOException;
@@ -71,6 +73,7 @@ class OrderImport {
 
     private final OrderArchive archive;
     private final OrderRepository orders;
+    private final ProviderAccounts providerAccounts;
     private final BrickLinkClient brickLink;
     private final BrickOwlClient brickOwl;
     private final BrickStoreClient brickStore;
@@ -84,6 +87,9 @@ class OrderImport {
     ImportTally importAll(boolean force) {
         Path directory = archive.directory();
         var tally = new ImportTally();
+        // Read once a run rather than once an order: a store states one period per marketplace, and a run over a
+        // whole history would otherwise ask the same question of the database thousands of times.
+        Map<OrderSource, OperatingPeriod> operating = operatingPeriods();
 
         for (ArchivedOrder archived : latestPerOrder(directory, tally)) {
             // Stopping a job interrupts this thread, and every order is imported under a catch that would otherwise
@@ -93,7 +99,7 @@ class OrderImport {
                 break;
             }
             try {
-                tally.count(upsert(archived, force));
+                tally.count(upsert(archived, operating.get(archived.getSource()), force));
             } catch (Exception exception) {
                 // One order that could not be imported is not a failed run: the rest of the archive still can be.
                 tally.failed++;
@@ -104,10 +110,33 @@ class OrderImport {
 
         // One line a run, not one an order: a first run imports a store's whole history, and which orders those were
         // is the tally's business and a debug line's.
-        log.info("Order import {}: {} imported, {} updated, {} unchanged, {} failed",
+        log.info("Order import {}: {} imported, {} updated, {} unchanged, {} outside the operating period, "
+                        + "{} removed as outside it, {} failed",
                 Thread.currentThread().isInterrupted() ? "stopped" : "finished",
-                tally.imported, tally.updated, tally.unchanged, tally.failed);
+                tally.imported, tally.updated, tally.unchanged, tally.outside, tally.removed, tally.failed);
         return tally;
+    }
+
+    /**
+     * The stretch of each marketplace's orders that is this store's, as its provider account states it.
+     *
+     * <p>Every marketplace answers a period, and one that states none answers a period bounding nothing, so there is
+     * no source the import reads without asking - a marketplace added later is bounded by the same question.
+     */
+    private Map<OrderSource, OperatingPeriod> operatingPeriods() {
+        var periods = new EnumMap<OrderSource, OperatingPeriod>(OrderSource.class);
+        for (OrderSource source : OrderSource.values()) {
+            periods.put(source, providerAccounts.operatingPeriod(providerOf(source)));
+        }
+        return periods;
+    }
+
+    /** Which provider account states a marketplace's terms, the archive and the accounts naming it differently. */
+    private static Provider providerOf(OrderSource source) {
+        return switch (source) {
+            case BRICKLINK -> Provider.BRICK_LINK;
+            case BRICKOWL -> Provider.BRICK_OWL;
+        };
     }
 
     /**
@@ -189,8 +218,14 @@ class OrderImport {
      * orders are all already stored as their latest state. A forced run reads them anyway, which is the only way a
      * row whose order has not changed since it was written is written again.
      */
-    private Outcome upsert(ArchivedOrder archived, boolean force) throws IOException {
+    private Outcome upsert(ArchivedOrder archived, OperatingPeriod operating, boolean force) throws IOException {
         Order stored = orders.findBySourceAndOrderId(archived.getSource(), archived.getOrderId()).orElse(null);
+        // A row written while the period was wider, judged by the date already on it: a file need not be read to
+        // find out whose order it is, and a run that stopped at the freshness check below would never find out.
+        if (stored != null && outside(operating, stored.getOrderDate())) {
+            orders.delete(stored);
+            return Outcome.REMOVED;
+        }
         if (!force && stored != null && !archived.getArchivedAt().isAfter(stored.getArchivedAt())) {
             return Outcome.UNCHANGED;
         }
@@ -200,10 +235,33 @@ class OrderImport {
             case BRICKLINK -> applyBrickLink(order, archived);
             case BRICKOWL -> applyBrickOwl(order, archived);
         }
+        // Not before the files are read: the archive names its files after the moment an order last changed, and the
+        // date it was placed - the one date that says whose order it is - is stated inside them and nowhere else.
+        if (outside(operating, order.getOrderDate())) {
+            if (stored != null) {
+                orders.delete(stored);
+                return Outcome.REMOVED;
+            }
+            return Outcome.OUTSIDE;
+        }
         order.setArchivedAt(archived.getArchivedAt());
         order.setUpdatedAt(Instant.now());
         orders.save(order);
         return stored == null ? Outcome.IMPORTED : Outcome.UPDATED;
+    }
+
+    /**
+     * Whether the order was placed outside the stretch the store's provider account says counts.
+     *
+     * <p>The archive already leaves such an order alone, so this is what an archive written before the store stated
+     * its period comes to - and what the archive's own by-id entry point, which is asked for one order rather than
+     * given a listing to bound, would otherwise let through. One marketplace login can hold orders that were never
+     * this tenant's, and a row of somebody else's order is read by every screen as one of this store's.
+     *
+     * <p>By the date it was placed, in UTC, which is the zone both marketplaces' dates are read to.
+     */
+    private static boolean outside(OperatingPeriod operating, Instant ordered) {
+        return operating.excludes(ordered == null ? null : ordered.atZone(ZoneOffset.UTC).toLocalDate());
     }
 
     /**
@@ -223,7 +281,6 @@ class OrderImport {
         // Read only when the export left something out, so an order the export fully states costs one file.
         Supplier<BrickLinkOrder> stated = lazily(() -> stated(archived));
 
-        order.setOrderUrl(OrderLinks.brickLink(order.getOrderId()));
         order.setOrderDate(required(
                 preferring(exported == null ? null : dayOf(exported.getOrderDate()),
                         () -> instantOf(value(stated.get(), BrickLinkOrder::getDateOrdered))),
@@ -238,6 +295,9 @@ class OrderImport {
         // without knowing that, and an archive holds files fetched under whatever the request was at the time.
         order.setBuyer(StringUtils.trimToNull(shippedTo(stated.get())));
         order.setBuyerUsername(StringUtils.trimToNull(value(stated.get(), BrickLinkOrder::getBuyerName)));
+        // Off the same address, which is the only place BrickLink states where an order went. The export names a
+        // country too, but as `Latvia, Riga` - a name and a city rather than the code both marketplaces agree on.
+        order.setCountry(country(address(stated.get()) == null ? null : address(stated.get()).getCountryCode()));
         order.setPaymentMethod(ReconciliationPaymentMethod.normalize(
                 preferring(exported == null ? null : StringUtils.trimToNull(exported.getPaymentType()),
                         () -> payment(stated.get(), BrickLinkOrder.Payment::getMethod))));
@@ -282,12 +342,12 @@ class OrderImport {
         // BrickOwl states several times an order was placed at, and the client reads every one of them to the same
         // moment in UTC whichever spelling it arrived in, so the zone put back here is the one it was read to.
         LocalDateTime placed = ObjectUtils.firstNonNull(stated.getIsoOrderTime(), stated.getOrderTime());
-        order.setOrderUrl(OrderLinks.brickOwl(order.getOrderId()));
         order.setOrderDate(required(placed == null ? null : placed.toInstant(ZoneOffset.UTC), order, "an order date"));
         order.setLotCount(stated.getTotalLots());
         order.setItemCount(stated.getTotalQuantity());
         order.setBuyer(StringUtils.trimToNull(stated.getBuyerName()));
         order.setBuyerUsername(StringUtils.trimToNull(stated.getCustomerUsername()));
+        order.setCountry(country(stated.getShipCountryCode()));
         order.setPaymentMethod(ReconciliationPaymentMethod.normalize(stated.getPaymentMethodType()));
         order.setCurrency(ReconciliationCurrency.normalize(stated.getPaymentCurrency()));
         order.setTaxType(OrderTaxTypes.of(stated));
@@ -373,10 +433,26 @@ class OrderImport {
      * parcel it is beats no name at all.
      */
     private static String shippedTo(BrickLinkOrder order) {
-        BrickLinkOrder.Shipping shipping = order == null ? null : order.getShipping();
-        BrickLinkOrder.Address address = shipping == null ? null : shipping.getAddress();
+        BrickLinkOrder.Address address = address(order);
         BrickLinkOrder.Name name = address == null ? null : address.getName();
         return name == null ? null : name.getFull();
+    }
+
+    /** The address the order was shipped to, which is where BrickLink states both the buyer and their country. */
+    private static BrickLinkOrder.Address address(BrickLinkOrder order) {
+        BrickLinkOrder.Shipping shipping = order == null ? null : order.getShipping();
+        return shipping == null ? null : shipping.getAddress();
+    }
+
+    /**
+     * A country code as a marketplace states it, in the one spelling a screen groups orders by.
+     *
+     * <p>Both marketplaces state ISO two-letter codes but for one country: BrickLink writes the United Kingdom as
+     * {@code UK} where BrickOwl writes {@code GB}, and two spellings of one country would read as two countries.
+     */
+    private static String country(String value) {
+        String stated = StringUtils.upperCase(StringUtils.trimToNull(value));
+        return "UK".equals(stated) ? "GB" : stated;
     }
 
     private static <T> T cost(BrickLinkOrder order, Function<BrickLinkOrder.Cost, T> field) {
@@ -499,7 +575,7 @@ class OrderImport {
 
     /** What storing one archived order came to. */
     private enum Outcome {
-        IMPORTED, UPDATED, UNCHANGED
+        IMPORTED, UPDATED, UNCHANGED, OUTSIDE, REMOVED
     }
 
     /** What importing a store's archive came to. */
@@ -508,6 +584,17 @@ class OrderImport {
         int imported;
         int updated;
         int unchanged;
+
+        /**
+         * The archived orders that were not this store's, which are no part of what the run stored.
+         *
+         * <p>Kept out of the tally the job reports, exactly as the archive keeps its own: a run that counted them as
+         * unchanged would report the database as holding orders it deliberately does not. A removal is reported,
+         * because a row that was there and is not is something that happened rather than something that did not.
+         */
+        int outside;
+
+        int removed;
         int failed;
 
         void count(Outcome outcome) {
@@ -515,6 +602,8 @@ class OrderImport {
                 case IMPORTED -> imported++;
                 case UPDATED -> updated++;
                 case UNCHANGED -> unchanged++;
+                case OUTSIDE -> outside++;
+                case REMOVED -> removed++;
             }
         }
     }

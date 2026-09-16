@@ -53,6 +53,7 @@ import {
   type StoredColumns
 } from 'sections/reconciliation/columns';
 import { currentMonth, monthDate } from 'utils/month';
+import { orderUrl } from 'utils/orderLink';
 import type { PeriodRange } from 'utils/period';
 import OrderTaxTypeIcon from 'components/OrderTaxTypeIcon';
 import ReconciliationColumnDrawer from 'sections/reconciliation/ReconciliationColumnDrawer';
@@ -621,7 +622,7 @@ function ReconciliationOrders() {
   const fieldLink = (order: ReconciliationOrder, field: string) => {
     if (field === 'order.orderId') {
       return {
-        url: order.order.orderUrl,
+        url: orderUrl(order.order.source, order.order.orderId),
         label: intl.formatMessage({ id: 'reconciliation-order-link' }, { source: order.order.source })
       };
     }

@@ -39,6 +39,7 @@ import OrdersFilterDrawer from 'sections/orders/OrdersFilterDrawer';
 import { formatAmount, numericCell } from 'utils/amount';
 import { downloadCsv, type CsvValue } from 'utils/csv';
 import { currentMonth, monthDate } from 'utils/month';
+import { orderUrl } from 'utils/orderLink';
 import type { StoreOrder } from 'types/order';
 import { orderTaxTypes, type OrderTaxType } from 'types/tax';
 
@@ -74,6 +75,7 @@ const columnFields = [
   'order.orderId',
   'order.buyer',
   'order.buyerUsername',
+  'order.country',
   'order.lotCount',
   'order.itemCount',
   'order.paymentMethod',
@@ -103,7 +105,7 @@ const storedColumnsKey = 'vast-orders-columns';
 const columnParam = 'columns';
 
 /** The facets the orders can be narrowed by, each read off the order itself. */
-const facetFields = ['source', 'paymentMethod', 'currency', 'taxType'] as const;
+const facetFields = ['source', 'country', 'paymentMethod', 'currency', 'taxType'] as const;
 
 type Facet = (typeof facetFields)[number];
 
@@ -278,6 +280,8 @@ export default function OrdersPage() {
     switch (facet) {
       case 'source':
         return order.source;
+      case 'country':
+        return order.country ?? '';
       case 'paymentMethod':
         return order.paymentMethod ?? '';
       case 'currency':
@@ -398,6 +402,8 @@ export default function OrdersPage() {
         return order.buyer ?? '—';
       case 'order.buyerUsername':
         return order.buyerUsername ?? '—';
+      case 'order.country':
+        return order.country ?? '—';
       case 'order.lotCount':
         return formatCount(order.lotCount);
       case 'order.itemCount':
@@ -789,10 +795,15 @@ export default function OrdersPage() {
                                     color={sourceColor(order.source)}
                                     label={sourceLabel(order.source)}
                                   />
-                                ) : column === 'order.orderId' && order.orderUrl ? (
+                                ) : column === 'order.orderId' && orderUrl(order.source, order.orderId) ? (
                                   // The link sits on the id, as it does on the report: the order a row raises a
                                   // question about is then one click away from the row.
-                                  <Link href={order.orderUrl} target="_blank" rel="noopener noreferrer" underline="hover">
+                                  <Link
+                                    href={orderUrl(order.source, order.orderId)!}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    underline="hover"
+                                  >
                                     {order.orderId}
                                   </Link>
                                 ) : (

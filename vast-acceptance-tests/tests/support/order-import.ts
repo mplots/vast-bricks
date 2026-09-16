@@ -18,6 +18,8 @@ export type ArchivedBrickLinkOrder = {
   buyerName?: string;
   /** The name the order is shipped to, which is the only place BrickLink states a person. */
   shippedTo?: string;
+  /** Where it was shipped. BrickLink writes the United Kingdom as `UK`, which is its one departure from ISO. */
+  shippedToCountry?: string;
   uniqueCount?: number;
   totalCount?: number;
   grandTotal?: string;
@@ -67,6 +69,8 @@ export type ArchivedBrickOwlOrder = {
   offset?: string;
   buyerName?: string;
   customerUsername?: string;
+  /** Where it was shipped, as BrickOwl states it: an ISO code, the United Kingdom included. */
+  shipCountryCode?: string;
   totalLots?: number;
   totalQuantity?: number;
   subTotal?: string;
@@ -83,10 +87,10 @@ export type ArchivedBrickOwlOrder = {
 export type ImportedOrder = {
   source: string;
   orderId: string;
-  orderUrl: string | null;
   orderDate: string;
   buyer: string | null;
   buyerUsername: string | null;
+  country: string | null;
   lotCount: number | null;
   itemCount: number | null;
   paymentMethod: string | null;
@@ -121,7 +125,12 @@ export function writeBrickLinkOrder(
       status: "COMPLETED",
       buyer_name: archived.buyerName ?? "brickfan_marta",
       // The only place BrickLink states a person rather than an account.
-      shipping: { address: { name: { full: archived.shippedTo ?? "Marta Ozola" } } },
+      shipping: {
+        address: {
+          name: { full: archived.shippedTo ?? "Marta Ozola" },
+          country_code: archived.shippedToCountry ?? "LV",
+        },
+      },
       total_count: archived.totalCount ?? 42,
       unique_count: archived.uniqueCount ?? 7,
       payment: {
@@ -158,6 +167,7 @@ export function writeBrickOwlOrder(
     status: "Shipped",
     buyer_name: archived.buyerName ?? "Juris Berzins",
     customer_username: archived.customerUsername ?? "owlfan_juris",
+    ship_country_code: archived.shipCountryCode ?? "LV",
     total_lots: archived.totalLots ?? 5,
     total_quantity: archived.totalQuantity ?? 19,
     sub_total: archived.subTotal ?? "10.00",

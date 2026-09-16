@@ -55,6 +55,9 @@ class OrderImportJob implements Job {
                 .count("imported", tally.imported)
                 .count("updated", tally.updated)
                 .count("unchanged", tally.unchanged)
+                // The orders that were another store's are no part of it, as they are no part of the archive's own
+                // tally. A row removed for being one is reported: it was there, and after this run it is not.
+                .count("removed", tally.removed)
                 .count("failed", tally.failed);
     }
 }

@@ -19,10 +19,10 @@ type ListedOrder = {
   id: number;
   source: string;
   orderId: string;
-  orderUrl: string | null;
   orderDate: string;
   buyer: string | null;
   buyerUsername: string | null;
+  country: string | null;
   lotCount: number | null;
   itemCount: number | null;
   paymentMethod: string | null;
@@ -49,6 +49,22 @@ async function listOrders(
     from: string;
     to: string;
     orders: ListedOrder[];
+  };
+}
+
+async function listCountries(
+  request: APIRequestContext,
+  from: string,
+  to: string,
+) {
+  const response = await request.get(
+    `/api/private/orders/countries?from=${from}&to=${to}`,
+  );
+  expect(response.status(), await response.text()).toBe(200);
+  return (await response.json()) as {
+    from: string;
+    to: string;
+    countries: { country: string | null; orders: number }[];
   };
 }
 
@@ -126,16 +142,16 @@ test("the orders of a range are listed, newest first", async ({
   expect(owl.buyerUsername).toBe("owlfan_juris");
   expect(brickLink.source).toBe("BRICKLINK");
   expect(brickLink.buyer).toBe("Marta Ozola");
+  expect(brickLink.country).toBe("LV");
   expect(brickLink.lotCount).toBe(7);
   expect(brickLink.itemCount).toBe(42);
   expect(Number(brickLink.subTotal)).toBe(28.9);
   expect(Number(brickLink.shippingCost)).toBe(2.5);
   expect(Number(brickLink.grandTotal)).toBe(31.4);
   expect(brickLink.currency).toBe("EUR");
-  expect(brickLink.orderUrl).toContain("bricklink.com");
 });
 
-test("every field the reconciliation report states about an order is stated here too", async ({
+test("every field the reconciliation report states about an order is stated here too, and the country it does not", async ({
   request,
   settings,
   authentication,
@@ -156,12 +172,15 @@ test("every field the reconciliation report states about an order is stated here
   const order = (await listOrders(request, "2026-04-01", "2026-04-30"))
     .orders[0]!;
   // The whole of what the report states about an order itself, so a reader can move between the two screens
-  // without meeting a column on one that the other does not have.
+  // without meeting a column on one that the other does not have - plus the country, which is the one field this
+  // screen states that the report does not, because it is a fact of the order rather than of the accounts held
+  // against it.
   expect(Object.keys(order).sort()).toEqual(
     [
       "archivedAt",
       "buyer",
       "buyerUsername",
+      "country",
       "currency",
       "facilitatorTax",
       "grandTotal",
@@ -170,7 +189,6 @@ test("every field the reconciliation report states about an order is stated here
       "lotCount",
       "orderDate",
       "orderId",
-      "orderUrl",
       "paymentMethod",
       "refundedAmount",
       "shippingCost",
@@ -277,6 +295,140 @@ test("a store reads only its own orders", async ({
 test("a range stated the wrong way round is refused", async ({ request }) => {
   const response = await request.get(
     "/api/private/orders?from=2026-08-31&to=2026-08-01",
+  );
+  expect(response.status()).toBe(400);
+});
+
+/**
+ * What a range came to by country, which the dashboard draws as a pie.
+ *
+ * <p>The same stored orders the listing reads, counted by the API rather than by the screen: a period is a screenful
+ * of slices however many orders it holds, and a year of them is not worth sending down to draw a dozen.
+ */
+
+test("the orders of a range are counted by the country they went to, largest share first", async ({
+  request,
+  settings,
+  authentication,
+}) => {
+  await importOrders(
+    request,
+    settings,
+    authentication.tenant.code,
+    (directory) => {
+      // Two to Latvia, one to Germany, and one the marketplace stated no country for.
+      writeBrickLinkArchive(directory, {
+        orderId: 32100401,
+        archivedAt: "2026-09-02T08:00:00.000Z",
+        shippedToCountry: "LV",
+        accounting: { orderDate: "9/1/2026" },
+      });
+      writeBrickOwlOrder(directory, {
+        orderId: "19200401",
+        archivedAt: "2026-09-03T08:00:00",
+        orderTime: "2026-09-02T09:10:11",
+        shipCountryCode: "LV",
+      });
+      writeBrickLinkArchive(directory, {
+        orderId: 32100402,
+        archivedAt: "2026-09-04T08:00:00.000Z",
+        shippedToCountry: "DE",
+        accounting: { orderDate: "9/3/2026" },
+      });
+      writeBrickLinkArchive(directory, {
+        orderId: 32100403,
+        archivedAt: "2026-09-05T08:00:00.000Z",
+        shippedToCountry: "",
+        accounting: { orderDate: "9/4/2026" },
+      });
+    },
+  );
+
+  const counted = await listCountries(request, "2026-09-01", "2026-09-30");
+  expect(counted.from).toBe("2026-09-01");
+  expect(counted.to).toBe("2026-09-30");
+  // Largest first, so the slices are drawn in the order a reader asks about them. The orders whose marketplace
+  // stated no country are a share of their own rather than orders left out of the total.
+  expect(counted.countries).toEqual([
+    { country: "LV", orders: 2 },
+    { country: null, orders: 1 },
+    { country: "DE", orders: 1 },
+  ]);
+});
+
+test("only the range's orders are counted, and the days at its edges are", async ({
+  request,
+  settings,
+  authentication,
+}) => {
+  await importOrders(
+    request,
+    settings,
+    authentication.tenant.code,
+    (directory) => {
+      writeBrickLinkArchive(directory, {
+        orderId: 32100411,
+        archivedAt: "2026-10-02T08:00:00.000Z",
+        shippedToCountry: "LV",
+        accounting: { orderDate: "10/1/2026" },
+      });
+      writeBrickLinkArchive(directory, {
+        orderId: 32100412,
+        archivedAt: "2026-10-31T08:00:00.000Z",
+        shippedToCountry: "DE",
+        accounting: { orderDate: "10/31/2026" },
+      });
+      // The day after the range, which is another period's order and no part of this pie.
+      writeBrickLinkArchive(directory, {
+        orderId: 32100413,
+        archivedAt: "2026-11-02T08:00:00.000Z",
+        shippedToCountry: "EE",
+        accounting: { orderDate: "11/1/2026" },
+      });
+    },
+  );
+
+  const counted = await listCountries(request, "2026-10-01", "2026-10-31");
+  expect(counted.countries).toEqual([
+    { country: "DE", orders: 1 },
+    { country: "LV", orders: 1 },
+  ]);
+});
+
+test("a store's countries are counted from its own orders alone", async ({
+  request,
+  settings,
+  authentication,
+  otherTenant,
+}) => {
+  await importOrders(
+    request,
+    settings,
+    authentication.tenant.code,
+    (directory) => {
+      writeBrickLinkArchive(directory, {
+        orderId: 32100421,
+        archivedAt: "2026-12-02T08:00:00.000Z",
+        shippedToCountry: "LV",
+        accounting: { orderDate: "12/1/2026" },
+      });
+    },
+  );
+
+  expect(
+    (await listCountries(request, "2026-12-01", "2026-12-31")).countries,
+  ).toEqual([{ country: "LV", orders: 1 }]);
+  expect(
+    (await listCountries(otherTenant.request, "2026-12-01", "2026-12-31"))
+      .countries,
+  ).toEqual([]);
+});
+
+test("a range stated the wrong way round is refused for the countries too", async ({
+  request,
+}) => {
+  const response = await request.get(
+    "/api/private/orders/countries?from=2026-08-31&to=2026-08-01",
   );
   expect(response.status()).toBe(400);
 });

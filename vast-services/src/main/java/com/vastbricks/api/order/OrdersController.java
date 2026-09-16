@@ -1,5 +1,6 @@
 package com.vastbricks.api.order;
 
+import com.vastbricks.api.order.OrderPayload.OrderCountriesResponse;
 import com.vastbricks.api.order.OrderPayload.OrdersResponse;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -25,11 +26,32 @@ class OrdersController {
             @RequestParam(value = "to") String to
     ) {
         LocalDate start = day(from, "from");
-        LocalDate end = day(to, "to");
+        LocalDate end = end(start, day(to, "to"));
+        return new OrdersResponse(start.toString(), end.toString(), orderService.findOrders(start, end));
+    }
+
+    /**
+     * What the range's orders came to by country, which the dashboard draws.
+     *
+     * <p>The same range the listing takes, stated the same way, because it is the same range: a reader moving from
+     * the dashboard to the orders beneath it carries the period with them.
+     */
+    @GetMapping("/countries")
+    OrderCountriesResponse listCountries(
+            @RequestParam(value = "from") String from,
+            @RequestParam(value = "to") String to
+    ) {
+        LocalDate start = day(from, "from");
+        LocalDate end = end(start, day(to, "to"));
+        return new OrderCountriesResponse(start.toString(), end.toString(), orderService.findCountries(start, end));
+    }
+
+    /** The end of a range, which cannot fall before its start: a range stated backwards is asked for by nobody. */
+    private static LocalDate end(LocalDate start, LocalDate end) {
         if (start.isAfter(end)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "from must not be after to");
         }
-        return new OrdersResponse(start.toString(), end.toString(), orderService.findOrders(start, end));
+        return end;
     }
 
     private static LocalDate day(String value, String name) {

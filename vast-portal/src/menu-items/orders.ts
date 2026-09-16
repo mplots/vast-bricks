@@ -1,4 +1,4 @@
-import { Bag2 } from 'iconsax-reactjs';
+import { Bag2, Category } from 'iconsax-reactjs';
 
 import { NavItemType } from 'types/menu';
 
@@ -11,6 +11,14 @@ const ordersMenu: NavItemType = {
   title: 'orders',
   type: 'group',
   children: [
+    {
+      // What the portal opens on: a period read whole, before any one order in it is looked at.
+      id: 'dashboard',
+      title: 'dashboard',
+      type: 'item',
+      url: '/dashboard',
+      icon: Category
+    },
     {
       id: 'orders',
       title: 'orders',
