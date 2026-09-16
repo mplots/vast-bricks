@@ -19,21 +19,40 @@ import { mockPayPalSettings, stubPayPalTransactions } from "./paypal";
 const emptyOrdersXml = '<?xml version="1.0" encoding="UTF-8"?><ORDERS/>';
 const brickOwlMaxBatchRequests = 50;
 
-/** Days the payment window reaches past the month at each end, as `PaymentWindow` pads it. */
+/** Days the payment window reaches before the month, as `PaymentWindow` pads it. */
 const paymentWindowPadDays = 7;
 
+/** The last instant a ledger is ever read to: the end of today, as `PaymentWindow` closes its window. */
+export function endOfToday(): Date {
+  const now = new Date();
+  return new Date(
+    Date.UTC(
+      now.getUTCFullYear(),
+      now.getUTCMonth(),
+      now.getUTCDate(),
+      23,
+      59,
+      59,
+    ),
+  );
+}
+
 /**
- * The period the payment providers are asked for when a month is reconciled: the month, padded so a payment captured
- * after the order's month is still collected. Tests assert the window the API actually asked for against this.
+ * The period the payment providers are asked for when a month is reconciled: it opens seven days before the month, so
+ * a payment captured after the order it paid is still collected, and it closes at the end of today, because a refund
+ * is dated when it was given and can follow its order by months. A month whose padded end has not arrived yet is read
+ * to that end instead. Tests assert the window the API actually asked for against this.
  */
 export function paymentWindow(month: string) {
   const [year, monthOfYear] = month.split("-").map(Number);
   const from = new Date(
     Date.UTC(year, monthOfYear - 1, 1 - paymentWindowPadDays, 0, 0, 0),
   );
-  const to = new Date(
+  const paddedTo = new Date(
     Date.UTC(year, monthOfYear, paymentWindowPadDays, 23, 59, 59),
   );
+  const today = endOfToday();
+  const to = paddedTo > today ? paddedTo : today;
   return {
     from,
     to,

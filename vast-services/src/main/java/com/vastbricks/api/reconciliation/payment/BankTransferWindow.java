@@ -10,14 +10,17 @@ import com.vastbricks.api.reconciliation.ReconciliationPeriod;
  * not by a moment in a zone of its own, and the entries are read out of Vast's own store rather than asked of a
  * provider.
  *
- * <p>The pad is lopsided because a bank transfer is paid after the order rather than around it. A buyer pays when
- * they get around to it, sometimes weeks later, and a buyer who underpaid sends the rest later still, so the window
- * reaches ninety days past the selected end date and barely before it — the few days before covering only the marketplaces
- * dating an order in their own zone.
+ * <p>The window is lopsided because a bank transfer is settled after the order rather than around it. It reaches
+ * barely before the selected dates — the few days before covering only the marketplaces dating an order in their own
+ * zone — and it ends today, because a buyer pays when they get around to it, a buyer who underpaid sends the rest
+ * later still, and a refund is repaid whenever it was agreed, sometimes months after the order. A window closing
+ * with the selected month would report such an order as settled however long ago the money went back. A period that
+ * has not ended yet is still read ninety days past its own end, so the window never stops short of what was asked
+ * for.
  *
  * <p>A wide window is safe here in a way it would not be for a weaker key: a transfer is attached to an order only
  * by the order id it names, never by its date, so a transfer belonging to another month's order matches nothing and
- * is ignored. What the pad costs is a wider read of one indexed local table.
+ * is ignored. What the width costs is a wider read of one indexed local table.
  */
 final class BankTransferWindow {
 
@@ -33,9 +36,11 @@ final class BankTransferWindow {
     }
 
     static BankTransferWindow of(ReconciliationPeriod period) {
+        var paddedTo = period.getTo().plusDays(PAD_DAYS_AFTER);
+        var today = LocalDate.now();
         return new BankTransferWindow(
                 period.getFrom().minusDays(PAD_DAYS_BEFORE),
-                period.getTo().plusDays(PAD_DAYS_AFTER)
+                paddedTo.isAfter(today) ? paddedTo : today
         );
     }
 
@@ -44,7 +49,7 @@ final class BankTransferWindow {
         return from;
     }
 
-    /** The last day read, included. */
+    /** The last day read, included. Never earlier than today. */
     LocalDate to() {
         return to;
     }

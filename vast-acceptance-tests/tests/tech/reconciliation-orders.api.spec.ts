@@ -804,15 +804,16 @@ test("reports what Stripe was paid for a BrickOwl order named in the payment des
   expect(body.orders[0].failures).toEqual([]);
 });
 
-test("asks both payment providers for the days around the month, so a payment taken later is still collected", async ({
+test("asks both payment providers from before the month through today, so a payment or refund taken later is still collected", async ({
   request,
   settings,
 }, testInfo) => {
   // A provider does not date a payment where the marketplace dates its order: Stripe dates a balance transaction at
   // the capture of the charge, which can fall days after the buyer ordered, and the marketplaces date an order in a
   // zone of their own. An order of the last of the month was therefore reported unpaid while its payment was
-  // collected in a month holding no order to attach it to. The month is one whose padded window has wholly passed,
-  // so the window is asked for as it stands.
+  // collected in a month holding no order to attach it to, which is what the seven days before the month cover.
+  // The far end is today rather than seven days past the month: a refund is dated when it was given, which can be
+  // months after the order it returns, and a long-closed month reconciled today must still show it.
   const wireMock = await mockReconciliationOrders(settings, request, testInfo, {
     month: "2026-05",
   });
@@ -837,11 +838,15 @@ test("asks both payment providers for the days around the month, so a payment ta
   expect(stripeQuery.get("created[lte]")).toBe(String(window.toEpochSeconds));
 
   // PayPal searches no more than 31 days at a time, so the same window arrives as consecutive segments that together
-  // cover it end to end and overlap nowhere, a transaction reported twice being a payment counted twice.
+  // cover it end to end and overlap nowhere, a transaction reported twice being a payment counted twice. Its last
+  // segment closes just short of now rather than at the end of today, because PayPal refuses a range reaching into
+  // the future.
   const searched = await payPalSearchedPeriods(wireMock);
   expect(searched.length).toBeGreaterThan(1);
   expect(searched[0].from).toBe(window.fromIso);
-  expect(searched[searched.length - 1].to).toBe(window.toIso);
+  const searchedTo = new Date(searched[searched.length - 1].to).getTime();
+  expect(searchedTo).toBeLessThanOrEqual(Date.now());
+  expect(searchedTo).toBeGreaterThan(Date.now() - 3600 * 1000);
   searched.slice(1).forEach((segment, index) => {
     expect(new Date(segment.from).getTime()).toBe(
       new Date(searched[index].to).getTime() + 1000,
