@@ -13,7 +13,15 @@ export interface ReconciliationFailure {
 }
 
 /** Which account of the order stated a field. Reconciliation holds these against each other. */
-export type ReconciliationFieldSource = 'order' | 'gateway' | 'shipment' | 'accounting' | 'stored' | 'calculated';
+export type ReconciliationFieldSource =
+  | 'order'
+  | 'gateway'
+  | 'shipment'
+  | 'accounting'
+  | 'stored'
+  | 'archive'
+  | 'storeSync'
+  | 'calculated';
 
 /** One field an order carries, named as the orders expose it and attributed to the source that stated it. */
 export interface ReconciliationFieldDescriptor {
@@ -138,12 +146,38 @@ export interface ReconciliationStoredFields {
   refundedAmount: number | null;
 }
 
+/**
+ * What the store's own order archive holds for the order: the copies it took of the marketplace's own documents. It
+ * is nobody's account of what the order came to, only of what survives of it, which is why it is a source apart.
+ */
+export interface ReconciliationArchiveFields {
+  /**
+   * Whether the VAT invoice BrickLink issued for the order is in the store's archive, or `null` where it holds none.
+   * It is only ever `true`: the archive names the orders it has an invoice for, so silence is an order with none.
+   */
+  vatInvoice: boolean | null;
+}
+
+/**
+ * What the store synchronization system holds for the order. It says whether one more system acted on the order
+ * rather than what the order came to, which is why it is a source apart from the accounts of it.
+ */
+export interface ReconciliationStoreSyncFields {
+  /**
+   * Whether BrickSync holds its own record of the order, or `null` where it holds none. It is only ever `true`: the
+   * synchronization names the orders it recorded, so silence is an order it never saw.
+   */
+  order: boolean | null;
+}
+
 export interface ReconciliationOrder {
   order: ReconciliationOrderFields;
   gateway: ReconciliationGatewayFields;
   shipment: ReconciliationShipmentFields;
   accounting: ReconciliationAccountingFields;
   stored: ReconciliationStoredFields;
+  archive: ReconciliationArchiveFields;
+  storeSync: ReconciliationStoreSyncFields;
   calculated: ReconciliationCalculatedFields;
   failures: ReconciliationFailure[];
 }

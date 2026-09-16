@@ -27,6 +27,9 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -50,6 +53,11 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 @Slf4j
 public class OrderArchive {
+
+    /** What a VAT invoice is called in the middle of an archived file's name, between the marketplace and the order. */
+    private static final String VAT_INVOICE_KIND = "vat-invoice";
+
+    private static final String VAT_INVOICE_SUFFIX = ".pdf";
 
     private final OrderArchiveSettings settings;
     private final TenantRoster tenants;
@@ -191,6 +199,50 @@ public class OrderArchive {
                 }
             }
         }
+    }
+
+    /**
+     * Every BrickLink order id the bound tenant's archive holds a VAT invoice for.
+     *
+     * <p>Asked as a listing rather than one order at a time because a reader wants the month: reconciliation judges
+     * every order of a period at once, and one directory listing answers for all of them where a question per order
+     * would be a listing per order.
+     *
+     * <p>The invoice is the one file of the archive this application does not write. BrickLink issues it only where
+     * it collected the VAT itself, and it is posted here by the browser extension's shipping label rather than
+     * fetched, so an order with none is the ordinary case and this says nothing about whether one was due. That is
+     * the reader's judgement, not the archive's.
+     *
+     * <p>An archive no order has ever been written to holds nothing, which is not a failure: a store whose first
+     * nightly run has not happened yet is a store with an empty archive.
+     */
+    public Set<String> vatInvoiceOrderIds() {
+        Path directory = directory();
+        if (!Files.isDirectory(directory)) {
+            return Set.of();
+        }
+        String prefix = OrderSource.BRICKLINK.prefix() + "-" + VAT_INVOICE_KIND + "-";
+        try (Stream<Path> files = Files.list(directory)) {
+            return files.map(file -> file.getFileName().toString())
+                    .filter(name -> name.startsWith(prefix) && name.endsWith(VAT_INVOICE_SUFFIX))
+                    .map(name -> orderIdOf(name, prefix))
+                    .filter(StringUtils::isNotBlank)
+                    .collect(Collectors.toUnmodifiableSet());
+        } catch (IOException exception) {
+            throw new OrderArchiveException("Could not read the store's order archive at " + directory, exception);
+        }
+    }
+
+    /**
+     * The order id out of {@code bricklink-vat-invoice-<orderId>-<changed>.pdf}, or null where the name carries none.
+     *
+     * <p>Up to the first dash after the prefix, because the moment that follows holds dashes of its own and the order
+     * id holds none. A name with nothing after the prefix is not one of these files however much it looks like one.
+     */
+    private static String orderIdOf(String name, String prefix) {
+        String rest = name.substring(prefix.length());
+        int end = rest.indexOf('-');
+        return end < 0 ? null : rest.substring(0, end);
     }
 
     /** Archives one order by id, for the bound tenant, and says whether anything was written. */

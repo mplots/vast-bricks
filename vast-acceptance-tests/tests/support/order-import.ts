@@ -264,6 +264,26 @@ export function writeBrickLinkArchive(
   );
 }
 
+/**
+ * The VAT invoice BrickLink issued for an order, as the archive holds it.
+ *
+ * <p>Nothing in the rewrite writes this file: BrickLink serves the PDF, and the browser extension's shipping label
+ * posts it into the same directory. A scenario about a store that has the invoice therefore states the file itself.
+ * What is in it is never read, so a marker of a PDF is a PDF as far as anything asking is concerned.
+ */
+export function writeBrickLinkVatInvoice(
+  directory: string,
+  orderId: number,
+  archivedAt: string,
+): string {
+  const path = join(
+    directory,
+    `bricklink-vat-invoice-${orderId}-${archivedAt}.pdf`,
+  );
+  writeFileSync(path, "%PDF-1.4\n");
+  return path;
+}
+
 function write(
   directory: string,
   source: string,

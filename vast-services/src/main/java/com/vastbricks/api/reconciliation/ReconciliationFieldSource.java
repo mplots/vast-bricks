@@ -32,6 +32,12 @@ public enum ReconciliationFieldSource {
     /** What the orders table holds for the order: the copy the import job stored out of the order archive. */
     STORED("stored"),
 
+    /** What the store's own order archive holds for the order, rather than what anyone claims about it. */
+    ARCHIVE("archive"),
+
+    /** What the store synchronization system holds for the order: whether it acted on the order at all. */
+    STORE_SYNC("storeSync"),
+
     /** Derived from the collected fields rather than stated by anyone. */
     CALCULATED("calculated");
 

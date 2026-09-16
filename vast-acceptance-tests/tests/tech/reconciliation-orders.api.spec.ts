@@ -202,6 +202,12 @@ test("lists BrickLink reconciliation orders for the selected month", async ({
           grandTotal: null,
           refundedAmount: null,
         },
+        archive: {
+          vatInvoice: null,
+        },
+        storeSync: {
+          order: true,
+        },
         calculated: {
           targetInvoice: null,
         },
@@ -256,6 +262,12 @@ test("lists BrickLink reconciliation orders for the selected month", async ({
           shippingCost: null,
           grandTotal: null,
           refundedAmount: null,
+        },
+        archive: {
+          vatInvoice: null,
+        },
+        storeSync: {
+          order: true,
         },
         calculated: {
           targetInvoice: 3.44,
@@ -378,6 +390,12 @@ test("lists BrickOwl reconciliation orders for the selected month", async ({
           grandTotal: null,
           refundedAmount: null,
         },
+        archive: {
+          vatInvoice: null,
+        },
+        storeSync: {
+          order: true,
+        },
         calculated: {
           targetInvoice: null,
         },
@@ -434,6 +452,12 @@ test("lists BrickOwl reconciliation orders for the selected month", async ({
           shippingCost: null,
           grandTotal: null,
           refundedAmount: null,
+        },
+        archive: {
+          vatInvoice: null,
+        },
+        storeSync: {
+          order: true,
         },
         calculated: {
           targetInvoice: 5.2,
@@ -588,6 +612,12 @@ test("lists BrickOwl reconciliation orders that span several batch requests", as
       grandTotal: null,
       refundedAmount: null,
     },
+    archive: {
+      vatInvoice: null,
+    },
+    storeSync: {
+      order: true,
+    },
     calculated: {
       targetInvoice: null,
     },
@@ -730,6 +760,8 @@ test("reports every order field with the source that stated it", async ({
     { name: "stored.shippingCost", source: "stored" },
     { name: "stored.grandTotal", source: "stored" },
     { name: "stored.refundedAmount", source: "stored" },
+    { name: "archive.vatInvoice", source: "archive" },
+    { name: "storeSync.order", source: "storeSync" },
     { name: "calculated.targetInvoice", source: "calculated" },
   ]);
   // A field sits at the path that names it, so every account of one refund carries that one name under a source of
@@ -1458,7 +1490,15 @@ test("reports the facilitator tax Stripe shows a BrickLink order was taken", asy
   expect(body.orders[0].order.taxType).toBe("export-taxable");
   expect(body.orders[0].order.facilitatorTax).toBe(2.61);
   expect(body.orders[0].gateway.facilitatorTax).toBe(2.61);
-  expect(body.orders[0].failures).toEqual([]);
+  // The two accounts of the tax agree, so nothing about the tax is reported. The order is export-taxable and this
+  // scenario archived no VAT invoice for it, which is a different question and has a rule of its own.
+  expect(body.orders[0].failures).toEqual([
+    {
+      code: "vat-invoice-missing",
+      level: "error",
+      fields: ["archive.vatInvoice", "order.taxType"],
+    },
+  ]);
 });
 
 test("reports no facilitator tax for a Stripe payment the marketplace took no application fee from", async ({
@@ -1624,7 +1664,14 @@ test("sums the partner fees PayPal raised against one BrickLink payment", async 
   const body = await response.json();
   expect(body.orders[0].order.facilitatorTax).toBe(1.97);
   expect(body.orders[0].gateway.facilitatorTax).toBe(1.97);
-  expect(body.orders[0].failures).toEqual([]);
+  // As above: the fees add up, and the missing VAT invoice of an export-taxable order is its own rule's business.
+  expect(body.orders[0].failures).toEqual([
+    {
+      code: "vat-invoice-missing",
+      level: "error",
+      fields: ["archive.vatInvoice", "order.taxType"],
+    },
+  ]);
 });
 
 test("collects the accounting invoice onto the order it notes", async ({

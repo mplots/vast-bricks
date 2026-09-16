@@ -1,3 +1,7 @@
+import { mkdtempSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+
 import type { APIRequestContext, TestInfo } from "@playwright/test";
 
 import type { SettingsOverrides } from "./api-test";
@@ -145,6 +149,12 @@ export type ReconciliationProviders = {
   mansPastsRefusesLogin?: boolean;
   /** Accounting invoices Manakabata holds. Defaults to none, so no order is invoiced. */
   manakabata?: ManakabataInvoiceMock[];
+  /**
+   * Order ids BrickSync holds no record of. Every other order the scenario states is recorded, that being the
+   * ordinary case: BrickSync synchronizes an order as it arrives, so a store whose orders are not all there is a
+   * store whose BrickSync was down, which is what the rule about it is for.
+   */
+  brickSyncMissing?: string[];
 };
 
 /**
@@ -185,8 +195,47 @@ export async function mockReconciliationOrders(
     await stubMansPasts(wireMock, settings, [providers.mansPasts ?? []]);
   }
   await mockManakabata(wireMock, settings, providers.manakabata ?? []);
+  await mockBrickSync(settings, providers);
 
   return wireMock;
+}
+
+/**
+ * BrickSync's own record of the orders it synchronized, as files in a directory of this scenario's own.
+ *
+ * <p>A directory per scenario because the setting is read live off the filesystem the service runs on, and the
+ * default is the developer's own BrickSync orders. Every order the scenario stated is recorded unless it named the
+ * order as missing, so a scenario that is not about the synchronization does not have to say anything about it.
+ */
+async function mockBrickSync(
+  settings: SettingsOverrides,
+  providers: ReconciliationProviders,
+) {
+  const directory = mkdtempSync(join(tmpdir(), "vast-bricksync-orders-"));
+  await settings.set("VAST_BRICKSYNC_ORDERS_DIR", directory);
+
+  const missing = new Set(providers.brickSyncMissing ?? []);
+  const recorded = [
+    ...brickLinkOrderIds(providers.brickLink).map(
+      (orderId) => `bricklink-${orderId}`,
+    ),
+    ...(providers.brickOwl ?? []).map((order) => `brickowl-${order.orderId}`),
+  ];
+  for (const key of recorded) {
+    if (!missing.has(key.slice(key.indexOf("-") + 1))) {
+      // Nothing reads what is in the file, only that it is there, so a marker of BrickSync's own is enough.
+      writeFileSync(join(directory, `${key}.bsx`), "<BrickStoreXML/>\n");
+    }
+  }
+}
+
+/** The orders a BrickLink scenario stubbed, read back out of the export it stated them as. */
+function brickLinkOrderIds(orders?: BrickLinkOrdersMock): string[] {
+  const stated = `${orders?.fullNameOrdersXml ?? ""}${orders?.usernameOrdersXml ?? ""}`;
+  const found = [...stated.matchAll(/<ORDERID>\s*([^<\s]+)\s*<\/ORDERID>/g)].map(
+    (match) => match[1],
+  );
+  return [...new Set(found)];
 }
 
 async function mockManakabata(

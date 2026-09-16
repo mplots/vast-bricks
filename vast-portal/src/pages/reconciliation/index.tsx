@@ -100,6 +100,11 @@ const countFields = ['order.itemCount', 'order.lotCount', 'stored.itemCount', 's
 const numericFields = [...amountFields, ...countFields];
 const dateFields: string[] = ['order.orderDate', 'stored.orderDate'];
 
+// Fields that state a fact about the order rather than a figure of it, and so read as a word rather than a value.
+// Each is only ever true or absent, and the word is the field's own — what an archived document reads as is not what
+// a completed synchronization reads as — so each is worded by a message of its own rather than by a shared yes.
+const factFields: string[] = ['archive.vatInvoice', 'storeSync.order'];
+
 // A field path is not a name a message can interpolate — an ICU argument carries no dot — so a failure hands its
 // values over under the path's segments joined up: `order.refundedAmount` is `{orderRefundedAmount}`.
 const placeholderName = (field: string) => field.replace(/\.(.)/g, (ignored, first: string) => first.toUpperCase());
@@ -609,6 +614,9 @@ function ReconciliationOrders() {
   // The backend words nothing, so the tax type arrives as a code and is worded here, as a failure code is. Every
   // other field is already the value it reads as.
   const fieldValue = (order: ReconciliationOrder, field: string) => {
+    if (factFields.includes(field)) {
+      return valueAt(order, field) === true ? intl.formatMessage({ id: `reconciliation-fact-${field.replace(/\./g, '-')}` }) : '—';
+    }
     if (field !== 'order.taxType' && field !== 'stored.taxType') {
       return formatFieldValue(order, field);
     }

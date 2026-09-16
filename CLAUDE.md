@@ -488,11 +488,20 @@ looks like. Read it, and never commit it.
   because the deployable runtime applies that same data to the same database.
 - `./vast ps` is the shortcut for `./vast services list`.
 - `./vast prod` reaches the production host. `./vast prod async` replaces the
-  local order archive with production's: it empties `VAST_ORDER_ARCHIVE_DIR`
-  (default `/tmp/vast-bricks/order-archive`) and copies the production archive
-  into it with `scp -r`. The copied files are a real store's own record of who
-  bought what, so they stay in `/tmp` and are never committed or pasted
-  anywhere.
+  local copies of production's order data, each by emptying its directory and
+  copying production's into it with `scp -r`. It copies two things: the store's
+  order archive, which empties `VAST_ORDER_ARCHIVE_DIR` (default
+  `/tmp/vast-bricks/order-archive`) and lands under the tenant directory it is
+  copied as, and BrickSync's own record of the orders it synchronized, which
+  replaces `VAST_BRICKSYNC_ORDERS_DIR` (default
+  `/tmp/vast-bricks/bricksync-orders`) with that directory itself. The two sit
+  beside each other rather than one inside the other: the archive is a
+  directory per tenant and BrickSync's orders are one directory for every store
+  it syncs, so a copy of the second under the first would read as a tenant
+  named after a program. Both halves are attempted whatever the other did, so
+  a host that would not serve one does not leave the other quietly uncopied.
+  The copied files are a real store's own record of who bought what, so they
+  stay in `/tmp` and are never committed or pasted anywhere.
 - An agent must never run a `./vast prod` subcommand without asking first, and
   asking once does not carry to the next time. These commands touch the
   deployment, and what they bring back is real customer data.

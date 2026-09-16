@@ -3,7 +3,7 @@ import { resolve, sep } from "node:path";
 
 import { ensureMockedTenant, mockedTenantEmail, mockedTenantPassword } from "./mocked-tenant.mjs";
 import { vastApiEnvFile } from "./env-file.mjs";
-import { repoRoot } from "./paths.mjs";
+import { repoRoot, runtimeRoot } from "./paths.mjs";
 
 const viteExecutable = resolve(repoRoot, "vast-portal", "node_modules", ".bin", process.platform === "win32" ? "vite.cmd" : "vite");
 
@@ -45,6 +45,9 @@ export const managedServices = [
       VAST_BRICKSTORE_TOR_ENABLED: "false",
       VAST_AUTH_JWT_SECRET: "vast-playwright-auth-secret-must-be-at-least-32-bytes",
       VAST_SETUP_ENCRYPTION_KEY: "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=",
+      // Away from the developer's own BrickSync orders, which `./vast prod async` fills with a real store's. A
+      // scenario sets its own directory per tenant; this is only so the default can never be the real one.
+      VAST_BRICKSYNC_ORDERS_DIR: resolve(runtimeRoot, "bricksync-orders"),
     },
     build: {
       command: "mvn",

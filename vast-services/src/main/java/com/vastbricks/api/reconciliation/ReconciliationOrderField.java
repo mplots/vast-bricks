@@ -1,10 +1,12 @@
 package com.vastbricks.api.reconciliation;
 
 import static com.vastbricks.api.reconciliation.ReconciliationFieldSource.ACCOUNTING;
+import static com.vastbricks.api.reconciliation.ReconciliationFieldSource.ARCHIVE;
 import static com.vastbricks.api.reconciliation.ReconciliationFieldSource.CALCULATED;
 import static com.vastbricks.api.reconciliation.ReconciliationFieldSource.GATEWAY;
 import static com.vastbricks.api.reconciliation.ReconciliationFieldSource.ORDER;
 import static com.vastbricks.api.reconciliation.ReconciliationFieldSource.SHIPMENT;
+import static com.vastbricks.api.reconciliation.ReconciliationFieldSource.STORE_SYNC;
 import static com.vastbricks.api.reconciliation.ReconciliationFieldSource.STORED;
 
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -69,6 +71,12 @@ public enum ReconciliationOrderField {
     STORED_SHIPPING_COST("stored.shippingCost", STORED),
     STORED_GRAND_TOTAL("stored.grandTotal", STORED),
     STORED_REFUNDED_AMOUNT("stored.refundedAmount", STORED),
+
+    // What the store still holds of the marketplace's own documents, which is nobody's account of the order and so
+    // a source of its own: every other one says what the order came to, this one only says what survives of it.
+    ARCHIVE_VAT_INVOICE("archive.vatInvoice", ARCHIVE),
+
+    STORE_SYNC_ORDER("storeSync.order", STORE_SYNC),
 
     CALCULATED_TARGET_INVOICE("calculated.targetInvoice", CALCULATED);
 

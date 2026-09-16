@@ -919,6 +919,37 @@ here as they are provided; do not invent unspecified behavior prematurely.
     whole grand total reads this way; a partial refund on an order with no
     payment is left to the rules holding the two sides of a payment against
     each other.
+  - A BrickLink order the marketplace collected the tax on must have its VAT
+    invoice in the store's own archive, and one with nothing archived is an
+    `error`. That order type — `export-taxable` — is the one case where
+    BrickLink charged tax under its own registration, and it issues a VAT
+    invoice of its own for it. The store did not write that invoice and cannot
+    write it again: it is the marketplace's document, served for as long as the
+    marketplace cares to serve it, and the store's copy is the only one that
+    will still be there when an inspection asks.
+  - The rule applies to no other order. BrickOwl issues nothing answering to
+    it, and a BrickLink order of any other tax type was either taxed under the
+    store's own registration, where the store's own invoice is the record, or
+    taxed by nobody. An archived invoice on such an order is not reported
+    either: that the marketplace issued a document nobody expected is
+    BrickLink's business, and the archive is a copy of what was shown rather
+    than a claim that it was due.
+  - Every order must have reached the store synchronization, and one BrickSync
+    holds no record of is an `error`. BrickSync is what takes the stock an
+    order sold off the store's other marketplace, so an order it never saw is
+    an order that was never taken off the other one, which is how the same
+    brick comes to be sold twice.
+  - Orders go missing here in runs rather than singly. BrickSync synchronizes
+    an order as it arrives, so the ordinary cause is that it was not running at
+    the time, and a report showing this on more than one order is first a
+    reason to go and check that BrickSync is up, before it is a reason to look
+    at any one of the orders. Checking that is a person's job: nothing watches
+    the process, and a rule claiming to would be reporting on a program it
+    cannot see.
+  - The rule applies to every collected order of either marketplace. BrickSync
+    synchronizes both, and names its record after the marketplace and the order
+    id exactly as the order archive names one, so there is no order it is
+    silent about by design.
   - The facilitator-tax rule reports its failures at `info`. The paid-amount
     rule reports both of its failures at `error`: money that was not found, or
     that does not add up, is something to fix.
@@ -936,6 +967,39 @@ here as they are provided; do not invent unspecified behavior prematurely.
   a provider into a source each, so the sourcing stage's own fan-out runs them
   rather than one waiting inside the other; keep them in one source only when a
   call depends on an earlier call's result.
+- The store's own order archive is a source too, in `reconciliation.archive`,
+  and the only one that reads a directory rather than a provider. It answers
+  which BrickLink orders it holds a VAT invoice for, through `OrderArchive`'s
+  own public API rather than by knowing how the archive names its files. It is
+  a source of its own rather than part of the order's account because it is
+  nobody's claim about the order: every other source says what the order came
+  to, this one says only what survives of it, which is why its field sits under
+  an `archive` source of the roster's own.
+- It is asked for the whole archive rather than for the period. The archive
+  names a file after the moment the order last changed, not the date it was
+  placed on, so narrowing the listing by the reconciled period would hide the
+  invoice of every order that has been touched since. One directory listing
+  answers for the whole month, and the detail mapper drops whatever the month
+  did not collect. An order the listing does not name states nothing rather
+  than stating that no invoice exists: whether one was due is the rule's
+  judgement, not the archive's.
+- The store synchronization is a source too, in `reconciliation.storesync`,
+  and reads a directory for the same reason: BrickSync runs beside the store
+  rather than answering questions over HTTP, so what it has done is on its
+  disk. It answers through the `bricksync` feature's own public API,
+  `BrickSyncOrders`, which lists the orders it holds a `.bsx` file for and
+  nothing else — the file existing is the whole of what is read, because the
+  question is whether BrickSync ever saw the order.
+- It is asked for the whole directory rather than for the period, as the
+  archive is: BrickSync names a file after the marketplace and the order id and
+  nothing else, so there is no date in it to narrow by.
+- `VAST_BRICKSYNC_ORDERS_DIR` is where that directory is, overridable per
+  tenant. Unlike the archive it is not split by tenant, because BrickSync's
+  file names carry no tenant: two tenants pointed at one directory read each
+  other's orders, so a tenant running its own BrickSync must be given its own
+  path. The managed `vast-api-test` is pointed away from the developer's own
+  copy for the same reason, since `./vast prod async` fills the default with a
+  real store's orders.
 - Current order access includes:
   - a BrickLink order source and a BrickLink username source, both using the
     reverse-engineered API client from the BrickStore application, alongside the

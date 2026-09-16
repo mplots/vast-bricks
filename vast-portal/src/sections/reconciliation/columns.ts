@@ -35,6 +35,8 @@ export const orderFields = [
   'accounting.subTotal',
   'accounting.vat',
   'accounting.grandTotal',
+  'archive.vatInvoice',
+  'storeSync.order',
   'calculated.targetInvoice'
 ] as const;
 // Fields shown as table columns; the detail view shows all of them.
