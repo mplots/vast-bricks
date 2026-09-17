@@ -1,8 +1,9 @@
-import { Data, Setting2 } from 'iconsax-reactjs';
+import { Data, Key, Setting2 } from 'iconsax-reactjs';
 
 import { NavItemType } from 'types/menu';
 
-/** How a tenant sets itself up: the values it can override, and the provider accounts it configures. */
+/** How a tenant sets itself up: the values it can override, the provider accounts it configures, and the keys it
+ * hands to programs that call the API without a login. */
 const setupMenu: NavItemType = {
   id: 'group-setup',
   title: 'setup',
@@ -21,6 +22,13 @@ const setupMenu: NavItemType = {
       type: 'item',
       url: '/provider-accounts',
       icon: Data
+    },
+    {
+      id: 'api-keys',
+      title: 'api-keys',
+      type: 'item',
+      url: '/api-keys',
+      icon: Key
     }
   ]
 };

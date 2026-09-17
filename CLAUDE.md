@@ -210,6 +210,15 @@ a scoping rule for settings, and only incidentally one for tables.
   checked against `user_tenants` on every request rather than trusted from the
   token, so a membership taken away stops working at once instead of when the
   token expires.
+- A second credential resolves the same way: an API key, sent as `X-Api-Key`,
+  is what an external program authenticates with in place of a login. A key
+  names its issuing user and the one tenant it was generated under, so it binds
+  exactly what a login token would and nothing downstream knows which was
+  presented. Membership is still asked per request, which is what stops a key
+  that has no expiry. The secret is returned once and kept only as a SHA-256,
+  so `api_keys` is identity rather than tenant-owned for the same reason
+  `user_tenants` is — it is the lookup that decides the tenant — and its
+  management queries name the user and tenant explicitly.
 - Login selects a tenant: the one named by `tenantCode`, or the caller's first.
   A login with no tenant to serve is `403`, which is a different answer from a
   wrong password and must not be reported as one.

@@ -21,10 +21,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.time.DateTimeException;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -58,6 +60,14 @@ public class OrderArchive {
     private static final String VAT_INVOICE_KIND = "vat-invoice";
 
     private static final String VAT_INVOICE_SUFFIX = ".pdf";
+
+    /**
+     * How BrickLink states a moment, and therefore how the order's other files are named: always to the millisecond,
+     * always in UTC. An invoice is named through this rather than through {@code Instant.toString()}, which drops a
+     * zero millisecond and would file the invoice under a moment spelled differently from its own siblings.
+     */
+    private static final DateTimeFormatter ARCHIVE_MOMENT =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").withZone(ZoneOffset.UTC);
 
     private final OrderArchiveSettings settings;
     private final TenantRoster tenants;
@@ -243,6 +253,36 @@ public class OrderArchive {
         String rest = name.substring(prefix.length());
         int end = rest.indexOf('-');
         return end < 0 ? null : rest.substring(0, end);
+    }
+
+    /**
+     * Writes the VAT invoice BrickLink issued for an order into the bound tenant's archive, and says whether
+     * anything was written.
+     *
+     * <p>The one file of the archive this application does not fetch. BrickLink serves the invoice only to the
+     * signed-in store, so it is the browser extension that downloads it and posts it here, and the archive's part is
+     * to name it as it names the order's other files and to leave an invoice already on disk alone.
+     *
+     * <p>The moment is the caller's because the invoice itself states none: it is the moment the order last changed,
+     * which is what the order's other files are named after, so the invoice files beside them rather than under a
+     * moment of its own.
+     */
+    public boolean storeVatInvoice(String orderId, Instant changed, byte[] pdf) {
+        Path directory = directory();
+        Path path = directory.resolve(
+                OrderSource.BRICKLINK.prefix() + "-" + VAT_INVOICE_KIND + "-" + part(orderId) + "-"
+                        + part(ARCHIVE_MOMENT.format(changed)) + VAT_INVOICE_SUFFIX);
+        if (Files.exists(path)) {
+            return false;
+        }
+        try {
+            Files.createDirectories(directory);
+            Files.write(path, pdf, StandardOpenOption.CREATE_NEW);
+        } catch (IOException exception) {
+            throw new OrderArchiveException("Could not write the VAT invoice of BrickLink order " + orderId, exception);
+        }
+        log.info("Archived the VAT invoice of BrickLink order {} as it stood at {}", orderId, changed);
+        return true;
     }
 
     /** Archives one order by id, for the bound tenant, and says whether anything was written. */

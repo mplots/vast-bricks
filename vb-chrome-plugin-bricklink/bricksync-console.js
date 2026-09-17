@@ -1,12 +1,17 @@
 (function () {
     const PROD_API_BASE_URL = 'https://tool.vastbricks.com';
-    const LOCAL_API_BASE_URL = 'http://127.0.0.1:6161';
+    const LOCAL_API_BASE_URL = 'http://127.0.0.1:6363';
     const STORAGE_KEYS = {
         environment: 'vbApiEnvironment',
         apiBaseUrl: 'vbBrickSyncApiBaseUrl',
         apiKey: 'vbApiKey',
         prodApiKey: 'vbProdApiKey',
         localApiKey: 'vbLocalApiKey',
+        // The key generated in the portal. A second key rather than a replacement: the one above authenticates the
+        // legacy endpoints, which check a key configured on the server and know no store, and this one
+        // authenticates /api/private/** and is what says which store the extension is acting for.
+        vastProdApiKey: 'vbVastProdApiKey',
+        vastLocalApiKey: 'vbVastLocalApiKey',
         tail: 'vbBrickSyncTail',
         hidden: 'vbBrickSyncHidden',
         panelLeft: 'vbBrickSyncPanelLeft',
@@ -21,6 +26,7 @@
         apiBaseUrl: PROD_API_BASE_URL,
         apiKey: '',
         localApiKey: 'change-me',
+        vastApiKey: '',
         tail: '200',
         hidden: true,
         pollMs: 2500,
@@ -49,12 +55,17 @@
             || (stored[STORAGE_KEYS.apiBaseUrl] === LOCAL_API_BASE_URL ? 'local' : defaults.environment);
         const prodApiKey = stored[STORAGE_KEYS.prodApiKey] || stored[STORAGE_KEYS.apiKey] || defaults.apiKey;
         const localApiKey = stored[STORAGE_KEYS.localApiKey] || defaults.localApiKey;
+        const vastProdApiKey = stored[STORAGE_KEYS.vastProdApiKey] || defaults.vastApiKey;
+        const vastLocalApiKey = stored[STORAGE_KEYS.vastLocalApiKey] || defaults.vastApiKey;
         return {
             environment,
             apiBaseUrl: apiBaseUrlForEnvironment(environment),
             apiKey: environment === 'local' ? localApiKey : prodApiKey,
             prodApiKey,
             localApiKey,
+            vastApiKey: environment === 'local' ? vastLocalApiKey : vastProdApiKey,
+            vastProdApiKey,
+            vastLocalApiKey,
             tail: stored[STORAGE_KEYS.tail] || defaults.tail,
             hidden: stored[STORAGE_KEYS.hidden] === undefined ? defaults.hidden : Boolean(stored[STORAGE_KEYS.hidden]),
             panelLeft: stored[STORAGE_KEYS.panelLeft],
@@ -65,14 +76,15 @@
     }
 
     function saveSettings(settings) {
-        const environmentApiKeyStorageKey = settings.environment === 'local'
-            ? STORAGE_KEYS.localApiKey
-            : STORAGE_KEYS.prodApiKey;
+        const local = settings.environment === 'local';
         return storageSet({
             [STORAGE_KEYS.environment]: settings.environment,
             [STORAGE_KEYS.apiBaseUrl]: settings.apiBaseUrl,
             [STORAGE_KEYS.apiKey]: settings.apiKey,
-            [environmentApiKeyStorageKey]: settings.apiKey,
+            [local ? STORAGE_KEYS.localApiKey : STORAGE_KEYS.prodApiKey]: settings.apiKey,
+            // Under the environment it was pasted for, since a key names one store on one platform: the local one
+            // is a developer's own, and the production one is the store's.
+            [local ? STORAGE_KEYS.vastLocalApiKey : STORAGE_KEYS.vastProdApiKey]: settings.vastApiKey,
             [STORAGE_KEYS.tail]: settings.tail
         });
     }
@@ -345,7 +357,11 @@
         const resetButton = createElement('button', buttonStyle(), 'Reset');
         resetButton.title = 'Reset BrickSync window position and size';
         const settingsButton = createElement('button', buttonStyle(), 'Settings');
-        headerActions.append(resetButton, settingsButton);
+        // Collecting runs by itself on a throttle, so this is for the store that wants it to happen now - and for
+        // seeing why it is not happening, which a silent throttle otherwise keeps to itself.
+        const invoicesButton = createElement('button', buttonStyle(), 'Invoices');
+        invoicesButton.title = 'Send BrickLink VAT invoices the platform is missing, now';
+        headerActions.append(resetButton, invoicesButton, settingsButton);
         header.append(closeButton, title, compactMasterSwitch, compactEnvironment.element, headerActions);
 
         const body = createElement('div', {
@@ -383,7 +399,15 @@
         tailInput.title = 'Number of recent BrickSync log lines to display';
         const keyInput = input('API key', settings.apiKey);
         keyInput.type = 'password';
-        settingsPanel.append(environmentRow, apiBaseInput, tailInput, keyInput);
+        keyInput.title = 'The shared key the legacy endpoints check';
+        // A key on a row of its own: the second column is the narrow one the log-line count sits in, and no key is
+        // readable in 100 pixels.
+        keyInput.style.gridColumn = '1 / -1';
+        const vastKeyInput = input('Vast API key', settings.vastApiKey);
+        vastKeyInput.type = 'password';
+        vastKeyInput.title = 'Generated in the portal under Setup > API Keys. Names the store this extension acts for';
+        vastKeyInput.style.gridColumn = '1 / -1';
+        settingsPanel.append(environmentRow, apiBaseInput, tailInput, keyInput, vastKeyInput);
 
         const status = createElement('div', { minHeight: '16px', color: '#9ca3af' }, '');
         const logOutput = createElement('pre', {
@@ -440,6 +464,7 @@
                 environment,
                 apiBaseUrl: apiBaseUrlForEnvironment(environment),
                 apiKey: keyInput.value,
+                vastApiKey: vastKeyInput.value.trim(),
                 tail: tailInput.value.trim() || defaults.tail
             };
         }
@@ -457,18 +482,25 @@
 
         async function selectEnvironment(local) {
             const previousEnvironment = settings.environment;
-            if (previousEnvironment === 'local') {
+            const previousLocal = previousEnvironment === 'local';
+            if (previousLocal) {
                 settings.localApiKey = keyInput.value;
+                settings.vastLocalApiKey = vastKeyInput.value.trim();
             } else {
                 settings.prodApiKey = keyInput.value;
+                settings.vastProdApiKey = vastKeyInput.value.trim();
             }
+            // Both keys are kept where the environment being left stores them, so switching back finds them again
+            // rather than carrying one environment's key over to the other's platform.
             await storageSet({
-                [previousEnvironment === 'local' ? STORAGE_KEYS.localApiKey : STORAGE_KEYS.prodApiKey]: keyInput.value
+                [previousLocal ? STORAGE_KEYS.localApiKey : STORAGE_KEYS.prodApiKey]: keyInput.value,
+                [previousLocal ? STORAGE_KEYS.vastLocalApiKey : STORAGE_KEYS.vastProdApiKey]: vastKeyInput.value.trim()
             });
 
             environmentInput.checked = local;
             renderEnvironmentSwitch();
             keyInput.value = local ? settings.localApiKey : settings.prodApiKey;
+            vastKeyInput.value = local ? settings.vastLocalApiKey : settings.vastProdApiKey;
             const current = currentSettings();
             settings.environment = current.environment;
             settings.apiBaseUrl = current.apiBaseUrl;
@@ -500,6 +532,7 @@
             compactMasterSwitch.style.display = hidden ? 'inline-flex' : 'none';
             compactEnvironment.element.style.display = hidden ? 'flex' : 'none';
             resetButton.style.display = hidden ? 'none' : '';
+            invoicesButton.style.display = hidden ? 'none' : '';
             settingsButton.style.display = hidden ? 'none' : '';
             headerActions.style.display = hidden ? 'none' : 'flex';
             header.style.borderBottom = hidden ? '0' : '1px solid #374151';
@@ -885,6 +918,15 @@
         });
         settingsButton.addEventListener('click', () => {
             settingsPanel.style.display = settingsPanel.style.display === 'none' ? 'grid' : 'none';
+        });
+        invoicesButton.addEventListener('click', async () => {
+            // Saved first, so the key typed into the settings a moment ago is the one the collection uses.
+            await saveSettings(currentSettings());
+            status.textContent = 'VAT invoices: collecting...';
+            document.dispatchEvent(new CustomEvent('vb-vat-invoice-collect'));
+        });
+        document.addEventListener('vb-vat-invoice-collected', event => {
+            status.textContent = `VAT invoices: ${event.detail.summary}`;
         });
         environmentInput.addEventListener('change', () => selectEnvironment(environmentInput.checked)
             .catch(error => status.textContent = error.message));

@@ -11,8 +11,8 @@
   "host_permissions": [
     "https://www.bricklink.com/*",
     "https://tool.vastbricks.com/*",
-    "http://localhost:6161/*",
-    "http://127.0.0.1:6161/*"
+    "http://localhost:6363/*",
+    "http://127.0.0.1:6363/*"
   ],
   "background": {
     "service_worker": "background.js"
@@ -54,6 +54,11 @@
     {
       "matches": ["https://www.bricklink.com/*"],
       "js": ["bricksync-console.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://www.bricklink.com/*"],
+      "js": ["vat-invoice-sync.js"],
       "run_at": "document_idle"
     }
   ]

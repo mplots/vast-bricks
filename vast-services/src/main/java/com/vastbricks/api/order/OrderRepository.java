@@ -1,6 +1,7 @@
 package com.vastbricks.api.order;
 
 import com.vastbricks.api.orderarchive.OrderSource;
+import com.vastbricks.api.tax.OrderTaxType;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -17,6 +18,9 @@ interface OrderRepository extends JpaRepository<Order, Long> {
     Optional<Order> findBySourceAndOrderId(OrderSource source, String orderId);
 
     List<Order> findAllByOrderByOrderDateDescIdDesc();
+
+    /** The store's orders of one marketplace treated one way for tax, newest first. */
+    List<Order> findBySourceAndTaxTypeOrderByOrderDateDescIdDesc(OrderSource source, OrderTaxType taxType);
 
     /** The orders placed in a range, newest first. The tenant is Hibernate's to add, as everywhere else here. */
     List<Order> findByOrderDateGreaterThanEqualAndOrderDateLessThanOrderByOrderDateDescIdDesc(Instant from, Instant to);

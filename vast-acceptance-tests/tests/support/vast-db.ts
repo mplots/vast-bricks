@@ -92,6 +92,18 @@ export async function findSettingOverride(tenantId: number, settingKey: string):
   });
 }
 
+/**
+ * Backdates a key's expiry so a scenario can assert that an expired key stops authenticating. Expiry is a wall-clock
+ * fact with no API that can bring it forward, which is the one thing here the public surface cannot set up.
+ */
+export async function expireVastApiKey(id: number): Promise<void> {
+  await withDatabaseClient(async (client) => {
+    await client.query(`UPDATE ${vastTable('api_keys')} SET expires_at = now() - interval '1 minute' WHERE id = $1`, [
+      id,
+    ]);
+  });
+}
+
 function encryptSettingValue(plaintext: string): string {
   const encodedKey = process.env[setupEncryptionKeyEnv];
   if (!encodedKey) {

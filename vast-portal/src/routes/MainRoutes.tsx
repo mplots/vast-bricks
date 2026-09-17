@@ -32,6 +32,7 @@ const PayPalTransactionsPage = Loadable(lazy(() => import('pages/paypal-transact
 const JobsPage = Loadable(lazy(() => import('pages/jobs')));
 const VastSettingsPage = Loadable(lazy(() => import('pages/vast-settings')));
 const ProviderAccountsPage = Loadable(lazy(() => import('pages/provider-accounts')));
+const ApiKeysPage = Loadable(lazy(() => import('pages/api-keys')));
 
 // ==============================|| MAIN ROUTES ||============================== //
 
@@ -107,6 +108,10 @@ const MainRoutes = {
         {
           path: 'provider-accounts',
           element: <ProviderAccountsPage />
+        },
+        {
+          path: 'api-keys',
+          element: <ApiKeysPage />
         }
       ]
     },

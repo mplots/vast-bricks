@@ -1,7 +1,7 @@
 const VB_API_ENVIRONMENT_STORAGE_KEY = 'vbApiEnvironment';
 const VB_LEGACY_API_BASE_URL_STORAGE_KEY = 'vbBrickSyncApiBaseUrl';
 const VB_PROD_API_BASE_URL = 'https://tool.vastbricks.com';
-const VB_LOCAL_API_BASE_URL = 'http://127.0.0.1:6161';
+const VB_LOCAL_API_BASE_URL = 'http://127.0.0.1:6363';
 
 function getApiBaseUrl() {
     return new Promise(resolve => {
