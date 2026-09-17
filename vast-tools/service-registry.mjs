@@ -1,6 +1,7 @@
 import { readdirSync } from "node:fs";
 import { resolve, sep } from "node:path";
 
+import { acceptanceDatabase, databasePassword, databaseUser, ensureDatabase, jdbcUrl } from "./database.mjs";
 import { ensureMockedTenant, mockedTenantEmail, mockedTenantPassword } from "./mocked-tenant.mjs";
 import { vastApiEnvFile } from "./env-file.mjs";
 import { repoRoot, runtimeRoot } from "./paths.mjs";
@@ -40,6 +41,15 @@ export const managedServices = [
     cwd: repoRoot,
     env: {
       VAST_API_PORT: "6362",
+      // A database of its own, never the developer's. Every run of the suite creates tenants, writes settings and
+      // fills tables, and not all of it is tenant-owned - a shipping tariff belongs to no store and so survives the
+      // teardown that deletes a scenario's tenant. Pointed at `bricks`, the suite would leave that in the data the
+      // developer works against. VAST_DB_NAME states the same database again for ./vast's own psql calls and for
+      // the Playwright process, neither of which reads a JDBC URL.
+      VAST_DB_URL: jdbcUrl(acceptanceDatabase),
+      VAST_DB_NAME: acceptanceDatabase,
+      VAST_DB_USERNAME: databaseUser(),
+      VAST_DB_PASSWORD: databasePassword(),
       VAST_SETTINGS_DEFAULT_PROFILE: "vast-playwright-default",
       VAST_HEALTH_SETTING_ENV_VALUE: "managed-health-env-value",
       VAST_BRICKSTORE_TOR_ENABLED: "false",
@@ -54,6 +64,8 @@ export const managedServices = [
       args: ["-pl", "vast-acceptance-tests", "-am", "clean", "package", "-DskipTests"],
     },
     processMarker: "vast-acceptance-tests-",
+    // The runtime makes its own schema but cannot make the database it connects to, so ./vast does.
+    beforeStart: (service) => ensureDatabase(service.env.VAST_DB_NAME),
     // So a browser opening vast-portal-test has a tenant whose providers are the managed WireMock.
     afterHealthy: ensureMockedTenant,
   },

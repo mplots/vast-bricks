@@ -38,6 +38,12 @@ covers every provider call the backend makes rather than one screen's.
   what it was and the row is marked truncated. A file's bytes are stored
   unmasked, there being no sensible way to mask inside a zip — a client's secrets
   are masked in the text and the URL as before.
+- **A recorded call must not be made inside a database transaction that spans the work.** The rows are written
+  through the same transaction as everything else, so one held open across a provider call is rolled back with it -
+  taking the record of the traffic with it, precisely when a reader wants to see what was sent. It also hides the
+  rows until the transaction commits, so a long operation shows nothing at all while it runs. A job that calls
+  providers therefore reads and writes in short transactions around the writing only, as the shipping price sweep
+  does: fifty requests under one transaction recorded nothing of a sweep that failed on the last of them.
 - The client layer records; the debug feature decides what is kept. A client wraps the
   operation it wants recorded in `HttpExchangeCapture.record`, naming itself as the
   provider, and knows nothing about who wants the traffic. `HttpExchangeSink` is the

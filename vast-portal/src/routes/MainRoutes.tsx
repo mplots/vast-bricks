@@ -33,6 +33,7 @@ const JobsPage = Loadable(lazy(() => import('pages/jobs')));
 const VastSettingsPage = Loadable(lazy(() => import('pages/vast-settings')));
 const ProviderAccountsPage = Loadable(lazy(() => import('pages/provider-accounts')));
 const ApiKeysPage = Loadable(lazy(() => import('pages/api-keys')));
+const ShippingPricesPage = Loadable(lazy(() => import('pages/shipping-prices')));
 
 // ==============================|| MAIN ROUTES ||============================== //
 
@@ -96,6 +97,10 @@ const MainRoutes = {
           element: <PayPalTransactionsPage />,
           // A ledger is a wide table, and the period over it already names the page.
           handle: { fullWidth: true, heading: false } satisfies PageLayout
+        },
+        {
+          path: 'shipping-prices',
+          element: <ShippingPricesPage />
         },
         {
           path: 'jobs',

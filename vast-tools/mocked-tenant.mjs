@@ -1,5 +1,6 @@
 import { createCipheriv, randomBytes } from "node:crypto";
-import { execFileSync } from "node:child_process";
+
+import { developmentDatabase, psql as runPsql } from "./database.mjs";
 
 /**
  * The tenant a browser signs into on vast-portal-test: one whose every provider is the managed WireMock.
@@ -35,6 +36,7 @@ const mockedSettings = {
   VAST_BRICKSTORE_TOKEN: { value: "mocked-brickstore-token", secret: true },
   VAST_BRICKOWL_BASE_URL: { value: wireMockBaseUrl },
   VAST_BRICKOWL_API_KEY: { value: "mocked-brickowl-api-key", secret: true },
+  VAST_LATVIJASPASTS_BASE_URL: { value: wireMockBaseUrl },
   VAST_MANAKABATA_BASE_URL: { value: wireMockBaseUrl },
   VAST_MANAKABATA_API_TOKEN: { value: "mocked-manakabata-api-token", secret: true },
   VAST_MANSPASTS_BASE_URL: { value: wireMockBaseUrl },
@@ -122,25 +124,8 @@ function schema(service) {
   return service.env.VAST_DB_SCHEMA ?? process.env.VAST_DB_SCHEMA ?? "vast";
 }
 
-// The database is the managed postgres container, which is the only one ./vast knows how to reach.
+// Into whichever database the service itself uses, which for vast-api-test is the acceptance one rather than the
+// developer's. Reading it off the service is what keeps the seed and the runtime from ever addressing two databases.
 function psql(service, statement) {
-  return execFileSync(
-    "docker",
-    [
-      "exec",
-      "-i",
-      "vast-bricks-postgres",
-      "psql",
-      "-U",
-      process.env.VAST_DB_USERNAME ?? "bricks",
-      "-d",
-      process.env.VAST_DB_NAME ?? "bricks",
-      "-v",
-      "ON_ERROR_STOP=1",
-      "-tA",
-      "-c",
-      statement,
-    ],
-    { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] },
-  );
+  return runPsql(service.env.VAST_DB_NAME ?? developmentDatabase, statement);
 }

@@ -30,6 +30,7 @@ const statusLabels = {
   stopped: { text: "STOPPED", color: "\x1b[32m" },
   build: { text: "BUILD", color: "\x1b[33m" },
   install: { text: "INSTALL", color: "\x1b[33m" },
+  created: { text: "CREATED", color: "\x1b[33m" },
   skipped: { text: "SKIPPED", color: "\x1b[2m" },
   stale: { text: "STALE", color: "\x1b[38;5;208m" },
   unmanaged: { text: "UNMANAGED", color: "\x1b[2m" },
@@ -181,6 +182,12 @@ async function startService(service, { skipBuild = false, cleanDb = false } = {}
   }
 
   ensureServiceDependency(service);
+
+  if (service.beforeStart) {
+    if (service.beforeStart(service)) {
+      console.log(`${statusLabel("created")} ${service.name.padEnd(13)} database ${service.env.VAST_DB_NAME}`);
+    }
+  }
 
   mkdirSync(logsRoot, { recursive: true });
   const logPath = resolve(logsRoot, `${service.name}.log`);

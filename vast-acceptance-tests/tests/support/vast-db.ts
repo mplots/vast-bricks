@@ -125,7 +125,10 @@ async function withDatabaseClient<T>(callback: (client: Client) => Promise<T>): 
   const client = new Client({
     host: process.env.VAST_DB_HOST ?? '127.0.0.1',
     port: Number.parseInt(process.env.VAST_DB_PORT ?? '2345', 10),
-    database: process.env.VAST_DB_NAME ?? 'bricks',
+    // The acceptance database, never the developer's `bricks`. `./vast test` states it too, but the default is what
+    // protects a suite run straight through Playwright: a scenario that could reach `bricks` would create tenants
+    // and settings in the data the developer works against, and would delete them from it too.
+    database: process.env.VAST_DB_NAME ?? 'bricks_test',
     user: process.env.VAST_DB_USERNAME ?? 'bricks',
     password: process.env.VAST_DB_PASSWORD ?? 'bricks',
   });

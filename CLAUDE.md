@@ -287,9 +287,22 @@ a scoping rule for settings, and only incidentally one for tables.
   on legacy or other existing schemas.
 - Migration execution must be safe in both runtime modes: standalone through
   `vast-api` and embedded through `vb-portal-api`.
-- Database credentials and connection settings may point both runtimes at the
-  same PostgreSQL server/database, but new objects remain isolated in the new
-  schema.
+- Database credentials and connection settings point both runtimes at the same
+  PostgreSQL server, and new objects remain isolated in the new schema.
+- The acceptance runtime gets a **database of its own**, `bricks_test`, while
+  development uses `bricks`. Both are on the managed server and `./vast`
+  creates the acceptance one if it is missing. A suite run creates tenants,
+  writes settings and fills tables on every pass, and not all of what it writes
+  is tenant-owned — a shipping tariff belongs to no store, so deleting a
+  scenario's tenant does not take it with it. Pointed at `bricks`, the suite
+  would leave that behind in the data the developer works against, and
+  `--clean-build` would wipe the developer's schema rather than the suite's.
+- A separate database rather than a separate schema, because the Vast schema
+  name is compiled into the entities: a second schema would need a second
+  build, where a second database needs one `CREATE DATABASE`.
+- `vast-tools/database.mjs` is the one place either database is named. A test
+  that connects for itself defaults to the acceptance database, so a suite run
+  straight through Playwright cannot reach the developer's either.
 - Local development data lives in `db/vast/migration/data`, which is excluded
   from production builds. It reaches the environment through Flyway
   placeholders that the scripts themselves declare: `VastDatabaseMigration`
@@ -438,7 +451,8 @@ looks like. Read it, and never commit it.
   build the entire final CLI during module scaffolding.
 - The managed service named `vast-api-test` builds and runs the
   `vast-acceptance-tests` JAR on port 6362, so the test-only endpoints are
-  available locally. Acceptance tests always run against it.
+  available locally. Acceptance tests always run against it, and it reads and
+  writes the `bricks_test` database rather than the developer's `bricks`.
 - The managed service named `vast-api` builds and runs the `vb-portal-api`
   JAR on port 6363, so one launch serves the legacy and rewritten halves of the
   backend exactly as the deployed artifact does. `./vast` sets `SERVER_PORT`

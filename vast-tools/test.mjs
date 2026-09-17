@@ -2,6 +2,7 @@ import { spawnSync } from "node:child_process";
 import { availableParallelism } from "node:os";
 import { readFileSync } from "node:fs";
 
+import { acceptanceDatabase } from "./database.mjs";
 import { repoRoot } from "./paths.mjs";
 import { restartServices } from "./service-manager.mjs";
 
@@ -37,6 +38,9 @@ export async function runTestCommand(args) {
       ACCEPTANCE_PLAYWRIGHT_WORKERS: String(wireMockPlan.workers),
       ACCEPTANCE_WIREMOCK_HOSTS: wireMockPlan.hosts.join(","),
       ACCEPTANCE_WIREMOCK_MODE: wireMockPlan.mode,
+      // The suite's direct database setup reaches the same database the runtime under test does, which is the
+      // acceptance one and never the developer's.
+      VAST_DB_NAME: acceptanceDatabase,
       VAST_SETUP_ENCRYPTION_KEY: process.env.VAST_SETUP_ENCRYPTION_KEY
         ?? "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=",
     },
@@ -108,7 +112,8 @@ Environment:
   VAST_API_BASE_URL     Target API base URL, default http://127.0.0.1:6362
   VAST_DB_HOST          PostgreSQL host for DB-backed setup, default 127.0.0.1
   VAST_DB_PORT          PostgreSQL port for DB-backed setup, default 2345
-  VAST_DB_NAME          PostgreSQL database for DB-backed setup, default bricks
+  VAST_DB_NAME          PostgreSQL database for DB-backed setup, default bricks_test
+                        (the acceptance database, kept apart from the developer's bricks)
   VAST_DB_USERNAME      PostgreSQL user for DB-backed setup, default bricks
   VAST_DB_PASSWORD      PostgreSQL password for DB-backed setup, default bricks
   VAST_DB_SCHEMA        Vast schema for DB-backed setup, default vast
