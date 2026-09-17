@@ -1,4 +1,4 @@
-package com.vastbricks.api.order;
+package com.vastbricks.api.orderarchive;
 
 import java.time.Instant;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.vastbricks.api.order;
+package com.vastbricks.api.orderarchive;
 
 /** A VAT invoice that was posted but cannot be filed as posted. */
 class VatInvoiceException extends RuntimeException {

@@ -218,10 +218,10 @@ public class OrderArchive {
      * every order of a period at once, and one directory listing answers for all of them where a question per order
      * would be a listing per order.
      *
-     * <p>The invoice is the one file of the archive this application does not write. BrickLink issues it only where
-     * it collected the VAT itself, and it is posted here by the browser extension's shipping label rather than
-     * fetched, so an order with none is the ordinary case and this says nothing about whether one was due. That is
-     * the reader's judgement, not the archive's.
+     * <p>The invoice is the one file of the archive this application does not fetch. BrickLink issues it only where
+     * it collected the VAT itself, and it is posted here by the browser extension rather than fetched, so an order
+     * with none is the ordinary case and this says nothing about whether one was due. That is the reader's
+     * judgement, not the archive's.
      *
      * <p>An archive no order has ever been written to holds nothing, which is not a failure: a store whose first
      * nightly run has not happened yet is a store with an empty archive.
@@ -260,14 +260,15 @@ public class OrderArchive {
      * anything was written.
      *
      * <p>The one file of the archive this application does not fetch. BrickLink serves the invoice only to the
-     * signed-in store, so it is the browser extension that downloads it and posts it here, and the archive's part is
-     * to name it as it names the order's other files and to leave an invoice already on disk alone.
+     * signed-in store, so it is the browser extension that downloads it and posts it to {@link VatInvoiceService},
+     * and this part is the same as for every other file: name it as the order's others are named, and leave an
+     * invoice already on disk alone.
      *
      * <p>The moment is the caller's because the invoice itself states none: it is the moment the order last changed,
      * which is what the order's other files are named after, so the invoice files beside them rather than under a
      * moment of its own.
      */
-    public boolean storeVatInvoice(String orderId, Instant changed, byte[] pdf) {
+    boolean storeVatInvoice(String orderId, Instant changed, byte[] pdf) {
         Path directory = directory();
         Path path = directory.resolve(
                 OrderSource.BRICKLINK.prefix() + "-" + VAT_INVOICE_KIND + "-" + part(orderId) + "-"

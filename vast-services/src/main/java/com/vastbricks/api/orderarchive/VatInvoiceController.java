@@ -1,7 +1,7 @@
-package com.vastbricks.api.order;
+package com.vastbricks.api.orderarchive;
 
-import com.vastbricks.api.order.VatInvoicePayload.OutstandingResponse;
-import com.vastbricks.api.order.VatInvoicePayload.StoredVatInvoice;
+import com.vastbricks.api.orderarchive.VatInvoicePayload.OutstandingResponse;
+import com.vastbricks.api.orderarchive.VatInvoicePayload.StoredVatInvoice;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -16,6 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * The exchange that gets BrickLink's VAT invoices into the store's archive: what is missing, and here it is.
+ *
+ * <p>An archive endpoint rather than an order one. The invoice is one of the order's archived files, and the only
+ * one the nightly run cannot fetch for itself.
  *
  * <p>Both ends are meant for the browser extension rather than for a person, because BrickLink serves the invoice
  * only to a signed-in store and nothing else can reach it. The extension asks the first on whatever BrickLink page
