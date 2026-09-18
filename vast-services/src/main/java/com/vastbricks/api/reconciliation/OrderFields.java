@@ -1,6 +1,6 @@
 package com.vastbricks.api.reconciliation;
 
-import com.vastbricks.api.tax.OrderTaxType;
+import com.vastbricks.api.charges.OrderTaxType;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import lombok.Builder;
@@ -48,6 +48,15 @@ public class OrderFields {
      * when it collected none.
      */
     private BigDecimal facilitatorTax;
+
+    /**
+     * The marketplace's own account of its commission on the order, stated rather than calculated: BrickOwl's
+     * {@code brickowl_fee}, or {@code null} for BrickLink, which states none. What this store calculates the same
+     * commission as, from {@link com.vastbricks.api.charges.MarketplaceFees}, is read beside it as
+     * {@link CalculatedFields#getMarketplaceFee()} so the two can be compared, exactly as {@link #refundedAmount} is
+     * read beside the gateway's own account of a refund.
+     */
+    private BigDecimal marketplaceFee;
 
     private BigDecimal subTotal;
 

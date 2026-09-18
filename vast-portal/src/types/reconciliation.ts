@@ -46,6 +46,8 @@ export interface ReconciliationOrderFields {
   taxType: OrderTaxType | null;
   /** What the marketplace collected on the order as tax facilitator, or `null` when it collected none. */
   facilitatorTax: number | null;
+  /** The marketplace's own account of its commission on the order, or `null` for BrickLink, which states none. */
+  marketplaceFee: number | null;
   subTotal: number | null;
   /**
    * What the marketplace charged the buyer for shipping the order, or `null` where it charged none. It is the buyer's
@@ -117,6 +119,20 @@ export interface ReconciliationCalculatedFields {
    * shows was refunded.
    */
   targetInvoice: number | null;
+  /**
+   * What this store calculates the marketplace's own commission on the order as, from BrickLink's or BrickOwl's
+   * published rate schedule rather than from what either states on the order. Read beside `order.marketplaceFee` so
+   * BrickOwl's own reported figure can be checked against it; `null` for an order with no grand total to apply a
+   * rate to.
+   */
+  marketplaceFee: number | null;
+  /**
+   * What this store calculates Stripe's or PayPal's own charge for taking the payment as, from each provider's
+   * published rate rather than from what a payment states. Read beside `gateway.feeAmount` so the provider's own
+   * reported fee can be checked against it; `null` for a payment method neither provider processes, or an order
+   * with no grand total.
+   */
+  paymentFee: number | null;
 }
 
 /**

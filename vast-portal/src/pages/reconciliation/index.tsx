@@ -77,6 +77,7 @@ import { orderTaxTypes, type OrderTaxType } from 'types/tax';
 
 const amountFields: string[] = [
   'order.facilitatorTax',
+  'order.marketplaceFee',
   'order.subTotal',
   'order.shippingCost',
   'order.grandTotal',
@@ -90,6 +91,8 @@ const amountFields: string[] = [
   'accounting.vat',
   'accounting.grandTotal',
   'calculated.targetInvoice',
+  'calculated.marketplaceFee',
+  'calculated.paymentFee',
   'stored.facilitatorTax',
   'stored.subTotal',
   'stored.shippingCost',
@@ -98,6 +101,11 @@ const amountFields: string[] = [
 ];
 const countFields = ['order.itemCount', 'order.lotCount', 'stored.itemCount', 'stored.lotCount'];
 const numericFields = [...amountFields, ...countFields];
+
+// The marketplace's own reported fee is BrickOwl's alone - BrickLink states none - so a total of it would silently
+// leave every BrickLink order out while reading as a total of all of them. The calculated fee beside it answers for
+// both marketplaces, which is what the footer sums instead.
+const unsummedFields = ['order.marketplaceFee'];
 const dateFields: string[] = ['order.orderDate', 'stored.orderDate'];
 
 // Fields that state a fact about the order rather than a figure of it, and so read as a word rather than a value.
@@ -768,19 +776,21 @@ function ReconciliationOrders() {
   // Sum every numeric field over the displayed orders. Money is added in cents so decimal addition cannot introduce
   // fractions of a cent; item and lot counts are added as whole numbers. A field nobody reported stays absent.
   const totals = Object.fromEntries(
-    numericFields.map((field) => {
-      const isAmount = amountFields.includes(field);
-      let total = 0;
-      let collected = false;
-      shownOrders.forEach((order) => {
-        const value = valueAt(order, field);
-        if (typeof value === 'number' && Number.isFinite(value)) {
-          total += isAmount ? Math.round(value * 100) : value;
-          collected = true;
-        }
-      });
-      return [field, collected ? (isAmount ? total / 100 : total) : null];
-    })
+    numericFields
+      .filter((field) => !unsummedFields.includes(field))
+      .map((field) => {
+        const isAmount = amountFields.includes(field);
+        let total = 0;
+        let collected = false;
+        shownOrders.forEach((order) => {
+          const value = valueAt(order, field);
+          if (typeof value === 'number' && Number.isFinite(value)) {
+            total += isAmount ? Math.round(value * 100) : value;
+            collected = true;
+          }
+        });
+        return [field, collected ? (isAmount ? total / 100 : total) : null];
+      })
   );
 
   const optionLabel = (facet: OrderFacet, value: string) =>

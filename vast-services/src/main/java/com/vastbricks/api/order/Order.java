@@ -1,7 +1,7 @@
 package com.vastbricks.api.order;
 
 import com.vastbricks.api.orderarchive.OrderSource;
-import com.vastbricks.api.tax.OrderTaxType;
+import com.vastbricks.api.charges.OrderTaxType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -83,6 +83,15 @@ class Order {
     /** What the marketplace collected on the order as tax facilitator, or null where it collected none. */
     @Column(name = "facilitator_tax", precision = 19, scale = 2)
     private BigDecimal facilitatorTax;
+
+    /**
+     * The marketplace's own account of its commission on the order, or null for BrickLink, which states none. What
+     * this store calculates the same commission as is not stored: {@link OrderService} works it out from this row's
+     * own amounts when the order is read, exactly as it works out the target invoice, rather than a run of this
+     * calculation being carried by every row until the schedule it was calculated under changes.
+     */
+    @Column(name = "marketplace_fee", precision = 19, scale = 2)
+    private BigDecimal marketplaceFee;
 
     @Column(name = "sub_total", precision = 19, scale = 2)
     private BigDecimal subTotal;

@@ -1,11 +1,11 @@
 package com.vastbricks.api.invoice;
 
-import static com.vastbricks.api.tax.OrderTaxType.DOMESTIC;
-import static com.vastbricks.api.tax.OrderTaxType.EUROPEAN_UNION;
-import static com.vastbricks.api.tax.OrderTaxType.EXPORT;
-import static com.vastbricks.api.tax.OrderTaxType.EXPORT_TAXABLE;
+import static com.vastbricks.api.charges.OrderTaxType.DOMESTIC;
+import static com.vastbricks.api.charges.OrderTaxType.EUROPEAN_UNION;
+import static com.vastbricks.api.charges.OrderTaxType.EXPORT;
+import static com.vastbricks.api.charges.OrderTaxType.EXPORT_TAXABLE;
 
-import com.vastbricks.api.tax.OrderTaxType;
+import com.vastbricks.api.charges.OrderTaxType;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Map;

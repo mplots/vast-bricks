@@ -3,7 +3,7 @@ package com.vastbricks.api.order;
 import com.vastbricks.api.orderarchive.OrderSource;
 import com.vastbricks.api.orderarchive.VatInvoiceOrder;
 import com.vastbricks.api.orderarchive.VatInvoiceOrders;
-import com.vastbricks.api.tax.OrderTaxType;
+import com.vastbricks.api.charges.OrderTaxType;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;

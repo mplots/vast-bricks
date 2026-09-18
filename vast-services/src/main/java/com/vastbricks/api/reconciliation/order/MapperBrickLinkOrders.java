@@ -1,5 +1,6 @@
 package com.vastbricks.api.reconciliation.order;
 
+import com.vastbricks.api.charges.MarketplaceFees;
 import com.vastbricks.api.reconciliation.Marketplace;
 import com.vastbricks.api.reconciliation.OrderMapper;
 import com.vastbricks.api.reconciliation.OrderFields;
@@ -8,8 +9,8 @@ import com.vastbricks.api.reconciliation.ReconciliationAmount;
 import com.vastbricks.api.reconciliation.ReconciliationCurrency;
 import com.vastbricks.api.reconciliation.ReconciliationPaymentMethod;
 import com.vastbricks.api.reconciliation.ReconciliationText;
-import com.vastbricks.api.tax.FacilitatorTaxes;
-import com.vastbricks.api.tax.OrderTaxTypes;
+import com.vastbricks.api.charges.FacilitatorTaxes;
+import com.vastbricks.api.charges.OrderTaxTypes;
 import java.math.BigDecimal;
 import java.util.List;
 import org.springframework.core.annotation.Order;
@@ -33,7 +34,7 @@ class MapperBrickLinkOrders implements OrderMapper<SourcedBrickLinkOrder> {
     private ReconciledOrder toReconciledOrder(SourcedBrickLinkOrder sourced) {
         var order = sourced.getOrder();
         var orderId = order.getOrderId() == null ? null : order.getOrderId().toString();
-        return ReconciledOrder.of(OrderFields.builder()
+        var reconciled = ReconciledOrder.of(OrderFields.builder()
                 .source(Marketplace.BRICK_LINK)
                 .orderId(orderId)
                 .orderDate(order.getOrderDate())
@@ -51,6 +52,10 @@ class MapperBrickLinkOrders implements OrderMapper<SourcedBrickLinkOrder> {
                 // already the marketplace saying no money came back.
                 .refundedAmount(refundedAmount(sourced))
                 .build());
+        // Calculated from the order itself rather than collected, so it belongs to the calculated group; set here,
+        // the one point this mapper still holds the marketplace's own order.
+        reconciled.setMarketplaceFee(ReconciliationAmount.normalize(MarketplaceFees.of(order)));
+        return reconciled;
     }
 
     private BigDecimal refundedAmount(SourcedBrickLinkOrder sourced) {

@@ -84,11 +84,14 @@ const columnFields = [
   'order.subTotal',
   'order.shippingCost',
   'order.facilitatorTax',
+  'order.marketplaceFee',
   'order.grandTotal',
   'order.refundedAmount',
   // Follows the amounts it is derived from, as it does on the report, so the columns read as the subtraction they
   // are: what the order came to, less the facilitator tax, less what has been refunded.
-  'calculated.targetInvoice'
+  'calculated.targetInvoice',
+  'calculated.marketplaceFee',
+  'calculated.paymentFee'
 ] as const;
 
 type ColumnField = (typeof columnFields)[number];
@@ -105,9 +108,12 @@ const amountFields: string[] = [
   'order.subTotal',
   'order.shippingCost',
   'order.facilitatorTax',
+  'order.marketplaceFee',
   'order.grandTotal',
   'order.refundedAmount',
-  'calculated.targetInvoice'
+  'calculated.targetInvoice',
+  'calculated.marketplaceFee',
+  'calculated.paymentFee'
 ];
 const numericFields: string[] = [...amountFields, 'order.lotCount', 'order.itemCount'];
 const dateFields: string[] = ['order.orderDate'];
@@ -152,6 +158,24 @@ const columnsIn = (stated: string[] | null | undefined): ColumnField[] | null =>
 };
 
 const formatCount = (value: number | null) => (value === null || value === undefined ? '—' : value.toLocaleString());
+
+/**
+ * A column's total across the given orders, or null where none of them stated it - a footer sum rather than a per-row
+ * read. Summed in cents, as the report sums its own totals, so decimal addition cannot introduce a fraction of one;
+ * an order the column has no answer for is left out rather than read as nothing owed.
+ */
+const sumOf = (orders: StoreOrder[], amountOf: (order: StoreOrder) => number | null): number | null => {
+  let total = 0;
+  let collected = false;
+  orders.forEach((order) => {
+    const value = amountOf(order);
+    if (value !== null) {
+      total += Math.round(value * 100);
+      collected = true;
+    }
+  });
+  return collected ? total / 100 : null;
+};
 
 /**
  * An amount, or an em dash where the marketplace stated none.
@@ -334,21 +358,16 @@ export default function OrdersPage() {
     [collected, searchParams]
   );
 
-  // The one column a reader adds up rather than reads order by order, so it is the one the footer sums. Summed in
-  // cents, as the report sums its own totals, so decimal addition cannot introduce a fraction of one; an order the
-  // formula has no answer for is left out rather than read as nothing owed.
-  const targetInvoiceTotal = useMemo(() => {
-    let total = 0;
-    let collected = false;
-    shownOrders.forEach((order) => {
-      const value = order.targetInvoice;
-      if (value !== null) {
-        total += Math.round(value * 100);
-        collected = true;
-      }
-    });
-    return collected ? total / 100 : null;
-  }, [shownOrders]);
+  // The columns a reader adds up rather than reads order by order, so they are the ones the footer sums.
+  const targetInvoiceTotal = useMemo(() => sumOf(shownOrders, (order) => order.targetInvoice), [shownOrders]);
+  const calculatedMarketplaceFeeTotal = useMemo(
+    () => sumOf(shownOrders, (order) => order.calculatedMarketplaceFee),
+    [shownOrders]
+  );
+  const calculatedPaymentFeeTotal = useMemo(
+    () => sumOf(shownOrders, (order) => order.calculatedPaymentFee),
+    [shownOrders]
+  );
 
   const filterFacets: FilterFacet[] = facetFields.map((facet) => {
     const counts = new Map<string, number>();
@@ -452,12 +471,18 @@ export default function OrdersPage() {
         return money(order.shippingCost);
       case 'order.facilitatorTax':
         return money(order.facilitatorTax);
+      case 'order.marketplaceFee':
+        return money(order.marketplaceFee);
       case 'order.grandTotal':
         return money(order.grandTotal);
       case 'order.refundedAmount':
         return money(order.refundedAmount);
       case 'calculated.targetInvoice':
         return moneyEur(order.targetInvoice);
+      case 'calculated.marketplaceFee':
+        return money(order.calculatedMarketplaceFee);
+      case 'calculated.paymentFee':
+        return money(order.calculatedPaymentFee);
     }
   };
 
@@ -470,12 +495,18 @@ export default function OrdersPage() {
         return order.shippingCost;
       case 'order.facilitatorTax':
         return order.facilitatorTax;
+      case 'order.marketplaceFee':
+        return order.marketplaceFee;
       case 'order.grandTotal':
         return order.grandTotal;
       case 'order.refundedAmount':
         return order.refundedAmount;
       case 'calculated.targetInvoice':
         return order.targetInvoice;
+      case 'calculated.marketplaceFee':
+        return order.calculatedMarketplaceFee;
+      case 'calculated.paymentFee':
+        return order.calculatedPaymentFee;
       default:
         return null;
     }
@@ -874,7 +905,9 @@ export default function OrdersPage() {
                               align={numericFields.includes(column) ? 'right' : 'left'}
                               sx={{ ...(bandStarts.has(column) && bandEdge) }}
                             >
-                              {column === 'calculated.targetInvoice' ? moneyEur(targetInvoiceTotal) : null}
+                              {column === 'calculated.targetInvoice' && moneyEur(targetInvoiceTotal)}
+                              {column === 'calculated.marketplaceFee' && money(calculatedMarketplaceFeeTotal)}
+                              {column === 'calculated.paymentFee' && money(calculatedPaymentFeeTotal)}
                             </TableCell>
                           ))}
                         </TableRow>

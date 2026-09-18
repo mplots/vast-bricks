@@ -1,6 +1,7 @@
 package com.vastbricks.api.reconciliation.order;
 
 import com.vastbricks.api.client.brickowl.BrickOwlOrder;
+import com.vastbricks.api.charges.MarketplaceFees;
 import com.vastbricks.api.reconciliation.Marketplace;
 import com.vastbricks.api.reconciliation.OrderMapper;
 import com.vastbricks.api.reconciliation.OrderFields;
@@ -9,8 +10,8 @@ import com.vastbricks.api.reconciliation.ReconciliationAmount;
 import com.vastbricks.api.reconciliation.ReconciliationCurrency;
 import com.vastbricks.api.reconciliation.ReconciliationPaymentMethod;
 import com.vastbricks.api.reconciliation.ReconciliationText;
-import com.vastbricks.api.tax.FacilitatorTaxes;
-import com.vastbricks.api.tax.OrderTaxTypes;
+import com.vastbricks.api.charges.FacilitatorTaxes;
+import com.vastbricks.api.charges.OrderTaxTypes;
 import java.math.BigDecimal;
 import java.util.List;
 import org.springframework.core.annotation.Order;
@@ -33,7 +34,7 @@ class MapperBrickOwlOrders implements OrderMapper<SourcedBrickOwlOrder> {
 
     private ReconciledOrder toReconciledOrder(SourcedBrickOwlOrder sourced) {
         var order = sourced.getOrder();
-        return ReconciledOrder.of(OrderFields.builder()
+        var reconciled = ReconciledOrder.of(OrderFields.builder()
                 .source(Marketplace.BRICK_OWL)
                 .orderId(order.getOrderId())
                 .orderDate(sourced.getOrderDate())
@@ -45,11 +46,16 @@ class MapperBrickOwlOrders implements OrderMapper<SourcedBrickOwlOrder> {
                 .currency(ReconciliationCurrency.normalize(order.getPaymentCurrency()))
                 .taxType(OrderTaxTypes.of(order))
                 .facilitatorTax(ReconciliationAmount.normalize(FacilitatorTaxes.of(order)))
+                .marketplaceFee(ReconciliationAmount.normalize(order.getBrickOwlFee()))
                 .subTotal(ReconciliationAmount.normalize(order.getSubTotal()))
                 .shippingCost(ReconciliationAmount.normalize(order.getShipping()))
                 .grandTotal(ReconciliationAmount.normalize(order.getBaseOrderTotal()))
                 .refundedAmount(refundedAmount(order))
                 .build());
+        // Calculated from the order itself rather than collected, so it belongs to the calculated group; set here,
+        // the one point this mapper still holds the marketplace's own order.
+        reconciled.setMarketplaceFee(ReconciliationAmount.normalize(MarketplaceFees.of(order)));
+        return reconciled;
     }
 
     /**

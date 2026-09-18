@@ -1,7 +1,7 @@
 package com.vastbricks.api.order;
 
 import com.vastbricks.api.orderarchive.OrderSource;
-import com.vastbricks.api.tax.OrderTaxType;
+import com.vastbricks.api.charges.OrderTaxType;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
@@ -102,6 +102,16 @@ final class OrderPayload {
         /** What the marketplace collected as tax facilitator, or null where it collected none. */
         private final BigDecimal facilitatorTax;
 
+        /** The marketplace's own account of its commission on the order, or null for BrickLink, which states none. */
+        private final BigDecimal marketplaceFee;
+
+        /**
+         * What this screen calculates the marketplace's own commission on the order as, from this row's own amounts
+         * rather than the marketplace's order. See {@link OrderService} for the gap between this and what
+         * reconciliation calculates live, and null for an order with no grand total to apply a rate to.
+         */
+        private final BigDecimal calculatedMarketplaceFee;
+
         private final BigDecimal subTotal;
 
         /** What the buyer was charged for shipping, not what the post office charged the store. */
@@ -120,15 +130,23 @@ final class OrderPayload {
          */
         private final BigDecimal targetInvoice;
 
+        /**
+         * What this screen calculates Stripe's or PayPal's own charge for taking the payment as, from this order's
+         * payment method and grand total. See {@link OrderService} for why it is not stored, and null for a payment
+         * method neither provider processes or an order with no grand total.
+         */
+        private final BigDecimal calculatedPaymentFee;
+
         /** When the archive this row was read from was taken, which is how current the row is. */
         private final Instant archivedAt;
 
-        OrderResponse(Order order, BigDecimal targetInvoice) {
+        OrderResponse(Order order, BigDecimal targetInvoice, BigDecimal calculatedMarketplaceFee, BigDecimal calculatedPaymentFee) {
             this(order.getId(), order.getSource(), order.getOrderId(), order.getOrderDate(),
                     order.getBuyer(), order.getBuyerUsername(), order.getCountry(), order.getItemCount(), order.getLotCount(),
                     order.getPaymentMethod(), order.getCurrency(), order.getTaxType(), order.getFacilitatorTax(),
-                    order.getSubTotal(), order.getShippingCost(), order.getGrandTotal(), order.getRefundedAmount(),
-                    targetInvoice, order.getArchivedAt());
+                    order.getMarketplaceFee(), calculatedMarketplaceFee, order.getSubTotal(),
+                    order.getShippingCost(), order.getGrandTotal(), order.getRefundedAmount(), targetInvoice,
+                    calculatedPaymentFee, order.getArchivedAt());
         }
     }
 }

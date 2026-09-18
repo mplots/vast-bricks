@@ -1,4 +1,4 @@
-package com.vastbricks.api.tax;
+package com.vastbricks.api.charges;
 
 import com.vastbricks.api.client.brickowl.BrickOwlOrder;
 import com.vastbricks.api.client.brickstore.BrickStoreOrder;
@@ -12,32 +12,29 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Reaches {@link FacilitatorTaxes} for logic tests, the way {@link OrderTaxTypes} is reached: one mapping per
- * marketplace taking exactly the fields that marketplace states, and a parameter left out is a field it did not
- * report. The amount depends on the order's tax type, so a mapping takes the fields that decide the type as well as
- * the ones that state the tax.
+ * Reaches {@link OrderTaxTypes} for logic tests. No endpoint exposes the tax type on its own, and the classification
+ * is decided by a marketplace's own fields, so there is one mapping per marketplace taking exactly the fields that
+ * marketplace states. A parameter left out is the field the marketplace did not report.
  */
 @RestController
-@RequestMapping(path = "/api/test/facilitator-tax", produces = MediaType.APPLICATION_JSON_VALUE)
-class VastFacilitatorTaxTestController {
+@RequestMapping(path = "/api/test/order-tax-type", produces = MediaType.APPLICATION_JSON_VALUE)
+class VastOrderTaxTypeTestController {
 
     @GetMapping("/brickowl")
-    Map<String, BigDecimal> ofBrickOwlOrder(
+    Map<String, OrderTaxType> ofBrickOwlOrder(
             @RequestParam(name = "billingCountryCode", required = false) String billingCountryCode,
             @RequestParam(name = "taxSchemeId", required = false) String taxSchemeId,
-            @RequestParam(name = "taxRate", required = false) BigDecimal taxRate,
-            @RequestParam(name = "taxAmount", required = false) BigDecimal taxAmount
+            @RequestParam(name = "taxRate", required = false) BigDecimal taxRate
     ) {
         var order = new BrickOwlOrder();
         order.setBillingCountryCode(billingCountryCode);
         order.setTaxSchemeId(taxSchemeId);
         order.setTaxRate(taxRate);
-        order.setTaxAmount(taxAmount);
-        return facilitatorTax(FacilitatorTaxes.of(order));
+        return taxType(OrderTaxTypes.of(order));
     }
 
     @GetMapping("/bricklink")
-    Map<String, BigDecimal> ofBrickLinkOrder(
+    Map<String, OrderTaxType> ofBrickLinkOrder(
             @RequestParam(name = "location", required = false) String location,
             @RequestParam(name = "vatCharges", required = false) BigDecimal vatCharges,
             @RequestParam(name = "salesTax", required = false) BigDecimal salesTax,
@@ -48,11 +45,11 @@ class VastFacilitatorTaxTestController {
         order.setVatCharges(vatCharges);
         order.setSalesTax(salesTax);
         order.setVat(vat);
-        return facilitatorTax(FacilitatorTaxes.of(order));
+        return taxType(OrderTaxTypes.of(order));
     }
 
-    /** No facilitator tax is the answer, not a missing one, so it is reported as a null value rather than no body. */
-    private Map<String, BigDecimal> facilitatorTax(BigDecimal facilitatorTax) {
-        return Collections.singletonMap("facilitatorTax", facilitatorTax);
+    /** An untyped order is the answer, not a missing one, so it is reported as a null value rather than no body. */
+    private Map<String, OrderTaxType> taxType(OrderTaxType taxType) {
+        return Collections.singletonMap("taxType", taxType);
     }
 }

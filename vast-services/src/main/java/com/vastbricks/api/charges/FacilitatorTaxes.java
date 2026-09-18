@@ -1,6 +1,6 @@
-package com.vastbricks.api.tax;
+package com.vastbricks.api.charges;
 
-import static com.vastbricks.api.tax.OrderTaxType.EXPORT_TAXABLE;
+import static com.vastbricks.api.charges.OrderTaxType.EXPORT_TAXABLE;
 
 import com.vastbricks.api.client.brickowl.BrickOwlOrder;
 import com.vastbricks.api.client.brickstore.BrickStoreOrder;

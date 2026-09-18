@@ -72,7 +72,11 @@ here as they are provided; do not invent unspecified behavior prematurely.
 - The reconciliation table footer sums every money and count column in the
   frontend over the orders currently shown after filtering. Totals follow the
   visible column order, add money in cents and counts as whole numbers, and
-  leave a wholly unreported column absent.
+  leave a wholly unreported column absent. One column is the exception:
+  `order.marketplaceFee` is BrickOwl's alone, so summing it would silently
+  leave every BrickLink order out while reading as everyone's total; it is
+  left unsummed, and `calculated.marketplaceFee`, which answers for both
+  marketplaces, is summed instead.
 - The selected reconciliation report can be downloaded as CSV. The download
   uses the selected date range and all frontend row filters, with the visible
   columns in their selected order. Headers identify each field's source;
@@ -119,11 +123,11 @@ here as they are provided; do not invent unspecified behavior prematurely.
   from the BrickStore XML export and BrickOwl orders from the BrickOwl API for
   the selected month. Each collected order carries its marketplace source
   (`BrickLink` or `BrickOwl`), order ID, order date, buyer, buyer username,
-  payment method, payment currency, tax type, facilitator tax, sub-total, grand
-  total, refunded amount, shipping charged, gateway paid amount, gateway fee,
-  gateway facilitator tax, gateway refunded amount, shipping cost, and target
-  invoice, together with its
-  rule failures and the links to the order
+  payment method, payment currency, tax type, facilitator tax, marketplace fee,
+  sub-total, grand total, refunded amount, shipping charged, gateway paid
+  amount, gateway fee, gateway facilitator tax, gateway refunded amount,
+  shipping cost, target invoice, calculated marketplace fee, and calculated
+  payment fee, together with its rule failures and the links to the order
   and its payment, each exposed beside the field it rides on. Add further fields
   and providers incrementally as their processing requirements are supplied.
 - The accounting source collects the invoice that was actually written for the
@@ -207,16 +211,35 @@ here as they are provided; do not invent unspecified behavior prematurely.
   normalized to an uppercase ISO 4217 code in the mapping stage, exposed as
   `order.currency`, shown as a report column, and available as a UI filter.
 - The tax type is how the order is treated for tax. It is not reconciliation's
-  own vocabulary, so it lives in the shared `tax` feature and is only collected
-  here; see "Order tax type feature requirements". The mapping stage derives it
-  once from the marketplace order, as it normalizes amounts and payment methods
-  there.
+  own vocabulary, so it lives in the shared `charges` feature and is only
+  collected here; see "Order charges feature requirements". The mapping stage
+  derives it once from the marketplace order, as it normalizes amounts and
+  payment methods there.
 - The facilitator tax is what the marketplace collected on the order under its
-  own tax registration. It belongs to the same shared `tax` feature as the tax
-  type, is derived in the mapping stage beside it, and is normalized like every
-  other collected amount. It is shown as its own column, unlike the tax type,
-  because it is an amount to be accounted for rather than a classification an
-  icon can carry.
+  own tax registration. It belongs to the same shared `charges` feature as the
+  tax type, is derived in the mapping stage beside it, and is normalized like
+  every other collected amount. It is shown as its own column, unlike the tax
+  type, because it is an amount to be accounted for rather than a
+  classification an icon can carry.
+- The marketplace fee, `order.marketplaceFee`, is the marketplace's own account
+  of its commission on the order: BrickOwl's `brickowl_fee`, or absent for
+  BrickLink, which reports none. It is collected beside the facilitator tax
+  rather than calculated.
+- What this store calculates the same commission as, from each marketplace's
+  published rate schedule, is a different fact and lives in the `calculated`
+  group instead, as `calculated.marketplaceFee`, beside the target invoice: it
+  is not reconciliation's own vocabulary either, so it lives in the same shared
+  `charges` feature as the tax type rather than inside reconciliation; see
+  "Order charges feature requirements". The mapper calculates it while it
+  still holds the marketplace's own order and carries the answer forward,
+  exactly as the target invoice's own formula runs once a read asks for it
+  rather than at mapping time - only reversed, because this calculation needs
+  the raw order the target invoice does not. Neither figure is held against
+  the other by a rule the way a refund or a facilitator tax is - there is one
+  calculation and one reported figure, and only for one of the two
+  marketplaces, so a reader compares them by eye; the reported figure is left
+  out of a footer total for the same reason, so a total does not read as
+  covering every order while quietly skipping every BrickLink one.
 - The paid facilitator tax is what the payment provider shows the marketplace
   took out of the payment as facilitator, and is collected beside the paid
   amount by the same payment mappers, for every marketplace and provider
@@ -368,6 +391,18 @@ here as they are provided; do not invent unspecified behavior prematurely.
   reported apart from the facilitator tax for the same reason — both are taken
   out of one payment, but one is the provider's charge and the other is the
   marketplace's tax going back to whoever owes it.
+- What this store calculates the same charge as, from Stripe's or PayPal's own
+  published rate rather than from a payment, is a different fact and lives in
+  the `calculated` group instead, as `calculated.paymentFee`: it is not
+  reconciliation's own vocabulary either, so it lives in the shared `charges`
+  feature beside the tax type and the marketplace fee rather than inside
+  reconciliation; see "Order charges feature requirements". Unlike the
+  marketplace fee, it needs nothing a mapper alone holds — only the payment
+  method and grand total already collected onto `OrderFields` — so it is
+  worked out on every read, exactly as the target invoice is, rather than once
+  at mapping time. Neither figure is held against the other by a rule, the
+  same as the marketplace fee and its own reported figure; a reader compares
+  them by eye.
 - The refunded amount is what the marketplace reports was refunded to the buyer
   on the order, as a positive amount, or nothing where it reports none. The
   BrickLink export names no refund at all, so it is read off the order detail
@@ -689,8 +724,19 @@ here as they are provided; do not invent unspecified behavior prematurely.
   own tolerances.
 - The orders table shows `Actions`, source, order ID, order date, buyer, payment
   method, grand total, facilitator tax, refunded amount, gateway refunded
-  amount, target invoice, gateway paid amount, gateway facilitator tax, and the
-  shipping cost, newest order first as the API returns them. The shipping cost
+  amount, target invoice, calculated marketplace fee, calculated payment fee,
+  gateway paid amount, gateway facilitator tax, and the shipping cost, newest
+  order first as the API returns them. The calculated marketplace fee and the
+  calculated payment fee both follow the target invoice rather than joining
+  the subtraction it reads as: each is this store's own cost estimate - one of
+  what the marketplace charges to sell the order, the other of what the
+  gateway charges to take the payment for it - not an amount collected on the
+  order's behalf, so it stands beside the invoice rather than inside its sum.
+  The marketplace's own reported figure is choosable but not shown by default,
+  being BrickOwl's own account of the same thing and useful only when checking
+  one against the other; the gateway's own reported figure already has its
+  place among the payment's own amounts below and needs no such treatment. The
+  shipping cost
   comes last, after the payment's own account of the order: it is a third
   account of the same order rather than part of the subtraction the amounts
   before it make. The gateway's paid amount and
@@ -950,6 +996,31 @@ here as they are provided; do not invent unspecified behavior prematurely.
     synchronizes both, and names its record after the marketplace and the order
     id exactly as the order archive names one, so there is no order it is
     silent about by design.
+  - A BrickOwl order's reported marketplace fee must be what this store
+    calculates the same commission as, and a disagreement is a `warning`. The
+    rule applies only to BrickOwl, which is the only marketplace that reports
+    one at all: BrickLink states no per-order fee anywhere, so
+    `order.marketplaceFee` is always absent for it and there is nothing to
+    check the calculation against. It is compared only once both sides state
+    an amount — a real BrickOwl order is not expected to carry no commission
+    at all, so an order this store cannot calculate a fee for is not the same
+    fact as BrickOwl reporting a fee of nothing, and treating the two as
+    agreeing would say more about what a particular run collected than about
+    the order.
+  - A Stripe- or PayPal-paid order's reported payment fee must be what this
+    store calculates the provider's own charge as, and a disagreement is a
+    `warning`. The rule applies only to Stripe and PayPal, the two providers
+    with a published rate to calculate from, and only once a payment has been
+    matched to the order — an order the rule requiring one already covers is
+    not failed twice here. As with the marketplace fee, it is compared only
+    once both sides state an amount: a real transaction is not expected to
+    cost nothing to take, so a payment this store cannot calculate a fee for
+    is not the same fact as the provider taking none.
+  - Both fee rules are `warning` rather than `error` for the same reason: each
+    calculation is a known approximation of a rate card it does not reproduce
+    exactly — it does not convert currency, know a card's country, or account
+    for a volume discount an account may have negotiated — so a disagreement
+    is worth a look without necessarily being a mistake either side made.
   - The facilitator-tax rule reports its failures at `info`. The paid-amount
     rule reports both of its failures at `error`: money that was not found, or
     that does not add up, is something to fix.

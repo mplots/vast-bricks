@@ -34,6 +34,13 @@ export interface StoreOrder {
   taxType: OrderTaxType | null;
   /** What the marketplace collected as tax facilitator, or null where it collected none. */
   facilitatorTax: number | null;
+  /** The marketplace's own account of its commission on the order, or null for BrickLink, which states none. */
+  marketplaceFee: number | null;
+  /**
+   * What this screen calculates the marketplace's own commission on the order as, from this order's own amounts
+   * rather than the marketplace's order. Not stored: worked out fresh whenever the order is read.
+   */
+  calculatedMarketplaceFee: number | null;
   subTotal: number | null;
   /** What the buyer was charged for shipping, not what the post office charged the store. */
   shippingCost: number | null;
@@ -46,6 +53,12 @@ export interface StoreOrder {
    * backend could not convert one of them - a currency the rate table holds no rate for.
    */
   targetInvoice: number | null;
+  /**
+   * What this screen calculates Stripe's or PayPal's own charge for taking the payment as, from this order's own
+   * payment method and grand total. Not stored: worked out fresh whenever the order is read. Null for a payment
+   * method neither provider processes, or an order with no grand total.
+   */
+  calculatedPaymentFee: number | null;
   /** When the archive this row was read from was taken, which is how current the row is. */
   archivedAt: string;
 }

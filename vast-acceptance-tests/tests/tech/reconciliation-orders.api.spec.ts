@@ -167,6 +167,8 @@ test("lists BrickLink reconciliation orders for the selected month", async ({
           currency: null,
           taxType: null,
           facilitatorTax: null,
+          // BrickLink reports no per-order fee anywhere the export or API record reaches.
+          marketplaceFee: null,
           subTotal: 3,
           shippingCost: null,
           grandTotal: null,
@@ -210,6 +212,10 @@ test("lists BrickLink reconciliation orders for the selected month", async ({
         },
         calculated: {
           targetInvoice: null,
+          // No grand total was collected, so there is no amount to apply BrickLink's tiered commission to.
+          marketplaceFee: null,
+          // Paid by bank transfer, which carries no published rate, and there is no grand total either way.
+          paymentFee: null,
         },
         // No grand total was collected, so there is nothing to invoice for and no payment is required.
         failures: [],
@@ -227,6 +233,8 @@ test("lists BrickLink reconciliation orders for the selected month", async ({
           currency: "USD",
           taxType: "domestic",
           facilitatorTax: null,
+          // BrickLink reports no per-order fee anywhere the export or API record reaches.
+          marketplaceFee: null,
           subTotal: 0.43,
           // What BrickLink charged the buyer for shipping, as its ORDERSHIPPING.
           shippingCost: 3,
@@ -271,6 +279,10 @@ test("lists BrickLink reconciliation orders for the selected month", async ({
         },
         calculated: {
           targetInvoice: 3.44,
+          // 3% of the 3.435 grand total, BrickLink's first-tier rate, rounded to 0.10.
+          marketplaceFee: 0.1,
+          // 1.5% of the 3.44 grand total plus EUR 0.25, Stripe's EEA card rate, rounded to 0.30.
+          paymentFee: 0.3,
         },
         // Paid through Stripe, but no Stripe payment names this order.
         failures: [
@@ -355,6 +367,8 @@ test("lists BrickOwl reconciliation orders for the selected month", async ({
           currency: null,
           taxType: null,
           facilitatorTax: null,
+          // BrickOwl reported no brickowl_fee for this order.
+          marketplaceFee: null,
           subTotal: 6,
           shippingCost: null,
           grandTotal: null,
@@ -398,6 +412,10 @@ test("lists BrickOwl reconciliation orders for the selected month", async ({
         },
         calculated: {
           targetInvoice: null,
+          // No order total was collected, so there is no amount to apply BrickOwl's flat commission to.
+          marketplaceFee: null,
+          // No payment method was collected either, so there is no rate to apply, on top of no grand total.
+          paymentFee: null,
         },
         // No grand total was collected, so there is nothing to invoice for and no payment is required.
         failures: [],
@@ -417,6 +435,8 @@ test("lists BrickOwl reconciliation orders for the selected month", async ({
           // export.
           taxType: "export-taxable",
           facilitatorTax: null,
+          // BrickOwl reported no brickowl_fee for this order.
+          marketplaceFee: null,
           subTotal: 2.7,
           // What BrickOwl charged the buyer for shipping, as its ship_total.
           shippingCost: 2.5,
@@ -461,6 +481,10 @@ test("lists BrickOwl reconciliation orders for the selected month", async ({
         },
         calculated: {
           targetInvoice: 5.2,
+          // 2.65% of the 5.20 order total less the 2.50 shipping, rounded to 0.07.
+          marketplaceFee: 0.07,
+          // 3.4% of the 5.20 grand total plus EUR 0.35, PayPal's EEA domestic rate, rounded to 0.53.
+          paymentFee: 0.53,
         },
         // Paid through PayPal, but no PayPal payment names this order.
         failures: [
@@ -577,6 +601,7 @@ test("lists BrickOwl reconciliation orders that span several batch requests", as
       currency: null,
       taxType: null,
       facilitatorTax: null,
+      marketplaceFee: null,
       subTotal: 1,
       shippingCost: null,
       grandTotal: null,
@@ -620,6 +645,8 @@ test("lists BrickOwl reconciliation orders that span several batch requests", as
     },
     calculated: {
       targetInvoice: null,
+      marketplaceFee: null,
+      paymentFee: null,
     },
     // No grand total was collected, so there is nothing to invoice for and no payment is required.
     failures: [],
@@ -735,6 +762,7 @@ test("reports every order field with the source that stated it", async ({
     { name: "order.currency", source: "order" },
     { name: "order.taxType", source: "order" },
     { name: "order.facilitatorTax", source: "order" },
+    { name: "order.marketplaceFee", source: "order" },
     { name: "order.subTotal", source: "order" },
     { name: "order.shippingCost", source: "order" },
     { name: "order.grandTotal", source: "order" },
@@ -763,6 +791,8 @@ test("reports every order field with the source that stated it", async ({
     { name: "archive.vatInvoice", source: "archive" },
     { name: "storeSync.order", source: "storeSync" },
     { name: "calculated.targetInvoice", source: "calculated" },
+    { name: "calculated.marketplaceFee", source: "calculated" },
+    { name: "calculated.paymentFee", source: "calculated" },
   ]);
   // A field sits at the path that names it, so every account of one refund carries that one name under a source of
   // its own: what the marketplace reports, what the payment shows, and what the store archived.

@@ -31,11 +31,11 @@ class VastOrderImportTestController {
     @GetMapping
     List<OrderPayload.OrderResponse> list() {
         // The feature's own response shape, which this controller can reach by sitting in its package: a second
-        // account of an order here would be one more thing to keep in step with the first. The target invoice is
-        // left unstated: what this endpoint is for is tenant isolation over the row itself, not the euro conversion
-        // the real endpoint layers on top of it.
+        // account of an order here would be one more thing to keep in step with the first. The target invoice and
+        // the calculated fees are left unstated: what this endpoint is for is tenant isolation over the row itself,
+        // not the calculations the real endpoint layers on top of it.
         return orders.findAllByOrderByOrderDateDescIdDesc().stream()
-                .map(order -> new OrderPayload.OrderResponse(order, null))
+                .map(order -> new OrderPayload.OrderResponse(order, null, null, null))
                 .toList();
     }
 

@@ -6,7 +6,7 @@ import static com.vastbricks.api.reconciliation.rule.ReconciliationFailureLevel.
 
 import com.vastbricks.api.reconciliation.Marketplace;
 import com.vastbricks.api.reconciliation.ReconciledOrder;
-import com.vastbricks.api.tax.OrderTaxType;
+import com.vastbricks.api.charges.OrderTaxType;
 import java.util.List;
 import org.springframework.stereotype.Component;
 

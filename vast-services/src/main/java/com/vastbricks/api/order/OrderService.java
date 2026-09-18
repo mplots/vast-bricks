@@ -1,7 +1,10 @@
 package com.vastbricks.api.order;
 
 import com.vastbricks.api.currencyrate.CurrencyRates;
+import com.vastbricks.api.charges.MarketplaceFees;
+import com.vastbricks.api.charges.PaymentFees;
 import com.vastbricks.api.order.OrderPayload.CountryOrders;
+import com.vastbricks.api.reconciliation.ReconciliationAmount;
 import com.vastbricks.api.order.OrderPayload.OrderResponse;
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -32,8 +35,37 @@ class OrderService {
     /** The orders placed in a range of days, newest first, for the tenant bound to the request. */
     List<OrderResponse> findOrders(LocalDate from, LocalDate to) {
         return ordersIn(from, to).stream()
-                .map(order -> new OrderResponse(order, targetInvoiceOf(order)))
+                .map(order -> new OrderResponse(order, targetInvoiceOf(order), marketplaceFeeOf(order), paymentFeeOf(order)))
                 .toList();
+    }
+
+    /**
+     * What this screen calculates Stripe's or PayPal's own charge for taking the payment as, from this row's own
+     * payment method and grand total - both already held here exactly as reconciliation collects them, so unlike the
+     * marketplace fee this needs no separate stored-row overload and answers the same as
+     * {@link com.vastbricks.api.reconciliation.ReconciledOrder}'s own live calculation.
+     */
+    private BigDecimal paymentFeeOf(Order order) {
+        return ReconciliationAmount.normalize(PaymentFees.of(order.getPaymentMethod(), order.getGrandTotal()));
+    }
+
+    /**
+     * What this screen calculates the marketplace's own commission on the order as, from this row's own amounts
+     * rather than the marketplace's own order - the calculation is never stored, so it always reflects the rate
+     * schedule as it reads now rather than as it read when the order was imported.
+     *
+     * <p>BrickLink's grand total is exactly {@code BASEGRANDTOTAL}, so tiering it here answers the same question
+     * {@link com.vastbricks.api.charges.MarketplaceFees#of(com.vastbricks.api.client.brickstore.BrickStoreOrder)}
+     * does. BrickOwl's does not: a stored row keeps no tax scheme or raw tax amount to tell an import tax apart from
+     * VAT the store charged under its own registration, so neither is subtracted here, which is the one gap between
+     * this figure and what reconciliation calculates live for such an order - the same kind of gap
+     * {@link #targetInvoiceOf} already carries for a different reason.
+     */
+    private BigDecimal marketplaceFeeOf(Order order) {
+        return ReconciliationAmount.normalize(switch (order.getSource()) {
+            case BRICKLINK -> MarketplaceFees.brickLinkOf(order.getGrandTotal());
+            case BRICKOWL -> MarketplaceFees.brickOwlOf(order.getGrandTotal(), order.getShippingCost());
+        });
     }
 
     /**

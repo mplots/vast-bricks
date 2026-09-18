@@ -1,4 +1,4 @@
-package com.vastbricks.api.tax;
+package com.vastbricks.api.charges;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;

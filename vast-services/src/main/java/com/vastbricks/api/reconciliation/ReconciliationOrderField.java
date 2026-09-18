@@ -40,6 +40,7 @@ public enum ReconciliationOrderField {
     ORDER_CURRENCY("order.currency", ORDER),
     ORDER_TAX_TYPE("order.taxType", ORDER),
     ORDER_FACILITATOR_TAX("order.facilitatorTax", ORDER),
+    ORDER_MARKETPLACE_FEE("order.marketplaceFee", ORDER),
     ORDER_SUB_TOTAL("order.subTotal", ORDER),
     ORDER_SHIPPING_COST("order.shippingCost", ORDER),
     ORDER_GRAND_TOTAL("order.grandTotal", ORDER),
@@ -78,7 +79,9 @@ public enum ReconciliationOrderField {
 
     STORE_SYNC_ORDER("storeSync.order", STORE_SYNC),
 
-    CALCULATED_TARGET_INVOICE("calculated.targetInvoice", CALCULATED);
+    CALCULATED_TARGET_INVOICE("calculated.targetInvoice", CALCULATED),
+    CALCULATED_MARKETPLACE_FEE("calculated.marketplaceFee", CALCULATED),
+    CALCULATED_PAYMENT_FEE("calculated.paymentFee", CALCULATED);
 
     @JsonValue
     private final String name;

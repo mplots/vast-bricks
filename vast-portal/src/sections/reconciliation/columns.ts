@@ -23,6 +23,7 @@ export const orderFields = [
   'order.currency',
   'order.taxType',
   'order.facilitatorTax',
+  'order.marketplaceFee',
   'order.subTotal',
   'order.shippingCost',
   'order.grandTotal',
@@ -37,7 +38,9 @@ export const orderFields = [
   'accounting.grandTotal',
   'archive.vatInvoice',
   'storeSync.order',
-  'calculated.targetInvoice'
+  'calculated.targetInvoice',
+  'calculated.marketplaceFee',
+  'calculated.paymentFee'
 ] as const;
 // Fields shown as table columns; the detail view shows all of them.
 // The tax type is absent: it rides in the actions cell as an icon rather than spending a column on a word. The
@@ -45,6 +48,14 @@ export const orderFields = [
 // invoice follows the amounts it is derived from so the columns read as the subtraction they are — the gateway's
 // refund among them, even though most orders have none, because a target invoice cut by a refund the reader cannot
 // see reads as a wrong one.
+//
+// The calculated marketplace fee and the calculated payment fee both follow the target invoice they take no part in:
+// one is this store's own cost estimate of what BrickLink or BrickOwl charges to sell the order, the other of what
+// Stripe or PayPal charges to take the payment for it, and neither is an amount collected on the order's behalf, so
+// a target invoice worked out with either subtracted would be wrong. The marketplace's own reported figure,
+// order.marketplaceFee, is choosable but not shown by default, being BrickOwl's account alone and useful only when
+// checking it against the calculation; the gateway's own gateway.feeAmount already has its place among the payment's
+// own amounts below and needs no such treatment.
 //
 // The two refunds stand next to each other rather than each beside its own source's amounts. They are the two
 // accounts of one refund that a rule holds against each other, so a disagreement between them is a thing to see at a
@@ -71,6 +82,8 @@ export const columnFields: string[] = [
   'order.refundedAmount',
   'gateway.refundedAmount',
   'calculated.targetInvoice',
+  'calculated.marketplaceFee',
+  'calculated.paymentFee',
   'gateway.paidAmount',
   'gateway.feeAmount',
   'gateway.facilitatorTax',

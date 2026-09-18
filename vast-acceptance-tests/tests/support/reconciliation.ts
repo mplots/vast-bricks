@@ -575,10 +575,16 @@ function payPalTransaction(
       transaction_initiation_date:
         transaction.initiatedAt ?? "2026-08-30T05:24:15Z",
       transaction_amount: { currency_code: "EUR", value: transaction.amount },
-      fee_amount: {
-        currency_code: "EUR",
-        value: transaction.feeAmount ?? "-0.96",
-      },
+      // A field PayPal did not state is one the transaction had none of, exactly as PayPalTransactionInfo reads it -
+      // so a scenario not naming a fee leaves the key out rather than defaulting to one nothing asked for.
+      ...(transaction.feeAmount === undefined
+        ? {}
+        : {
+            fee_amount: {
+              currency_code: "EUR",
+              value: transaction.feeAmount,
+            },
+          }),
       transaction_status: "S",
       invoice_id: transaction.invoiceId ?? null,
     },

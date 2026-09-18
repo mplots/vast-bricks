@@ -15,8 +15,8 @@ import com.vastbricks.api.reconciliation.ReconciliationPaymentMethod;
 import com.vastbricks.api.setup.provideraccount.OperatingPeriod;
 import com.vastbricks.api.setup.provideraccount.Provider;
 import com.vastbricks.api.setup.provideraccount.ProviderAccounts;
-import com.vastbricks.api.tax.FacilitatorTaxes;
-import com.vastbricks.api.tax.OrderTaxTypes;
+import com.vastbricks.api.charges.FacilitatorTaxes;
+import com.vastbricks.api.charges.OrderTaxTypes;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.math.BigDecimal;
@@ -309,6 +309,8 @@ class OrderImport {
         // An order archived without one carries neither rather than a guess from the fields that are left.
         order.setTaxType(exported == null ? null : OrderTaxTypes.of(exported));
         order.setFacilitatorTax(exported == null ? null : ReconciliationAmount.normalize(FacilitatorTaxes.of(exported)));
+        // BrickLink states no per-order fee anywhere the archive reaches, so there is nothing to prefer here either.
+        order.setMarketplaceFee(null);
         order.setSubTotal(ReconciliationAmount.normalize(preferring(exported == null ? null : exported.getTotal(),
                 () -> amountOf(cost(stated.get(), BrickLinkOrder.Cost::getSubtotal)))));
         order.setShippingCost(ReconciliationAmount.normalize(preferring(exported == null ? null : exported.getShipping(),
@@ -351,6 +353,7 @@ class OrderImport {
         order.setCurrency(ReconciliationCurrency.normalize(stated.getPaymentCurrency()));
         order.setTaxType(OrderTaxTypes.of(stated));
         order.setFacilitatorTax(ReconciliationAmount.normalize(FacilitatorTaxes.of(stated)));
+        order.setMarketplaceFee(ReconciliationAmount.normalize(stated.getBrickOwlFee()));
         order.setSubTotal(ReconciliationAmount.normalize(stated.getSubTotal()));
         order.setShippingCost(ReconciliationAmount.normalize(stated.getShipping()));
         order.setGrandTotal(ReconciliationAmount.normalize(stated.getBaseOrderTotal()));

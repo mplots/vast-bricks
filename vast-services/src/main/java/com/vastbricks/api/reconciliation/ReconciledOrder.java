@@ -1,8 +1,11 @@
 package com.vastbricks.api.reconciliation;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.vastbricks.api.charges.PaymentFees;
 import java.math.BigDecimal;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.Setter;
 
 /**
  * One item of the reconciled order list: every account of one order, each under the source that stated it. An order
@@ -41,6 +44,17 @@ public class ReconciledOrder {
     /** What the store synchronization system holds for the order, which says whether it acted on it at all. */
     private final StoreSyncFields storeSync = new StoreSyncFields();
 
+    /**
+     * What this store calculates the marketplace's own commission on the order as. Filled in by the order mapper
+     * itself, immediately after building this, rather than by a later detail mapper: the calculation needs the
+     * marketplace's own order, which only the order mapper still holds by the time anything else sees this. No
+     * public getter, unlike every other field here: it is exposed only through {@link #getCalculated()}, which is
+     * what puts it in the {@code calculated} group rather than a {@code marketplaceFee} of its own at the top level.
+     */
+    @Getter(AccessLevel.NONE)
+    @Setter
+    private BigDecimal marketplaceFee;
+
     private ReconciledOrder(OrderFields order) {
         this.order = order;
     }
@@ -55,7 +69,18 @@ public class ReconciledOrder {
      * states what the current fields come to; that is also why it carries no setter.
      */
     public CalculatedFields getCalculated() {
-        return new CalculatedFields(targetInvoice());
+        return new CalculatedFields(targetInvoice(), marketplaceFee, paymentFee());
+    }
+
+    /**
+     * Needs nothing the order mapper alone holds - only the payment method and grand total {@link OrderFields}
+     * already carries - so unlike the marketplace fee this is worked out here, on every read, rather than set once
+     * at mapping time. Normalized here rather than by a mapper, because a mapper is where every other amount is, but
+     * a rate applied to an already-normalized grand total states more decimals than the normalization it started
+     * from.
+     */
+    private BigDecimal paymentFee() {
+        return ReconciliationAmount.normalize(PaymentFees.of(order.getPaymentMethod(), order.getGrandTotal()));
     }
 
     private BigDecimal targetInvoice() {

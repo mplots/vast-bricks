@@ -33,4 +33,25 @@ public class CalculatedFields {
      * be invoiced for less than nothing, and no invoice can be written for that.
      */
     private final BigDecimal targetInvoice;
+
+    /**
+     * What this store calculates the marketplace's own commission on the order as, from
+     * {@link com.vastbricks.api.charges.MarketplaceFees} rather than from any figure either marketplace
+     * states: BrickLink states no such figure at all, and BrickOwl's own reported one,
+     * {@link OrderFields#getMarketplaceFee()}, is what this is for checking against, not reading in place of
+     * calculating. Computed from the marketplace's own order at mapping time, the one point a live order is at hand,
+     * rather than here from the fields already collected — the same reason the tax type and facilitator tax above it
+     * are derived where they are rather than recomputed on every read.
+     */
+    private final BigDecimal marketplaceFee;
+
+    /**
+     * What this store calculates Stripe's or PayPal's own charge for taking the payment as, from
+     * {@link com.vastbricks.api.charges.PaymentFees} rather than from any figure a payment states: the gateway's own
+     * reported fee, {@link GatewayFields#getFeeAmount()}, is what this is for checking against, not reading in place
+     * of calculating. Unlike the marketplace fee beside it, this needs nothing a mapper alone holds - only the
+     * payment method and grand total already collected onto {@link OrderFields} - so it is worked out here, on every
+     * read, exactly as the target invoice is.
+     */
+    private final BigDecimal paymentFee;
 }
