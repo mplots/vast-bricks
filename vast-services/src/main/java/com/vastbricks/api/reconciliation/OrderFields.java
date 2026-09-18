@@ -25,6 +25,14 @@ public class OrderFields {
     private String buyer;
     private String buyerUsername;
 
+    /**
+     * Where the order was shipped, as a two-letter ISO code. BrickOwl states one directly as {@code
+     * ship_country_code}; BrickLink's own export states only a name and a city together, {@code "Latvia, Riga"},
+     * resolved to a code through {@link com.vastbricks.api.country.Countries}, or {@code null} where nothing in
+     * that table lists what it names.
+     */
+    private String country;
+
     /** Total individual items ordered, as reported by the marketplace. */
     private Integer itemCount;
 

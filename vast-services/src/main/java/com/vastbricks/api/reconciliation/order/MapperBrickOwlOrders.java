@@ -2,6 +2,7 @@ package com.vastbricks.api.reconciliation.order;
 
 import com.vastbricks.api.client.brickowl.BrickOwlOrder;
 import com.vastbricks.api.charges.MarketplaceFees;
+import com.vastbricks.api.country.Countries;
 import com.vastbricks.api.reconciliation.Marketplace;
 import com.vastbricks.api.reconciliation.OrderMapper;
 import com.vastbricks.api.reconciliation.OrderFields;
@@ -14,13 +15,17 @@ import com.vastbricks.api.charges.FacilitatorTaxes;
 import com.vastbricks.api.charges.OrderTaxTypes;
 import java.math.BigDecimal;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 /** Turns the fetched BrickOwl orders into reconciled orders. */
 @Component
 @Order(2)
+@RequiredArgsConstructor
 class MapperBrickOwlOrders implements OrderMapper<SourcedBrickOwlOrder> {
+
+    private final Countries countries;
 
     @Override
     public Class<SourcedBrickOwlOrder> type() {
@@ -40,6 +45,7 @@ class MapperBrickOwlOrders implements OrderMapper<SourcedBrickOwlOrder> {
                 .orderDate(sourced.getOrderDate())
                 .buyer(ReconciliationText.normalize(order.getBuyerName()))
                 .buyerUsername(ReconciliationText.normalize(order.getCustomerUsername()))
+                .country(countries.resolve(order.getShipCountryCode()).orElse(null))
                 .itemCount(order.getTotalQuantity())
                 .lotCount(order.getTotalLots())
                 .paymentMethod(ReconciliationPaymentMethod.normalize(order.getPaymentMethodType()))

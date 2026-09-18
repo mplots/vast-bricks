@@ -126,6 +126,7 @@
   "reconciliation-field-order-orderDate": "Order date",
   "reconciliation-field-order-buyer": "Buyer",
   "reconciliation-field-order-buyerUsername": "Buyer username",
+  "reconciliation-field-order-country": "Country",
   "reconciliation-field-order-itemCount": "Item count",
   "reconciliation-field-order-lotCount": "Lot count",
   "reconciliation-field-order-paymentMethod": "Payment method",

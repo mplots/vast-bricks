@@ -161,6 +161,8 @@ test("lists BrickLink reconciliation orders for the selected month", async ({
           orderDate: "2026-08-31",
           buyer: "another buyer",
           buyerUsername: "another-buyer-username",
+          // No LOCATION was collected, so there is no country to resolve.
+          country: null,
           itemCount: null,
           lotCount: null,
           paymentMethod: "Bank Transfer",
@@ -227,6 +229,8 @@ test("lists BrickLink reconciliation orders for the selected month", async ({
           orderDate: "2026-08-30",
           buyer: "some buyer",
           buyerUsername: "some-buyer-username",
+          // LOCATION states "Latvia, Riga", resolved through the country name before the city.
+          country: "LV",
           itemCount: null,
           lotCount: null,
           paymentMethod: "Stripe",
@@ -361,6 +365,7 @@ test("lists BrickOwl reconciliation orders for the selected month", async ({
           orderDate: "2026-08-11",
           buyer: "Test Buyer Beta",
           buyerUsername: "test_beta",
+          country: null,
           itemCount: null,
           lotCount: null,
           paymentMethod: null,
@@ -427,6 +432,8 @@ test("lists BrickOwl reconciliation orders for the selected month", async ({
           orderDate: "2026-08-10",
           buyer: "Test Buyer Alpha",
           buyerUsername: "test_alpha",
+          // billing_country_code is stated, but the mapper reads ship_country_code, which this order states none of.
+          country: null,
           itemCount: null,
           lotCount: null,
           paymentMethod: "PayPal",
@@ -595,6 +602,7 @@ test("lists BrickOwl reconciliation orders that span several batch requests", as
       orderDate: "2026-08-10",
       buyer: "Bulk Buyer 1",
       buyerUsername: "bulk_1",
+      country: null,
       itemCount: null,
       lotCount: null,
       paymentMethod: null,
@@ -756,6 +764,7 @@ test("reports every order field with the source that stated it", async ({
     { name: "order.orderDate", source: "order" },
     { name: "order.buyer", source: "order" },
     { name: "order.buyerUsername", source: "order" },
+    { name: "order.country", source: "order" },
     { name: "order.itemCount", source: "order" },
     { name: "order.lotCount", source: "order" },
     { name: "order.paymentMethod", source: "order" },
@@ -1300,6 +1309,10 @@ test("leaves no target invoice for a fully refunded BrickOwl order no payment wa
   // With no payment collected there is no account of the money the refund could come out of, so the order has no
   // target at all rather than a target of nothing.
   expect(body.orders[0].calculated.targetInvoice).toBeNull();
+  // Refunded in full: a commission or a payment fee is not owed on a sale that was wholly undone, so neither
+  // calculated fee has anything left to price, even though the order otherwise states enough to calculate one.
+  expect(body.orders[0].calculated.marketplaceFee).toBeNull();
+  expect(body.orders[0].calculated.paymentFee).toBeNull();
   // Nothing being left to invoice for is where no payment is owed, so the payment is not reported as missing.
   // The order is reported at info all the same: the gateway only released a reservation, which is worth seeing
   // rather than reading as a reconciled order.

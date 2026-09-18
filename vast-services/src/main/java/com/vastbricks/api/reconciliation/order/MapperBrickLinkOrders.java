@@ -1,6 +1,8 @@
 package com.vastbricks.api.reconciliation.order;
 
 import com.vastbricks.api.charges.MarketplaceFees;
+import com.vastbricks.api.client.brickstore.BrickStoreOrder;
+import com.vastbricks.api.country.Countries;
 import com.vastbricks.api.reconciliation.Marketplace;
 import com.vastbricks.api.reconciliation.OrderMapper;
 import com.vastbricks.api.reconciliation.OrderFields;
@@ -13,13 +15,18 @@ import com.vastbricks.api.charges.FacilitatorTaxes;
 import com.vastbricks.api.charges.OrderTaxTypes;
 import java.math.BigDecimal;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 /** Turns the exported BrickLink orders into reconciled orders. The buyer username arrives with its own mapper. */
 @Component
 @Order(1)
+@RequiredArgsConstructor
 class MapperBrickLinkOrders implements OrderMapper<SourcedBrickLinkOrder> {
+
+    private final Countries countries;
 
     @Override
     public Class<SourcedBrickLinkOrder> type() {
@@ -39,6 +46,7 @@ class MapperBrickLinkOrders implements OrderMapper<SourcedBrickLinkOrder> {
                 .orderId(orderId)
                 .orderDate(order.getOrderDate())
                 .buyer(ReconciliationText.normalize(order.getBuyer()))
+                .country(countryOf(order))
                 .itemCount(order.getTotalItems())
                 .lotCount(order.getTotalLots())
                 .paymentMethod(ReconciliationPaymentMethod.normalize(order.getPaymentType()))
@@ -56,6 +64,21 @@ class MapperBrickLinkOrders implements OrderMapper<SourcedBrickLinkOrder> {
         // the one point this mapper still holds the marketplace's own order.
         reconciled.setMarketplaceFee(ReconciliationAmount.normalize(MarketplaceFees.of(order)));
         return reconciled;
+    }
+
+    /**
+     * The country BrickLink's own export names first in its free-text location, {@code "Latvia, Riga"} - the only
+     * country signal this mapper has, since it reads the accounting export rather than BrickLink's API record, which
+     * is where a clean code lives instead. Null where the export states no location, or where nothing in
+     * {@link Countries} lists what it names.
+     */
+    private String countryOf(BrickStoreOrder order) {
+        String location = StringUtils.trimToNull(order.getLocation());
+        if (location == null) {
+            return null;
+        }
+        String countryName = location.split(",", 2)[0].trim();
+        return countries.resolve(countryName).orElse(null);
     }
 
     private BigDecimal refundedAmount(SourcedBrickLinkOrder sourced) {

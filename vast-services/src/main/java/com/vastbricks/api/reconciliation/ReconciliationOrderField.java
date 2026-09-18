@@ -34,6 +34,7 @@ public enum ReconciliationOrderField {
     ORDER_DATE("order.orderDate", ORDER),
     ORDER_BUYER("order.buyer", ORDER),
     ORDER_BUYER_USERNAME("order.buyerUsername", ORDER),
+    ORDER_COUNTRY("order.country", ORDER),
     ORDER_ITEM_COUNT("order.itemCount", ORDER),
     ORDER_LOT_COUNT("order.lotCount", ORDER),
     ORDER_PAYMENT_METHOD("order.paymentMethod", ORDER),

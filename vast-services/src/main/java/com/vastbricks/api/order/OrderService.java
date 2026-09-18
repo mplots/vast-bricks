@@ -32,21 +32,34 @@ class OrderService {
 
     private final CurrencyRates currencyRates;
 
-    /** The orders placed in a range of days, newest first, for the tenant bound to the request. */
+    /**
+     * The orders placed in a range of days, newest first, for the tenant bound to the request.
+     *
+     * <p>Neither calculated fee is stated when there is no target invoice at all: nothing left to invoice is nothing
+     * left to have cost a commission or a payment charge either, whether that is because the order came back in full
+     * or because there was no total this screen could convert to price one from.
+     */
     List<OrderResponse> findOrders(LocalDate from, LocalDate to) {
         return ordersIn(from, to).stream()
-                .map(order -> new OrderResponse(order, targetInvoiceOf(order), marketplaceFeeOf(order), paymentFeeOf(order)))
+                .map(order -> {
+                    var targetInvoice = targetInvoiceOf(order);
+                    boolean nothingToInvoice = targetInvoice == null || targetInvoice.signum() == 0;
+                    return new OrderResponse(order, targetInvoice,
+                            nothingToInvoice ? null : marketplaceFeeOf(order),
+                            nothingToInvoice ? null : paymentFeeOf(order));
+                })
                 .toList();
     }
 
     /**
      * What this screen calculates Stripe's or PayPal's own charge for taking the payment as, from this row's own
-     * payment method and grand total - both already held here exactly as reconciliation collects them, so unlike the
-     * marketplace fee this needs no separate stored-row overload and answers the same as
+     * payment method, grand total and country - all three already held here exactly as reconciliation collects them,
+     * so unlike the marketplace fee this needs no separate stored-row overload and answers the same as
      * {@link com.vastbricks.api.reconciliation.ReconciledOrder}'s own live calculation.
      */
     private BigDecimal paymentFeeOf(Order order) {
-        return ReconciliationAmount.normalize(PaymentFees.of(order.getPaymentMethod(), order.getGrandTotal()));
+        return ReconciliationAmount.normalize(
+                PaymentFees.of(order.getPaymentMethod(), order.getGrandTotal(), order.getCountry()));
     }
 
     /**

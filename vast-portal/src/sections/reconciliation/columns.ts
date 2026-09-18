@@ -17,6 +17,7 @@ export const orderFields = [
   'order.orderDate',
   'order.buyer',
   'order.buyerUsername',
+  'order.country',
   'order.itemCount',
   'order.lotCount',
   'order.paymentMethod',

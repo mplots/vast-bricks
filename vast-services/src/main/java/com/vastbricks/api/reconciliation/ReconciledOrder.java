@@ -67,9 +67,16 @@ public class ReconciledOrder {
     /**
      * What reconciliation derives from the accounts above. It is built on every read rather than held, so it always
      * states what the current fields come to; that is also why it carries no setter.
+     *
+     * <p>Neither fee is stated when there is no target invoice at all - nothing left to invoice is nothing left to
+     * have cost a commission or a payment charge either, whether that is because the order came back in full or
+     * because there is no grand total to have priced one from in the first place.
      */
     public CalculatedFields getCalculated() {
-        return new CalculatedFields(targetInvoice(), marketplaceFee, paymentFee());
+        var targetInvoice = targetInvoice();
+        boolean nothingToInvoice = targetInvoice == null || targetInvoice.signum() == 0;
+        return new CalculatedFields(targetInvoice, nothingToInvoice ? null : marketplaceFee,
+                nothingToInvoice ? null : paymentFee());
     }
 
     /**
@@ -80,7 +87,8 @@ public class ReconciledOrder {
      * from.
      */
     private BigDecimal paymentFee() {
-        return ReconciliationAmount.normalize(PaymentFees.of(order.getPaymentMethod(), order.getGrandTotal()));
+        return ReconciliationAmount.normalize(
+                PaymentFees.of(order.getPaymentMethod(), order.getGrandTotal(), order.getCountry()));
     }
 
     private BigDecimal targetInvoice() {

@@ -36,6 +36,8 @@ export interface ReconciliationOrderFields {
   orderDate: string | null;
   buyer: string;
   buyerUsername: string | null;
+  /** Where the order was shipped, as a two-letter ISO code, or `null` where nothing states one it can resolve. */
+  country: string | null;
   itemCount: number | null;
   lotCount: number | null;
   /** How the order was paid, in the provider's own wording. */

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Reaches {@link PaymentFees} for logic tests: unlike {@link MarketplaceFees}, it takes no marketplace order at all,
- * only the payment method and grand total a scenario states directly.
+ * only the payment method, grand total and country a scenario states directly.
  */
 @RestController
 @RequestMapping(path = "/api/test/payment-fee", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -20,8 +20,9 @@ class VastPaymentFeeTestController {
     @GetMapping
     Map<String, BigDecimal> of(
             @RequestParam(name = "paymentMethod", required = false) String paymentMethod,
-            @RequestParam(name = "grandTotal", required = false) BigDecimal grandTotal
+            @RequestParam(name = "grandTotal", required = false) BigDecimal grandTotal,
+            @RequestParam(name = "country", required = false) String country
     ) {
-        return Collections.singletonMap("paymentFee", PaymentFees.of(paymentMethod, grandTotal));
+        return Collections.singletonMap("paymentFee", PaymentFees.of(paymentMethod, grandTotal, country));
     }
 }

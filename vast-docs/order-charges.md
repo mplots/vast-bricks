@@ -178,15 +178,16 @@ charge for taking the payment as, from each provider's published rate rather
 than from a figure a payment states.
 
 - The public API is one type, `PaymentFees`, with a single `of` overload:
-  `of(String paymentMethod, BigDecimal grandTotal)`. Unlike `OrderTaxTypes`,
-  `FacilitatorTaxes`, and `MarketplaceFees`, it takes no marketplace order:
-  Stripe and PayPal charge on the amount actually taken rather than on
-  anything a marketplace's own order shape states, and that amount, together
-  with which of the two took it, is already collected onto every order, live
-  or stored, as `paymentMethod` and `grandTotal`. There is consequently no
-  second overload for a caller holding only a stored row either - the gap
-  `MarketplaceFees.brickLinkOf` / `brickOwlOf` exist to cover does not arise
-  here.
+  `of(String paymentMethod, BigDecimal grandTotal, String country)`. Unlike
+  `OrderTaxTypes`, `FacilitatorTaxes`, and `MarketplaceFees`, it takes no
+  marketplace order: Stripe and PayPal charge on the amount actually taken,
+  from where it came from, rather than on anything a marketplace's own order
+  shape states, and all three - which of the two took it, how much, and where
+  the order was shipped - are already collected onto every order, live or
+  stored, as `paymentMethod`, `grandTotal` and `country`. There is
+  consequently no second overload for a caller holding only a stored row
+  either - the gap `MarketplaceFees.brickLinkOf` / `brickOwlOf` exist to cover
+  does not arise here.
 - The calculation is never stored, for the same reason the marketplace fee's
   is not: a stored figure would go stale the moment a rate changed, silently
   disagreeing with a fresh calculation of the same order.
@@ -197,17 +198,33 @@ than from a figure a payment states.
   other payment method - `Bank Transfer`, or a marketplace's own wording
   nothing normalizes - has no payment fee rather than a zero, there being no
   such rate to apply.
-- Stripe's rate is for an EEA-issued card: 1.5% + EUR 0.25 per transaction,
-  matching <https://stripe.com/pricing> as published for a Latvia-based
-  account. PayPal's is its EEA domestic commercial-transaction rate:
-  3.4% + EUR 0.35, matching
-  <https://www.paypal.com/ee/business/paypal-business-fees>. Neither
-  formula's fixed fee is converted for the currency the amount happens to be
-  in, and PayPal's own cross-border surcharge for a buyer outside the EEA is
-  not added, there being nothing here to tell a buyer's region from; both are
-  known gaps between this figure and what either provider actually bills, in
-  the same spirit as the gaps `MarketplaceFees` already documents for not
-  converting currency and not subtracting BrickLink's VAT-net adjustment.
+- Both providers price a payment by where it came from as well as by which of
+  them took it, so the calculation takes the order's country as a third input
+  alongside the payment method and the grand total, resolved through the
+  shared `country` feature exactly as `order.country` already is; see
+  "Country feature requirements". Three tiers, the same shape for both
+  providers: this store's own EEA, the United Kingdom, which both price apart
+  from the rest of the EEA even though it sits right beside it, and everywhere
+  else.
+    - Stripe (<https://stripe.com/pricing>, published for a Latvia-based
+      account): 1.5% + EUR 0.25 for an EEA-issued card, 2.5% + EUR 0.25 for a
+      UK-issued one, 3.15% + EUR 0.25 for anywhere else.
+    - PayPal (<https://www.paypal.com/ee/business/paypal-business-fees>): its
+      domestic EEA-to-EEA commercial rate, 3.4%, plus its own published
+      cross-border surcharge for a non-EEA buyer - 1.29% for the UK, 1.99% for
+      everywhere else - all with its EUR 0.35 fixed fee. So a UK buyer is
+      4.69% + EUR 0.35 and any other non-EEA buyer is 5.39% + EUR 0.35.
+  A country neither table places - `null`, most often, since a caller like
+  BrickLink's own export leaves it there whenever nothing resolves - is priced
+  as EEA rather than as international: most of this store's own orders are,
+  and defaulting to the rate none of them are would read every unresolved
+  order as foreign instead of merely unclassified.
+  Neither formula's fixed fee is converted for the currency the amount happens
+  to be in, which is a known gap between this figure and what either provider
+  actually bills, in the same spirit as the gap `MarketplaceFees` already
+  documents for not converting currency either. Neither is either provider's
+  own volume discount or negotiated rate, which this has no way to know at
+  all.
 - Applied to the grand total: the amount actually charged to the card or
   PayPal account, in whatever currency it is stated in - the store's own base
   currency for `order.grandTotal`, which for a Latvia-based store is normally
@@ -218,17 +235,17 @@ than from a figure a payment states.
   transaction record actually shows it took. The calculation is not a
   substitute for that figure and does not replace it: it rides beside it as
   `calculated.paymentFee`, computed generically inside
-  `ReconciledOrder.getCalculated()` from the payment method and grand total
-  `OrderFields` already carries, rather than at mapping time from a raw
-  provider record the way the marketplace fee has to be. A reader compares the
-  two by eye, exactly as the marketplace's own reported fee and its
+  `ReconciledOrder.getCalculated()` from the payment method, grand total and
+  country `OrderFields` already carries, rather than at mapping time from a
+  raw provider record the way the marketplace fee has to be. A reader compares
+  the two by eye, exactly as the marketplace's own reported fee and its
   calculation are compared - and, as with that pair, reconciliation also runs
   a rule of its own holding them against each other; see "Reconciliation" for
   `payment-fee-mismatch`.
 - The orders screen has no gateway data at all - it never calls Stripe or
   PayPal - so `calculated.paymentFee` is the only account of a payment fee it
-  can show, calculated from the same stored `paymentMethod` and `grandTotal`
-  the marketplace fee's own stored-row overloads already read.
+  can show, calculated from the same stored `paymentMethod`, `grandTotal` and
+  `country` the marketplace fee's own stored-row overloads already read.
 - The live calculation is a logic test addressing it through the test-only
   `/api/test/payment-fee` controller, beside the rest of this package's own
   test-only endpoints - one endpoint rather than one per provider, because,

@@ -30,11 +30,14 @@ type ListedOrder = {
   currency: string | null;
   taxType: string | null;
   facilitatorTax: string | null;
+  marketplaceFee: string | null;
+  calculatedMarketplaceFee: string | null;
   subTotal: string | null;
   shippingCost: string | null;
   grandTotal: string | null;
   refundedAmount: string | null;
   targetInvoice: string | null;
+  calculatedPaymentFee: string | null;
   archivedAt: string;
 };
 
@@ -232,6 +235,32 @@ test("the target invoice converts the facilitator tax and the refund out of what
   expect(order.currency).toBe(TEST_CURRENCY);
   // 50.00 - 10.00 - 5.00, all three converted before they were added or subtracted rather than taken off as stated.
   expect(Number(order.targetInvoice)).toBe(35);
+});
+
+test("calculates no marketplace or payment fee for an order refunded in full", async ({
+  request,
+  settings,
+  authentication,
+}) => {
+  await importOrders(
+    request,
+    settings,
+    authentication.tenant.code,
+    (directory) => {
+      writeBrickLinkArchive(directory, {
+        orderId: 32100209,
+        archivedAt: "2026-04-12T08:00:00.000Z",
+        accounting: { orderDate: "4/12/2026", grandTotal: "100.00" },
+        // Refunded for the whole of what it came to.
+        refunded: "100.00",
+      });
+    },
+  );
+
+  const order = (await listOrders(request, "2026-04-01", "2026-04-30")).orders[0]!;
+  expect(Number(order.refundedAmount)).toBe(100);
+  expect(order.calculatedMarketplaceFee).toBeNull();
+  expect(order.calculatedPaymentFee).toBeNull();
 });
 
 test("a currency the rate table has never held a rate for leaves the target invoice unstated", async ({

@@ -126,6 +126,7 @@
   "reconciliation-field-order-orderDate": "Pasūtījuma datums",
   "reconciliation-field-order-buyer": "Pircējs",
   "reconciliation-field-order-buyerUsername": "Pircēja lietotājvārds",
+  "reconciliation-field-order-country": "Valsts",
   "reconciliation-field-order-itemCount": "Vienību skaits",
   "reconciliation-field-order-lotCount": "Pozīciju skaits",
   "reconciliation-field-order-paymentMethod": "Maksājuma veids",

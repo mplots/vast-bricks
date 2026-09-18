@@ -123,7 +123,7 @@ here as they are provided; do not invent unspecified behavior prematurely.
   from the BrickStore XML export and BrickOwl orders from the BrickOwl API for
   the selected month. Each collected order carries its marketplace source
   (`BrickLink` or `BrickOwl`), order ID, order date, buyer, buyer username,
-  payment method, payment currency, tax type, facilitator tax, marketplace fee,
+  country, payment method, payment currency, tax type, facilitator tax, marketplace fee,
   sub-total, grand total, refunded amount, shipping charged, gateway paid
   amount, gateway fee, gateway facilitator tax, gateway refunded amount,
   shipping cost, target invoice, calculated marketplace fee, and calculated
@@ -210,6 +210,20 @@ here as they are provided; do not invent unspecified behavior prematurely.
   `PAYCURRENCYCODE` and BrickOwl's `payment_currency`. It is trimmed and
   normalized to an uppercase ISO 4217 code in the mapping stage, exposed as
   `order.currency`, shown as a report column, and available as a UI filter.
+- The order country is where the order was shipped, as a two-letter ISO code,
+  resolved through the shared `country` feature for both marketplaces rather
+  than read as each states it; see "Country feature requirements". BrickOwl
+  states a code directly, `ship_country_code`, and the mapper resolves it all
+  the same, rather than trusting an already-clean-looking code as correct: a
+  discrepancy - a `UK` where every other source says `GB`, or any other
+  spelling a provider is later found to use - is fixed by adding that spelling
+  to the country's own search terms, not by teaching this mapper a fold of its
+  own. BrickLink's export states no code at all: reconciliation reads the
+  accounting export rather than BrickLink's own API record, which is the only
+  place a clean code lives, so the mapper instead reads the free-text location
+  it does have, `"Latvia, Riga"`, splits off the part naming the country, and
+  resolves that the same way. Null wherever nothing states enough to resolve
+  one - no location at all, or a spelling the country table does not yet list.
 - The tax type is how the order is treated for tax. It is not reconciliation's
   own vocabulary, so it lives in the shared `charges` feature and is only
   collected here; see "Order charges feature requirements". The mapping stage
