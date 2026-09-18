@@ -68,15 +68,15 @@ public class ReconciledOrder {
      * What reconciliation derives from the accounts above. It is built on every read rather than held, so it always
      * states what the current fields come to; that is also why it carries no setter.
      *
-     * <p>Neither fee is stated when there is no target invoice at all - nothing left to invoice is nothing left to
-     * have cost a commission or a payment charge either, whether that is because the order came back in full or
-     * because there is no grand total to have priced one from in the first place.
+     * <p>The marketplace fee is not stated when there is no target invoice at all: a commission is owed on a sale,
+     * and nothing left to invoice is nothing left to have sold. The payment fee is not the same question - a
+     * provider charges for taking a payment whether or not anything is still owed on it afterwards, a refund among
+     * them, so it is calculated regardless.
      */
     public CalculatedFields getCalculated() {
         var targetInvoice = targetInvoice();
         boolean nothingToInvoice = targetInvoice == null || targetInvoice.signum() == 0;
-        return new CalculatedFields(targetInvoice, nothingToInvoice ? null : marketplaceFee,
-                nothingToInvoice ? null : paymentFee());
+        return new CalculatedFields(targetInvoice, nothingToInvoice ? null : marketplaceFee, paymentFee());
     }
 
     /**

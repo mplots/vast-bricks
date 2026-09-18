@@ -237,7 +237,7 @@ test("the target invoice converts the facilitator tax and the refund out of what
   expect(Number(order.targetInvoice)).toBe(35);
 });
 
-test("calculates no marketplace or payment fee for an order refunded in full", async ({
+test("calculates no marketplace fee, but still a payment fee, for an order refunded in full", async ({
   request,
   settings,
   authentication,
@@ -260,7 +260,9 @@ test("calculates no marketplace or payment fee for an order refunded in full", a
   const order = (await listOrders(request, "2026-04-01", "2026-04-30")).orders[0]!;
   expect(Number(order.refundedAmount)).toBe(100);
   expect(order.calculatedMarketplaceFee).toBeNull();
-  expect(order.calculatedPaymentFee).toBeNull();
+  // PayPal charged for taking the payment whether or not a refund came after it: 3.4% of the 100.00 grand total
+  // plus EUR 0.35, its EEA domestic rate.
+  expect(Number(order.calculatedPaymentFee)).toBe(3.75);
 });
 
 test("a currency the rate table has never held a rate for leaves the target invoice unstated", async ({

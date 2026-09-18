@@ -35,9 +35,10 @@ class OrderService {
     /**
      * The orders placed in a range of days, newest first, for the tenant bound to the request.
      *
-     * <p>Neither calculated fee is stated when there is no target invoice at all: nothing left to invoice is nothing
-     * left to have cost a commission or a payment charge either, whether that is because the order came back in full
-     * or because there was no total this screen could convert to price one from.
+     * <p>The marketplace fee is not stated when there is no target invoice at all: a commission is owed on a sale,
+     * and nothing left to invoice is nothing left to have sold. The payment fee is not the same question - a
+     * provider charges for taking a payment whether or not anything is still owed on it afterwards, a refund among
+     * them, so it is calculated regardless.
      */
     List<OrderResponse> findOrders(LocalDate from, LocalDate to) {
         return ordersIn(from, to).stream()
@@ -46,7 +47,7 @@ class OrderService {
                     boolean nothingToInvoice = targetInvoice == null || targetInvoice.signum() == 0;
                     return new OrderResponse(order, targetInvoice,
                             nothingToInvoice ? null : marketplaceFeeOf(order),
-                            nothingToInvoice ? null : paymentFeeOf(order));
+                            paymentFeeOf(order));
                 })
                 .toList();
     }

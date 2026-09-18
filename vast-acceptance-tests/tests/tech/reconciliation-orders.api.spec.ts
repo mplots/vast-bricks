@@ -1309,10 +1309,12 @@ test("leaves no target invoice for a fully refunded BrickOwl order no payment wa
   // With no payment collected there is no account of the money the refund could come out of, so the order has no
   // target at all rather than a target of nothing.
   expect(body.orders[0].calculated.targetInvoice).toBeNull();
-  // Refunded in full: a commission or a payment fee is not owed on a sale that was wholly undone, so neither
-  // calculated fee has anything left to price, even though the order otherwise states enough to calculate one.
+  // Refunded in full: a commission is not owed on a sale that was wholly undone, so there is nothing left for it to
+  // price even though the order otherwise states enough to calculate one. A payment fee is not the same question -
+  // Stripe charged for taking the payment whether or not a refund came after it - so it is still calculated: 1.5%
+  // of the 5.20 grand total plus EUR 0.25, its EEA card rate, rounded to 0.33.
   expect(body.orders[0].calculated.marketplaceFee).toBeNull();
-  expect(body.orders[0].calculated.paymentFee).toBeNull();
+  expect(body.orders[0].calculated.paymentFee).toBe(0.33);
   // Nothing being left to invoice for is where no payment is owed, so the payment is not reported as missing.
   // The order is reported at info all the same: the gateway only released a reservation, which is worth seeing
   // rather than reading as a reconciled order.

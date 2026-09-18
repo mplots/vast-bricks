@@ -124,6 +124,17 @@ rate schedule rather than from a figure either one states on the order itself.
   than a zero, as every other amount derived here does; one whose shipping and
   taxes exceed its total has a marketplace fee of zero rather than a negative
   one, there being no such thing as a marketplace paying a store to sell.
+- Also unstated - regardless of what the formula above would otherwise come to
+  - when the order has no target invoice at all, `null` or zero alike: a
+  commission is owed on a sale, and nothing left to invoice is nothing left to
+  have sold, whether that is because the order came back in full or because
+  there was no total to have priced one from in the first place. Applied on
+  both screens once `calculated.targetInvoice` is known: at
+  `ReconciledOrder.getCalculated()` for reconciliation, and inline in
+  `OrderService.findOrders` for the orders screen. The payment fee is not
+  suppressed the same way - see "Payment fee" - because it answers a different
+  question: a provider charges for taking a payment whether or not anything is
+  still owed on it afterwards.
 - The reconciliation report holds the marketplace's own order at the point it
   maps it, so it calls `of(BrickStoreOrder)` / `of(BrickOwlOrder)` there and
   carries the answer forward on `ReconciledOrder` until a read exposes it,
@@ -254,6 +265,11 @@ than from a figure a payment states.
   calculation are compared - and, as with that pair, reconciliation also runs
   a rule of its own holding them against each other; see "Reconciliation" for
   `payment-fee-mismatch`.
+- Calculated whether or not the order has a target invoice, unlike the
+  marketplace fee - see "Marketplace fee". A provider charges for taking a
+  payment whether or not anything is still owed on it afterwards, a refund
+  among them, so a `null` or zero target invoice does not suppress this
+  figure the way it does the marketplace fee.
 - The orders screen has no gateway data at all - it never calls Stripe or
   PayPal - so `calculated.paymentFee` is the only account of a payment fee it
   can show, calculated from the same stored `paymentMethod`, `grandTotal` and
