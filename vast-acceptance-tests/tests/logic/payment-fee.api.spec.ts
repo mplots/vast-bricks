@@ -22,14 +22,19 @@ test('takes 1.5% plus 0.25 as the Stripe fee for an EEA country', async ({ reque
   await expect(paymentFeeOf(request, 'Stripe', '100', 'LV')).resolves.toBe(1.75);
 });
 
+// A non-euro EEA country prices the same as one that uses the euro.
+test('takes the EEA Stripe rate for a non-euro EEA country too', async ({ request }) => {
+  await expect(paymentFeeOf(request, 'Stripe', '100', 'DK')).resolves.toBe(1.75);
+});
+
 // Stripe's rate for a UK-issued card: 2.5% + EUR 0.25.
 test('takes 2.5% plus 0.25 as the Stripe fee for the United Kingdom', async ({ request }) => {
   await expect(paymentFeeOf(request, 'Stripe', '100', 'GB')).resolves.toBe(2.75);
 });
 
-// Stripe's rate for a card issued anywhere else: 3.15% + EUR 0.25.
-test('takes 3.15% plus 0.25 as the Stripe fee for a country neither EEA nor the UK', async ({ request }) => {
-  await expect(paymentFeeOf(request, 'Stripe', '100', 'US')).resolves.toBe(3.4);
+// Stripe's rate for a card issued anywhere else: 3.25% + EUR 0.25.
+test('takes 3.25% plus 0.25 as the Stripe fee for a country neither EEA nor the UK', async ({ request }) => {
+  await expect(paymentFeeOf(request, 'Stripe', '100', 'US')).resolves.toBe(3.5);
 });
 
 test('takes the EEA Stripe rate when no country is stated', async ({ request }) => {
@@ -39,6 +44,11 @@ test('takes the EEA Stripe rate when no country is stated', async ({ request }) 
 // PayPal's EEA domestic commercial rate: 3.4% + EUR 0.35.
 test('takes 3.4% plus 0.35 as the PayPal fee for an EEA country', async ({ request }) => {
   await expect(paymentFeeOf(request, 'PayPal', '100', 'LV')).resolves.toBe(3.75);
+});
+
+// A non-euro EEA country prices the same as one that uses the euro.
+test('takes the EEA PayPal rate for a non-euro EEA country too', async ({ request }) => {
+  await expect(paymentFeeOf(request, 'PayPal', '100', 'DK')).resolves.toBe(3.75);
 });
 
 // PayPal's rate for a UK buyer: the domestic 3.4% plus its published 1.29% surcharge.

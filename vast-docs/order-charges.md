@@ -205,10 +205,22 @@ than from a figure a payment states.
   "Country feature requirements". Three tiers, the same shape for both
   providers: this store's own EEA, the United Kingdom, which both price apart
   from the rest of the EEA even though it sits right beside it, and everywhere
-  else.
+  else. The preferential tier reaches the whole EEA rather than only the
+  countries that use the euro - real orders from Bulgaria, the Czech Republic,
+  Hungary, Poland, Romania and Sweden all matched the same domestic rate a
+  Latvian order does, none of them the euro. One Danish order priced at the
+  international rate instead, which first read as evidence the euro was the
+  real boundary; a wider sample of Danish orders priced at the domestic one
+  like every other EEA country, so that first order is read as the gap
+  `country` already carries - the order's shipping destination need not be
+  the account or card that actually paid - not a second tier inside the EEA.
     - Stripe (<https://stripe.com/pricing>, published for a Latvia-based
       account): 1.5% + EUR 0.25 for an EEA-issued card, 2.5% + EUR 0.25 for a
-      UK-issued one, 3.15% + EUR 0.25 for anywhere else.
+      UK-issued one, 3.25% + EUR 0.25 for anywhere else. Stripe's own page
+      states 3.15% for the last tier; four real orders from outside the EEA -
+      Australia, Brazil, Switzerland, Vietnam - each matched 3.25% to the cent
+      instead, so the calculation uses what the real fee came to rather than
+      what is published.
     - PayPal (<https://www.paypal.com/ee/business/paypal-business-fees>): its
       domestic EEA-to-EEA commercial rate, 3.4%, plus its own published
       cross-border surcharge for a non-EEA buyer - 1.29% for the UK, 1.99% for

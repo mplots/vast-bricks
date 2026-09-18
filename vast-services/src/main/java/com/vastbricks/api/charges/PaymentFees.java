@@ -18,8 +18,10 @@ public final class PaymentFees {
     private static final BigDecimal STRIPE_EEA_RATE = new BigDecimal("0.015");
     // Stripe's rate for a UK-issued card: 2.5% + EUR 0.25.
     private static final BigDecimal STRIPE_UK_RATE = new BigDecimal("0.025");
-    // Stripe's rate for a card issued anywhere else: 3.15% + EUR 0.25.
-    private static final BigDecimal STRIPE_INTERNATIONAL_RATE = new BigDecimal("0.0315");
+    // Stripe's rate for a card issued anywhere else: 3.25% + EUR 0.25. Stripe's own page states 3.15%; four real
+    // orders from outside the EEA - Australia, Brazil, Switzerland, Vietnam - each matched 3.25% to the cent
+    // instead, so this states what the real fee comes to rather than what is published.
+    private static final BigDecimal STRIPE_INTERNATIONAL_RATE = new BigDecimal("0.0325");
     private static final BigDecimal STRIPE_FIXED_FEE = new BigDecimal("0.25");
 
     // PayPal's domestic commercial-transaction rate, EEA seller to EEA buyer
@@ -34,6 +36,14 @@ public final class PaymentFees {
     /**
      * The European Economic Area: the EU's 27 members plus Iceland, Liechtenstein and Norway. The United Kingdom
      * left both and both providers price it as a tier of its own, so it is deliberately not here.
+     *
+     * <p>The preferential tier reaches the whole EEA rather than only the countries that use the euro: real orders
+     * from Bulgaria, the Czech Republic, Hungary, Poland, Romania and Sweden - none of them the euro - all matched
+     * the same domestic rate a Latvian order does. A euro-only tier was tried first on the strength of one Danish
+     * order that priced at the international rate instead; a wider sample of Danish orders priced at the domestic
+     * one like every other EEA country, so that first order is read as the gap {@code country} already documents -
+     * a mismatch between where the order shipped and the account or card that actually paid for it - not a second
+     * tier inside the EEA.
      */
     private static final Set<String> EEA = Set.of(
             "AT", "BE", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR", "DE", "GR", "HU", "IE", "IT", "LV", "LT",
@@ -54,7 +64,9 @@ public final class PaymentFees {
      * folding it into either side. A country this cannot place - {@code null}, or one nothing here recognizes as
      * EEA, UK, or otherwise - is priced as EEA, the same answer this returned before a country was collected at all:
      * an order this cannot classify is not evidence that it is foreign, and defaulting to the rate most of this
-     * store's own orders are is closer than defaulting to the rate none of its domestic ones are.
+     * store's own orders are is closer than defaulting to the rate none of its domestic ones are. This is also the
+     * shape of the one gap known between this and what a provider actually billed: {@code country} is the order's
+     * shipping destination, not the account or card that paid for it, and the two need not agree.
      *
      * <p>Null for a payment method neither provider processes - a bank transfer, or the marketplace's own wording
      * for one {@link com.vastbricks.api.reconciliation.ReconciliationPaymentMethod} did not normalize to Stripe or
