@@ -33,3 +33,39 @@ export function formatDuration(run: JobRun) {
   if (!Number.isFinite(seconds) || seconds < 0) return null;
   return seconds < 60 ? `${seconds}s` : `${Math.floor(seconds / 60)}m ${seconds % 60}s`;
 }
+
+/** A schedule read from the handful of cron shapes a job actually declares: every day, or every week, at a time. */
+export type CronSchedule = { time: string } & ({ frequency: 'daily' } | { frequency: 'weekly'; dayCode: string });
+
+const CRON_WEEKDAY_CODES: Record<string, string> = {
+  SUN: 'sun',
+  MON: 'mon',
+  TUE: 'tue',
+  WED: 'wed',
+  THU: 'thu',
+  FRI: 'fri',
+  SAT: 'sat'
+};
+
+/**
+ * Reads a job's own cron into a schedule a reader does not have to know cron syntax for.
+ *
+ * <p>Only the two shapes a job actually declares are read: every day, or every week on a named day, both at a fixed
+ * second past a fixed minute and hour. Anything else — a day-of-month, a list, a step — answers null rather than a
+ * guess, and the card falls back to the raw expression: a schedule misread is worse than one shown as cron.
+ */
+export function parseCronSchedule(cron: string): CronSchedule | null {
+  const fields = cron.trim().split(/\s+/);
+  if (fields.length !== 6) return null;
+  const [second, minute, hour, day, month, weekday] = fields;
+  if (day !== '*' || month !== '*' || !/^\d+$/.test(second) || !/^\d+$/.test(minute) || !/^\d+$/.test(hour)) {
+    return null;
+  }
+
+  const time = `${hour.padStart(2, '0')}:${minute.padStart(2, '0')}`;
+  if (weekday === '*') {
+    return { frequency: 'daily', time };
+  }
+  const dayCode = CRON_WEEKDAY_CODES[weekday.toUpperCase()];
+  return dayCode ? { frequency: 'weekly', time, dayCode } : null;
+}

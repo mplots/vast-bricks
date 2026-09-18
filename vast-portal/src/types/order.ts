@@ -29,7 +29,7 @@ export interface StoreOrder {
   lotCount: number | null;
   /** How the order was paid, unified across the marketplaces' wordings. */
   paymentMethod: string | null;
-  /** What the buyer paid in. The grand total is in the store's own base currency. */
+  /** What the buyer paid in, which every amount on the order - the grand total among them - is stated in. */
   currency: string | null;
   taxType: OrderTaxType | null;
   /** What the marketplace collected as tax facilitator, or null where it collected none. */
@@ -40,6 +40,12 @@ export interface StoreOrder {
   grandTotal: number | null;
   /** What the marketplace reports was refunded, or null where it reports none. */
   refundedAmount: number | null;
+  /**
+   * What the screen approximates the accounting invoice for this order as coming to, in euros: the grand total less
+   * the facilitator tax and the refund, all three already converted from whatever the buyer paid in. Null where the
+   * backend could not convert one of them - a currency the rate table holds no rate for.
+   */
+  targetInvoice: number | null;
   /** When the archive this row was read from was taken, which is how current the row is. */
   archivedAt: string;
 }

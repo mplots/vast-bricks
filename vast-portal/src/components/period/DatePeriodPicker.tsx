@@ -2,6 +2,7 @@ import { useEffect, useId, useState } from 'react';
 
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
+import Chip from '@mui/material/Chip';
 import Divider from '@mui/material/Divider';
 import Typography from '@mui/material/Typography';
 import Popover from '@mui/material/Popover';
@@ -16,7 +17,7 @@ import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import DateRangeCalendar from 'components/period/DateRangeCalendar';
 import PeriodRangeGrid, { rangeUnitOf } from 'components/period/PeriodRangeGrid';
 import type { RangeUnit } from 'components/period/rangeSelection';
-import { endOfMonth, endOfYear, format, isValid, parseISO, startOfMonth, startOfYear } from 'date-fns';
+import { endOfMonth, endOfYear, format, isValid, parseISO, startOfMonth, startOfYear, subMonths, subYears } from 'date-fns';
 import { useIntl } from 'react-intl';
 
 interface Props {
@@ -53,6 +54,31 @@ export default function DatePeriodPicker({ from, to, view, onApply, allowRange =
     setDraftFrom(period.length === 4 ? startOfYear(date) : startOfMonth(date));
     setDraftTo(period.length === 4 ? endOfYear(date) : endOfMonth(date));
   };
+
+  // The four spans a reader reaches for most: this and the one before it, in each of the two units on offer here.
+  // Years are left out where the screen does not offer a year view at all, rather than applying one it cannot show.
+  const now = new Date();
+  const quickPeriods = [
+    { key: 'this-month', from: startOfMonth(now), to: endOfMonth(now), view: 'month' as const },
+    { key: 'last-month', from: startOfMonth(subMonths(now, 1)), to: endOfMonth(subMonths(now, 1)), view: 'month' as const },
+    ...(allowYear
+      ? [
+          { key: 'this-year', from: startOfYear(now), to: endOfYear(now), view: 'year' as const },
+          { key: 'last-year', from: startOfYear(subYears(now, 1)), to: endOfYear(subYears(now, 1)), view: 'year' as const }
+        ]
+      : [])
+  ];
+
+  // Applied on the spot rather than only drafted: a quick period is the one thing here already whole and valid the
+  // moment it is picked, so waiting for a second click on Apply would make the shortcut slower than using it.
+  const applyQuickPeriod = (period: (typeof quickPeriods)[number]) => {
+    onApply(format(period.from, 'yyyy-MM-dd'), format(period.to, 'yyyy-MM-dd'), period.view);
+    setAnchor(null);
+  };
+
+  const selectedQuickKey = quickPeriods.find(
+    (period) => view === period.view && from === format(period.from, 'yyyy-MM-dd') && to === format(period.to, 'yyyy-MM-dd')
+  )?.key;
 
   const valid =
     draftFrom !== null &&
@@ -202,6 +228,43 @@ export default function DatePeriodPicker({ from, to, view, onApply, allowRange =
               ))}
             </ToggleButtonGroup>
           </Box>
+          {/* Set apart from the Month/Year/Range switch above: that chooses how to browse, this jumps straight to an
+              answer and throws away whatever was being browsed or drawn — a tinted strip and a filled chip are what
+              say "this replaces your selection" rather than "this is one more way to narrow it". Never more than
+              four of these, so they are kept to one line rather than left to wrap onto a second. */}
+          <Stack
+            direction="row"
+            sx={{
+              mx: 2.5,
+              mt: 1.5,
+              py: 0.75,
+              px: 1,
+              gap: 0.5,
+              justifyContent: 'center',
+              flexWrap: 'nowrap',
+              bgcolor: 'primary.lighter',
+              borderRadius: 1.5
+            }}
+          >
+            {quickPeriods.map((period) => {
+              const selected = period.key === selectedQuickKey;
+              return (
+                <Chip
+                  key={period.key}
+                  size="small"
+                  clickable
+                  color="primary"
+                  variant={selected ? 'filled' : 'outlined'}
+                  label={intl.formatMessage({ id: `period-quick-${period.key}` })}
+                  onClick={() => applyQuickPeriod(period)}
+                  sx={{
+                    bgcolor: selected ? undefined : 'background.paper',
+                    '& .MuiChip-label': { px: 1, fontSize: '0.75rem' }
+                  }}
+                />
+              );
+            })}
+          </Stack>
           <Stack sx={{ p: 2.5, gap: 2, minHeight: 264 }}>
             {draftView === 'range' && (
               <Stack direction="row" sx={{ justifyContent: 'center' }}>

@@ -301,8 +301,7 @@ class OrderImport {
         order.setPaymentMethod(ReconciliationPaymentMethod.normalize(
                 preferring(exported == null ? null : StringUtils.trimToNull(exported.getPaymentType()),
                         () -> payment(stated.get(), BrickLinkOrder.Payment::getMethod))));
-        // What the buyer paid in, which need not be what the order is totalled in: the grand total below is the
-        // store's own base currency, as the reconciliation report states it.
+        // What the buyer paid in, which every amount below - the grand total among them - is stated in.
         order.setCurrency(ReconciliationCurrency.normalize(
                 preferring(exported == null ? null : StringUtils.trimToNull(exported.getPaymentCurrencyCode()),
                         () -> payment(stated.get(), BrickLinkOrder.Payment::getCurrencyCode))));

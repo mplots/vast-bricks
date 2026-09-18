@@ -92,6 +92,31 @@ export async function findSettingOverride(tenantId: number, settingKey: string):
   });
 }
 
+export type VastCurrencyRate = {
+  readonly currency: string;
+  readonly rateDate: string;
+  readonly rate: string;
+};
+
+/**
+ * The currency rates the sync stored for one date, read directly because the table is global rather than
+ * tenant-owned: there is no scenario to scope a `GET` to, and the job's own tally is all its endpoints answer.
+ */
+export async function findCurrencyRates(rateDate: string): Promise<VastCurrencyRate[]> {
+  return withDatabaseClient(async (client) => {
+    const result = await client.query<{ currency: string; rate_date: string; rate: string }>(
+      `
+        SELECT currency, to_char(rate_date, 'YYYY-MM-DD') AS rate_date, rate
+        FROM ${vastTable('currency_rates')}
+        WHERE rate_date = $1
+        ORDER BY currency
+      `,
+      [rateDate],
+    );
+    return result.rows.map((row) => ({ currency: row.currency, rateDate: row.rate_date, rate: row.rate }));
+  });
+}
+
 /**
  * Backdates a key's expiry so a scenario can assert that an expired key stops authenticating. Expiry is a wall-clock
  * fact with no API that can bring it forward, which is the one thing here the public surface cannot set up.

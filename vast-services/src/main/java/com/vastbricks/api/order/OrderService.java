@@ -1,7 +1,9 @@
 package com.vastbricks.api.order;
 
+import com.vastbricks.api.currencyrate.CurrencyRates;
 import com.vastbricks.api.order.OrderPayload.CountryOrders;
 import com.vastbricks.api.order.OrderPayload.OrderResponse;
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
@@ -25,11 +27,55 @@ class OrderService {
 
     private final OrderRepository orders;
 
+    private final CurrencyRates currencyRates;
+
     /** The orders placed in a range of days, newest first, for the tenant bound to the request. */
     List<OrderResponse> findOrders(LocalDate from, LocalDate to) {
         return ordersIn(from, to).stream()
-                .map(OrderResponse::new)
+                .map(order -> new OrderResponse(order, targetInvoiceOf(order)))
                 .toList();
+    }
+
+    /**
+     * What the accounting invoice for this order has to come to, in euros - the same question the reconciliation
+     * report's own target invoice answers, approximated from what this screen holds rather than what reconciliation
+     * collects live.
+     *
+     * <p>Every amount an order states - the grand total among them - is in whatever the buyer paid in, which need
+     * not be euros at all, so all three figures the formula touches are converted before they are added or
+     * subtracted; converting only two of them would subtract euros from a foreign-currency total and answer a wrong
+     * number for every order not paid in euros. Reconciliation subtracts the payment gateway's own refund instead of
+     * the marketplace's, which this screen has no account of at all; that difference, not the currency, is the rest
+     * of why the two figures are not always the same.
+     *
+     * <p>An order this cannot convert - a currency the rate table has never held a rate for - answers null rather
+     * than a total that silently left an amount out of it.
+     */
+    private BigDecimal targetInvoiceOf(Order order) {
+        LocalDate orderDay = order.getOrderDate().atZone(ZoneOffset.UTC).toLocalDate();
+
+        // No total at all and a total this cannot convert both answer the same way: there is no target to invoice.
+        BigDecimal grandTotal = currencyRates.toEur(order.getGrandTotal(), order.getCurrency(), orderDay);
+        if (grandTotal == null) {
+            return null;
+        }
+        BigDecimal facilitatorTax = currencyRates.toEur(order.getFacilitatorTax(), order.getCurrency(), orderDay);
+        if (order.getFacilitatorTax() != null && facilitatorTax == null) {
+            return null;
+        }
+        BigDecimal refunded = currencyRates.toEur(order.getRefundedAmount(), order.getCurrency(), orderDay);
+        if (order.getRefundedAmount() != null && refunded == null) {
+            return null;
+        }
+
+        BigDecimal target = grandTotal;
+        if (facilitatorTax != null) {
+            target = target.subtract(facilitatorTax);
+        }
+        if (refunded != null) {
+            target = target.subtract(refunded);
+        }
+        return target.max(BigDecimal.ZERO);
     }
 
     /**

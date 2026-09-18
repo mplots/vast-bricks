@@ -12,6 +12,7 @@ import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
+import TableFooter from '@mui/material/TableFooter';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Tooltip from '@mui/material/Tooltip';
@@ -84,20 +85,30 @@ const columnFields = [
   'order.shippingCost',
   'order.facilitatorTax',
   'order.grandTotal',
-  'order.refundedAmount'
+  'order.refundedAmount',
+  // Follows the amounts it is derived from, as it does on the report, so the columns read as the subtraction they
+  // are: what the order came to, less the facilitator tax, less what has been refunded.
+  'calculated.targetInvoice'
 ] as const;
 
 type ColumnField = (typeof columnFields)[number];
 
-/** The sources a column can come from. Today the marketplace's own account is the only one stored. */
-const fieldSources = ['order'] as const;
+/** The sources a column can come from. `calculated` is derived here rather than stored or reported by any of them. */
+const fieldSources = ['order', 'calculated'] as const;
 
 type FieldSource = (typeof fieldSources)[number];
 
 /** The source a column path names, which is the segment before its dot. */
 const sourceOf = (column: string) => column.split('.')[0] as FieldSource;
 
-const amountFields: string[] = ['order.subTotal', 'order.shippingCost', 'order.facilitatorTax', 'order.grandTotal', 'order.refundedAmount'];
+const amountFields: string[] = [
+  'order.subTotal',
+  'order.shippingCost',
+  'order.facilitatorTax',
+  'order.grandTotal',
+  'order.refundedAmount',
+  'calculated.targetInvoice'
+];
 const numericFields: string[] = [...amountFields, 'order.lotCount', 'order.itemCount'];
 const dateFields: string[] = ['order.orderDate'];
 
@@ -145,10 +156,17 @@ const formatCount = (value: number | null) => (value === null || value === undef
 /**
  * An amount, or an em dash where the marketplace stated none.
  *
- * <p>No currency written beside it: the amounts are in the store's own base currency while the currency column
- * states what the buyer paid in, so putting that code against a base-currency figure would say something untrue.
+ * <p>No currency written beside it: every amount on an order is in what the buyer paid in, which the currency column
+ * already states once for the row, so repeating it beside every amount would say the same thing several times over.
  */
 const money = (value: number | null) => (value === null || value === undefined ? '—' : formatAmount(value));
+
+/**
+ * A euro amount, unlike every other figure on this table: the target invoice is the one column the backend has
+ * already converted out of whatever the buyer paid in, so it is the one column that may say which currency it is in
+ * without saying something untrue about the others.
+ */
+const moneyEur = (value: number | null) => (value === null || value === undefined ? '—' : `€${formatAmount(value)}`);
 
 const formatDay = (value: string) => {
   const day = new Date(value);
@@ -316,6 +334,22 @@ export default function OrdersPage() {
     [collected, searchParams]
   );
 
+  // The one column a reader adds up rather than reads order by order, so it is the one the footer sums. Summed in
+  // cents, as the report sums its own totals, so decimal addition cannot introduce a fraction of one; an order the
+  // formula has no answer for is left out rather than read as nothing owed.
+  const targetInvoiceTotal = useMemo(() => {
+    let total = 0;
+    let collected = false;
+    shownOrders.forEach((order) => {
+      const value = order.targetInvoice;
+      if (value !== null) {
+        total += Math.round(value * 100);
+        collected = true;
+      }
+    });
+    return collected ? total / 100 : null;
+  }, [shownOrders]);
+
   const filterFacets: FilterFacet[] = facetFields.map((facet) => {
     const counts = new Map<string, number>();
     collected
@@ -422,6 +456,8 @@ export default function OrdersPage() {
         return money(order.grandTotal);
       case 'order.refundedAmount':
         return money(order.refundedAmount);
+      case 'calculated.targetInvoice':
+        return moneyEur(order.targetInvoice);
     }
   };
 
@@ -438,6 +474,8 @@ export default function OrdersPage() {
         return order.grandTotal;
       case 'order.refundedAmount':
         return order.refundedAmount;
+      case 'calculated.targetInvoice':
+        return order.targetInvoice;
       default:
         return null;
     }
@@ -814,6 +852,33 @@ export default function OrdersPage() {
                           </TableRow>
                         ))}
                       </TableBody>
+                      <TableFooter sx={{ bgcolor: 'transparent', border: 0 }}>
+                        <TableRow
+                          sx={{
+                            '& .MuiTableCell-root': {
+                              bgcolor: 'secondary.lighter',
+                              color: 'text.primary',
+                              fontWeight: 600,
+                              fontSize: '0.875rem',
+                              whiteSpace: 'nowrap',
+                              borderTop: (theme: Theme) => `2px solid ${theme.palette.divider}`
+                            }
+                          }}
+                        >
+                          <TableCell component="th" scope="row" sx={{ width: 92 }}>
+                            {intl.formatMessage({ id: 'orders-total' })}
+                          </TableCell>
+                          {shownColumns.map((column) => (
+                            <TableCell
+                              key={column}
+                              align={numericFields.includes(column) ? 'right' : 'left'}
+                              sx={{ ...(bandStarts.has(column) && bandEdge) }}
+                            >
+                              {column === 'calculated.targetInvoice' ? moneyEur(targetInvoiceTotal) : null}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      </TableFooter>
                     </Table>
                   </TableContainer>
                 ) : (

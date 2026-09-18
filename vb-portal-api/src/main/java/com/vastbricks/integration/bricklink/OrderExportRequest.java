@@ -23,7 +23,7 @@ public class OrderExportRequest {
     @Builder.Default
     private final String getStatusSel = "I";
     @Builder.Default
-    private final String getFiled = "Y";
+    private final String getFiled = "N";
     @Builder.Default
     private final String getDetail = "y";
     @Builder.Default

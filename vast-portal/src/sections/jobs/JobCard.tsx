@@ -18,7 +18,7 @@ import MainCard from 'components/MainCard';
 import type { Job } from 'types/job';
 import JobRuns from './JobRuns';
 import JobRunTally from './JobRunTally';
-import { formatDuration, formatMoment, outcomeColour } from './jobWording';
+import { formatDuration, formatMoment, outcomeColour, parseCronSchedule } from './jobWording';
 
 /**
  * One job: what it is, when it fires, how it last went, and the two things a reader does to it.
@@ -48,6 +48,7 @@ export default function JobCard({
   // because a flag that survived out of sight is one a later run is asked for without anyone meaning to.
   const [asked, setAsked] = useState<Record<string, boolean>>({});
   const flags = (job.parameters ?? []).filter((parameter) => parameter.type === 'BOOLEAN');
+  const schedule = job.cron ? parseCronSchedule(job.cron) : null;
 
   return (
     // Equal height across a row, but nothing inside is stretched to fill it: one card opening its runs makes the
@@ -67,11 +68,24 @@ export default function JobCard({
               <Calendar size={14} />
               {/* A job says when it runs in one of three ways: on its own clock, after another job, or only when
                   someone asks. A follower named by its own code would be the one thing on this screen not worded
-                  for a reader, so it is named the way its card is titled. */}
+                  for a reader, so it is named the way its card is titled. A cron nobody should have to read as cron
+                  is worded as a schedule instead; one this screen cannot confidently read falls back to the raw
+                  expression rather than a guess. */}
               {job.cron ? (
-                <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
-                  {job.cron}
-                </Typography>
+                schedule ? (
+                  <Typography variant="body2">
+                    {schedule.frequency === 'daily'
+                      ? intl.formatMessage({ id: 'job-schedule-daily' }, { time: schedule.time })
+                      : intl.formatMessage(
+                          { id: 'job-schedule-weekly' },
+                          { time: schedule.time, day: intl.formatMessage({ id: `job-schedule-day-${schedule.dayCode}` }) }
+                        )}
+                  </Typography>
+                ) : (
+                  <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+                    {job.cron}
+                  </Typography>
+                )
               ) : job.after ? (
                 <Typography variant="body2">
                   {intl.formatMessage(

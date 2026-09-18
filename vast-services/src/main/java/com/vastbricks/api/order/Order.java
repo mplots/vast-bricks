@@ -95,7 +95,7 @@ class Order {
     @Column(name = "refunded_amount", precision = 19, scale = 2)
     private BigDecimal refundedAmount;
 
-    /** What the order came to in the store's own currency, which {@link #currency} names. */
+    /** What the order came to, in whatever the buyer paid in, which {@link #currency} names. */
     @Column(name = "grand_total", precision = 19, scale = 2)
     private BigDecimal grandTotal;
 

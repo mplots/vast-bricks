@@ -94,7 +94,7 @@ final class OrderPayload {
         /** How the order was paid, unified across the marketplaces' wordings. */
         private final String paymentMethod;
 
-        /** What the buyer paid in. The grand total is in the store's own base currency. */
+        /** What the buyer paid in, which every amount on the order - the grand total among them - is stated in. */
         private final String currency;
 
         private final OrderTaxType taxType;
@@ -112,15 +112,23 @@ final class OrderPayload {
         /** What the marketplace reports was refunded, or null where it reports none. */
         private final BigDecimal refundedAmount;
 
+        /**
+         * What this screen approximates the accounting invoice for this order as coming to, in euros: the grand
+         * total less the facilitator tax and the refund, all three converted from whatever the buyer paid in. See
+         * {@link OrderService} for why it is only an approximation of what the reconciliation report calls the same
+         * thing, and null for whichever amount this could not convert to euros.
+         */
+        private final BigDecimal targetInvoice;
+
         /** When the archive this row was read from was taken, which is how current the row is. */
         private final Instant archivedAt;
 
-        OrderResponse(Order order) {
+        OrderResponse(Order order, BigDecimal targetInvoice) {
             this(order.getId(), order.getSource(), order.getOrderId(), order.getOrderDate(),
                     order.getBuyer(), order.getBuyerUsername(), order.getCountry(), order.getItemCount(), order.getLotCount(),
                     order.getPaymentMethod(), order.getCurrency(), order.getTaxType(), order.getFacilitatorTax(),
                     order.getSubTotal(), order.getShippingCost(), order.getGrandTotal(), order.getRefundedAmount(),
-                    order.getArchivedAt());
+                    targetInvoice, order.getArchivedAt());
         }
     }
 }

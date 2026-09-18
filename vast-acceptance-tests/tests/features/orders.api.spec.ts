@@ -1,6 +1,7 @@
 import type { APIRequestContext } from "@playwright/test";
 
 import { expect, test } from "../support/api-test";
+import { anEcbRateDate, mockEcb, TEST_CURRENCY } from "../support/ecb";
 import { archiveBaseDirectory } from "../support/order-archive";
 import {
   archiveDirectory,
@@ -33,6 +34,7 @@ type ListedOrder = {
   shippingCost: string | null;
   grandTotal: string | null;
   refundedAmount: string | null;
+  targetInvoice: string | null;
   archivedAt: string;
 };
 
@@ -94,6 +96,43 @@ async function importOrders(
     .toBe("succeeded");
 }
 
+/**
+ * Stubs one day of ECB rates and syncs it, so a test order's foreign-currency amounts have something to convert by.
+ * Answers with that day, both as the ISO date and as BrickLink's own accounting-export format, for a scenario to
+ * date its order by.
+ *
+ * <p>`TEST_CURRENCY` is shared with every other scenario that converts a currency, and the conversion reads the
+ * *closest* rate on or before an order rather than an exact one - so a scenario dating its order any later than the
+ * rate it just synced would have another scenario's later rate for the same currency outrun its own. Dating the
+ * order the same day as the rate is what keeps this scenario's own row the closest one on or before it: the
+ * (currency, date) pair is unique by the table's own constraint, so no other scenario can ever hold that exact day.
+ */
+async function syncCurrencyRate(
+  settings: Parameters<typeof mockEcb>[0],
+  request: APIRequestContext,
+  testInfo: Parameters<typeof mockEcb>[2],
+  rate: string,
+) {
+  const rateDate = anEcbRateDate(testInfo);
+  await mockEcb(settings, request, testInfo, rateDate, { [TEST_CURRENCY]: rate });
+
+  expect(
+    (await request.post("/api/private/jobs/currency-rate-sync/run?force=true")).status(),
+  ).toBe(202);
+  await expect
+    .poll(
+      async () =>
+        (await (await request.get("/api/private/jobs/currency-rate-sync")).json())
+          .lastRun?.outcome,
+      { timeout: 30_000 },
+    )
+    .toBe("succeeded");
+
+  // BrickLink's own accounting export date format: month/day/year, no leading zeros.
+  const [year, month, day] = rateDate.split("-").map(Number);
+  return { rateDate, orderDate: `${month}/${day}/${year}` };
+}
+
 test("the orders of a range are listed, newest first", async ({
   request,
   settings,
@@ -151,6 +190,79 @@ test("the orders of a range are listed, newest first", async ({
   expect(brickLink.currency).toBe("EUR");
 });
 
+/**
+ * The target invoice: the one figure on this screen worked out from more than one of an order's own fields, and the
+ * only one stated in a currency the order was not necessarily placed in.
+ */
+
+test("the target invoice converts the facilitator tax and the refund out of whatever the buyer paid in", async ({
+  request,
+  settings,
+  authentication,
+}, testInfo) => {
+  const { rateDate, orderDate } = await syncCurrencyRate(settings, request, testInfo, "2.000000");
+  const month = rateDate.slice(0, 7);
+  const monthEnd = new Date(Date.UTC(Number(month.slice(0, 4)), Number(month.slice(5, 7)), 0)).getUTCDate();
+
+  await importOrders(
+    request,
+    settings,
+    authentication.tenant.code,
+    (directory) => {
+      writeBrickLinkArchive(directory, {
+        orderId: 32100208,
+        archivedAt: "2026-04-11T08:00:00.000Z",
+        accounting: {
+          orderDate,
+          paymentCurrency: TEST_CURRENCY,
+          // 100.00 in the buyer's currency, at 2 to the euro: 50.00 once converted. Every amount an order states is
+          // in whatever the buyer paid in, the grand total included, so this converts exactly as the other two do.
+          grandTotal: "100.00",
+          // 20.00 in the buyer's currency, at 2 to the euro: 10.00 once converted.
+          vat: "20.00",
+        },
+        // 10.00 in the buyer's currency, at 2 to the euro: 5.00 once converted.
+        refunded: "10.00",
+      });
+    },
+  );
+
+  const order = (await listOrders(request, `${month}-01`, `${month}-${String(monthEnd).padStart(2, "0")}`))
+    .orders[0]!;
+  expect(order.currency).toBe(TEST_CURRENCY);
+  // 50.00 - 10.00 - 5.00, all three converted before they were added or subtracted rather than taken off as stated.
+  expect(Number(order.targetInvoice)).toBe(35);
+});
+
+test("a currency the rate table has never held a rate for leaves the target invoice unstated", async ({
+  request,
+  settings,
+  authentication,
+}) => {
+  await importOrders(
+    request,
+    settings,
+    authentication.tenant.code,
+    (directory) => {
+      writeBrickLinkArchive(directory, {
+        orderId: 32100209,
+        archivedAt: "2026-04-12T08:00:00.000Z",
+        accounting: {
+          orderDate: "4/9/2026",
+          // A currency code no test and no real order ever states, so this table never holds a rate for it.
+          paymentCurrency: "ZZZ",
+          vat: "20.00",
+          grandTotal: "100.00",
+        },
+      });
+    },
+  );
+
+  const order = (await listOrders(request, "2026-04-01", "2026-04-30"))
+    .orders[0]!;
+  expect(order.targetInvoice).toBeNull();
+});
+
 test("every field the reconciliation report states about an order is stated here too, and the country it does not", async ({
   request,
   settings,
@@ -174,7 +286,8 @@ test("every field the reconciliation report states about an order is stated here
   // The whole of what the report states about an order itself, so a reader can move between the two screens
   // without meeting a column on one that the other does not have - plus the country, which is the one field this
   // screen states that the report does not, because it is a fact of the order rather than of the accounts held
-  // against it.
+  // against it. `targetInvoice` is the exception the other way: this screen approximates the report's own
+  // calculated figure from what it has stored, rather than the report handing it down flat.
   expect(Object.keys(order).sort()).toEqual(
     [
       "archivedAt",
@@ -194,6 +307,7 @@ test("every field the reconciliation report states about an order is stated here
       "shippingCost",
       "source",
       "subTotal",
+      "targetInvoice",
       "taxType",
     ].sort(),
   );
