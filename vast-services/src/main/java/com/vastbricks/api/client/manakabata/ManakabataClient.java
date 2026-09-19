@@ -34,8 +34,9 @@ public class ManakabataClient {
 
     private static final String PROVIDER = "Manakabata";
 
-    private static final int INVOICES_PER_PAGE = 1000;
-    private static final int CLIENTS_PER_PAGE = 1000;
+    // Manakabata rejects a per_page above 100 ("Šis lauks nedrīkst pārsniegt 100.") on every paginated endpoint.
+    private static final int INVOICES_PER_PAGE = 100;
+    private static final int CLIENTS_PER_PAGE = 100;
     private static final int MESSAGE_BODY_LIMIT = 1000;
 
     private final ManakabataSettings settings;

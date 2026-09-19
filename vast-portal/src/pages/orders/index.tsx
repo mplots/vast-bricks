@@ -359,6 +359,8 @@ export default function OrdersPage() {
   );
 
   // The columns a reader adds up rather than reads order by order, so they are the ones the footer sums.
+  const lotCountTotal = useMemo(() => sumOf(shownOrders, (order) => order.lotCount), [shownOrders]);
+  const itemCountTotal = useMemo(() => sumOf(shownOrders, (order) => order.itemCount), [shownOrders]);
   const targetInvoiceTotal = useMemo(() => sumOf(shownOrders, (order) => order.targetInvoice), [shownOrders]);
   const calculatedMarketplaceFeeTotal = useMemo(
     () => sumOf(shownOrders, (order) => order.calculatedMarketplaceFee),
@@ -905,6 +907,8 @@ export default function OrdersPage() {
                               align={numericFields.includes(column) ? 'right' : 'left'}
                               sx={{ ...(bandStarts.has(column) && bandEdge) }}
                             >
+                              {column === 'order.lotCount' && formatCount(lotCountTotal)}
+                              {column === 'order.itemCount' && formatCount(itemCountTotal)}
                               {column === 'calculated.targetInvoice' && moneyEur(targetInvoiceTotal)}
                               {column === 'calculated.marketplaceFee' && money(calculatedMarketplaceFeeTotal)}
                               {column === 'calculated.paymentFee' && money(calculatedPaymentFeeTotal)}

@@ -36,6 +36,8 @@ export const managedServices = [
     name: "vast-api-test",
     port: 6362,
     healthUrl: "http://127.0.0.1:6362/api/health",
+    // Owns a Vast schema of its own, so --clean-db can wipe it before a restart.
+    supportsDbClean: true,
     command: "java",
     args: () => ["-jar", resolveAcceptanceJar()],
     cwd: repoRoot,
@@ -76,6 +78,9 @@ export const managedServices = [
     name: "vast-api",
     port: 6363,
     healthUrl: "http://127.0.0.1:6363/api/health",
+    // Flyway's clean is scoped to the Vast schema alone, so this never touches vb-portal-api's legacy tables - only
+    // what vast-portal itself reads and writes through the rewritten API.
+    supportsDbClean: true,
     command: "java",
     args: () => ["-jar", resolveLegacyJar()],
     cwd: repoRoot,

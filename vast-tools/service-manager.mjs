@@ -238,7 +238,7 @@ function serviceEnvironment(service, { cleanDb = false, externalEnvironment = {}
     ...externalEnvironment,
     // The managed port belongs to ./vast, so registry values win over anything the environment file sets.
     ...service.env,
-    ...(cleanDb && service.name === "vast-api-test" ? { VAST_DB_CLEAN_ON_STARTUP: "true" } : {}),
+    ...(cleanDb && service.supportsDbClean ? { VAST_DB_CLEAN_ON_STARTUP: "true" } : {}),
   };
 }
 

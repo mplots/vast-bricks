@@ -6,14 +6,16 @@ import com.vastbricks.api.reconciliation.Source;
 import com.vastbricks.api.reconciliation.ReconciliationPeriod;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 
 /**
  * Fetches the accounting invoices from Manakabata. The selected date range is deliberately ignored: the list endpoint offers no
  * filter beyond the page size, and an order may be invoiced outside the month it was placed in, so the whole list is
  * requested and the mapper searches it.
+ *
+ * <p>Temporarily not registered as a bean, so this source fetches nothing until the {@code @Component} annotation is
+ * restored. An unsourced class is not an error - {@code SourcedData} answers an empty list for it - so
+ * {@link MapperManakabataInvoices} runs as normal with no accounting invoices to merge.
  */
-@Component
 @RequiredArgsConstructor
 class SourceManakabataInvoices implements Source<InvoiceIndex200ResponseDataInner> {
 

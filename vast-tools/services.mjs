@@ -4,8 +4,12 @@ import {
   startServices,
   stopServices,
 } from "./service-manager.mjs";
+import { managedServices } from "./service-registry.mjs";
 
 const actions = new Set(["list", "start", "stop", "restart"]);
+const dbCleanableServices = managedServices
+  .filter((service) => service.supportsDbClean)
+  .map(({ name }) => name);
 
 export async function runServicesCommand(args) {
   const options = parseOptions(args);
@@ -68,8 +72,8 @@ function parseOptions(args) {
     if (options.action !== "restart") {
       throw new Error("--clean-db is accepted only by restart.");
     }
-    if (options.services.length > 0 && !options.services.includes("vast-api-test")) {
-      throw new Error("--clean-db applies only when restarting vast-api-test.");
+    if (options.services.length > 0 && !options.services.some((name) => dbCleanableServices.includes(name))) {
+      throw new Error(`--clean-db applies only when restarting ${dbCleanableServices.join(" or ")}.`);
     }
   }
 
@@ -93,6 +97,7 @@ Commands:
 Options:
   --skip-build, -sb     Use existing built service artifacts
   --clean-db            Clean the Vast database schema before restarting vast-api-test
+                        or vast-api (only the Vast schema; legacy tables are untouched)
   --help, -h            Show this help
 
 Managed ports:
