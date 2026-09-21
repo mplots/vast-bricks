@@ -1,12 +1,12 @@
 export type CsvValue = string | number | boolean | null | undefined;
 
-/** Quote every cell so commas, quotes and multiline text round-trip unchanged. */
+/** Use decimal commas for numbers and quote every cell so delimiters and multiline text round-trip unchanged. */
 export function serializeCsv(rows: CsvValue[][]): string {
   return rows
     .map((row) =>
       row
         .map((value) => {
-          let text = value == null ? '' : String(value);
+          let text = value == null ? '' : typeof value === 'number' ? String(value).replace('.', ',') : String(value);
           // Provider text must remain text when a spreadsheet opens the download.
           if (typeof value === 'string' && /^[\s]*[=+@-]/.test(text)) text = `'${text}`;
           return `"${text.replace(/"/g, '""')}"`;

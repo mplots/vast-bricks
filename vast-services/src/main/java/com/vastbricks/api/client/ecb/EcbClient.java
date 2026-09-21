@@ -49,6 +49,19 @@ public class EcbClient {
         });
     }
 
+    /** All published daily rates, for explicitly backfilling the history needed by older orders. */
+    public List<EcbDailyRates> fetchHistory() {
+        return capture.record(PROVIDER, List.of(), () -> {
+            try {
+                return xmlMapper.readValue(get("/stats/eurofxref/eurofxref-hist.xml"), EcbEnvelope.class).history();
+            } catch (EcbClientException exception) {
+                throw exception;
+            } catch (Exception exception) {
+                throw new EcbClientException("ECB history is not readable XML", exception);
+            }
+        });
+    }
+
     private EcbDailyRates parse(String body) {
         try {
             return xmlMapper.readValue(body, EcbEnvelope.class).dailyRates();

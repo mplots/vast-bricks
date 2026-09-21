@@ -12,6 +12,7 @@ export const createdInvoiceNumber = '17/0001EC';
 /** One order in the BrickStore export. The export names the buyer by real name or by username, never both. */
 export type BrickLinkOrderMock = {
   orderId: string;
+  baseCurrency?: string;
   /** BrickStore export date format, for example `8/30/2026`. */
   orderDate?: string;
   buyer?: string;
@@ -129,7 +130,7 @@ const orderXml = (order: BrickLinkOrderMock, buyer: string) => {
     <LOCATION>${order.location ?? 'Latvia, Riga'}</LOCATION>
     <ORDERSALESTAX>${order.salesTax ?? '0.00'}</ORDERSALESTAX>
     <ORDERVAT>${order.vat ?? '0.00'}</ORDERVAT>
-    <BASECURRENCYCODE>EUR</BASECURRENCYCODE>
+    <BASECURRENCYCODE>${order.baseCurrency ?? "EUR"}</BASECURRENCYCODE>
   </ORDER>`;
 };
 
@@ -144,7 +145,7 @@ async function mockBrickOwl(wireMock: WireMockApi, settings: SettingsOverrides, 
       json:
         order === undefined
           ? [{ req_num: 1, code: 404, body: [] }]
-          : [{ req_num: 1, code: 200, body: { order_id: order.orderId, ...order.view } }]
+          : [{ req_num: 1, code: 200, body: { order_id: order.orderId, base_currency: "EUR", ...order.view } }]
     }
   });
 }

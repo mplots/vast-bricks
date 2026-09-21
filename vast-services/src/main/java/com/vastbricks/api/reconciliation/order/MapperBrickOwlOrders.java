@@ -1,5 +1,8 @@
 package com.vastbricks.api.reconciliation.order;
 
+
+import com.vastbricks.api.currencyrate.EuroAmounts;
+import com.vastbricks.api.currencyrate.CurrencyRates;
 import com.vastbricks.api.client.brickowl.BrickOwlOrder;
 import com.vastbricks.api.charges.MarketplaceFees;
 import com.vastbricks.api.country.Countries;
@@ -26,6 +29,7 @@ import org.springframework.stereotype.Component;
 class MapperBrickOwlOrders implements OrderMapper<SourcedBrickOwlOrder> {
 
     private final Countries countries;
+    private final CurrencyRates currencyRates;
 
     @Override
     public Class<SourcedBrickOwlOrder> type() {
@@ -39,6 +43,9 @@ class MapperBrickOwlOrders implements OrderMapper<SourcedBrickOwlOrder> {
 
     private ReconciledOrder toReconciledOrder(SourcedBrickOwlOrder sourced) {
         var order = sourced.getOrder();
+        var amounts = new EuroAmounts(currencyRates);
+        var currency = order.getBaseCurrency();
+        var date = sourced.getOrderDate();
         var reconciled = ReconciledOrder.of(OrderFields.builder()
                 .source(Marketplace.BRICK_OWL)
                 .orderId(order.getOrderId())
@@ -51,16 +58,17 @@ class MapperBrickOwlOrders implements OrderMapper<SourcedBrickOwlOrder> {
                 .paymentMethod(ReconciliationPaymentMethod.normalize(order.getPaymentMethodType()))
                 .currency(ReconciliationCurrency.normalize(order.getPaymentCurrency()))
                 .taxType(OrderTaxTypes.of(order))
-                .facilitatorTax(ReconciliationAmount.normalize(FacilitatorTaxes.of(order)))
-                .marketplaceFee(ReconciliationAmount.normalize(order.getBrickOwlFee()))
-                .subTotal(ReconciliationAmount.normalize(order.getSubTotal()))
-                .shippingCost(ReconciliationAmount.normalize(order.getShipping()))
-                .grandTotal(ReconciliationAmount.normalize(order.getBaseOrderTotal()))
-                .refundedAmount(refundedAmount(order))
+                .facilitatorTax(amounts.convert(FacilitatorTaxes.of(order), currency, date))
+                .marketplaceFee(amounts.convert(order.getBrickOwlFee(), currency, date))
+                .subTotal(amounts.convert(order.getSubTotal(), currency, date))
+                .shippingCost(amounts.convert(order.getShipping(), currency, date))
+                .grandTotal(amounts.convert(order.getBaseOrderTotal(), currency, date))
+                .refundedAmount(amounts.convert(refundedAmount(order), currency, date))
                 .build());
         // Calculated from the order itself rather than collected, so it belongs to the calculated group; set here,
         // the one point this mapper still holds the marketplace's own order.
-        reconciled.setMarketplaceFee(ReconciliationAmount.normalize(MarketplaceFees.of(order)));
+        reconciled.setMarketplaceFee(amounts.convert(MarketplaceFees.of(order), currency, date));
+        reconciled.setCurrencyConversionMissing(amounts.isIncomplete());
         return reconciled;
     }
 

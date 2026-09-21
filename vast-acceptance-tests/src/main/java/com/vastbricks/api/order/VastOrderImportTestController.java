@@ -35,7 +35,11 @@ class VastOrderImportTestController {
         // the calculated fees are left unstated: what this endpoint is for is tenant isolation over the row itself,
         // not the calculations the real endpoint layers on top of it.
         return orders.findAllByOrderByOrderDateDescIdDesc().stream()
-                .map(order -> new OrderPayload.OrderResponse(order, null, null, null))
+                .map(order -> new OrderPayload.OrderResponse(order.getId(), order.getSource(), order.getOrderId(), order.getOrderDate(),
+                        order.getBuyer(), order.getBuyerUsername(), order.getCountry(), order.getItemCount(), order.getLotCount(),
+                        order.getPaymentMethod(), order.getCurrency(), order.getTaxType(), order.getFacilitatorTax(),
+                        order.getMarketplaceFee(), null, order.getSubTotal(), order.getShippingCost(), order.getGrandTotal(),
+                        order.getRefundedAmount(), null, null, order.getArchivedAt()))
                 .toList();
     }
 

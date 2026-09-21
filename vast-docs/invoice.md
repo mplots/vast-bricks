@@ -68,3 +68,7 @@ store's to invoice for. Adding a marketplace is one more `InvoiceOrderSource`.
   and asserts the rate and the price of the invoice line it comes to. What the
   type itself is stays a logic test of the `tax` feature.
 
+
+- Before creating any accounting client or invoice, convert base grand total and facilitator tax to EUR using
+  the order date and marketplace base currency. The buyer's payment currency does not govern those fields.
+  A missing conversion rejects generation before any accounting write.

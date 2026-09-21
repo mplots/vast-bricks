@@ -1,5 +1,6 @@
 package com.vastbricks.api.reconciliation.payment;
 
+import com.vastbricks.api.currencyrate.CurrencyRates;
 import com.vastbricks.api.client.paypal.PayPalTransaction;
 import com.vastbricks.api.reconciliation.ReconciliationAmount;
 import java.math.BigDecimal;
@@ -36,6 +37,7 @@ final class PayPalRefunds {
 
     /** What came back out of each payment, by the transaction id the refund names. */
     private final Map<String, BigDecimal> byPayment;
+    private final java.util.Set<String> missing = new java.util.HashSet<>();
 
     private PayPalRefunds(Map<String, BigDecimal> byPayment) {
         this.byPayment = byPayment;
@@ -45,8 +47,9 @@ final class PayPalRefunds {
      * Indexes the month's refunds by the payment each was taken out of. Refunds naming one payment are summed, so an
      * order refunded in parts twice is read as what came back altogether rather than as the last part of it.
      */
-    static PayPalRefunds of(List<PayPalTransaction> sourced) {
+    static PayPalRefunds of(List<PayPalTransaction> sourced, CurrencyRates rates) {
         var byPayment = new HashMap<String, BigDecimal>();
+        var result = new PayPalRefunds(byPayment);
         for (var transaction : sourced) {
             var info = transaction.getTransactionInfo();
             if (info == null || !PAYMENT_REFUND.equalsIgnoreCase(info.getTransactionEventCode())) {
@@ -57,9 +60,11 @@ final class PayPalRefunds {
             if (payment == null || payment.isBlank() || amount == null) {
                 continue;
             }
-            byPayment.merge(payment.trim(), amount, BigDecimal::add);
+            var converted = rates.toEur(amount, info.getTransactionAmount().getCurrencyCode(), PayPalPayments.paymentDate(transaction));
+            if (converted == null) result.missing.add(payment.trim());
+            else byPayment.merge(payment.trim(), converted, BigDecimal::add);
         }
-        return new PayPalRefunds(byPayment);
+        return result;
     }
 
     /**
@@ -71,7 +76,12 @@ final class PayPalRefunds {
      * opposite.
      */
     BigDecimal refundedFrom(PayPalTransaction payment) {
+        if (incomplete(payment)) return null;
         var refunded = byPayment.get(PayPalPayments.paymentReference(payment));
         return refunded == null ? null : ReconciliationAmount.normalize(refunded.negate());
     }
+    boolean incomplete(PayPalTransaction payment) {
+        return missing.contains(PayPalPayments.paymentReference(payment));
+    }
+
 }

@@ -92,6 +92,9 @@ export type BrickOwlOrderMock = {
 };
 
 export type StripeTransactionMock = {
+  currency?: string;
+  chargeCurrency?: string;
+  created?: number;
   /** Payment description, which is what an order is matched on: `Brick Owl Order 1600001`,
    *  `Payment for BrickLink from some-username`. */
   description: string;
@@ -113,6 +116,8 @@ export type StripeTransactionMock = {
 };
 
 export type PayPalTransactionMock = {
+  currency?: string;
+  feeCurrency?: string;
   /** Payer name PayPal reports, which is what a BrickLink order is matched on. */
   payerName?: string;
   /** Shipping recipient PayPal reports; a second spelling of the buyer, matched just as well. */
@@ -207,6 +212,7 @@ export async function mockReconciliationOrders(
     settings,
     providers.payPalPages ?? [providers.payPal ?? []],
     providers.month,
+    providers.period,
   );
   if (providers.mansPastsRefusesLogin) {
     await stubMansPastsRefusedLogin(wireMock, settings);
@@ -368,7 +374,8 @@ async function addBrickLinkOrdersMapping(
     request: { bodyPatterns: [{ contains: bodyPattern }] },
     response: {
       headers: { "Content-Type": "application/xml" },
-      body: ordersXml,
+      body: ordersXml.replace(/<ORDER>([\s\S]*?)<\/ORDER>/g, (order) =>
+        order.includes("<BASECURRENCYCODE>") ? order : order.replace("<ORDER>", "<ORDER><BASECURRENCYCODE>EUR</BASECURRENCYCODE>")),
     },
   });
 }
@@ -403,6 +410,7 @@ async function mockBrickOwl(
   for (const batch of brickOwlBatches(requestedOrders)) {
     await addBrickOwlBatchMapping(wireMock, batch, "order/view", (order) => ({
       order_id: order.orderId,
+      base_currency: "EUR",
       ...order.view,
     }));
   }
@@ -491,6 +499,8 @@ function stripeBalanceTransaction(
     source: {
       id: `ch_${transaction.charge}`,
       object: "charge",
+      currency: transaction.chargeCurrency ?? transaction.currency ?? "eur",
+      created: transaction.created,
       payment_intent: paymentIntent,
       amount_refunded: transaction.amountRefunded ?? 0,
       refunded: (transaction.amountRefunded ?? 0) > 0,
@@ -498,7 +508,8 @@ function stripeBalanceTransaction(
     type,
     reporting_category: type,
     status: "available",
-    currency: "eur",
+    currency: transaction.currency ?? "eur",
+    created: transaction.created,
     amount: transaction.amount,
     fee: (transaction.applicationFee ?? 0) + (transaction.stripeFee ?? 0),
     // Stripe lists every deduction here, its own and the marketplace's, and tells them apart by type alone.
@@ -509,7 +520,7 @@ function stripeBalanceTransaction(
             {
               amount: transaction.applicationFee,
               application: "ca_test-marketplace-connect-application",
-              currency: "eur",
+              currency: transaction.currency ?? "eur",
               description: "BrickLink Payment Connector application fee",
               type: "application_fee",
             },
@@ -519,7 +530,7 @@ function stripeBalanceTransaction(
         : [
             {
               amount: transaction.stripeFee,
-              currency: "eur",
+              currency: transaction.currency ?? "eur",
               description: "Stripe processing fees",
               type: "stripe_fee",
             },
@@ -538,13 +549,15 @@ async function mockPayPal(
   settings: SettingsOverrides,
   pages: PayPalTransactionMock[][],
   month?: string,
+  period?: { from: string; to: string },
 ) {
   await mockPayPalSettings(settings, wireMock);
 
   // The window a reconciled month is searched in opens at the padded month, so a scenario that names its month pins
   // its transactions to that first segment and asserts the window the API actually asked for.
   const firstSegment: WireMockValueMatcher | undefined =
-    month === undefined ? undefined : { equalTo: paymentWindow(month).fromIso };
+    period ? { equalTo: new Date(Date.parse(`${period.from}T00:00:00Z`) - 7 * 86400000).toISOString().replace(".000Z", "Z") }
+      : month === undefined ? undefined : { equalTo: paymentWindow(month).fromIso };
 
   let transactionNumber = 0;
   await stubPayPalTransactions(
@@ -574,14 +587,14 @@ function payPalTransaction(
       transaction_event_code: transaction.eventCode ?? "T0006",
       transaction_initiation_date:
         transaction.initiatedAt ?? "2026-08-30T05:24:15Z",
-      transaction_amount: { currency_code: "EUR", value: transaction.amount },
+      transaction_amount: { currency_code: transaction.currency ?? "EUR", value: transaction.amount },
       // A field PayPal did not state is one the transaction had none of, exactly as PayPalTransactionInfo reads it -
       // so a scenario not naming a fee leaves the key out rather than defaulting to one nothing asked for.
       ...(transaction.feeAmount === undefined
         ? {}
         : {
             fee_amount: {
-              currency_code: "EUR",
+              currency_code: transaction.feeCurrency ?? transaction.currency ?? "EUR",
               value: transaction.feeAmount,
             },
           }),

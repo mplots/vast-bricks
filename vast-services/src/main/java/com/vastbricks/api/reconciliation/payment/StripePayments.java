@@ -2,8 +2,8 @@ package com.vastbricks.api.reconciliation.payment;
 
 import com.stripe.model.BalanceTransaction;
 import com.stripe.model.Charge;
-import com.vastbricks.api.reconciliation.ReconciliationAmount;
 import java.math.BigDecimal;
+import com.vastbricks.api.currencyrate.EuroAmounts;
 import java.util.Set;
 
 /**
@@ -29,6 +29,10 @@ final class StripePayments {
      */
     private static final String APPLICATION_FEE = "application_fee";
 
+    // https://docs.stripe.com/currencies#zero-decimal. ISK and UGX retain two decimal API representation.
+    private static final Set<String> ZERO_DECIMAL = Set.of(
+            "BIF", "CLP", "DJF", "GNF", "JPY", "KMF", "KRW", "MGA", "PYG", "RWF", "VND", "VUV", "XAF", "XOF", "XPF");
+
     private StripePayments() {
     }
 
@@ -37,10 +41,10 @@ final class StripePayments {
     }
 
     /** What the transaction took, gross of Stripe's fees, normalized like every other collected amount. */
-    static BigDecimal paidAmount(BalanceTransaction transaction) {
+    static BigDecimal paidAmount(BalanceTransaction transaction, EuroAmounts amounts) {
         return transaction.getAmount() == null
                 ? null
-                : ReconciliationAmount.normalize(BigDecimal.valueOf(transaction.getAmount()).movePointLeft(2));
+                : amounts.convert(major(transaction.getAmount(), transaction.getCurrency()), transaction.getCurrency(), date(transaction.getCreated()));
     }
 
     /**
@@ -52,7 +56,7 @@ final class StripePayments {
      * the marketplace deducted rather than as a tax Stripe named, because Stripe names it a fee; whether it agrees
      * with what the marketplace reported collecting is what the rule stage decides.
      */
-    static BigDecimal facilitatorTax(BalanceTransaction transaction) {
+    static BigDecimal facilitatorTax(BalanceTransaction transaction, EuroAmounts amounts) {
         if (transaction.getFeeDetails() == null) {
             return null;
         }
@@ -62,10 +66,13 @@ final class StripePayments {
         if (applicationFees.isEmpty()) {
             return null;
         }
-        var total = applicationFees.stream()
-                .map(fee -> BigDecimal.valueOf(fee.getAmount()))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        return ReconciliationAmount.normalize(total.movePointLeft(2));
+        BigDecimal total = BigDecimal.ZERO;
+        for (var fee : applicationFees) {
+            var converted = amounts.convert(major(fee.getAmount(), fee.getCurrency()), fee.getCurrency(), date(transaction.getCreated()));
+            if (converted == null) return null;
+            total = total.add(converted);
+        }
+        return total;
     }
 
     /**
@@ -77,15 +84,18 @@ final class StripePayments {
      * countries charge on it, are what taking the payment cost. Reading it as "the rest of the fee" rather than as
      * {@code stripe_fee} alone keeps a fee type Stripe adds later inside the total rather than silently outside it.
      */
-    static BigDecimal feeAmount(BalanceTransaction transaction) {
+    static BigDecimal feeAmount(BalanceTransaction transaction, EuroAmounts amounts) {
         if (transaction.getFeeDetails() == null) {
             return null;
         }
-        var fees = transaction.getFeeDetails().stream()
-                .filter(fee -> !APPLICATION_FEE.equalsIgnoreCase(fee.getType()) && fee.getAmount() != null)
-                .map(fee -> BigDecimal.valueOf(fee.getAmount()))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        return fees.signum() == 0 ? null : ReconciliationAmount.normalize(fees.movePointLeft(2));
+        BigDecimal total = BigDecimal.ZERO;
+        for (var fee : transaction.getFeeDetails()) {
+            if (APPLICATION_FEE.equalsIgnoreCase(fee.getType()) || fee.getAmount() == null) continue;
+            var converted = amounts.convert(major(fee.getAmount(), fee.getCurrency()), fee.getCurrency(), date(transaction.getCreated()));
+            if (converted == null) return null;
+            total = total.add(converted);
+        }
+        return total.signum() == 0 ? null : total;
     }
 
     /**
@@ -102,13 +112,23 @@ final class StripePayments {
      * refunds nor only its; a refund for an older order arrives with no charge in the list to attach it to, and one
      * made a month later never arrives at all.
      */
-    static BigDecimal refundedAmount(BalanceTransaction transaction) {
+    static BigDecimal refundedAmount(BalanceTransaction transaction, EuroAmounts amounts) {
         if (!(transaction.getSourceObject() instanceof Charge charge)
                 || charge.getAmountRefunded() == null
                 || charge.getAmountRefunded() == 0L) {
             return null;
         }
-        return ReconciliationAmount.normalize(BigDecimal.valueOf(charge.getAmountRefunded()).movePointLeft(2));
+        return amounts.convert(major(charge.getAmountRefunded(), charge.getCurrency()), charge.getCurrency(),
+                date(charge.getCreated() == null ? transaction.getCreated() : charge.getCreated()));
+    }
+
+    private static java.time.LocalDate date(Long seconds) {
+        return seconds == null ? null : java.time.Instant.ofEpochSecond(seconds).atZone(java.time.ZoneOffset.UTC).toLocalDate();
+    }
+
+    private static BigDecimal major(Long minor, String currency) {
+        int scale = currency != null && ZERO_DECIMAL.contains(currency.toUpperCase(java.util.Locale.ROOT)) ? 0 : 2;
+        return BigDecimal.valueOf(minor).movePointLeft(scale);
     }
 
     /**

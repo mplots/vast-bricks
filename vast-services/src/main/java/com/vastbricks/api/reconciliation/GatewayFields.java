@@ -11,6 +11,8 @@ import lombok.Setter;
  * decided which order a payment settled, so every field is {@code null} until then and stays {@code null} on an
  * order no payment was matched to.
  *
+ * <p>All amounts are normalized to EUR from the currency and date stated by their own transaction.
+ *
  * <p>Two of its fields carry the same names as fields of {@link OrderFields}. That is deliberate and is the whole
  * point of grouping by source: the facilitator tax and the refund are each stated twice, once by the marketplace and
  * once by the provider, and a rule holding {@code order.refundedAmount} against {@code gateway.refundedAmount} is

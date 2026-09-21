@@ -1,5 +1,6 @@
 import type { APIRequestContext } from "@playwright/test";
 
+import { markOrdersWithLegacyCurrency } from "../support/vast-db";
 import { expect, test } from "../support/api-test";
 import { anEcbRateDate, mockEcb, TEST_CURRENCY } from "../support/ecb";
 import { archiveBaseDirectory } from "../support/order-archive";
@@ -198,7 +199,7 @@ test("the orders of a range are listed, newest first", async ({
  * only one stated in a currency the order was not necessarily placed in.
  */
 
-test("the target invoice converts the facilitator tax and the refund out of whatever the buyer paid in", async ({
+test("the target invoice converts base amounts and the independently denominated refund", async ({
   request,
   settings,
   authentication,
@@ -217,24 +218,25 @@ test("the target invoice converts the facilitator tax and the refund out of what
         archivedAt: "2026-04-11T08:00:00.000Z",
         accounting: {
           orderDate,
-          paymentCurrency: TEST_CURRENCY,
-          // 100.00 in the buyer's currency, at 2 to the euro: 50.00 once converted. Every amount an order states is
-          // in whatever the buyer paid in, the grand total included, so this converts exactly as the other two do.
+          currency: TEST_CURRENCY,
+          paymentCurrency: "DKK",
+          // Base amounts use XTS, independently of the DKK payment.
           grandTotal: "100.00",
-          // 20.00 in the buyer's currency, at 2 to the euro: 10.00 once converted.
+          // 20.00 in the reported currency, at 2 to the euro: 10.00 once converted.
           vat: "20.00",
         },
-        // 10.00 in the buyer's currency, at 2 to the euro: 5.00 once converted.
+        // The detail page reports the refund in EUR, independently of the XTS base amounts.
         refunded: "10.00",
+        refundCurrency: "EUR",
       });
     },
   );
 
   const order = (await listOrders(request, `${month}-01`, `${month}-${String(monthEnd).padStart(2, "0")}`))
     .orders[0]!;
-  expect(order.currency).toBe(TEST_CURRENCY);
-  // 50.00 - 10.00 - 5.00, all three converted before they were added or subtracted rather than taken off as stated.
-  expect(Number(order.targetInvoice)).toBe(35);
+  expect(order.currency).toBe("DKK");
+  // EUR 50 total - EUR 10 converted tax - EUR 10 refund already in euros.
+  expect(Number(order.targetInvoice)).toBe(30);
 });
 
 test("calculates no marketplace fee, but still a payment fee, for an order refunded in full", async ({
@@ -281,7 +283,8 @@ test("a currency the rate table has never held a rate for leaves the target invo
         accounting: {
           orderDate: "4/9/2026",
           // A currency code no test and no real order ever states, so this table never holds a rate for it.
-          paymentCurrency: "ZZZ",
+          currency: "ZZZ",
+          paymentCurrency: "EUR",
           vat: "20.00",
           grandTotal: "100.00",
         },
@@ -579,4 +582,52 @@ test("a range stated the wrong way round is refused for the countries too", asyn
     "/api/private/orders/countries?from=2026-08-31&to=2026-08-01",
   );
   expect(response.status()).toBe(400);
+});
+
+test("EUR base amounts are not converted again when the buyer pays in DKK", async ({ request, settings, authentication }) => {
+  await importOrders(request, settings, authentication.tenant.code, (directory) => {
+    writeBrickLinkArchive(directory, {
+      orderId: 910010, archivedAt: "2026-04-12T08:00:00.000Z",
+      accounting: { orderDate: "4/12/2026", currency: "EUR", paymentCurrency: "DKK", grandTotal: "100.00", vat: "20.00" },
+      refunded: "10.00", refundCurrency: "EUR",
+    });
+    writeBrickOwlOrder(directory, {
+      orderId: "910011", archivedAt: "2026-04-12T08:00:00", orderTime: "2026-04-12T08:00:00",
+      baseCurrency: "EUR", paymentCurrency: "GBP", baseOrderTotal: "100.00", refundTotal: "10.00",
+    });
+  });
+  const rows = (await listOrders(request, "2026-04-01", "2026-04-30")).orders;
+  const brickLink = rows.find(order => order.orderId === "910010")!;
+  expect(Number(brickLink.grandTotal)).toBe(100);
+  expect(Number(brickLink.targetInvoice)).toBe(70);
+  const brickOwl = rows.find(order => order.orderId === "910011")!;
+  expect(Number(brickOwl.grandTotal)).toBe(100);
+  expect(Number(brickOwl.targetInvoice)).toBe(90);
+});
+
+test("a future exchange rate cannot value an older order", async ({ request, settings, authentication }, info) => {
+  await syncCurrencyRate(settings, request, info, "2.000000");
+  await importOrders(request, settings, authentication.tenant.code, (directory) => {
+    writeBrickLinkArchive(directory, {
+      orderId: 910012, archivedAt: "2026-04-12T08:00:00.000Z",
+      accounting: { orderDate: "1/1/1900", currency: TEST_CURRENCY, grandTotal: "100.00" },
+    });
+  });
+  const row = (await listOrders(request, "1900-01-01", "1900-01-31")).orders[0]!;
+  expect(row.targetInvoice).toBeNull();
+  expect(row.calculatedPaymentFee).toBeNull();
+});
+
+test("unchanged archives refresh orders imported before currencies were separated", async ({ request, settings, authentication }) => {
+  await importOrders(request, settings, authentication.tenant.code, directory => {
+    writeBrickLinkArchive(directory, {
+      orderId: 910013, archivedAt: "2026-04-12T08:00:00.000Z",
+      accounting: { orderDate: "4/12/2026", currency: "EUR", paymentCurrency: "DKK", grandTotal: "100.00" },
+    });
+  });
+  await markOrdersWithLegacyCurrency(authentication.tenant.id);
+  expect((await listOrders(request, "2026-04-01", "2026-04-30")).orders[0]!.targetInvoice).toBeNull();
+  expect((await request.post("/api/private/jobs/order-import/run")).status()).toBe(202);
+  await expect.poll(async () => (await (await request.get("/api/private/jobs/order-import")).json()).lastRun?.outcome).toBe("succeeded");
+  expect(Number((await listOrders(request, "2026-04-01", "2026-04-30")).orders[0]!.targetInvoice)).toBe(100);
 });

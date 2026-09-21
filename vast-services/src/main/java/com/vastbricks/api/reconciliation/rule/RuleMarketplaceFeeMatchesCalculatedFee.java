@@ -34,6 +34,7 @@ class RuleMarketplaceFeeMatchesCalculatedFee implements Rule {
 
     @Override
     public List<ReconciliationFailure> evaluate(ReconciledOrder order) {
+        if (order.isCurrencyConversionMissing()) return List.of();
         if (!Marketplace.BRICK_OWL.equals(order.getOrder().getSource())) {
             return List.of();
         }

@@ -34,6 +34,7 @@ class RuleGatewayPaidAmountMatchesGrandTotal implements Rule {
 
     @Override
     public List<ReconciliationFailure> evaluate(ReconciledOrder order) {
+        if (order.isCurrencyConversionMissing()) return List.of();
         // An immutable set rejects a null lookup, and an order may have been collected with no payment method.
         if (order.getOrder().getPaymentMethod() == null || !COLLECTED_PROVIDERS.contains(order.getOrder().getPaymentMethod())) {
             return List.of();

@@ -1,5 +1,7 @@
 package com.vastbricks.api.invoice;
 
+import com.vastbricks.api.currencyrate.EuroAmounts;
+import com.vastbricks.api.currencyrate.CurrencyRates;
 import com.vastbricks.api.client.brickstore.BrickStoreClient;
 import com.vastbricks.api.client.brickstore.BrickStoreOrder;
 import com.vastbricks.api.client.brickstore.BrickStoreOrderExportRequest;
@@ -20,6 +22,8 @@ import org.springframework.stereotype.Component;
 class BrickLinkInvoiceOrderSource implements InvoiceOrderSource {
 
     private final BrickStoreClient brickStoreClient;
+
+    private final CurrencyRates currencyRates;
 
     @Override
     public InvoiceOrderMarketplace marketplace() {
@@ -48,13 +52,19 @@ class BrickLinkInvoiceOrderSource implements InvoiceOrderSource {
         if (OrderTaxTypes.of(fullNameOrder) == null) {
             throw new InvoiceException("BrickLink order has no tax type");
         }
+        var amounts = new EuroAmounts(currencyRates);
+        var totalEur = amounts.convert(fullNameOrder.getBaseGrandTotal(), fullNameOrder.getBaseCurrencyCode(), fullNameOrder.getOrderDate());
+        var taxEur = amounts.convert(FacilitatorTaxes.of(fullNameOrder), fullNameOrder.getBaseCurrencyCode(), fullNameOrder.getOrderDate());
+        if (amounts.isIncomplete()) {
+            throw new InvoiceException("Order currency or historical EUR exchange rate is missing");
+        }
         return new InvoiceOrder(
                 marketplace().key() + ":customer:" + username,
                 name,
                 fullNameOrder.getOrderDate(),
                 OrderTaxTypes.of(fullNameOrder),
-                fullNameOrder.getBaseGrandTotal(),
-                FacilitatorTaxes.of(fullNameOrder)
+                totalEur,
+                taxEur
         );
     }
 

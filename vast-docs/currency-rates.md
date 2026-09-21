@@ -44,3 +44,22 @@ this feature syncs it into a table the rest of the backend can read instead.
 - `currency-rate-sync`, daily at 18:00 - well after the ECB's own 16:00 CET publication, with room for it to run
   late.
 - Its tally is `added` and `skipped`.
+
+## Conversion and history
+
+- Convert each amount using its reported currency, with the latest stored rate on or before its date.
+  Missing currency, date, or rate produces an unavailable result; never use a future rate or assume EUR.
+  Amounts explicitly in EUR need no rate. Reported EUR amounts round to cents, HALF_UP.
+- Order totals, tax, shipping and marketplace commission use the marketplace base currency. Payment currency
+  describes the buyer's payment and does not relabel those amounts. BrickLink detail refunds retain their own
+  currency; BrickOwl refunds use the base currency.
+- The rate-sync job accepts `history=true` to fetch `/stats/eurofxref/eurofxref-hist.xml` and insert missing
+  published dates. It bypasses freshness, preserves days already stored, and reports added/skipped rows.
+  The scheduled daily job still fetches only the daily feed.
+- After deploying the currency correction, run currency-rate-sync with History selected, then order-import.
+  Migration V19 marks old rows for rereading even if their archived timestamp is unchanged. Until reread,
+  their monetary report fields remain unavailable because their former currency label cannot be trusted.
+
+- Fetch and parse ECB responses outside database transactions so debug records become visible before the rate
+  import finishes and remain available if parsing or storage fails. Store each published day in its own short
+  transaction; an interrupted backfill keeps completed days and skips them when resumed.

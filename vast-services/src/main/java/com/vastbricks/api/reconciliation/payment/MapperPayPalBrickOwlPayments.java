@@ -1,5 +1,7 @@
 package com.vastbricks.api.reconciliation.payment;
 
+import com.vastbricks.api.currencyrate.EuroAmounts;
+import com.vastbricks.api.currencyrate.CurrencyRates;
 import com.vastbricks.api.client.paypal.PayPalTransaction;
 import com.vastbricks.api.reconciliation.DetailMapper;
 import com.vastbricks.api.reconciliation.Marketplace;
@@ -24,6 +26,7 @@ import org.springframework.stereotype.Component;
 class MapperPayPalBrickOwlPayments implements DetailMapper<PayPalTransaction> {
 
     private final PaymentLinks paymentLinks;
+    private final CurrencyRates currencyRates;
 
     @Override
     public Class<PayPalTransaction> type() {
@@ -35,12 +38,13 @@ class MapperPayPalBrickOwlPayments implements DetailMapper<PayPalTransaction> {
         // What the marketplace took back out of each payment, and what has since come back out of it, are stated by
         // transactions of the month rather than by the payment, so both are indexed once before the payments are
         // walked.
-        var partnerFees = PayPalPartnerFees.of(sourced);
-        var refunds = PayPalRefunds.of(sourced);
+        var partnerFees = PayPalPartnerFees.of(sourced, currencyRates);
+        var refunds = PayPalRefunds.of(sourced, currencyRates);
 
         // The first payment of an order wins: a later one does not overwrite what was already matched.
         Set<ReconciledOrder> paid = Collections.newSetFromMap(new IdentityHashMap<>());
         for (var transaction : sourced) {
+            var amounts = new EuroAmounts(currencyRates);
             if (!PayPalPayments.paysForOrder(transaction)) {
                 continue;
             }
@@ -48,14 +52,16 @@ class MapperPayPalBrickOwlPayments implements DetailMapper<PayPalTransaction> {
             if (invoiceId == null) {
                 continue;
             }
-            var paidAmount = PayPalPayments.paidAmount(transaction);
+            var paidAmount = PayPalPayments.paidAmount(transaction, amounts);
             for (var order : orders.find(Marketplace.BRICK_OWL, invoiceId)) {
                 if (PayPalPayments.PAID_THROUGH_PAYPAL.test(order) && paid.add(order)) {
                     order.getGateway().setPaidAmount(paidAmount);
-                    order.getGateway().setFeeAmount(PayPalPayments.feeAmount(transaction));
+                    order.getGateway().setFeeAmount(PayPalPayments.feeAmount(transaction, amounts));
                     order.getGateway().setFacilitatorTax(partnerFees.takenFrom(transaction));
                     order.getGateway().setRefundedAmount(refunds.refundedFrom(transaction));
                     order.getGateway().setPaymentUrl(paymentLinks.payPal(PayPalPayments.paymentReference(transaction)));
+                    order.setCurrencyConversionMissing(order.isCurrencyConversionMissing() || amounts.isIncomplete()
+                        || partnerFees.incomplete(transaction) || refunds.incomplete(transaction));
                 }
             }
         }

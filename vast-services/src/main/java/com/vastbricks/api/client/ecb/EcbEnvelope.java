@@ -33,7 +33,18 @@ class EcbEnvelope {
 
     /** The one day this envelope states, and what it gives for every currency it quotes. */
     EcbDailyRates dailyRates() {
-        DatedCube dated = cube == null ? null : cube.getDated();
+        return history().stream().max(java.util.Comparator.comparing(EcbDailyRates::getRateDate))
+                .orElseThrow(() -> new EcbClientException("The ECB envelope states no reference date"));
+    }
+
+    List<EcbDailyRates> history() {
+        if (cube == null || cube.getDated() == null || cube.getDated().isEmpty()) {
+            throw new EcbClientException("The ECB envelope states no reference date");
+        }
+        return cube.getDated().stream().map(this::rates).toList();
+    }
+
+    private EcbDailyRates rates(DatedCube dated) {
         if (dated == null || dated.getTime() == null || dated.getTime().isBlank()) {
             throw new EcbClientException("The ECB envelope states no reference date");
         }
@@ -71,7 +82,8 @@ class EcbEnvelope {
     static class OuterCube {
 
         @JacksonXmlProperty(localName = "Cube")
-        private DatedCube dated;
+        @JacksonXmlElementWrapper(useWrapping = false)
+        private List<DatedCube> dated;
     }
 
     @Data

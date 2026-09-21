@@ -54,10 +54,7 @@ public final class PaymentFees {
     }
 
     /**
-     * Calculated from the grand total - the amount actually charged to the card or PayPal account - in whatever
-     * currency it is stated in, which for {@code order.grandTotal} is the store's own base currency rather than what
-     * the buyer paid in; neither provider's fixed fee is converted out of EUR to match, a gap this shares with
-     * {@link MarketplaceFees} not converting currency either.
+     * Calculated from the grand total converted to EUR. The fixed charge is also denominated in EUR.
      *
      * <p>{@code country} tells the tier apart: this store is in the EEA, so a card or account issued anywhere else
      * costs more to take a payment from, and both providers price the United Kingdom as its own tier rather than

@@ -37,6 +37,7 @@ class RuleGatewayRefundedAmountMatchesRefundedAmount implements Rule {
 
     @Override
     public List<ReconciliationFailure> evaluate(ReconciledOrder order) {
+        if (order.isCurrencyConversionMissing()) return List.of();
         if (order.getGateway().getPaidAmount() == null) {
             return List.of();
         }

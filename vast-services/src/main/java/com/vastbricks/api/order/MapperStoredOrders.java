@@ -1,5 +1,6 @@
 package com.vastbricks.api.order;
 
+import com.vastbricks.api.currencyrate.CurrencyRates;
 import com.vastbricks.api.orderarchive.OrderSource;
 import com.vastbricks.api.reconciliation.DetailMapper;
 import com.vastbricks.api.reconciliation.Marketplace;
@@ -18,9 +19,12 @@ import org.springframework.stereotype.Component;
  * order reaching no collected one is a row for an order this period did not collect and is dropped - as every detail
  * mapper drops what matches nothing. Whether a collected order having no stored row matters is a rule's decision.
  */
+@lombok.RequiredArgsConstructor
 @Component
 @Order(5)
 class MapperStoredOrders implements DetailMapper<SourcedStoredOrder> {
+
+    private final CurrencyRates currencyRates;
 
     @Override
     public Class<SourcedStoredOrder> type() {
@@ -40,8 +44,10 @@ class MapperStoredOrders implements DetailMapper<SourcedStoredOrder> {
         return source == OrderSource.BRICKOWL ? Marketplace.BRICK_OWL : Marketplace.BRICK_LINK;
     }
 
-    private static void apply(StoredFields fields, com.vastbricks.api.order.Order order) {
+    private void apply(StoredFields fields, com.vastbricks.api.order.Order order) {
         fields.setPresent(true);
+        var day = order.getOrderDate().atZone(ZoneOffset.UTC).toLocalDate();
+        var currency = order.getBaseCurrency();
         // Stored as a moment and compared as a day, which is what the marketplace's own account states: BrickLink's
         // accounting export names a day and no time of day, so the moment is midnight UTC of the day it named.
         fields.setOrderDate(order.getOrderDate() == null ? null : order.getOrderDate().atZone(ZoneOffset.UTC).toLocalDate());
@@ -54,10 +60,10 @@ class MapperStoredOrders implements DetailMapper<SourcedStoredOrder> {
         fields.setPaymentMethod(order.getPaymentMethod());
         fields.setCurrency(order.getCurrency());
         fields.setTaxType(order.getTaxType());
-        fields.setFacilitatorTax(order.getFacilitatorTax());
-        fields.setSubTotal(order.getSubTotal());
-        fields.setShippingCost(order.getShippingCost());
-        fields.setGrandTotal(order.getGrandTotal());
-        fields.setRefundedAmount(order.getRefundedAmount());
+        fields.setFacilitatorTax(currencyRates.toEur(order.getFacilitatorTax(), currency, day));
+        fields.setSubTotal(currencyRates.toEur(order.getSubTotal(), currency, day));
+        fields.setShippingCost(currencyRates.toEur(order.getShippingCost(), currency, day));
+        fields.setGrandTotal(currencyRates.toEur(order.getGrandTotal(), currency, day));
+        fields.setRefundedAmount(currencyRates.toEur(order.getRefundedAmount(), order.getRefundCurrency(), day));
     }
 }

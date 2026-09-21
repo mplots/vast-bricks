@@ -26,6 +26,11 @@ public class ReconciledOrder {
     /** What the marketplace reported about the order itself, which the rest is reconciled against. */
     private final OrderFields order;
 
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    @Setter
+    private boolean currencyConversionMissing;
+
+
     /** What the payment provider reports about the payment matched to the order. */
     private final GatewayFields gateway = new GatewayFields();
 
@@ -74,6 +79,7 @@ public class ReconciledOrder {
      * them, so it is calculated regardless.
      */
     public CalculatedFields getCalculated() {
+        if (currencyConversionMissing) return new CalculatedFields(null, null, null);
         var targetInvoice = targetInvoice();
         boolean nothingToInvoice = targetInvoice == null || targetInvoice.signum() == 0;
         return new CalculatedFields(targetInvoice, nothingToInvoice ? null : marketplaceFee, paymentFee());

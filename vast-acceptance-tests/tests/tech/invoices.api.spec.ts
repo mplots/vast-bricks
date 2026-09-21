@@ -344,3 +344,30 @@ test('invoice generation rejects missing and invalid tokens', async ({ anonymous
   });
   expect(invalidToken.status()).toBe(401);
 });
+
+test('converts a foreign base total before writing an EUR invoice', async ({ request, settings }, info) => {
+  const { anEcbRateDate, mockEcb } = await import('../support/ecb');
+  const date = anEcbRateDate(info);
+  await mockEcb(settings, request, info, date, { XTS: '2' });
+  expect((await request.post('/api/private/jobs/currency-rate-sync/run?force=true')).status()).toBe(202);
+  await expect.poll(async () => (await (await request.get('/api/private/jobs/currency-rate-sync')).json()).lastRun?.outcome).toBe('succeeded');
+  const [year, month, day] = date.split('-');
+  const wireMock = await mockInvoiceGeneration(settings, request, info, {
+    brickLink: { orderId: '910020', orderDate: `${month}/${day}/${year}`, baseCurrency: 'XTS', grandTotal: '242', vatCharges: '42' }
+  });
+  const response = await request.post(endpoint, { data: { orderId: '910020', source: 'BrickLink' } });
+  expect(response.status(), await response.text()).toBe(200);
+  const invoices = await wireMock.findMethodHostRequests('POST', '/invoices');
+  expect(invoices).toHaveLength(1);
+  expect(JSON.parse(invoices[0].text())).toMatchObject({ currency: 'EUR', products: [{ price: 100, tax: 21 }] });
+});
+
+test('does not write accounting data when the order currency cannot be converted', async ({ request, settings }, info) => {
+  const wireMock = await mockInvoiceGeneration(settings, request, info, {
+    brickLink: { orderId: '910021', baseCurrency: 'ZZZ', grandTotal: '100' }
+  });
+  const response = await request.post(endpoint, { data: { orderId: '910021', source: 'BrickLink' } });
+  expect(response.status()).toBeGreaterThanOrEqual(400);
+  expect(await wireMock.findMethodHostRequests('POST', '/invoices')).toHaveLength(0);
+  expect(await wireMock.findMethodHostRequests('POST', '/clients')).toHaveLength(0);
+});

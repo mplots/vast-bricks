@@ -42,6 +42,7 @@ class RulePaymentFeeMatchesCalculatedFee implements Rule {
 
     @Override
     public List<ReconciliationFailure> evaluate(ReconciledOrder order) {
+        if (order.isCurrencyConversionMissing()) return List.of();
         // An immutable set rejects a null lookup, and an order may have been collected with no payment method.
         if (order.getGateway().getPaidAmount() == null
                 || order.getOrder().getPaymentMethod() == null

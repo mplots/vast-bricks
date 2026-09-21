@@ -1,5 +1,7 @@
 package com.vastbricks.api.reconciliation.payment;
 
+import com.vastbricks.api.currencyrate.EuroAmounts;
+import com.vastbricks.api.currencyrate.CurrencyRates;
 import com.vastbricks.api.ledger.bank.BankTransfer;
 import com.vastbricks.api.reconciliation.DetailMapper;
 import com.vastbricks.api.reconciliation.ReconciledOrder;
@@ -37,9 +39,12 @@ import org.springframework.stereotype.Component;
  * gateway's facilitator tax stays absent because a bank deducts none, and there is no payment link: a bank has no
  * page to open the transfer at, so the screen shows the payment method as the plain value it is.
  */
+@lombok.RequiredArgsConstructor
 @Component
 @Order(7)
 class MapperBankTransfers implements DetailMapper<BankTransfer> {
+
+    private final CurrencyRates currencyRates;
 
     @Override
     public Class<BankTransfer> type() {
@@ -74,8 +79,9 @@ class MapperBankTransfers implements DetailMapper<BankTransfer> {
     }
 
     /** What one order's own entries came to, each way, and which entries those were. */
-    private static final class Settlement {
+    private final class Settlement {
 
+        private final EuroAmounts amounts = new EuroAmounts(currencyRates);
         private BigDecimal paid;
         private BigDecimal refunded;
         private final List<String> references = new ArrayList<>();
@@ -86,16 +92,22 @@ class MapperBankTransfers implements DetailMapper<BankTransfer> {
             if (transfer.getEntryReference() != null) {
                 references.add(transfer.getEntryReference());
             }
+            var euros = amounts.convert(transfer.getAmount(), transfer.getCurrency(), transfer.getBookingDate());
             if (BankPayments.isCredit(transfer)) {
-                paid = sum(paid, transfer.getAmount());
+                paid = sum(paid, euros);
             } else if (BankPayments.isDebit(transfer)) {
-                refunded = sum(refunded, transfer.getAmount());
+                refunded = sum(refunded, euros);
             }
         }
 
         void mergeOnto(ReconciledOrder order) {
             // Absent rather than zero on either side: no entry either way is the bank saying nothing about it, which
             // is a different fact from a transfer of nothing.
+            if (amounts.isIncomplete()) {
+                order.setCurrencyConversionMissing(true);
+                order.getGateway().getEntryReferences().addAll(references);
+                return;
+            }
             if (paid != null) {
                 order.getGateway().setPaidAmount(ReconciliationAmount.normalize(paid));
             }

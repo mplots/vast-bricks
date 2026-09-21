@@ -180,3 +180,11 @@ function quotedIdentifier(identifier: string): string {
   }
   return `"${identifier}"`;
 }
+
+/** Recreates a pre-currency-fix row for the migration acceptance scenario, scoped to its test tenant. */
+export async function markOrdersWithLegacyCurrency(tenantId: number): Promise<void> {
+  await withDatabaseClient(client => client.query(
+    `UPDATE ${vastTable('orders')} SET currency_version = 0, base_currency = NULL, refund_currency = NULL WHERE tenant_id = $1`,
+    [tenantId],
+  ).then(() => undefined));
+}

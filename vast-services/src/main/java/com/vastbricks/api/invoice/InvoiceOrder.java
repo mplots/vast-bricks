@@ -22,7 +22,7 @@ class InvoiceOrder {
     /** How the order is treated for tax, which is what decides the rate the invoice is issued under. */
     private final OrderTaxType taxType;
 
-    /** Order total in the store's base currency, with shipping and additional charges included. */
+    /** Order total converted to EUR, with shipping and additional charges included. */
     private final BigDecimal grandTotal;
 
     /** What the marketplace collected on the order under its own tax registration, or nothing where it collected none. */

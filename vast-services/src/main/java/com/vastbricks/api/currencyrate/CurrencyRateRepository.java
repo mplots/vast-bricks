@@ -24,6 +24,4 @@ interface CurrencyRateRepository extends JpaRepository<CurrencyRate, Long> {
      * until the next one is published. */
     Optional<CurrencyRate> findFirstByCurrencyAndRateDateLessThanEqualOrderByRateDateDesc(String currency, LocalDate date);
 
-    /** The earliest rate held for a currency, for a date older than this table's own history. */
-    Optional<CurrencyRate> findFirstByCurrencyOrderByRateDateAsc(String currency);
 }

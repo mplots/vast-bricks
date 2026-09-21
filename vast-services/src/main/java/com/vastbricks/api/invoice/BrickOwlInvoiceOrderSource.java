@@ -1,5 +1,7 @@
 package com.vastbricks.api.invoice;
 
+import com.vastbricks.api.currencyrate.EuroAmounts;
+import com.vastbricks.api.currencyrate.CurrencyRates;
 import com.vastbricks.api.client.brickowl.BrickOwlBatchRequest;
 import com.vastbricks.api.client.brickowl.BrickOwlBatchResponse;
 import com.vastbricks.api.client.brickowl.BrickOwlClient;
@@ -22,6 +24,8 @@ class BrickOwlInvoiceOrderSource implements InvoiceOrderSource {
     private static final String ORDER_ENDPOINT = "order/view";
 
     private final BrickOwlClient brickOwlClient;
+
+    private final CurrencyRates currencyRates;
 
     @Override
     public InvoiceOrderMarketplace marketplace() {
@@ -55,13 +59,19 @@ class BrickOwlInvoiceOrderSource implements InvoiceOrderSource {
         if (OrderTaxTypes.of(order) == null) {
             throw new InvoiceException("BrickOwl order has no tax type");
         }
+        var amounts = new EuroAmounts(currencyRates);
+        var totalEur = amounts.convert(order.getBaseOrderTotal(), order.getBaseCurrency(), orderTime.toLocalDate());
+        var taxEur = amounts.convert(FacilitatorTaxes.of(order), order.getBaseCurrency(), orderTime.toLocalDate());
+        if (amounts.isIncomplete()) {
+            throw new InvoiceException("Order currency or historical EUR exchange rate is missing");
+        }
         return new InvoiceOrder(
                 marketplace().key() + ":customer:" + customerId,
                 name,
                 orderTime.toLocalDate(),
                 OrderTaxTypes.of(order),
-                order.getBaseOrderTotal(),
-                FacilitatorTaxes.of(order)
+                totalEur,
+                taxEur
         );
     }
 

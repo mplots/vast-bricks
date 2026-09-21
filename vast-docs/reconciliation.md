@@ -81,6 +81,8 @@ here as they are provided; do not invent unspecified behavior prematurely.
   uses the selected date range and all frontend row filters, with the visible
   columns in their selected order. Headers identify each field's source;
   numeric values remain numeric and missing values are empty cells.
+  Orders and reconciliation CSV exports use a comma as the decimal separator (for example `12,34`).
+  Every cell is quoted so decimal commas do not split values into separate columns; text and integer counts stay unchanged.
 - The table's columns are chosen and ordered by the reader, from a panel down
   the right of the table that stays shut until it is asked for. Every collected
   order field can be a column; the screen opens with the subset it has always
@@ -426,9 +428,8 @@ here as they are provided; do not invent unspecified behavior prematurely.
   BrickOwl detail batches are. Only a cancelled order is asked about, a page per
   order being two hundred fetches a month against the handful of orders a refund
   plausibly belongs to, so a partial refund on an order of another status stays
-  uncollected. The page states the refund in the order's own currency, which is
-  collected as `order.currency`; the amount is still compared with the
-  payment's as a number, as the payment matching's own amount key already is.
+  uncollected. The page states the refund's own currency, retained and used to convert the refund to EUR
+  on the order date; it is independent of `order.currency`, which names the buyer's payment currency.
   BrickOwl states it as `refund_total` on the order itself, so it is
   collected in the mapping stage with the order's other amounts; the field is
   written as `0.00` rather than omitted where nothing came back, so a zero is
@@ -498,12 +499,8 @@ here as they are provided; do not invent unspecified behavior prematurely.
   PayPal, because a weak key would otherwise attach a payment to an order settled
   another way. The Stripe mappers need no such guard: they match an order ID or a
   username the payment states outright.
-- The amount-and-day fallback compares the payment against the order's grand
-  total, which is in the store's base currency, while the payment is in the
-  currency it was taken in. Although the collected order now carries its payment
-  currency, the two amounts are still compared as numbers. That is correct while
-  both are the same currency and is worth revisiting when a payment in another
-  currency has to reconcile.
+- Amount matching compares EUR against EUR, after converting the order from its base currency and
+  the payment from its own transaction currency. Unknown conversions cannot satisfy an amount match.
 - An order the marketplace says was settled by bank transfer is paid through the
   bank, which is the one party to an order no provider exposes, so its payment is
   read out of the statement entries a person imported rather than asked of
@@ -552,9 +549,8 @@ here as they are provided; do not invent unspecified behavior prematurely.
   deducts none.
 - The shipping charged is what the marketplace charged the buyer for shipping
   the order: BrickOwl's `ship_total` and BrickLink's `ORDERSHIPPING`, or nothing
-  where it charged none. It is stated as the marketplace stated it, in the
-  currency it stated it in, as the sub-total is — the grand total is the one
-  amount either marketplace gives in the store's base currency. It is the
+  where it charged none. Shipping, subtotal, taxes and grand total are converted from the marketplace
+  base currency to EUR. It is the
   buyer's side of the postage that the shipment source states from the post
   office's, and no rule compares the two yet.
 - The shipping cost is what the post office charged for the order's shipment:
@@ -1032,7 +1028,7 @@ here as they are provided; do not invent unspecified behavior prematurely.
     is not the same fact as the provider taking none.
   - Both fee rules are `warning` rather than `error` for the same reason: each
     calculation is a known approximation of a rate card it does not reproduce
-    exactly — it does not convert currency, know a card's country, or account
+    exactly — it does not know a card's country or account
     for a volume discount an account may have negotiated — so a disagreement
     is worth a look without necessarily being a mistake either side made.
   - The facilitator-tax rule reports its failures at `info`. The paid-amount
@@ -1153,3 +1149,22 @@ here as they are provided; do not invent unspecified behavior prematurely.
   invoice store request types its recipient, numerator and bank-account fields as arrays
   of strings although the API expects lookup objects.
 
+
+### Currency normalization
+
+All order, gateway, stored-order and calculated monetary fields exposed by reconciliation and Orders are EUR.
+The existing `currency` field and filter mean **payment currency**, not the denomination of report amounts.
+Original base and refund currencies remain attached to archived/imported data. Totals and comparisons therefore
+never sum amounts in different currencies. Each converted amount rounds to cents before a report comparison.
+
+Marketplace amounts use the order date. Stripe paid amounts and fees use the balance transaction currency/date;
+its running refund total uses the charge currency/date, independently of settlement currency. Stripe minor units
+follow its currency rules, including zero-decimal charges. PayPal payment, fee, partner-fee and refund amounts
+use each amount's currency and transaction date. Bank credits and debits use each entry's currency/booking date.
+Refunds and partner fees are converted individually before summing. Reference-rate conversion may differ from
+what a provider actually settled due to its own exchange rate and timing; fee comparisons remain estimates.
+
+A missing currency or historical rate on collected order/gateway money reports `currency-conversion-missing`
+as an error, leaves calculated values unavailable and suppresses comparisons that would treat unknown money
+as zero. A partially convertible set of refunds never becomes a partial refund total. Missing USD history leaves
+BrickLink's calculated commission unavailable. See currency-rates.md for the history backfill and imported-row refresh.

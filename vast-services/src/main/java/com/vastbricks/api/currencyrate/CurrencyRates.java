@@ -20,32 +20,35 @@ public class CurrencyRates {
 
     private final CurrencyRateRepository repository;
 
-    /**
-     * {@code amount}, stated in {@code currency}, converted to euros at the rate closest to {@code date}. An amount
-     * already in euros - or one with no currency stated at all - is handed back unchanged, since there is nothing to
-     * convert. Null where {@code amount} is null, and null where this table has never held a rate for {@code
-     * currency}: a figure this cannot convert is answered as unknown rather than as the number it arrived in.
-     *
-     * <p>The rate used is the one the ECB published on or before {@code date}, which is what a published rate answers
-     * for until the next one replaces it. A date older than this table's own history falls back to the earliest rate
-     * held for the currency, rather than refusing to convert an order older than the sync's own history.
-     */
+    /** Converts with the latest rate published on or before the amount's date; missing history is unknown. */
     public BigDecimal toEur(BigDecimal amount, String currency, LocalDate date) {
-        if (amount == null) {
-            return null;
-        }
-        String code = currency == null ? null : currency.trim().toUpperCase(Locale.ROOT);
-        if (code == null || code.isBlank() || code.equals("EUR")) {
-            return amount;
-        }
-        BigDecimal rate = rateFor(code, date);
-        return rate == null ? null : amount.divide(rate, 2, RoundingMode.HALF_UP);
+        BigDecimal converted = convertUnrounded(amount, currency, "EUR", date);
+        return converted == null ? null : converted.setScale(2, RoundingMode.HALF_UP);
+    }
+
+    /** Retains precision for calculations such as applying a USD fee schedule before rounding the final EUR fee. */
+    public BigDecimal convertUnrounded(BigDecimal amount, String from, String to, LocalDate date) {
+        if (amount == null) return null;
+        String source = normalize(from);
+        String target = normalize(to);
+        if (source == null || target == null) return null;
+        if (source.equals(target)) return amount;
+        BigDecimal sourceRate = rateFor(source, date);
+        BigDecimal targetRate = rateFor(target, date);
+        if (sourceRate == null || targetRate == null) return null;
+        return amount.multiply(targetRate).divide(sourceRate, java.math.MathContext.DECIMAL128);
+    }
+
+    private static String normalize(String currency) {
+        return currency == null || currency.isBlank() ? null : currency.trim().toUpperCase(Locale.ROOT);
     }
 
     private BigDecimal rateFor(String currency, LocalDate date) {
+        if ("EUR".equals(currency)) return BigDecimal.ONE;
+        if (date == null) return null;
         return repository.findFirstByCurrencyAndRateDateLessThanEqualOrderByRateDateDesc(currency, date)
-                .or(() -> repository.findFirstByCurrencyOrderByRateDateAsc(currency))
                 .map(CurrencyRate::getRate)
+                .filter(rate -> rate.signum() > 0)
                 .orElse(null);
     }
 }

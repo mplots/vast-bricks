@@ -226,7 +226,7 @@ class OrderImport {
             orders.delete(stored);
             return Outcome.REMOVED;
         }
-        if (!force && stored != null && !archived.getArchivedAt().isAfter(stored.getArchivedAt())) {
+        if (!force && stored != null && stored.getCurrencyVersion() == 1 && !archived.getArchivedAt().isAfter(stored.getArchivedAt())) {
             return Outcome.UNCHANGED;
         }
 
@@ -244,6 +244,7 @@ class OrderImport {
             }
             return Outcome.OUTSIDE;
         }
+        order.setCurrencyVersion(1);
         order.setArchivedAt(archived.getArchivedAt());
         order.setUpdatedAt(Instant.now());
         orders.save(order);
@@ -301,10 +302,13 @@ class OrderImport {
         order.setPaymentMethod(ReconciliationPaymentMethod.normalize(
                 preferring(exported == null ? null : StringUtils.trimToNull(exported.getPaymentType()),
                         () -> payment(stated.get(), BrickLinkOrder.Payment::getMethod))));
-        // What the buyer paid in, which every amount below - the grand total among them - is stated in.
+        // Payment currency is metadata; the amounts below use the base currency.
         order.setCurrency(ReconciliationCurrency.normalize(
                 preferring(exported == null ? null : StringUtils.trimToNull(exported.getPaymentCurrencyCode()),
                         () -> payment(stated.get(), BrickLinkOrder.Payment::getCurrencyCode))));
+        order.setBaseCurrency(ReconciliationCurrency.normalize(
+                preferring(exported == null ? null : StringUtils.trimToNull(exported.getBaseCurrencyCode()),
+                        () -> cost(stated.get(), BrickLinkOrder.Cost::getCurrencyCode))));
         // Only the export states enough to type an order for tax or to say what the marketplace collected on it.
         // An order archived without one carries neither rather than a guess from the fields that are left.
         order.setTaxType(exported == null ? null : OrderTaxTypes.of(exported));
@@ -319,17 +323,18 @@ class OrderImport {
                 () -> amountOf(cost(stated.get(), BrickLinkOrder.Cost::getGrandTotal)))));
         // Neither of the other two files names a refund: BrickLink states one on the order detail page alone, which
         // is the third file the archive keeps and the only reason this import reads it.
-        order.setRefundedAmount(refunded(archived));
+        BrickStoreOrderRefund refund = refunded(archived);
+        order.setRefundedAmount(refund == null ? null : ReconciliationAmount.normalize(refund.getAmount()));
+        order.setRefundCurrency(refund == null ? null : ReconciliationCurrency.normalize(refund.getCurrency()));
     }
 
     /** What the archived order detail page says came back, or null where it says nothing did. */
-    private BigDecimal refunded(ArchivedOrder archived) throws IOException {
+    private BrickStoreOrderRefund refunded(ArchivedOrder archived) throws IOException {
         Path path = archived.files.get(ArchiveKind.DETAIL);
         if (path == null) {
             return null;
         }
-        BrickStoreOrderRefund refund = brickStore.readOrderRefund(Files.readString(path, StandardCharsets.UTF_8));
-        return refund == null ? null : ReconciliationAmount.normalize(refund.getAmount());
+        return brickStore.readOrderRefund(Files.readString(path, StandardCharsets.UTF_8));
     }
 
     /** BrickOwl states one record of an order and nothing beside it, so there is nothing to prefer over it. */
@@ -351,6 +356,8 @@ class OrderImport {
         order.setCountry(country(stated.getShipCountryCode()));
         order.setPaymentMethod(ReconciliationPaymentMethod.normalize(stated.getPaymentMethodType()));
         order.setCurrency(ReconciliationCurrency.normalize(stated.getPaymentCurrency()));
+        order.setBaseCurrency(ReconciliationCurrency.normalize(stated.getBaseCurrency()));
+        order.setRefundCurrency(order.getBaseCurrency());
         order.setTaxType(OrderTaxTypes.of(stated));
         order.setFacilitatorTax(ReconciliationAmount.normalize(FacilitatorTaxes.of(stated)));
         order.setMarketplaceFee(ReconciliationAmount.normalize(stated.getBrickOwlFee()));

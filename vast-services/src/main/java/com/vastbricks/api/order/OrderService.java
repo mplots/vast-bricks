@@ -1,5 +1,6 @@
 package com.vastbricks.api.order;
 
+import com.vastbricks.api.charges.MarketplaceFeeAmounts;
 import com.vastbricks.api.currencyrate.CurrencyRates;
 import com.vastbricks.api.charges.MarketplaceFees;
 import com.vastbricks.api.charges.PaymentFees;
@@ -31,6 +32,7 @@ class OrderService {
     private final OrderRepository orders;
 
     private final CurrencyRates currencyRates;
+    private final MarketplaceFeeAmounts marketplaceFees;
 
     /**
      * The orders placed in a range of days, newest first, for the tenant bound to the request.
@@ -47,7 +49,7 @@ class OrderService {
                     boolean nothingToInvoice = targetInvoice == null || targetInvoice.signum() == 0;
                     return new OrderResponse(order, targetInvoice,
                             nothingToInvoice ? null : marketplaceFeeOf(order),
-                            paymentFeeOf(order));
+                            paymentFeeOf(order), currencyRates);
                 })
                 .toList();
     }
@@ -60,7 +62,7 @@ class OrderService {
      */
     private BigDecimal paymentFeeOf(Order order) {
         return ReconciliationAmount.normalize(
-                PaymentFees.of(order.getPaymentMethod(), order.getGrandTotal(), order.getCountry()));
+                PaymentFees.of(order.getPaymentMethod(), euro(order, order.getGrandTotal()), order.getCountry()));
     }
 
     /**
@@ -68,17 +70,14 @@ class OrderService {
      * rather than the marketplace's own order - the calculation is never stored, so it always reflects the rate
      * schedule as it reads now rather than as it read when the order was imported.
      *
-     * <p>BrickLink's grand total is exactly {@code BASEGRANDTOTAL}, so tiering it here answers the same question
-     * {@link com.vastbricks.api.charges.MarketplaceFees#of(com.vastbricks.api.client.brickstore.BrickStoreOrder)}
-     * does. BrickOwl's does not: a stored row keeps no tax scheme or raw tax amount to tell an import tax apart from
-     * VAT the store charged under its own registration, so neither is subtracted here, which is the one gap between
-     * this figure and what reconciliation calculates live for such an order - the same kind of gap
-     * {@link #targetInvoiceOf} already carries for a different reason.
+     * <p>BrickLink's total is converted to USD for its fee tiers and the result to EUR. BrickOwl's percentage
+     * is applied in the base currency and converted to EUR. Stored rows still lack the non-import tax breakdown
+     * used by the live BrickOwl calculation, so its fee remains an approximation.
      */
     private BigDecimal marketplaceFeeOf(Order order) {
         return ReconciliationAmount.normalize(switch (order.getSource()) {
-            case BRICKLINK -> MarketplaceFees.brickLinkOf(order.getGrandTotal());
-            case BRICKOWL -> MarketplaceFees.brickOwlOf(order.getGrandTotal(), order.getShippingCost());
+            case BRICKLINK -> marketplaceFees.brickLinkInEur(order.getGrandTotal(), order.getBaseCurrency(), day(order));
+            case BRICKOWL -> euro(order, MarketplaceFees.brickOwlOf(order.getGrandTotal(), order.getShippingCost()));
         });
     }
 
@@ -87,29 +86,23 @@ class OrderService {
      * report's own target invoice answers, approximated from what this screen holds rather than what reconciliation
      * collects live.
      *
-     * <p>Every amount an order states - the grand total among them - is in whatever the buyer paid in, which need
-     * not be euros at all, so all three figures the formula touches are converted before they are added or
-     * subtracted; converting only two of them would subtract euros from a foreign-currency total and answer a wrong
-     * number for every order not paid in euros. Reconciliation subtracts the payment gateway's own refund instead of
-     * the marketplace's, which this screen has no account of at all; that difference, not the currency, is the rest
-     * of why the two figures are not always the same.
-     *
-     * <p>An order this cannot convert - a currency the rate table has never held a rate for - answers null rather
-     * than a total that silently left an amount out of it.
+     * <p>Totals and taxes use the marketplace base currency; the refund uses its own reported currency.
+     * Missing currency or historical rate leaves the target unknown.
      */
     private BigDecimal targetInvoiceOf(Order order) {
+        if (order.getCurrencyVersion() == 0) return null;
         LocalDate orderDay = order.getOrderDate().atZone(ZoneOffset.UTC).toLocalDate();
 
         // No total at all and a total this cannot convert both answer the same way: there is no target to invoice.
-        BigDecimal grandTotal = currencyRates.toEur(order.getGrandTotal(), order.getCurrency(), orderDay);
+        BigDecimal grandTotal = currencyRates.toEur(order.getGrandTotal(), order.getBaseCurrency(), orderDay);
         if (grandTotal == null) {
             return null;
         }
-        BigDecimal facilitatorTax = currencyRates.toEur(order.getFacilitatorTax(), order.getCurrency(), orderDay);
+        BigDecimal facilitatorTax = currencyRates.toEur(order.getFacilitatorTax(), order.getBaseCurrency(), orderDay);
         if (order.getFacilitatorTax() != null && facilitatorTax == null) {
             return null;
         }
-        BigDecimal refunded = currencyRates.toEur(order.getRefundedAmount(), order.getCurrency(), orderDay);
+        BigDecimal refunded = currencyRates.toEur(order.getRefundedAmount(), order.getRefundCurrency(), orderDay);
         if (order.getRefundedAmount() != null && refunded == null) {
             return null;
         }
@@ -122,6 +115,14 @@ class OrderService {
             target = target.subtract(refunded);
         }
         return target.max(BigDecimal.ZERO);
+    }
+
+    private LocalDate day(Order order) {
+        return order.getOrderDate().atZone(ZoneOffset.UTC).toLocalDate();
+    }
+
+    private BigDecimal euro(Order order, BigDecimal amount) {
+        return order.getCurrencyVersion() == 0 ? null : currencyRates.toEur(amount, order.getBaseCurrency(), day(order));
     }
 
     /**

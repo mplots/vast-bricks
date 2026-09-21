@@ -1,5 +1,7 @@
 package com.vastbricks.api.reconciliation.payment;
 
+import com.vastbricks.api.currencyrate.EuroAmounts;
+import com.vastbricks.api.currencyrate.CurrencyRates;
 import com.stripe.model.BalanceTransaction;
 import com.vastbricks.api.reconciliation.DetailMapper;
 import com.vastbricks.api.reconciliation.Marketplace;
@@ -28,6 +30,7 @@ class MapperStripeBrickOwlPayments implements DetailMapper<BalanceTransaction> {
     private static final Pattern BRICK_OWL_ORDER = Pattern.compile("\\bBrick Owl Order\\s+#?(\\S+)\\b");
 
     private final PaymentLinks paymentLinks;
+    private final CurrencyRates currencyRates;
 
     @Override
     public Class<BalanceTransaction> type() {
@@ -39,6 +42,7 @@ class MapperStripeBrickOwlPayments implements DetailMapper<BalanceTransaction> {
         // The first payment of an order wins: a later one does not overwrite what was already matched.
         Set<ReconciledOrder> paid = Collections.newSetFromMap(new IdentityHashMap<>());
         for (var transaction : sourced) {
+            var amounts = new EuroAmounts(currencyRates);
             if (!StripePayments.paysForOrder(transaction)) {
                 continue;
             }
@@ -46,14 +50,15 @@ class MapperStripeBrickOwlPayments implements DetailMapper<BalanceTransaction> {
             if (orderId == null) {
                 continue;
             }
-            var paidAmount = StripePayments.paidAmount(transaction);
+            var paidAmount = StripePayments.paidAmount(transaction, amounts);
             for (var order : orders.find(Marketplace.BRICK_OWL, orderId)) {
                 if (paid.add(order)) {
                     order.getGateway().setPaidAmount(paidAmount);
-                    order.getGateway().setFeeAmount(StripePayments.feeAmount(transaction));
-                    order.getGateway().setFacilitatorTax(StripePayments.facilitatorTax(transaction));
-                    order.getGateway().setRefundedAmount(StripePayments.refundedAmount(transaction));
+                    order.getGateway().setFeeAmount(StripePayments.feeAmount(transaction, amounts));
+                    order.getGateway().setFacilitatorTax(StripePayments.facilitatorTax(transaction, amounts));
+                    order.getGateway().setRefundedAmount(StripePayments.refundedAmount(transaction, amounts));
                     order.getGateway().setPaymentUrl(paymentLinks.stripe(StripePayments.paymentReference(transaction)));
+                    order.setCurrencyConversionMissing(order.isCurrencyConversionMissing() || amounts.isIncomplete());
                 }
             }
         }

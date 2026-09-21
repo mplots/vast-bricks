@@ -1,5 +1,6 @@
 import type { APIRequestContext } from "@playwright/test";
 
+import { readExchanges, setRecording } from "../support/debug";
 import { expect, test } from "../support/api-test";
 import { anEcbRateDate, mockEcb, TEST_CURRENCY } from "../support/ecb";
 import { findCurrencyRates } from "../support/vast-db";
@@ -87,3 +88,39 @@ test("a firing this soon after another is skipped as fresh unless forced", async
   expect(run.outcome).toBe("succeeded");
   expect(run.tally).toMatchObject({ "skipped-fresh": 1 });
 });
+
+test("historical backfill imports missing dates and keeps previously synced days", async ({ request, settings }, info) => {
+  const current = anEcbRateDate(info);
+  const previous = new Date(Date.parse(current) - 86400000).toISOString().slice(0, 10);
+  const wireMock = await mockEcb(settings, request, info, current, { XTS: "2" });
+  expect((await sync(request)).outcome).toBe("succeeded");
+  await wireMock.addMethodHostMapping("GET", "/stats/eurofxref/eurofxref-hist.xml", {
+    response: { headers: { "Content-Type": "text/xml" }, body: `<Envelope><Cube>
+      <Cube time="${current}"><Cube currency="XTS" rate="2"/></Cube>
+      <Cube time="${previous}"><Cube currency="XTS" rate="3"/></Cube>
+    </Cube></Envelope>` },
+  });
+  expect((await request.post(`/api/private/jobs/${job}/run?history=true`)).status()).toBe(202);
+  await expect.poll(async () => (await statusOf(request)).lastRun?.outcome).toBe("succeeded");
+  expect((await statusOf(request)).lastRun?.tally).toMatchObject({ added: 1, skipped: 1 });
+  expect(await findCurrencyRates(previous)).toEqual([{ currency: "XTS", rateDate: previous, rate: "3.000000" }]);
+});
+
+for (const history of [false, true]) {
+  test(`ECB ${history ? "history" : "daily"} response remains in debug when parsing fails`, async ({ request, settings }, info) => {
+    const wireMock = await mockEcb(settings, request, info, anEcbRateDate(info), { XTS: "2" });
+    await wireMock.reset();
+    const path = `/stats/eurofxref/eurofxref-${history ? "hist" : "daily"}.xml`;
+    const body = "<Envelope><Cube/></Envelope>";
+    await wireMock.addMethodHostMapping("GET", path, {
+      response: { headers: { "Content-Type": "text/xml" }, body },
+    });
+    await setRecording(request, true);
+    expect((await request.post(`/api/private/jobs/${job}/run?force=true&history=${history}`)).status()).toBe(202);
+    await expect.poll(async () => (await statusOf(request)).lastRun?.outcome).toBe("failed");
+    const recorded = (await readExchanges(request)).filter(exchange => exchange.provider === "European Central Bank");
+    expect(recorded).toHaveLength(1);
+    expect(recorded[0]).toMatchObject({ method: "GET", statusCode: 200, responseBody: body });
+    expect(recorded[0].url).toContain(path);
+  });
+}

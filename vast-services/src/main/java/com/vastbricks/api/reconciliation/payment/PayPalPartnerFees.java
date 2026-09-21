@@ -1,5 +1,6 @@
 package com.vastbricks.api.reconciliation.payment;
 
+import com.vastbricks.api.currencyrate.CurrencyRates;
 import com.vastbricks.api.client.paypal.PayPalTransaction;
 import com.vastbricks.api.reconciliation.ReconciliationAmount;
 import java.math.BigDecimal;
@@ -29,6 +30,7 @@ final class PayPalPartnerFees {
 
     /** What was taken out of each payment, by the transaction id the fee names. */
     private final Map<String, BigDecimal> byPayment;
+    private final java.util.Set<String> missing = new java.util.HashSet<>();
 
     private PayPalPartnerFees(Map<String, BigDecimal> byPayment) {
         this.byPayment = byPayment;
@@ -38,8 +40,9 @@ final class PayPalPartnerFees {
      * Indexes the month's partner fees by the payment each was taken from. Fees naming one payment are summed, so a
      * deduction stated in several rows is not read as only part of itself.
      */
-    static PayPalPartnerFees of(List<PayPalTransaction> sourced) {
+    static PayPalPartnerFees of(List<PayPalTransaction> sourced, CurrencyRates rates) {
         var byPayment = new HashMap<String, BigDecimal>();
+        var result = new PayPalPartnerFees(byPayment);
         for (var transaction : sourced) {
             var info = transaction.getTransactionInfo();
             if (info == null || !PARTNER_FEE.equalsIgnoreCase(info.getTransactionEventCode())) {
@@ -50,9 +53,11 @@ final class PayPalPartnerFees {
             if (payment == null || payment.isBlank() || amount == null) {
                 continue;
             }
-            byPayment.merge(payment.trim(), amount, BigDecimal::add);
+            var converted = rates.toEur(amount, info.getTransactionAmount().getCurrencyCode(), PayPalPayments.paymentDate(transaction));
+            if (converted == null) result.missing.add(payment.trim());
+            else byPayment.merge(payment.trim(), converted, BigDecimal::add);
         }
-        return new PayPalPartnerFees(byPayment);
+        return result;
     }
 
     /**
@@ -63,7 +68,12 @@ final class PayPalPartnerFees {
      * <p>A fee is a debit, which PayPal states as a negative amount; what the marketplace took is its opposite.
      */
     BigDecimal takenFrom(PayPalTransaction payment) {
+        if (incomplete(payment)) return null;
         var taken = byPayment.get(PayPalPayments.paymentReference(payment));
         return taken == null ? null : ReconciliationAmount.normalize(taken.negate());
     }
+    boolean incomplete(PayPalTransaction payment) {
+        return missing.contains(PayPalPayments.paymentReference(payment));
+    }
+
 }

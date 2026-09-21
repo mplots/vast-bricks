@@ -114,12 +114,10 @@ rate schedule rather than from a figure either one states on the order itself.
   `european-union` order carries under the store's own registration is not and
   is subtracted alongside shipping. An `export` order carries no tax at all, so
   nothing is subtracted for it either way.
-- Neither formula converts currency. Each is applied to the fields a
-  marketplace states its own totals in, exactly as `order.grandTotal` and the
-  rest of an order's amounts already are elsewhere without being reconciled
-  against each other's currency - the known limitation `OrderFields` already
-  documents for mixing a marketplace's base-currency and payment-currency
-  fields applies here too, rather than being solved anew for this feature.
+- Report callers convert BrickLink's base total to USD before applying its USD thresholds, then convert the
+  calculated fee to EUR. BrickOwl's percentage is applied to base-currency amounts and its result converted to EUR.
+  Missing historical rates leave the calculated fee unavailable. Unrounded intermediate conversion avoids rounding
+  at the tier boundary; the final EUR commission is rounded to cents.
 - An order stating no total to apply a rate to has no marketplace fee rather
   than a zero, as every other amount derived here does; one whose shipping and
   taxes exceed its total has a marketplace fee of zero rather than a negative
@@ -242,17 +240,9 @@ than from a figure a payment states.
   as EEA rather than as international: most of this store's own orders are,
   and defaulting to the rate none of them are would read every unresolved
   order as foreign instead of merely unclassified.
-  Neither formula's fixed fee is converted for the currency the amount happens
-  to be in, which is a known gap between this figure and what either provider
-  actually bills, in the same spirit as the gap `MarketplaceFees` already
-  documents for not converting currency either. Neither is either provider's
-  own volume discount or negotiated rate, which this has no way to know at
-  all.
-- Applied to the grand total: the amount actually charged to the card or
-  PayPal account, in whatever currency it is stated in - the store's own base
-  currency for `order.grandTotal`, which for a Latvia-based store is normally
-  EUR, so the EUR-denominated fixed fees above are added to an amount already
-  in the same currency more often than not.
+  Negotiated rates and the actual card/account country remain outside the estimate.
+- Apply the percentage to the grand total converted to EUR before adding the EUR fixed fee. A foreign payment
+  currency must never cause an already-EUR base total to be converted again.
 - Reconciliation already collects a live, reported figure for the same thing,
   `gateway.feeAmount` - what the provider's own balance transaction or
   transaction record actually shows it took. The calculation is not a

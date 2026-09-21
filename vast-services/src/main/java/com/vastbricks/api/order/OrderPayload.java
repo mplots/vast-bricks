@@ -1,5 +1,6 @@
 package com.vastbricks.api.order;
 
+import com.vastbricks.api.currencyrate.CurrencyRates;
 import com.vastbricks.api.orderarchive.OrderSource;
 import com.vastbricks.api.charges.OrderTaxType;
 import java.math.BigDecimal;
@@ -94,7 +95,7 @@ final class OrderPayload {
         /** How the order was paid, unified across the marketplaces' wordings. */
         private final String paymentMethod;
 
-        /** What the buyer paid in, which every amount on the order - the grand total among them - is stated in. */
+        /** What the buyer paid in. All report amounts are normalized to EUR. */
         private final String currency;
 
         private final OrderTaxType taxType;
@@ -124,7 +125,7 @@ final class OrderPayload {
 
         /**
          * What this screen approximates the accounting invoice for this order as coming to, in euros: the grand
-         * total less the facilitator tax and the refund, all three converted from whatever the buyer paid in. See
+         * total less the facilitator tax and the refund, each converted from its own reported currency. See
          * {@link OrderService} for why it is only an approximation of what the reconciliation report calls the same
          * thing, and null for whichever amount this could not convert to euros.
          */
@@ -140,13 +141,18 @@ final class OrderPayload {
         /** When the archive this row was read from was taken, which is how current the row is. */
         private final Instant archivedAt;
 
-        OrderResponse(Order order, BigDecimal targetInvoice, BigDecimal calculatedMarketplaceFee, BigDecimal calculatedPaymentFee) {
+        OrderResponse(Order order, BigDecimal targetInvoice, BigDecimal calculatedMarketplaceFee, BigDecimal calculatedPaymentFee, CurrencyRates rates) {
             this(order.getId(), order.getSource(), order.getOrderId(), order.getOrderDate(),
                     order.getBuyer(), order.getBuyerUsername(), order.getCountry(), order.getItemCount(), order.getLotCount(),
-                    order.getPaymentMethod(), order.getCurrency(), order.getTaxType(), order.getFacilitatorTax(),
-                    order.getMarketplaceFee(), calculatedMarketplaceFee, order.getSubTotal(),
-                    order.getShippingCost(), order.getGrandTotal(), order.getRefundedAmount(), targetInvoice,
+                    order.getPaymentMethod(), order.getCurrency(), order.getTaxType(), eur(order, order.getFacilitatorTax(), order.getBaseCurrency(), rates),
+                    eur(order, order.getMarketplaceFee(), order.getBaseCurrency(), rates), calculatedMarketplaceFee, eur(order, order.getSubTotal(), order.getBaseCurrency(), rates),
+                    eur(order, order.getShippingCost(), order.getBaseCurrency(), rates), eur(order, order.getGrandTotal(), order.getBaseCurrency(), rates), eur(order, order.getRefundedAmount(), order.getRefundCurrency(), rates), targetInvoice,
                     calculatedPaymentFee, order.getArchivedAt());
         }
+        private static BigDecimal eur(Order order, BigDecimal amount, String currency, CurrencyRates rates) {
+            return order.getCurrencyVersion() == 0 ? null : rates.toEur(amount, currency,
+                    order.getOrderDate().atZone(java.time.ZoneOffset.UTC).toLocalDate());
+        }
+
     }
 }

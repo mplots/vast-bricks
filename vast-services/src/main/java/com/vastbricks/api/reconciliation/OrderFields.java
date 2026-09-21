@@ -12,6 +12,8 @@ import lombok.Setter;
  * order mapper builds it whole; the one field a detail mapper fills in afterwards is the buyer username, which
  * BrickLink reports in an export of its own.
  *
+ * <p>All monetary fields are converted to EUR before matching and comparisons. Currency names the payment only.
+ *
  * <p>The field order is the order the API exposes them in, and it is the order the roster declares them in.
  */
 @Getter
@@ -76,13 +78,11 @@ public class OrderFields {
      * office's: one is what the order collected for shipping and the other is what shipping it cost. Nothing compares
      * them yet.
      *
-     * <p>Stated as the marketplace stated it, in the currency it stated it in, as the sub-total above is. The order's
-     * currency says what the buyer paid in; the grand total is the one amount either marketplace gives in the
-     * store's base currency.
+     * <p>Converted from the marketplace base currency to EUR on the order date.
      */
     private BigDecimal shippingCost;
 
-    /** What the order came to in the store's base currency, shipping and additional charges included. */
+    /** What the order came to in EUR, shipping and additional charges included. */
     private BigDecimal grandTotal;
 
     /**

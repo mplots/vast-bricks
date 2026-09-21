@@ -4,6 +4,7 @@ import com.vastbricks.api.client.paypal.PayPalTransaction;
 import com.vastbricks.api.reconciliation.ReconciledOrder;
 import com.vastbricks.api.reconciliation.ReconciliationAmount;
 import java.math.BigDecimal;
+import com.vastbricks.api.currencyrate.EuroAmounts;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,9 +44,9 @@ final class PayPalPayments {
     }
 
     /** What the transaction took, gross of PayPal's fee, normalized like every other collected amount. */
-    static BigDecimal paidAmount(PayPalTransaction transaction) {
+    static BigDecimal paidAmount(PayPalTransaction transaction, EuroAmounts amounts) {
         var amount = transaction.getTransactionInfo().getTransactionAmount();
-        return amount == null ? null : ReconciliationAmount.normalize(amount.getValue());
+        return amount == null ? null : amounts.convert(amount.getValue(), amount.getCurrencyCode(), paymentDate(transaction));
     }
 
     /**
@@ -56,12 +57,12 @@ final class PayPalPayments {
      * <p>It is PayPal's own fee and nothing the marketplace took: a facilitator tax comes back to the marketplace as
      * a partner fee of its own, which is why that is read from {@link PayPalPartnerFees} rather than from here.
      */
-    static BigDecimal feeAmount(PayPalTransaction transaction) {
+    static BigDecimal feeAmount(PayPalTransaction transaction, EuroAmounts amounts) {
         var fee = transaction.getTransactionInfo().getFeeAmount();
         if (fee == null || fee.getValue() == null || fee.getValue().signum() == 0) {
             return null;
         }
-        return ReconciliationAmount.normalize(fee.getValue().abs());
+        return amounts.convert(fee.getValue().abs(), fee.getCurrencyCode(), paymentDate(transaction));
     }
 
     /** The payment this transaction is, as PayPal's own transaction views address one. */

@@ -225,9 +225,10 @@ export function writeBrickLinkDetail(
   orderId: number,
   archivedAt: string,
   refunded?: string,
+  refundCurrency = "EUR",
 ): string {
   const body = refunded
-    ? `<html><body><p>Total refunded: <strong>EUR&nbsp;${refunded}</strong></p></body></html>`
+    ? `<html><body><p>Total refunded: <strong>${refundCurrency}&nbsp;${refunded}</strong></p></body></html>`
     : "<html><body><p>Nothing came back on this order.</p></body></html>";
   const path = join(
     directory,
@@ -248,6 +249,7 @@ export function writeBrickLinkArchive(
   archived: ArchivedBrickLinkOrder & {
     accounting?: Partial<ArchivedAccountingOrder>;
     refunded?: string;
+    refundCurrency?: string;
   },
 ): void {
   writeBrickLinkOrder(directory, archived);
@@ -261,6 +263,7 @@ export function writeBrickLinkArchive(
     archived.orderId,
     archived.archivedAt,
     archived.refunded,
+    archived.refundCurrency,
   );
 }
 

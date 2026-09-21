@@ -45,12 +45,7 @@ public final class MarketplaceFees {
         return grandTotal == null ? null : tiered(grandTotal);
     }
 
-    /**
-     * BrickLink's tiered commission applied to a grand total already at hand, for a caller holding a stored amount
-     * rather than BrickLink's own order — the orders screen's stored {@code grandTotal}, which is
-     * {@code BASEGRANDTOTAL} verbatim, so there is no approximation in calculating from it here instead of from
-     * {@link #of(BrickStoreOrder)}'s own order.
-     */
+    /** Pure USD fee schedule. Report callers use MarketplaceFeeAmounts to handle currency conversion. */
     public static BigDecimal brickLinkOf(BigDecimal grandTotal) {
         return grandTotal == null ? null : tiered(grandTotal);
     }

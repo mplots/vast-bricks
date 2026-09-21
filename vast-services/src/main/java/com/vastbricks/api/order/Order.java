@@ -104,12 +104,23 @@ class Order {
     @Column(name = "refunded_amount", precision = 19, scale = 2)
     private BigDecimal refundedAmount;
 
-    /** What the order came to, in whatever the buyer paid in, which {@link #currency} names. */
+    /** What the order came to, in the marketplace base currency, which {@link #baseCurrency} names. */
     @Column(name = "grand_total", precision = 19, scale = 2)
     private BigDecimal grandTotal;
 
+    /** Buyer payment currency; never used to interpret base amounts. */
     @Column(length = 3)
     private String currency;
+
+    @Column(name = "base_currency", length = 3)
+    private String baseCurrency;
+
+    @Column(name = "refund_currency", length = 3)
+    private String refundCurrency;
+
+    @Column(name = "currency_version", nullable = false)
+    private int currencyVersion;
+
 
     /**
      * The moment the imported file was the archive of. What makes the import an upsert: a file naming a later moment

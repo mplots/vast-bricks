@@ -41,18 +41,18 @@ class CurrencyRateSyncJob implements Job {
 
     @Override
     public List<JobParameter> parameters() {
-        return List.of(JobParameter.flag(FORCE));
+        return List.of(JobParameter.flag(FORCE), JobParameter.flag("history"));
     }
 
     @Override
     public JobTally run(JobParameters parameters) {
-        if (!parameters.flag(FORCE) && sync.isFresh()) {
+        if (!parameters.flag("history") && !parameters.flag(FORCE) && sync.isFresh()) {
             // Another tenant's firing already synced it. Reported as a run that did nothing rather than as a
             // failure, because nothing went wrong: the answer was already there.
             return JobTally.empty().count("skipped-fresh", 1);
         }
 
-        CurrencyRateSyncTally tally = sync.sync();
+        CurrencyRateSyncTally tally = parameters.flag("history") ? sync.syncHistory() : sync.sync();
         return JobTally.empty()
                 .count("added", tally.getAdded())
                 .count("skipped", tally.getSkipped());
