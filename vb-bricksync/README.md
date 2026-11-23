@@ -22,7 +22,7 @@ docker run -d \
   -v /home/ubuntu/bricksync/control:/opt/bricksync/control \
   vastbricks.com/bricksync:latest
 ```
-sudo docker run -d  -v /home/ubuntu/bricksync/data:/opt/bricksync/data --name bricksync vastbricks.com/bricksync:latest
+
 ## Send Commands
 
 Send a command from inside the container:
@@ -42,12 +42,30 @@ Replace `help` with the BrickSync command you want to test.
 ## View Output
 
 ```sh
-docker logs -f vb-bricksync-test
+docker logs -f bricksync
 ```
 
 ## Clean Up
 
 ```sh
-docker stop vb-bricksync-test
-docker rm vb-bricksync-test
+docker stop bricksync
+docker rm bricksync
 ```
+
+## Upgrade on vastbricks.com
+
+The release is pinned by `BRICKSYNC_RELEASE` and `BRICKSYNC_SHA256`; take the checksum from the release's `SHA256SUMS`. The host builds the image itself:
+
+```sh
+scp vb-bricksync/Dockerfile ubuntu@vastbricks.com:bricksync-build/Dockerfile
+ssh ubuntu@vastbricks.com
+cd ~/bricksync-build
+sudo docker build -t vastbricks.com/bricksync:<release> -t vastbricks.com/bricksync:latest .
+sudo docker stop bricksync && sudo docker rm bricksync
+sudo docker run -d --name bricksync --cpus=".1" \
+  -v /home/ubuntu/bricksync/data:/opt/bricksync/data \
+  -v /home/ubuntu/bricksync/control:/opt/bricksync/control \
+  vastbricks.com/bricksync:latest
+```
+
+Back up `~/bricksync/data` first, after the container has stopped. `docker stop` returns within a second once BrickSync has saved its state; one that takes the full timeout means the entrypoint did not reach it.

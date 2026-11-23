@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickLink</Service>
+  <OrderID>30579926</OrderID>
+  <OrderDate>1769369135</OrderDate>
+  <Customer>arciks</Customer>
+  <SubTotal>1.646</SubTotal>
+  <GrandTotal>2.052</GrandTotal>
+  <Payment>2.060</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>98138</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>19</ColorID>
+   <ItemName>Tile, Round 1 x 1</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Trans-Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>6</Qty>
+   <Price>0.019</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/469795219&quot;&gt;</Comments>
+   <Remarks>MA_I27</Remarks>
+   <LotID>469795219</LotID>
+  </Item>
+  <Item>
+   <ItemID>98138</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>2</ColorID>
+   <ItemName>Tile, Round 1 x 1</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Tan</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.038</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/469855205&quot;&gt;</Comments>
+   <Remarks>MA_D03</Remarks>
+   <LotID>469855205</LotID>
+  </Item>
+  <Item>
+   <ItemID>87994</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Bar   3L &amp;#40;Bar Arrow&amp;#41;</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>5</Qty>
+   <Price>0.061</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/470849158&quot;&gt;</Comments>
+   <Remarks>MA_M22</Remarks>
+   <LotID>470849158</LotID>
+  </Item>
+  <Item>
+   <ItemID>65473</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>3</ColorID>
+   <ItemName>Brick, Round 2 x 2 D. 45 degrees Elbow &amp;#40;25.5mm Standing Height&amp;#41;</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.323</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/471315452&quot;&gt;</Comments>
+   <Remarks>DA_G01</Remarks>
+   <LotID>471315452</LotID>
+  </Item>
+  <Item>
+   <ItemID>4185</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>1</ColorID>
+   <ItemName>Technic Wedge Belt Wheel &amp;#40;Pulley&amp;#41;</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>White</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.238</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/471315467&quot;&gt;</Comments>
+   <Remarks>MA_I09</Remarks>
+   <LotID>471315467</LotID>
+  </Item>
+  <Item>
+   <ItemID>42003</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Technic, Axle and Pin Connector Perpendicular 3L with 2 Pin Holes</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.034</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/475396988&quot;&gt;</Comments>
+   <Remarks>DA_H14</Remarks>
+   <LotID>475396988</LotID>
+  </Item>
+  <Item>
+   <ItemID>22961</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Technic, Axle and Pin Connector Hub with 1L Axle</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.068</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/475397003&quot;&gt;</Comments>
+   <Remarks>MA_E33</Remarks>
+   <LotID>475397003</LotID>
+  </Item>
+  <Item>
+   <ItemID>32524</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Technic, Liftarm Thick 1 x 7</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.094</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/475397033&quot;&gt;</Comments>
+   <Remarks>DA_TU3</Remarks>
+   <LotID>475397033</LotID>
+  </Item>
+  <Item>
+   <ItemID>6126b</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>98</ColorID>
+   <ItemName>Wave Rounded Straight with Bar End &amp;#40;Castle Dragon Flame / Seaweed / Water&amp;#41;</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Trans-Orange</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.022</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/477278680&quot;&gt;</Comments>
+   <Remarks>MA_E55</Remarks>
+   <LotID>477278680</LotID>
+  </Item>
+  <Item>
+   <ItemID>6126b</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>98</ColorID>
+   <ItemName>Wave Rounded Straight with Bar End &amp;#40;Castle Dragon Flame / Seaweed / Water&amp;#41;</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Trans-Orange</ColorName>
+   <Status>I</Status>
+   <Qty>3</Qty>
+   <Price>0.022</Price>
+   <Condition>U</Condition>
+   <Remarks>MA_R14</Remarks>
+   <LotID>518364561</LotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

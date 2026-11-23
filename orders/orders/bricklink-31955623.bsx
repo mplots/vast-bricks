@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickLink</Service>
+  <OrderID>31955623</OrderID>
+  <OrderDate>1782513356</OrderDate>
+  <Customer>ruben2094</Customer>
+  <SubTotal>6.457</SubTotal>
+  <GrandTotal>14.465</GrandTotal>
+  <Payment>14.470</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>12618</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>95</ColorID>
+   <ItemName>Minifigure Armor Shoulder Pads with Spikes</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Flat Silver</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>1.943</Price>
+   <SalePrice>1.749</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_H026</Remarks>
+   <LotID>518364457</LotID>
+  </Item>
+  <Item>
+   <ItemID>68406pb01</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>120</ColorID>
+   <ItemName>Minifigure, Hair Combo, Hair with Hat, Long and Wavy with Pearl Gold Helmet with Forehead and Cheek Protectors Pattern</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Brown</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>2.000</Price>
+   <SalePrice>1.800</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_N023</Remarks>
+   <LotID>526408021</LotID>
+  </Item>
+  <Item>
+   <ItemID>970c00pb1126</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>63</ColorID>
+   <ItemName>Hips and Legs with Dark Bluish Gray Boots and Light Bluish Gray Fur Pattern</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Blue</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.726</Price>
+   <SalePrice>0.653</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_E15 (03)</Remarks>
+   <LotID>531359793</LotID>
+  </Item>
+  <Item>
+   <ItemID>37614</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>89</ColorID>
+   <ItemName>Minifigure Armor Shoulder Pads Ridged</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Purple</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.590</Price>
+   <SalePrice>0.531</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_N117</Remarks>
+   <LotID>534407629</LotID>
+  </Item>
+  <Item>
+   <ItemID>973pb3745c01</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>1</ColorID>
+   <ItemName>Torso Suit, Medium Lavender Shirt, White Tie Pattern / White Arms / White Hands</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>White</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.922</Price>
+   <SalePrice>0.830</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_B02</Remarks>
+   <LotID>534542501</LotID>
+  </Item>
+  <Item>
+   <ItemID>973pb4865c01</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>5</ColorID>
+   <ItemName>Torso 3 Gold Chains, 6 Buttons, Black Belt with Buckle Pattern / Red Arms with Gold Cuffs Pattern / Yellow Hands</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Red</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.993</Price>
+   <SalePrice>0.894</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_B05</Remarks>
+   <LotID>534542538</LotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

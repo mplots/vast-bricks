@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickLink</Service>
+  <OrderID>32422699</OrderID>
+  <OrderDate>1787734093</OrderDate>
+  <Customer>rmcb1977</Customer>
+  <SubTotal>11.680</SubTotal>
+  <GrandTotal>21.050</GrandTotal>
+  <Payment>21.050</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>3035</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>5</ColorID>
+   <ItemName>Plate 4 x 8</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Red</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.403</Price>
+   <Condition>N</Condition>
+   <Remarks>DA_M03</Remarks>
+   <LotID>490599921</LotID>
+  </Item>
+  <Item>
+   <ItemID>3830</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>6</ColorID>
+   <ItemName>Hinge Brick 1 x 4 Swivel Top</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Green</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.413</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_G47</Remarks>
+   <LotID>490599934</LotID>
+  </Item>
+  <Item>
+   <ItemID>34816</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>6</ColorID>
+   <ItemName>Brick, Modified 1 x 2 with Bar Handle on End - Bar Flush with Edge</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Green</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.169</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_G51</Remarks>
+   <LotID>490599937</LotID>
+  </Item>
+  <Item>
+   <ItemID>3009</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>6</ColorID>
+   <ItemName>Brick 1 x 6</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Green</ColorName>
+   <Status>I</Status>
+   <Qty>7</Qty>
+   <Price>0.165</Price>
+   <Condition>N</Condition>
+   <Remarks>DA_M15</Remarks>
+   <LotID>490599941</LotID>
+  </Item>
+  <Item>
+   <ItemID>18653</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>6</ColorID>
+   <ItemName>Arch 1 x 3 x 2 Inverted</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Green</ColorName>
+   <Status>I</Status>
+   <Qty>12</Qty>
+   <Price>0.287</Price>
+   <Condition>N</Condition>
+   <Remarks>DA_M16</Remarks>
+   <LotID>490599944</LotID>
+  </Item>
+  <Item>
+   <ItemID>48092</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>7</ColorID>
+   <ItemName>Brick, Round Corner 4 x 4 Macaroni with 3 Studs</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Blue</ColorName>
+   <Status>I</Status>
+   <Qty>14</Qty>
+   <Price>0.201</Price>
+   <Condition>N</Condition>
+   <Remarks>DA_M17</Remarks>
+   <LotID>490599946</LotID>
+  </Item>
+  <Item>
+   <ItemID>35044</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>7</ColorID>
+   <ItemName>Plate, Modified 4 x 4 with 3 x 3 Curved Cutout</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Blue</ColorName>
+   <Status>I</Status>
+   <Qty>9</Qty>
+   <Price>0.300</Price>
+   <Condition>N</Condition>
+   <Remarks>DA_M18</Remarks>
+   <LotID>490599948</LotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

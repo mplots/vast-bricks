@@ -1,0 +1,773 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickLink</Service>
+  <OrderID>28859107</OrderID>
+  <OrderDate>1752684690</OrderDate>
+  <Customer>Addan</Customer>
+  <SubTotal>23.674</SubTotal>
+  <GrandTotal>26.608</GrandTotal>
+  <Payment>26.600</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>44567b</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Hinge Plate 1 x 2 Locking with 1 Finger on Side without Bottom Groove</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.025</Price>
+   <SalePrice>0.020</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_D14</Remarks>
+   <LotID>463230897</LotID>
+  </Item>
+  <Item>
+   <ItemID>23443</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Bar Holder with Handle</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>5</Qty>
+   <Price>0.089</Price>
+   <SalePrice>0.071</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_E03</Remarks>
+   <LotID>463230906</LotID>
+  </Item>
+  <Item>
+   <ItemID>36841</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Bracket 1 x 1 - 1 x 1</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>5</Qty>
+   <Price>0.069</Price>
+   <SalePrice>0.055</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_C24</Remarks>
+   <LotID>463230913</LotID>
+  </Item>
+  <Item>
+   <ItemID>36840</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Bracket 1 x 1 - 1 x 1 Inverted</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>11</Qty>
+   <Price>0.106</Price>
+   <SalePrice>0.085</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_B28</Remarks>
+   <LotID>463230949</LotID>
+  </Item>
+  <Item>
+   <ItemID>3024</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Plate 1 x 1</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>26</Qty>
+   <Price>0.045</Price>
+   <SalePrice>0.036</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_F28</Remarks>
+   <LotID>463230969</LotID>
+  </Item>
+  <Item>
+   <ItemID>3062</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Brick, Round  1 x 1</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>5</Qty>
+   <Price>0.051</Price>
+   <SalePrice>0.041</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_C35</Remarks>
+   <LotID>463231037</LotID>
+  </Item>
+  <Item>
+   <ItemID>3004</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Brick 1 x 2</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.098</Price>
+   <SalePrice>0.078</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_D17</Remarks>
+   <LotID>463231171</LotID>
+  </Item>
+  <Item>
+   <ItemID>3070pb174</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Tile 1 x 1 with Silver Keypad Buttons, Medium Azure Screen and Red Light &amp;#40;Calculator&amp;#41; Pattern</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>3</Qty>
+   <Price>0.107</Price>
+   <SalePrice>0.086</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_F30</Remarks>
+   <LotID>464420273</LotID>
+  </Item>
+  <Item>
+   <ItemID>23186</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>120</ColorID>
+   <ItemName>Minifigure, Hair Swept Left Tousled with Slight Widow&amp;#39;s Peak and Short Sideburns</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Brown</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.349</Price>
+   <SalePrice>0.279</SalePrice>
+   <Condition>N</Condition>
+   <LotID>464420279</LotID>
+  </Item>
+  <Item>
+   <ItemID>3020</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Plate 2 x 4</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>10</Qty>
+   <Price>0.066</Price>
+   <SalePrice>0.053</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>DA_K20</Remarks>
+   <LotID>464420292</LotID>
+  </Item>
+  <Item>
+   <ItemID>37762</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Minifigure, Utensil Candle</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.103</Price>
+   <SalePrice>0.082</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_G05</Remarks>
+   <LotID>464420357</LotID>
+  </Item>
+  <Item>
+   <ItemID>30374</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>34</ColorID>
+   <ItemName>Bar   4L &amp;#40;Lightsaber Blade / Wand&amp;#41;</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Lime</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.077</Price>
+   <SalePrice>0.062</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_H18</Remarks>
+   <LotID>464663322</LotID>
+  </Item>
+  <Item>
+   <ItemID>14769</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Tile, Round 2 x 2 with Bottom Stud Holder</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>10</Qty>
+   <Price>0.060</Price>
+   <SalePrice>0.048</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_B21</Remarks>
+   <LotID>464949060</LotID>
+  </Item>
+  <Item>
+   <ItemID>87079</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Tile 2 x 4</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>10</Qty>
+   <Price>0.192</Price>
+   <SalePrice>0.154</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>DA_B07</Remarks>
+   <LotID>464949063</LotID>
+  </Item>
+  <Item>
+   <ItemID>3034</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Plate 2 x 8</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>3</Qty>
+   <Price>0.136</Price>
+   <SalePrice>0.109</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>DA_B09</Remarks>
+   <LotID>464949072</LotID>
+  </Item>
+  <Item>
+   <ItemID>63965</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Bar   6L with Stop Ring</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.075</Price>
+   <SalePrice>0.060</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_B23</Remarks>
+   <LotID>464949087</LotID>
+  </Item>
+  <Item>
+   <ItemID>44709</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Minifigure, Weapon Gun, Blaster with Studs on Sides, Bottom, and Front</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.193</Price>
+   <SalePrice>0.154</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_B11</Remarks>
+   <LotID>464949092</LotID>
+  </Item>
+  <Item>
+   <ItemID>3020</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Plate 2 x 4</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>10</Qty>
+   <Price>0.054</Price>
+   <SalePrice>0.043</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>DA_GH1</Remarks>
+   <LotID>464949099</LotID>
+  </Item>
+  <Item>
+   <ItemID>2488</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Minifigure, Weapon Whip / Plant Vine</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.501</Price>
+   <SalePrice>0.401</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>DA_A10</Remarks>
+   <LotID>464949100</LotID>
+  </Item>
+  <Item>
+   <ItemID>2736</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Technic, Axle  1L with Tow Ball</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>10</Qty>
+   <Price>0.024</Price>
+   <SalePrice>0.019</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_K22</Remarks>
+   <LotID>466051043</LotID>
+  </Item>
+  <Item>
+   <ItemID>11477</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Slope, Curved 2 x 1 x 2/3</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>10</Qty>
+   <Price>0.043</Price>
+   <SalePrice>0.034</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_F60</Remarks>
+   <LotID>468661996</LotID>
+  </Item>
+  <Item>
+   <ItemID>22484</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Bar   1L with Tow Ball</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.378</Price>
+   <SalePrice>0.302</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_I03</Remarks>
+   <LotID>468662037</LotID>
+  </Item>
+  <Item>
+   <ItemID>6636</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Tile 1 x 6</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>8</Qty>
+   <Price>0.141</Price>
+   <SalePrice>0.113</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>DA_D18</Remarks>
+   <LotID>469795247</LotID>
+  </Item>
+  <Item>
+   <ItemID>4175</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Ladder 1 1/2 x 2 x 2</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.097</Price>
+   <SalePrice>0.078</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>DA_E06</Remarks>
+   <LotID>469795266</LotID>
+  </Item>
+  <Item>
+   <ItemID>30150</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Container, Crate 3 x 4 x 1 2/3 with Handholds</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.607</Price>
+   <SalePrice>0.486</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>DA_AB3</Remarks>
+   <LotID>469795268</LotID>
+  </Item>
+  <Item>
+   <ItemID>88704</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Minifigure, Weapon Whip Bent Flexible</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.159</Price>
+   <SalePrice>0.127</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_J15</Remarks>
+   <LotID>469855180</LotID>
+  </Item>
+  <Item>
+   <ItemID>54200</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Slope 30 1 x 1 x 2/3</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>8</Qty>
+   <Price>0.042</Price>
+   <SalePrice>0.034</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_D36</Remarks>
+   <LotID>469855193</LotID>
+  </Item>
+  <Item>
+   <ItemID>3070</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Tile 1 x 1</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>11</Qty>
+   <Price>0.063</Price>
+   <SalePrice>0.050</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_D36</Remarks>
+   <LotID>469855198</LotID>
+  </Item>
+  <Item>
+   <ItemID>3068</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Tile 2 x 2</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>5</Qty>
+   <Price>0.118</Price>
+   <SalePrice>0.094</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_J30</Remarks>
+   <LotID>469855212</LotID>
+  </Item>
+  <Item>
+   <ItemID>69958</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Brick, Modified 16 x 16 x 2/3 with 1 x 4 and 2 x 4 Indentations</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>2.006</Price>
+   <SalePrice>1.605</SalePrice>
+   <Condition>N</Condition>
+   <LotID>470849053</LotID>
+  </Item>
+  <Item>
+   <ItemID>63864</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Tile 1 x 3</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>6</Qty>
+   <Price>0.108</Price>
+   <SalePrice>0.086</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_I02</Remarks>
+   <LotID>470849118</LotID>
+  </Item>
+  <Item>
+   <ItemID>12885</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Minifigure, Utensil Paint Roller Brush Handle</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.278</Price>
+   <SalePrice>0.222</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_J14</Remarks>
+   <LotID>470849150</LotID>
+  </Item>
+  <Item>
+   <ItemID>4162</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Tile 1 x 8</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.161</Price>
+   <SalePrice>0.129</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>DA_H01</Remarks>
+   <LotID>473357924</LotID>
+  </Item>
+  <Item>
+   <ItemID>30414</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Brick, Modified 1 x 4 with Studs on Side</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.074</Price>
+   <SalePrice>0.059</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>DA_I15</Remarks>
+   <LotID>473357961</LotID>
+  </Item>
+  <Item>
+   <ItemID>40001</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Technic, Steering Wheel Pilot&apos;s Yoke</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.178</Price>
+   <SalePrice>0.142</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_L21</Remarks>
+   <LotID>475396994</LotID>
+  </Item>
+  <Item>
+   <ItemID>2457</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Technic, Panel Curved # 3 2 x 3 x 1 Angled</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.278</Price>
+   <SalePrice>0.222</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>DA_I08</Remarks>
+   <LotID>475397047</LotID>
+  </Item>
+  <Item>
+   <ItemID>44375b</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Dish 6 x 6 Inverted (Radar) - Solid Studs</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>1.050</Price>
+   <SalePrice>0.840</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>DA_I18</Remarks>
+   <LotID>477278576</LotID>
+  </Item>
+  <Item>
+   <ItemID>37762</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Minifigure, Utensil Candle</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.162</Price>
+   <SalePrice>0.130</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_E59</Remarks>
+   <LotID>477278601</LotID>
+  </Item>
+  <Item>
+   <ItemID>36840</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Bracket 1 x 1 - 1 x 1 Inverted</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.137</Price>
+   <SalePrice>0.110</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_E60</Remarks>
+   <LotID>477278609</LotID>
+  </Item>
+  <Item>
+   <ItemID>6628a</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Technic, Pin with Friction Ridges and Tow Ball with Round Pin Hole</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.030</Price>
+   <SalePrice>0.024</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_D32</Remarks>
+   <LotID>477278620</LotID>
+  </Item>
+  <Item>
+   <ItemID>44302</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Hinge Plate 1 x 2 Locking with 2 Fingers on End</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.035</Price>
+   <SalePrice>0.028</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_E58</Remarks>
+   <LotID>477278633</LotID>
+  </Item>
+  <Item>
+   <ItemID>3062</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Brick, Round  1 x 1</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>5</Qty>
+   <Price>0.052</Price>
+   <SalePrice>0.042</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_C31</Remarks>
+   <LotID>477278645</LotID>
+  </Item>
+  <Item>
+   <ItemID>6541</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Technic, Brick 1 x 1 with Hole</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>6</Qty>
+   <Price>0.044</Price>
+   <SalePrice>0.035</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_E38</Remarks>
+   <LotID>480940161</LotID>
+  </Item>
+  <Item>
+   <ItemID>3069</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Tile 1 x 2</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>6</Qty>
+   <Price>0.098</Price>
+   <SalePrice>0.078</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_D59</Remarks>
+   <LotID>480940198</LotID>
+  </Item>
+  <Item>
+   <ItemID>6134</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Hinge Brick 2 x 2 Top Plate</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.054</Price>
+   <SalePrice>0.043</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_D54</Remarks>
+   <LotID>480940210</LotID>
+  </Item>
+  <Item>
+   <ItemID>6231</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Panel 1 x 1 x 1 Corner</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.077</Price>
+   <SalePrice>0.062</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_B08</Remarks>
+   <LotID>480940270</LotID>
+  </Item>
+  <Item>
+   <ItemID>2431</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Tile 1 x 4</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>6</Qty>
+   <Price>0.120</Price>
+   <SalePrice>0.096</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_F47</Remarks>
+   <LotID>480940278</LotID>
+  </Item>
+  <Item>
+   <ItemID>54200</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Slope 30 1 x 1 x 2/3</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>7</Qty>
+   <Price>0.036</Price>
+   <SalePrice>0.029</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_J36</Remarks>
+   <LotID>483472256</LotID>
+  </Item>
+  <Item>
+   <ItemID>34103</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Plate, Modified 1 x 3 with 2 Studs &amp;#40;Double Jumper&amp;#41;</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>12</Qty>
+   <Price>0.094</Price>
+   <SalePrice>0.075</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_J39</Remarks>
+   <LotID>483472266</LotID>
+  </Item>
+  <Item>
+   <ItemID>3176</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Plate, Modified 2 x 3 with Hole</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.067</Price>
+   <SalePrice>0.054</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_J52</Remarks>
+   <LotID>484143722</LotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickLink</Service>
+  <OrderID>30925524</OrderID>
+  <OrderDate>1772236087</OrderDate>
+  <Customer>shellycarroll</Customer>
+  <SubTotal>67.016</SubTotal>
+  <GrandTotal>76.231</GrandTotal>
+  <Payment>76.240</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>loc013</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Crawley</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>1.406</Price>
+   <Condition>U</Condition>
+   <LotID>518405448</LotID>
+  </Item>
+  <Item>
+   <ItemID>loc017</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Leonidas</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>1.145</Price>
+   <Condition>U</Condition>
+   <LotID>518405455</LotID>
+  </Item>
+  <Item>
+   <ItemID>3626pb0519</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>90</ColorID>
+   <ItemName>Minifigure, Head Dark Tan Eyebrows, Large Sand Blue Eyes, Medium Nougat Eye Shadow, Upper Lip, Cheek Lines and Chin Dimple, Scowl Pattern</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Nougat</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.551</Price>
+   <Condition>U</Condition>
+   <Remarks>SA_B31</Remarks>
+   <LotID>519769654</LotID>
+  </Item>
+  <Item>
+   <ItemID>970c05pb17</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Hips and Red Legs with Silver Chain Belt, Fur Shorts, Dark Red Spots and Orange and Black Claws Pattern</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.320</Price>
+   <Condition>U</Condition>
+   <Remarks>MA_T05</Remarks>
+   <LotID>519848104</LotID>
+  </Item>
+  <Item>
+   <ItemID>973pb2787c01</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Torso Ninjago Skeleton Ribs Gray and Dark Blue Waist Sash Pattern / Black Arms / Black Hands</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.402</Price>
+   <Condition>U</Condition>
+   <Remarks>MA_T17</Remarks>
+   <LotID>519962257</LotID>
+  </Item>
+  <Item>
+   <ItemID>min180</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Hero - Orange Suit</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>1.253</Price>
+   <Condition>U</Condition>
+   <Remarks>UFG_A022</Remarks>
+   <LotID>524821328</LotID>
+  </Item>
+  <Item>
+   <ItemID>collt02</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Bugs Bunny, Looney Tunes &amp;#40;Minifigure Only without Stand and Accessories&amp;#41;</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>5.844</Price>
+   <Condition>U</Condition>
+   <Remarks>UFG_A025</Remarks>
+   <LotID>524821331</LotID>
+  </Item>
+  <Item>
+   <ItemID>min010</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Zombie - Dark Purple Legs</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.963</Price>
+   <Condition>U</Condition>
+   <Remarks>UFG_A036</Remarks>
+   <LotID>524821342</LotID>
+  </Item>
+  <Item>
+   <ItemID>min010</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Zombie - Dark Purple Legs</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.962</Price>
+   <Condition>U</Condition>
+   <Remarks>UFG_A048</Remarks>
+   <LotID>525103367</LotID>
+  </Item>
+  <Item>
+   <ItemID>min010</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Zombie - Dark Purple Legs</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.962</Price>
+   <Condition>U</Condition>
+   <Remarks>UFG_A050</Remarks>
+   <LotID>525103369</LotID>
+  </Item>
+  <Item>
+   <ItemID>coltm07</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Fozzie Bear, The Muppets &amp;#40;Minifigure Only without Stand and Accessories&amp;#41;</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>3.075</Price>
+   <Condition>U</Condition>
+   <Remarks>UFG_A055</Remarks>
+   <LotID>525103374</LotID>
+  </Item>
+  <Item>
+   <ItemID>mnn013</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Minion Bob - Blue Overalls, no Eyelids</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>4.037</Price>
+   <Condition>U</Condition>
+   <Remarks>UFG_A056</Remarks>
+   <LotID>525103375</LotID>
+  </Item>
+  <Item>
+   <ItemID>sw1193</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Bib Fortuna - Black Robe, Reddish Brown Straps</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>5.488</Price>
+   <Condition>U</Condition>
+   <Remarks>UFG_A080</Remarks>
+   <LotID>525103399</LotID>
+  </Item>
+  <Item>
+   <ItemID>coltm01</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Rowlf the Dog, The Muppets &amp;#40;Minifigure Only without Stand and Accessories&amp;#41;</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>2.484</Price>
+   <Condition>U</Condition>
+   <Remarks>UFG_A097</Remarks>
+   <LotID>525227070</LotID>
+  </Item>
+  <Item>
+   <ItemID>idea077</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Cookie Monster</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>13.189</Price>
+   <Condition>U</Condition>
+   <Remarks>UFG_A110</Remarks>
+   <LotID>525227082</LotID>
+  </Item>
+  <Item>
+   <ItemID>min010</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Zombie - Dark Purple Legs</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.962</Price>
+   <Condition>U</Condition>
+   <Remarks>UFG_A112</Remarks>
+   <LotID>525227085</LotID>
+  </Item>
+  <Item>
+   <ItemID>coltm07</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Fozzie Bear, The Muppets &amp;#40;Minifigure Only without Stand and Accessories&amp;#41;</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>3.075</Price>
+   <Condition>U</Condition>
+   <Remarks>UFG_A132</Remarks>
+   <LotID>525227105</LotID>
+  </Item>
+  <Item>
+   <ItemID>coltm07</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Fozzie Bear, The Muppets &amp;#40;Minifigure Only without Stand and Accessories&amp;#41;</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>3.075</Price>
+   <Condition>U</Condition>
+   <Remarks>UFG_A158</Remarks>
+   <LotID>525341403</LotID>
+  </Item>
+  <Item>
+   <ItemID>coltm06</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Miss Piggy, The Muppets &amp;#40;Minifigure Only without Stand and Accessories&amp;#41;</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>3.713</Price>
+   <Condition>U</Condition>
+   <Remarks>UFG_A160</Remarks>
+   <LotID>525341405</LotID>
+  </Item>
+  <Item>
+   <ItemID>coltm05</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Kermit the Frog, The Muppets &amp;#40;Minifigure Only without Stand and Accessories&amp;#41;</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>7.408</Price>
+   <Condition>U</Condition>
+   <Remarks>UFG_A176</Remarks>
+   <LotID>525341421</LotID>
+  </Item>
+  <Item>
+   <ItemID>min193</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Cactus Knight</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>1.304</Price>
+   <Condition>U</Condition>
+   <Remarks>UFG_B008</Remarks>
+   <LotID>525363611</LotID>
+  </Item>
+  <Item>
+   <ItemID>col417</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>T-Rex Costume Fan, Series 24 &amp;#40;Minifigure Only without Stand and Accessories&amp;#41;</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>4.847</Price>
+   <Condition>U</Condition>
+   <Remarks>UFG_B060</Remarks>
+   <LotID>526150259</LotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

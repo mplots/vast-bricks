@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickOwl</Service>
+  <OrderID>1544738</OrderID>
+  <OrderDate>1778753940</OrderDate>
+  <Customer>Kristi\u0101na K\u0101rkli\u0146a</Customer>
+  <SubTotal>0.840</SubTotal>
+  <GrandTotal>3.560</GrandTotal>
+  <Payment>3.560</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>80441pb01</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>12</ColorID>
+   <ItemName>LEGO Transparent Wheel \u00d817.6 x 3.9 with Black Tire (80441)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Trans-Clear</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.152</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_J25</Remarks>
+   <OrigQty>6</OrigQty>
+   <LotID>470849133</LotID>
+   <OwlID>827188</OwlID>
+   <OwlLotID>181157191</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>80440</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>3</ColorID>
+   <ItemName>LEGO Yellow Wheelchair Seat with Open Sides (80440)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.456</Price>
+   <Condition>N</Condition>
+   <Remarks>DA_F08</Remarks>
+   <OrigQty>2</OrigQty>
+   <LotID>470849060</LotID>
+   <OwlID>1020722</OwlID>
+   <OwlLotID>181157189</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>67696</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>LEGO Black Brick 2 x 2 with Ball Joint Socket (Wide Closed Socket) (67696)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.228</Price>
+   <Condition>N</Condition>
+   <Remarks>DA_L09</Remarks>
+   <OrigQty>15</OrigQty>
+   <LotID>484143733</LotID>
+   <OwlID>365245</OwlID>
+   <OwlLotID>188743741</OwlLotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

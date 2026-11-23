@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickLink</Service>
+  <OrderID>32098860</OrderID>
+  <OrderDate>1784130014</OrderDate>
+  <Customer>Matthias_Coast</Customer>
+  <SubTotal>7.044</SubTotal>
+  <GrandTotal>7.044</GrandTotal>
+  <Payment>7.040</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>gen047</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Skeleton - Standard Skull, Bent Arms Vertical Grip</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>1.555</Price>
+   <Condition>N</Condition>
+   <Remarks>FG_B07</Remarks>
+   <LotID>521161720</LotID>
+  </Item>
+  <Item>
+   <ItemID>gen099</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Skeleton - Standard Skull, Bent Arms Horizontal Grip</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>1.250</Price>
+   <Condition>U</Condition>
+   <Remarks>UFG_A183</Remarks>
+   <LotID>525363657</LotID>
+  </Item>
+  <Item>
+   <ItemID>gen047</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Skeleton - Standard Skull, Bent Arms Vertical Grip</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>1.383</Price>
+   <Condition>U</Condition>
+   <Remarks>UFG_A184</Remarks>
+   <LotID>525363658</LotID>
+  </Item>
+  <Item>
+   <ItemID>gen047</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Skeleton - Standard Skull, Bent Arms Vertical Grip</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>1.383</Price>
+   <Condition>U</Condition>
+   <Remarks>UFG_B063</Remarks>
+   <LotID>526150262</LotID>
+  </Item>
+  <Item>
+   <ItemID>min011</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Skeleton, Minecraft</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>1.064</Price>
+   <Condition>U</Condition>
+   <Remarks>UFG_C032</Remarks>
+   <LotID>528144843</LotID>
+  </Item>
+  <Item>
+   <ItemID>87544pb076</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>12</ColorID>
+   <ItemName>Panel 1 x 2 x 3 with Side Supports - Hollow Studs with Bright Pink Dots, Skeleton and Black Hat Pattern &amp;#40;Sticker&amp;#41; - Set 76388</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Trans-Clear</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.409</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_A031</Remarks>
+   <LotID>537821400</LotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

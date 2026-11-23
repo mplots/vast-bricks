@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickOwl</Service>
+  <OrderID>4330568</OrderID>
+  <OrderDate>1761509639</OrderDate>
+  <Customer>Simon Hodges</Customer>
+  <SubTotal>2.000</SubTotal>
+  <GrandTotal>8.140</GrandTotal>
+  <Payment>8.140</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>x77ac50</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>LEGO Black String - Thin x 50 cm (85953 \/ 111634)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>2.004</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_G42</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>487648023</LotID>
+   <OwlID>757340</OwlID>
+   <OwlLotID>190613403</OwlLotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

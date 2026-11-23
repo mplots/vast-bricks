@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickLink</Service>
+  <OrderID>30231757</OrderID>
+  <OrderDate>1766407488</OrderDate>
+  <Customer>luhuhu</Customer>
+  <SubTotal>19.614</SubTotal>
+  <GrandTotal>24.167</GrandTotal>
+  <Payment>24.160</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>5404</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>1</ColorID>
+   <ItemName>Slope 18 2 x 1 x 2/3</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>White</ColorName>
+   <Status>I</Status>
+   <Qty>7</Qty>
+   <Price>0.388</Price>
+   <SalePrice>0.310</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_E20</Remarks>
+   <LotID>464420198</LotID>
+  </Item>
+  <Item>
+   <ItemID>77845</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>5</ColorID>
+   <ItemName>Plate, Round 1 x 4 with 2 Open Studs</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Red</ColorName>
+   <Status>I</Status>
+   <Qty>5</Qty>
+   <Price>0.281</Price>
+   <SalePrice>0.225</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>DA_A20</Remarks>
+   <LotID>464949029</LotID>
+  </Item>
+  <Item>
+   <ItemID>3460</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Plate 1 x 8</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>21</Qty>
+   <Price>0.134</Price>
+   <SalePrice>0.107</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>DA_B05</Remarks>
+   <LotID>464949056</LotID>
+  </Item>
+  <Item>
+   <ItemID>3002</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Brick 2 x 3</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>12</Qty>
+   <Price>0.114</Price>
+   <SalePrice>0.091</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>DA_K10</Remarks>
+   <LotID>464949058</LotID>
+  </Item>
+  <Item>
+   <ItemID>30104</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Chain 21 Links &amp;#40;16-17L&amp;#41;</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.590</Price>
+   <SalePrice>0.472</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_C11</Remarks>
+   <LotID>466051050</LotID>
+  </Item>
+  <Item>
+   <ItemID>89522</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>115</ColorID>
+   <ItemName>Horn, Unicorn / Spiral</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Pearl Gold</ColorName>
+   <Status>I</Status>
+   <Qty>13</Qty>
+   <Price>0.061</Price>
+   <SalePrice>0.049</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_E07</Remarks>
+   <LotID>468580282</LotID>
+  </Item>
+  <Item>
+   <ItemID>98138pb363</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>1</ColorID>
+   <ItemName>Tile, Round 1 x 1 with Black Star Pattern</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>White</ColorName>
+   <Status>I</Status>
+   <Qty>9</Qty>
+   <Price>0.040</Price>
+   <SalePrice>0.032</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_I24</Remarks>
+   <LotID>468580295</LotID>
+  </Item>
+  <Item>
+   <ItemID>98138pb364</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>1</ColorID>
+   <ItemName>Tile, Round 1 x 1 with Black Eye Closed &amp;#40;Thin Curved Line&amp;#41; Pattern</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>White</ColorName>
+   <Status>I</Status>
+   <Qty>9</Qty>
+   <Price>0.035</Price>
+   <SalePrice>0.028</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_I26</Remarks>
+   <LotID>468580297</LotID>
+  </Item>
+  <Item>
+   <ItemID>98138pb365</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>1</ColorID>
+   <ItemName>Tile, Round 1 x 1 with Black Eye Shut Tight / Letter V / Less Than Sign / Greater Than Sign &amp;#40;Thin Line&amp;#41; Pattern</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>White</ColorName>
+   <Status>I</Status>
+   <Qty>9</Qty>
+   <Price>0.033</Price>
+   <SalePrice>0.026</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_I28</Remarks>
+   <LotID>468580299</LotID>
+  </Item>
+  <Item>
+   <ItemID>2431pb0905</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>1</ColorID>
+   <ItemName>Tile 1 x 4 with Black Checkered Pattern</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>White</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.432</Price>
+   <SalePrice>0.346</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_H04</Remarks>
+   <LotID>470849084</LotID>
+  </Item>
+  <Item>
+   <ItemID>7126</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>3</ColorID>
+   <ItemName>Slope, Curved 1 x 1</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>1.082</Price>
+   <SalePrice>0.866</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_G06</Remarks>
+   <LotID>479559297</LotID>
+  </Item>
+  <Item>
+   <ItemID>2391</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Technic, Liftarm, Modified Perpendicular Holes Thick 1 x 7</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>3</Qty>
+   <Price>1.212</Price>
+   <SalePrice>0.970</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_G42</Remarks>
+   <LotID>489204314</LotID>
+  </Item>
+  <Item>
+   <ItemID>4589b</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>15</ColorID>
+   <ItemName>Cone 1 x 1 with Top Groove</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Trans-Light Blue</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.041</Price>
+   <SalePrice>0.033</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_H44</Remarks>
+   <LotID>491759857</LotID>
+  </Item>
+  <Item>
+   <ItemID>5404</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>3</ColorID>
+   <ItemName>Slope 18 2 x 1 x 2/3</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>7</Qty>
+   <Price>0.437</Price>
+   <SalePrice>0.350</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_L40</Remarks>
+   <LotID>492757115</LotID>
+  </Item>
+  <Item>
+   <ItemID>30363</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Slope 18 4 x 2</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.135</Price>
+   <SalePrice>0.108</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_L49</Remarks>
+   <LotID>500626776</LotID>
+  </Item>
+  <Item>
+   <ItemID>4865b</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>110</ColorID>
+   <ItemName>Panel 1 x 2 x 1 with Rounded Corners</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Bright Light Orange</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.606</Price>
+   <SalePrice>0.485</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_M27</Remarks>
+   <LotID>507011763</LotID>
+  </Item>
+  <Item>
+   <ItemID>98989</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Technic, Axle and Pin Connector Perpendicular Double 4L</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.550</Price>
+   <SalePrice>0.440</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_N03</Remarks>
+   <LotID>510435547</LotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

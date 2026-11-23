@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickLink</Service>
+  <OrderID>31019615</OrderID>
+  <OrderDate>1773057063</OrderDate>
+  <Customer>Victor77</Customer>
+  <SubTotal>2.652</SubTotal>
+  <GrandTotal>7.931</GrandTotal>
+  <Payment>7.930</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>3386</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Brick, Round 1 x 1 x 2/3 Half Circle Extended with Stud on Side</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.180</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/463230957&quot;&gt;</Comments>
+   <Remarks>MA_L13</Remarks>
+   <LotID>463230957</LotID>
+  </Item>
+  <Item>
+   <ItemID>25269</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>104</ColorID>
+   <ItemName>Tile, Round 1 x 1 Quarter</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Bright Pink</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.018</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/480390432&quot;&gt;</Comments>
+   <Remarks>MA_C51</Remarks>
+   <LotID>480390432</LotID>
+  </Item>
+  <Item>
+   <ItemID>92909</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Technic, Steering, Wheel Hub 3 Pins Round</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.595</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/514481640&quot;&gt;</Comments>
+   <Remarks>DA_H12</Remarks>
+   <LotID>514481640</LotID>
+  </Item>
+  <Item>
+   <ItemID>53451</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>1</ColorID>
+   <ItemName>Barb / Claw / Horn / Tooth - Small</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>White</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.018</Price>
+   <Condition>U</Condition>
+   <Remarks>MB_A22</Remarks>
+   <LotID>518364495</LotID>
+  </Item>
+  <Item>
+   <ItemID>32034</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Technic, Axle and Pin Connector Angled #2 - 180 degrees</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.046</Price>
+   <Condition>U</Condition>
+   <Remarks>MB_C01</Remarks>
+   <LotID>523404947</LotID>
+  </Item>
+  <Item>
+   <ItemID>42003</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Technic, Axle and Pin Connector Perpendicular 3L with 2 Pin Holes</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>3</Qty>
+   <Price>0.046</Price>
+   <Condition>U</Condition>
+   <Remarks>MB_C11</Remarks>
+   <LotID>523404964</LotID>
+  </Item>
+  <Item>
+   <ItemID>32054</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Technic, Pin 3L with Friction Ridges and Stop Bush</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.022</Price>
+   <Condition>U</Condition>
+   <Remarks>MB_C24</Remarks>
+   <LotID>523404978</LotID>
+  </Item>
+  <Item>
+   <ItemID>2780</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Technic, Pin with Short Friction Ridges</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>15</Qty>
+   <Price>0.012</Price>
+   <Condition>U</Condition>
+   <Remarks>DB_D09</Remarks>
+   <LotID>523404979</LotID>
+  </Item>
+  <Item>
+   <ItemID>64276</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Technic, Liftarm, Modified Ball Joint Straight 1 x 2 with 1 Hole in Ball</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.162</Price>
+   <Condition>U</Condition>
+   <Remarks>MB_C25</Remarks>
+   <LotID>523404980</LotID>
+  </Item>
+  <Item>
+   <ItemID>43093</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>7</ColorID>
+   <ItemName>Technic, Axle  1L with Pin with Friction Ridges</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Blue</ColorName>
+   <Status>I</Status>
+   <Qty>9</Qty>
+   <Price>0.012</Price>
+   <Condition>U</Condition>
+   <Remarks>DB_D10</Remarks>
+   <LotID>523404992</LotID>
+  </Item>
+  <Item>
+   <ItemID>6558</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>7</ColorID>
+   <ItemName>Technic, Pin 3L with Friction Ridges</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Blue</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.020</Price>
+   <Condition>U</Condition>
+   <Remarks>DB_D11</Remarks>
+   <LotID>523404993</LotID>
+  </Item>
+  <Item>
+   <ItemID>32209</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Technic, Axle  5.5L with Stop</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.019</Price>
+   <Condition>U</Condition>
+   <Remarks>MB_C21</Remarks>
+   <LotID>523453180</LotID>
+  </Item>
+  <Item>
+   <ItemID>4519</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Technic, Axle  3L</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>5</Qty>
+   <Price>0.017</Price>
+   <Condition>U</Condition>
+   <Remarks>MB_C48</Remarks>
+   <LotID>523453184</LotID>
+  </Item>
+  <Item>
+   <ItemID>3706</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Technic, Axle  6L</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.028</Price>
+   <Condition>U</Condition>
+   <Remarks>MB_C48</Remarks>
+   <LotID>523453185</LotID>
+  </Item>
+  <Item>
+   <ItemID>58176</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>14</ColorID>
+   <ItemName>Bar with Light Cover &amp;#40;Bulb&amp;#41; / Bionicle Barraki Eye</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Trans-Dark Blue</ColorName>
+   <Status>I</Status>
+   <Qty>3</Qty>
+   <Price>0.054</Price>
+   <Condition>U</Condition>
+   <Remarks>MB_E17</Remarks>
+   <LotID>523710639</LotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

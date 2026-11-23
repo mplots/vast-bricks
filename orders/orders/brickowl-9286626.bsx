@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickOwl</Service>
+  <OrderID>9286626</OrderID>
+  <OrderDate>1769121931</OrderDate>
+  <Customer>Angelo Sartori</Customer>
+  <SubTotal>6.410</SubTotal>
+  <GrandTotal>13.260</GrandTotal>
+  <Payment>13.260</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>6636</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>5</ColorID>
+   <ItemName>LEGO Red Tile 1 x 6 (6636)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Red</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.084</Price>
+   <Condition>N</Condition>
+   <Comments>&amp;lt;img src=&amp;quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;amp;path=/cart/464949031&amp;quot;&amp;gt;</Comments>
+   <Remarks>MA_H20</Remarks>
+   <OrigQty>17</OrigQty>
+   <LotID>464949031</LotID>
+   <OwlID>154034</OwlID>
+   <OwlLotID>177099923</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>3666</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>5</ColorID>
+   <ItemName>LEGO Red Plate 1 x 6 (3666)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Red</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.079</Price>
+   <Condition>N</Condition>
+   <Comments>&amp;lt;img src=&amp;quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;amp;path=/cart/480390403&amp;quot;&amp;gt;</Comments>
+   <Remarks>MA_D01</Remarks>
+   <OrigQty>7</OrigQty>
+   <LotID>480390403</LotID>
+   <OwlID>804561</OwlID>
+   <OwlLotID>186794051</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>65632</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>13</ColorID>
+   <ItemName>LEGO Transparent Brown Black Windscreen 6 x 6 x 1.3 (65632)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Trans-Brown</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>1.248</Price>
+   <Condition>N</Condition>
+   <Comments>&amp;lt;img src=&amp;quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;amp;path=/cart/511831851&amp;quot;&amp;gt;</Comments>
+   <Remarks>DA_P07</Remarks>
+   <OrigQty>3</OrigQty>
+   <LotID>511831851</LotID>
+   <OwlID>748884</OwlID>
+   <OwlLotID>208146571</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>72206pb01</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>LEGO Black Wheel \u00d824 x 12 with Black Tire (72206)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.124</Price>
+   <Condition>N</Condition>
+   <Comments>&amp;lt;img src=&amp;quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;amp;path=/cart/464949086&amp;quot;&amp;gt;</Comments>
+   <Remarks>DA_RS2</Remarks>
+   <OrigQty>40</OrigQty>
+   <LotID>464949086</LotID>
+   <OwlID>116015</OwlID>
+   <OwlLotID>177099935</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>6825</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>LEGO Black Hub Caps (5 and 9 Spokes) without Rim (6825 \/ 1042049)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>1.629</Price>
+   <Condition>N</Condition>
+   <Comments>&amp;lt;img src=&amp;quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;amp;path=/cart/507011779&amp;quot;&amp;gt;</Comments>
+   <Remarks>DA_B19</Remarks>
+   <OrigQty>2</OrigQty>
+   <LotID>507011779</LotID>
+   <OwlID>783391</OwlID>
+   <OwlLotID>202526181</OwlLotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickLink</Service>
+  <OrderID>32346857</OrderID>
+  <OrderDate>1786912628</OrderDate>
+  <Customer>cactevre</Customer>
+  <SubTotal>15.470</SubTotal>
+  <GrandTotal>23.060</GrandTotal>
+  <Payment>23.060</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>col27-12</ItemID>
+   <ItemTypeID>S</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Steampunk Inventor, Series 27 &amp;#40;Complete Set with Stand and Accessories&amp;#41;</ItemName>
+   <ItemTypeName>Set</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>4.002</Price>
+   <SalePrice>3.802</SalePrice>
+   <Condition>N</Condition>
+   <Completeness>S</Completeness>
+   <Remarks>FG_C06</Remarks>
+   <LotID>465133571</LotID>
+  </Item>
+  <Item>
+   <ItemID>3623</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>1</ColorID>
+   <ItemName>Plate 1 x 3</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>White</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.050</Price>
+   <SalePrice>0.047</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_J10</Remarks>
+   <LotID>518617836</LotID>
+  </Item>
+  <Item>
+   <ItemID>2412b</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Tile, Modified 1 x 2 Grille with Bottom Groove</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.022</Price>
+   <SalePrice>0.021</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_H102</Remarks>
+   <LotID>519282172</LotID>
+  </Item>
+  <Item>
+   <ItemID>colhp36</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Moaning Myrtle, Harry Potter, Series 2 &amp;#40;Minifigure Only without Stand and Accessories&amp;#41;</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>2.645</Price>
+   <SalePrice>2.513</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>UFG_A082</Remarks>
+   <LotID>525103401</LotID>
+  </Item>
+  <Item>
+   <ItemID>hp372</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Moaning Myrtle - Dark Bluish Gray Robe, Black Glasses</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>2.770</Price>
+   <SalePrice>2.632</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>UFG_A084</Remarks>
+   <LotID>525103403</LotID>
+  </Item>
+  <Item>
+   <ItemID>sh0742</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Rocket Raccoon - Dark Bluish Gray Outfit, Reddish Brown Head</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>3.197</Price>
+   <SalePrice>3.037</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>UFG_A113</Remarks>
+   <LotID>525227086</LotID>
+  </Item>
+  <Item>
+   <ItemID>sh0836</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Groot, Teen Groot - Dark Tan with Neck Bracket</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>3.598</Price>
+   <SalePrice>3.418</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>UFG_A118</Remarks>
+   <LotID>525227091</LotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

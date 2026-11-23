@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickLink</Service>
+  <OrderID>28581005</OrderID>
+  <OrderDate>1749677345</OrderDate>
+  <Customer>pmgarcao</Customer>
+  <SubTotal>9.941</SubTotal>
+  <GrandTotal>15.230</GrandTotal>
+  <Payment>15.230</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>3937</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Hinge Brick 1 x 2 Base</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>6</Qty>
+   <Price>0.122</Price>
+   <SalePrice>0.085</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_D17</Remarks>
+   <LotID>463231169</LotID>
+  </Item>
+  <Item>
+   <ItemID>35480</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Plate, Round 1 x 2 with Open Studs</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.052</Price>
+   <SalePrice>0.036</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>DA_I12</Remarks>
+   <LotID>464420290</LotID>
+  </Item>
+  <Item>
+   <ItemID>18041</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>95</ColorID>
+   <ItemName>Minifigure, Weapon Harpoon, Smooth Shaft</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Flat Silver</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.055</Price>
+   <SalePrice>0.038</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>SA_E59</Remarks>
+   <LotID>466051044</LotID>
+  </Item>
+  <Item>
+   <ItemID>98138pb386</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Tile, Round 1 x 1 with Yellow Eye Half Closed, Slit Pupil, White Glints, and Dark Blue Eyelid Lines Pattern</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.296</Price>
+   <SalePrice>0.207</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>SA_F08</Remarks>
+   <LotID>466051084</LotID>
+  </Item>
+  <Item>
+   <ItemID>53451</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Barb / Claw / Horn / Tooth - Small</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.023</Price>
+   <SalePrice>0.016</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>SA_F10</Remarks>
+   <LotID>466051089</LotID>
+  </Item>
+  <Item>
+   <ItemID>15071</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Minifigure, Weapon Gun, Blaster 1 x 2 x 2/3 with Studs on Sides and Handle</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.129</Price>
+   <SalePrice>0.090</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_A04</Remarks>
+   <LotID>466051102</LotID>
+  </Item>
+  <Item>
+   <ItemID>11610</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Cone 1 x 1 Inverted with Bar</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.072</Price>
+   <SalePrice>0.050</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>SA_F16</Remarks>
+   <LotID>466051104</LotID>
+  </Item>
+  <Item>
+   <ItemID>drm007</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Night Hunter</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>6.604</Price>
+   <SalePrice>4.623</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>FG13</Remarks>
+   <LotID>466051109</LotID>
+  </Item>
+  <Item>
+   <ItemID>drm074</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Cyberling</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>6.215</Price>
+   <SalePrice>4.351</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>FG_A14</Remarks>
+   <LotID>474159445</LotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

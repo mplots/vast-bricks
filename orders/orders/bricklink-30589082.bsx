@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickLink</Service>
+  <OrderID>30589082</OrderID>
+  <OrderDate>1769441864</OrderDate>
+  <Customer>kate111</Customer>
+  <SubTotal>0.300</SubTotal>
+  <GrandTotal>2.439</GrandTotal>
+  <Payment>2.440</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>2420</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>2</ColorID>
+   <ItemName>Plate 2 x 2 Corner</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Tan</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.051</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/464663306&quot;&gt;</Comments>
+   <Remarks>DA_D05</Remarks>
+   <LotID>464663306</LotID>
+  </Item>
+  <Item>
+   <ItemID>49668</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>1</ColorID>
+   <ItemName>Plate, Modified 1 x 1 with Tooth Horizontal</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>White</ColorName>
+   <Status>I</Status>
+   <Qty>3</Qty>
+   <Price>0.032</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/473228650&quot;&gt;</Comments>
+   <Remarks>MA_E41</Remarks>
+   <LotID>473228650</LotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

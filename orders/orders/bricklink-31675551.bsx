@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickLink</Service>
+  <OrderID>31675551</OrderID>
+  <OrderDate>1779478489</OrderDate>
+  <Customer>Kaiblack</Customer>
+  <SubTotal>55.446</SubTotal>
+  <GrandTotal>63.368</GrandTotal>
+  <Payment>63.370</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>njo0008</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Bonezai &amp;#40;Skulkin&amp;#41; - Vertical Grip Hands</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>1.697</Price>
+   <SalePrice>1.527</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>UFG_A025</Remarks>
+   <LotID>518405445</LotID>
+  </Item>
+  <Item>
+   <ItemID>njo0011</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Frakjaw &amp;#40;Skulkin&amp;#41; - Horizontal Grip Hands, Armor</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>2.293</Price>
+   <SalePrice>2.064</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>UFG_A022</Remarks>
+   <LotID>518405469</LotID>
+  </Item>
+  <Item>
+   <ItemID>3626pb1339</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>95</ColorID>
+   <ItemName>Minifigure, Head Dual Sided Alien Robot with Silver Face with Medium Azure Eyes / Medium Azure Visor with Headset and Eyepiece Pattern</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Flat Silver</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.560</Price>
+   <SalePrice>0.504</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_E11 (05)</Remarks>
+   <LotID>519769613</LotID>
+  </Item>
+  <Item>
+   <ItemID>njo0570</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Lloyd - Digi Lloyd, White Shoulder Armor with Scabbard</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>2.444</Price>
+   <SalePrice>2.200</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>UFG_A042</Remarks>
+   <LotID>525103361</LotID>
+  </Item>
+  <Item>
+   <ItemID>njo0492</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Kai - Legacy</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>1.432</Price>
+   <SalePrice>1.289</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>UFG_A065</Remarks>
+   <LotID>525103384</LotID>
+  </Item>
+  <Item>
+   <ItemID>njo0877</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Sora - Shoulder Pads, Headphones</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>2.910</Price>
+   <SalePrice>2.619</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>UFG_A115</Remarks>
+   <LotID>525227088</LotID>
+  </Item>
+  <Item>
+   <ItemID>njo0892</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Jay - Evil Jay, Scabbard</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>6.024</Price>
+   <SalePrice>5.422</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>UFG_A133</Remarks>
+   <LotID>525227106</LotID>
+  </Item>
+  <Item>
+   <ItemID>njo0822</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Arin - Shirt with Orange Dragon, Hood with Horns</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>2.657</Price>
+   <SalePrice>2.391</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>UFG_A165</Remarks>
+   <LotID>525341410</LotID>
+  </Item>
+  <Item>
+   <ItemID>njo0489</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Jay - Legacy</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>1.907</Price>
+   <SalePrice>1.716</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>UFG_B013</Remarks>
+   <LotID>525363616</LotID>
+  </Item>
+  <Item>
+   <ItemID>njo0760</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Zane &amp;#40;Golden Ninja&amp;#41; - Crystalized</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>3.303</Price>
+   <SalePrice>2.973</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>UFG_B026</Remarks>
+   <LotID>525363629</LotID>
+  </Item>
+  <Item>
+   <ItemID>njo0808</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Kai - Dragon Power Kai</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>3.805</Price>
+   <SalePrice>3.424</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>UFG_B036</Remarks>
+   <LotID>525363639</LotID>
+  </Item>
+  <Item>
+   <ItemID>njo0745</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Kai - Core</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>1.550</Price>
+   <SalePrice>1.395</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>UFG_B039</Remarks>
+   <LotID>525363642</LotID>
+  </Item>
+  <Item>
+   <ItemID>njo0492</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Kai - Legacy</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>1.432</Price>
+   <SalePrice>1.289</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>UFG_B055</Remarks>
+   <LotID>526150254</LotID>
+  </Item>
+  <Item>
+   <ItemID>njo0781</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Cole &amp;#40;Golden Dragon&amp;#41;</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>6.396</Price>
+   <SalePrice>5.756</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_E08</Remarks>
+   <LotID>526150263</LotID>
+  </Item>
+  <Item>
+   <ItemID>njo0747</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Kai - Core Spinjitzu</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>4.682</Price>
+   <SalePrice>4.214</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>UFG_C007</Remarks>
+   <LotID>527898290</LotID>
+  </Item>
+  <Item>
+   <ItemID>njo0567</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Kai - Avatar Kai</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>3.864</Price>
+   <SalePrice>3.478</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>UFG_C013</Remarks>
+   <LotID>527898296</LotID>
+  </Item>
+  <Item>
+   <ItemID>njo0879</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Euphrasia - Medium Blue Robes</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>7.239</Price>
+   <SalePrice>6.515</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>UFG_C016</Remarks>
+   <LotID>527898299</LotID>
+  </Item>
+  <Item>
+   <ItemID>njo0622</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Zane Hero</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>3.788</Price>
+   <SalePrice>3.409</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>UFG_C037</Remarks>
+   <LotID>528144848</LotID>
+  </Item>
+  <Item>
+   <ItemID>njo0036</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Fang-Suei</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>3.624</Price>
+   <SalePrice>3.262</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>UFG_C034</Remarks>
+   <LotID>531695877</LotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

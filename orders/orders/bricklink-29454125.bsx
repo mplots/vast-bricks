@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickLink</Service>
+  <OrderID>29454125</OrderID>
+  <OrderDate>1758815471</OrderDate>
+  <Customer>Sillo89</Customer>
+  <SubTotal>12.967</SubTotal>
+  <GrandTotal>19.125</GrandTotal>
+  <Payment>19.130</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>45677pb158</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Wedge 4 x 4 x 2/3 Triple Curved with White Audi Logo on Dark Bluish Gray and Silver Stripes Pattern</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.316</Price>
+   <SalePrice>0.221</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_G38</Remarks>
+   <LotID>482159025</LotID>
+  </Item>
+  <Item>
+   <ItemID>sw1398</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Anakin Skywalker - Dark Brown and Black Robe, Black Hands</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>9.005</Price>
+   <SalePrice>6.304</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>FG_A23</Remarks>
+   <LotID>491759904</LotID>
+  </Item>
+  <Item>
+   <ItemID>sw1396</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Ahsoka Tano &amp;#40;Padawan&amp;#41; - Medium Legs</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>9.204</Price>
+   <SalePrice>6.443</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>FG_A22</Remarks>
+   <LotID>491759906</LotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

@@ -1,0 +1,824 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickOwl</Service>
+  <OrderID>6719968</OrderID>
+  <OrderDate>1766183195</OrderDate>
+  <Customer>Yann-Erick LEMONNIER</Customer>
+  <SubTotal>36.080</SubTotal>
+  <GrandTotal>43.070</GrandTotal>
+  <Payment>43.070</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>32063</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>LEGO Black Beam 6 x 0.5 Thin (28570 \/ 32063)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>6</Qty>
+   <Price>0.220</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_A38</Remarks>
+   <OrigQty>6</OrigQty>
+   <LotID>475397041</LotID>
+   <OwlID>914428</OwlID>
+   <OwlLotID>183555353</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>61409</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>LEGO Black Slope 1 x 2 x 0.7 (18\u00b0) with Grille (61409)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>8</Qty>
+   <Price>0.040</Price>
+   <Condition>N</Condition>
+   <Remarks>DA_A16</Remarks>
+   <OrigQty>18</OrigQty>
+   <LotID>463231032</LotID>
+   <OwlID>912280</OwlID>
+   <OwlLotID>175979055</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>60478</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>39</ColorID>
+   <ItemName>LEGO Dark Turquoise Plate 1 x 2 with End Bar Handle (60478)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Turquoise</ColorName>
+   <Status>I</Status>
+   <Qty>12</Qty>
+   <Price>0.033</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_B50</Remarks>
+   <OrigQty>12</OrigQty>
+   <LotID>479559356</LotID>
+   <OwlID>571639</OwlID>
+   <OwlLotID>186283671</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>18677</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>39</ColorID>
+   <ItemName>LEGO Dark Turquoise Plate 1 x 2 with Underside Pin Hole (18677 \/ 28809)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Turquoise</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.183</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_M44</Remarks>
+   <OrigQty>2</OrigQty>
+   <LotID>510435540</LotID>
+   <OwlID>612598</OwlID>
+   <OwlLotID>206788095</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>4175</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>LEGO Dark Stone Gray Plate 1 x 2 with Ladder (4175 \/ 31593)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.097</Price>
+   <Condition>N</Condition>
+   <Remarks>DA_E06</Remarks>
+   <OrigQty>2</OrigQty>
+   <LotID>469795266</LotID>
+   <OwlID>171167</OwlID>
+   <OwlLotID>180258059</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>87609</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>LEGO Black Plate 2 x 6 x 0.7 with 4 Studs on Side (72132 \/ 87609)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.088</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_E44</Remarks>
+   <OrigQty>6</OrigQty>
+   <LotID>480940148</LotID>
+   <OwlID>299752</OwlID>
+   <OwlLotID>187051155</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>87609</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>39</ColorID>
+   <ItemName>LEGO Dark Turquoise Plate 2 x 6 x 0.7 with 4 Studs on Side (72132 \/ 87609)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Turquoise</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.101</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_K01</Remarks>
+   <OrigQty>3</OrigQty>
+   <LotID>473357936</LotID>
+   <OwlID>299752</OwlID>
+   <OwlLotID>182487941</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>20482</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>12</ColorID>
+   <ItemName>LEGO Transparent Tile 1 x 1 Round with Hollow Bar (20482 \/ 31561)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Trans-Clear</ColorName>
+   <Status>I</Status>
+   <Qty>6</Qty>
+   <Price>0.033</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_K56</Remarks>
+   <OrigQty>7</OrigQty>
+   <LotID>487648043</LotID>
+   <OwlID>56596</OwlID>
+   <OwlLotID>190613251</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>67095</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>LEGO Black Tile 3 x 3 Round (67095)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.173</Price>
+   <Condition>N</Condition>
+   <Remarks>DA_K03</Remarks>
+   <OrigQty>18</OrigQty>
+   <LotID>470792726</LotID>
+   <OwlID>849724</OwlID>
+   <OwlLotID>181120697</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>3069</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>17</ColorID>
+   <ItemName>LEGO Transparent Red Tile 1 x 2 with Groove (3069 \/ 30070)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Trans-Red</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.047</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_M01</Remarks>
+   <OrigQty>2</OrigQty>
+   <LotID>504378418</LotID>
+   <OwlID>487300</OwlID>
+   <OwlLotID>200751669</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>22385</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>LEGO Black Tile 2 x 3 Pentagonal (22385 \/ 35341)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.104</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_F29</Remarks>
+   <OrigQty>18</OrigQty>
+   <LotID>468662038</LotID>
+   <OwlID>389290</OwlID>
+   <OwlLotID>179714091</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>15535</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>39</ColorID>
+   <ItemName>LEGO Dark Turquoise Tile 2 x 2 Round with Hole in Center (15535)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Turquoise</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.190</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_F36</Remarks>
+   <OrigQty>4</OrigQty>
+   <LotID>479559364</LotID>
+   <OwlID>893466</OwlID>
+   <OwlLotID>186283527</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>98138pb175</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>LEGO Medium Stone Gray Tile 1 x 1 Round with Gauge (35380 \/ 73774)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>3</Qty>
+   <Price>0.085</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_N19</Remarks>
+   <OrigQty>3</OrigQty>
+   <LotID>511543634</LotID>
+   <OwlID>260123</OwlID>
+   <OwlLotID>207966799</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>62462</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>LEGO Black Pin Joiner Round with Slot (29219 \/ 62462)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.081</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_L26</Remarks>
+   <OrigQty>5</OrigQty>
+   <LotID>475397020</LotID>
+   <OwlID>318180</OwlID>
+   <OwlLotID>183555441</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>54200</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>39</ColorID>
+   <ItemName>LEGO Dark Turquoise Slope 1 x 1 (31\u00b0) (50746 \/ 54200)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Turquoise</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.036</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_D24</Remarks>
+   <OrigQty>3</OrigQty>
+   <LotID>463231003</LotID>
+   <OwlID>158788</OwlID>
+   <OwlLotID>175979037</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>2819</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>LEGO Black Small Steering Wheel (2819)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.181</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_M14</Remarks>
+   <OrigQty>2</OrigQty>
+   <LotID>504378484</LotID>
+   <OwlID>52206</OwlID>
+   <OwlLotID>200751667</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>24116</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>LEGO Black Curved Panel 3 x 6 x 3 (24116 \/ 35396)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>6</Qty>
+   <Price>0.137</Price>
+   <Condition>N</Condition>
+   <Remarks>DA_D15</Remarks>
+   <OrigQty>6</OrigQty>
+   <LotID>506286513</LotID>
+   <OwlID>448395</OwlID>
+   <OwlLotID>201933751</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>10197</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>39</ColorID>
+   <ItemName>LEGO Dark Turquoise Beam 1 with Perpendicular Axles (10197)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Turquoise</ColorName>
+   <Status>I</Status>
+   <Qty>6</Qty>
+   <Price>0.233</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_M60</Remarks>
+   <OrigQty>6</OrigQty>
+   <LotID>510435543</LotID>
+   <OwlID>291664</OwlID>
+   <OwlLotID>206788085</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>22961</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>39</ColorID>
+   <ItemName>LEGO Dark Turquoise Beam 1 with Axle (22961)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Turquoise</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.238</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_G35</Remarks>
+   <OrigQty>4</OrigQty>
+   <LotID>487648003</LotID>
+   <OwlID>617534</OwlID>
+   <OwlLotID>190613255</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>22961</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>LEGO Black Beam 1 with Axle (22961)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>6</Qty>
+   <Price>0.169</Price>
+   <Condition>N</Condition>
+   <Remarks>DA_P16</Remarks>
+   <OrigQty>58</OrigQty>
+   <LotID>475397052</LotID>
+   <OwlID>617534</OwlID>
+   <OwlLotID>183555313</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>6610</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>LEGO Medium Stone Gray Link 1 x 4 (6610)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.405</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_M18</Remarks>
+   <OrigQty>2</OrigQty>
+   <LotID>506286494</LotID>
+   <OwlID>1328363</OwlID>
+   <OwlLotID>201933805</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>15100</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>LEGO Black Technic Connector with Pin and Hole (15100 \/ 65487)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>10</Qty>
+   <Price>0.097</Price>
+   <Condition>N</Condition>
+   <Remarks>DA_H15</Remarks>
+   <OrigQty>77</OrigQty>
+   <LotID>471498962</LotID>
+   <OwlID>588658</OwlID>
+   <OwlLotID>181499025</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>2780</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>LEGO Black Technic Pin with Short Friction Ridges (2780 \/ 61332)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>100</Qty>
+   <Price>0.015</Price>
+   <Condition>N</Condition>
+   <Remarks>DA_EF2</Remarks>
+   <OrigQty>854</OrigQty>
+   <LotID>463231205</LotID>
+   <OwlID>33899</OwlID>
+   <OwlLotID>175978695</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>62531</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>LEGO Black Curved Panel 11 x 3 with 2 Pin Holes (62531)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.810</Price>
+   <Condition>N</Condition>
+   <Remarks>DA_D19</Remarks>
+   <OrigQty>2</OrigQty>
+   <LotID>487647978</LotID>
+   <OwlID>700975</OwlID>
+   <OwlLotID>190613353</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>7101</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>LEGO Black Curved Panel 2 x 5 (7101)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>1.360</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_M25</Remarks>
+   <OrigQty>6</OrigQty>
+   <LotID>506286508</LotID>
+   <OwlID>502430</OwlID>
+   <OwlLotID>201933807</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>87761</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>LEGO Black Gear Rack 7 (65127 \/ 87761)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.225</Price>
+   <Condition>N</Condition>
+   <Remarks>DA_L11</Remarks>
+   <OrigQty>8</OrigQty>
+   <LotID>475397008</LotID>
+   <OwlID>276332</OwlID>
+   <OwlLotID>183555473</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>79389</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>LEGO Black Bracket 1 x 1 with 1 x 2 Plate Down (79389)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.164</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_F47</Remarks>
+   <OrigQty>11</OrigQty>
+   <LotID>468662022</LotID>
+   <OwlID>773418</OwlID>
+   <OwlLotID>179714233</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>3069</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>39</ColorID>
+   <ItemName>LEGO Dark Turquoise Tile 1 x 2 with Groove (3069 \/ 30070)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Turquoise</ColorName>
+   <Status>I</Status>
+   <Qty>10</Qty>
+   <Price>0.048</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_J24</Remarks>
+   <OrigQty>16</OrigQty>
+   <LotID>464612690</LotID>
+   <OwlID>487300</OwlID>
+   <OwlLotID>176804539</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>2431</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>39</ColorID>
+   <ItemName>LEGO Dark Turquoise Tile 1 x 4 (2431 \/ 35371)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Turquoise</ColorName>
+   <Status>I</Status>
+   <Qty>6</Qty>
+   <Price>0.128</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_B31</Remarks>
+   <OrigQty>14</OrigQty>
+   <LotID>473357947</LotID>
+   <OwlID>853045</OwlID>
+   <OwlLotID>182487819</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>6636</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>39</ColorID>
+   <ItemName>LEGO Dark Turquoise Tile 1 x 6 (6636)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Turquoise</ColorName>
+   <Status>I</Status>
+   <Qty>6</Qty>
+   <Price>0.082</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_B08</Remarks>
+   <OrigQty>6</OrigQty>
+   <LotID>464612688</LotID>
+   <OwlID>154034</OwlID>
+   <OwlLotID>176804603</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>25269</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>39</ColorID>
+   <ItemName>LEGO Dark Turquoise Tile 1 x 1 Quarter Circle (25269 \/ 84411)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Turquoise</ColorName>
+   <Status>I</Status>
+   <Qty>8</Qty>
+   <Price>0.018</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_B24</Remarks>
+   <OrigQty>31</OrigQty>
+   <LotID>478227852</LotID>
+   <OwlID>392043</OwlID>
+   <OwlLotID>185442253</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>24246</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>39</ColorID>
+   <ItemName>LEGO Dark Turquoise Tile 1 x 1 Half Oval (24246 \/ 35399)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Turquoise</ColorName>
+   <Status>I</Status>
+   <Qty>8</Qty>
+   <Price>0.039</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_B03</Remarks>
+   <OrigQty>31</OrigQty>
+   <LotID>478227853</LotID>
+   <OwlID>832628</OwlID>
+   <OwlLotID>185442245</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>50943</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>95</ColorID>
+   <ItemName>LEGO Flat Silver Car Engine 2 x 2 with Air Scoop (50943)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Flat Silver</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.047</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_N26</Remarks>
+   <OrigQty>4</OrigQty>
+   <LotID>473357933</LotID>
+   <OwlID>540345</OwlID>
+   <OwlLotID>182487903</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>60483</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>39</ColorID>
+   <ItemName>LEGO Dark Turquoise Beam 2 with Axle Hole and Pin Hole (40147 \/ 74695)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Turquoise</ColorName>
+   <Status>I</Status>
+   <Qty>8</Qty>
+   <Price>0.265</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_G31</Remarks>
+   <OrigQty>8</OrigQty>
+   <LotID>487647992</LotID>
+   <OwlID>251668</OwlID>
+   <OwlLotID>190613343</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>18654</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>39</ColorID>
+   <ItemName>LEGO Dark Turquoise Beam 1 (18654)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Turquoise</ColorName>
+   <Status>I</Status>
+   <Qty>19</Qty>
+   <Price>0.082</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_G34</Remarks>
+   <OrigQty>19</OrigQty>
+   <LotID>487648001</LotID>
+   <OwlID>479549</OwlID>
+   <OwlLotID>190613245</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>32316</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>39</ColorID>
+   <ItemName>LEGO Dark Turquoise Beam 5 (32316 \/ 41616)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Turquoise</ColorName>
+   <Status>I</Status>
+   <Qty>5</Qty>
+   <Price>0.459</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_N07</Remarks>
+   <OrigQty>5</OrigQty>
+   <LotID>510435533</LotID>
+   <OwlID>786387</OwlID>
+   <OwlLotID>206788117</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>32524</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>39</ColorID>
+   <ItemName>LEGO Dark Turquoise Beam 7 (32524)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Turquoise</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.125</Price>
+   <Condition>N</Condition>
+   <Remarks>DA_H12</Remarks>
+   <OrigQty>2</OrigQty>
+   <LotID>510435532</LotID>
+   <OwlID>413097</OwlID>
+   <OwlLotID>206788119</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>32140</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>39</ColorID>
+   <ItemName>LEGO Dark Turquoise Beam 2 x 4 Bent 90 Degrees (32140 \/ 42137)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Turquoise</ColorName>
+   <Status>I</Status>
+   <Qty>8</Qty>
+   <Price>0.351</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_G41</Remarks>
+   <OrigQty>8</OrigQty>
+   <LotID>487648021</LotID>
+   <OwlID>603062</OwlID>
+   <OwlLotID>190613289</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>5427</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>39</ColorID>
+   <ItemName>LEGO Dark Turquoise Panel 3 x 9 Curved (4415 \/ 5427)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Turquoise</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.470</Price>
+   <Condition>N</Condition>
+   <Remarks>DA_L10</Remarks>
+   <OrigQty>2</OrigQty>
+   <LotID>487647983</LotID>
+   <OwlID>30692</OwlID>
+   <OwlLotID>190613335</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>2387</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>39</ColorID>
+   <ItemName>LEGO Dark Turquoise Curved Panel 7 Left (2387)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Turquoise</ColorName>
+   <Status>I</Status>
+   <Qty>3</Qty>
+   <Price>0.262</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_M59</Remarks>
+   <OrigQty>3</OrigQty>
+   <LotID>510435539</LotID>
+   <OwlID>886358</OwlID>
+   <OwlLotID>206788097</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>2389</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>39</ColorID>
+   <ItemName>LEGO Dark Turquoise Curved Panel 8 Right (2389)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Turquoise</ColorName>
+   <Status>I</Status>
+   <Qty>3</Qty>
+   <Price>0.256</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_M58</Remarks>
+   <OrigQty>3</OrigQty>
+   <LotID>510435538</LotID>
+   <OwlID>1166811</OwlID>
+   <OwlLotID>206788099</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>2395</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>39</ColorID>
+   <ItemName>LEGO Dark Turquoise Curved Panel 9 Left  (2395)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Turquoise</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.272</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_M52</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>510435537</LotID>
+   <OwlID>847224</OwlID>
+   <OwlLotID>206788101</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>2403</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>39</ColorID>
+   <ItemName>LEGO Dark Turquoise Curved Panel 10 Right (2403)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Turquoise</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.272</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_M50</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>510435536</LotID>
+   <OwlID>1273941</OwlID>
+   <OwlLotID>206788103</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>89679</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>39</ColorID>
+   <ItemName>LEGO Dark Turquoise Curved Panel 2 x 1 x 1 (89679)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Turquoise</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.439</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_M51</Remarks>
+   <OrigQty>4</OrigQty>
+   <LotID>510435529</LotID>
+   <OwlID>1245807</OwlID>
+   <OwlLotID>206788151</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>11946</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>39</ColorID>
+   <ItemName>LEGO Dark Turquoise Curved Panel 21 Right (11946 \/ 43499)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Turquoise</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.320</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_N09</Remarks>
+   <OrigQty>4</OrigQty>
+   <LotID>510435542</LotID>
+   <OwlID>116132</OwlID>
+   <OwlLotID>206788087</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>11947</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>39</ColorID>
+   <ItemName>LEGO Dark Turquoise Curved Panel 22 Left (11947 \/ 43500)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Turquoise</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.346</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_N08</Remarks>
+   <OrigQty>4</OrigQty>
+   <LotID>510435541</LotID>
+   <OwlID>474941</OwlID>
+   <OwlLotID>206788089</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>2459</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>39</ColorID>
+   <ItemName>LEGO Dark Turquoise Arch Panel 3 x 9 x 2 (2459)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Turquoise</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.222</Price>
+   <Condition>N</Condition>
+   <Remarks>DA_P04</Remarks>
+   <OrigQty>8</OrigQty>
+   <LotID>510435535</LotID>
+   <OwlID>710961</OwlID>
+   <OwlLotID>206788105</OwlLotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

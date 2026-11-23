@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickOwl</Service>
+  <OrderID>1646795</OrderID>
+  <OrderDate>1791524016</OrderDate>
+  <Customer>Rani Kaddo</Customer>
+  <SubTotal>9.180</SubTotal>
+  <GrandTotal>18.720</GrandTotal>
+  <Payment>18.720</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>25405pb01</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>LEGO Black Wavy Hair with Long Bangs and Ponytail (25405 \/ 34553)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.857</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_H007</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>519743776</LotID>
+   <OwlID>341103</OwlID>
+   <OwlLotID>215439263</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>njo0682</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>LEGO Lloyd - The Island with Face Mask and Shoulder Armor Minifigure</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>2.609</Price>
+   <Condition>U</Condition>
+   <Remarks>UFG_C001</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>527898284</LotID>
+   <OwlID>606244</OwlID>
+   <OwlLotID>223351523</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>njo0882</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>LEGO Kai - Dragons Rising with Tunic and Hair Minifigure</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>2.245</Price>
+   <Condition>U</Condition>
+   <Remarks>UFG_A130</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>525227103</LotID>
+   <OwlID>172638</OwlID>
+   <OwlLotID>221084813</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>njo0881</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>LEGO Nya - Dragons Rising with Tunic and Hair Minifigure</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>3.470</Price>
+   <Condition>U</Condition>
+   <Remarks>UFG_A141</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>525341386</LotID>
+   <OwlID>447799</OwlID>
+   <OwlLotID>221193167</OwlLotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickLink</Service>
+  <OrderID>28664911</OrderID>
+  <OrderDate>1750611761</OrderDate>
+  <Customer>Anitasekkelund</Customer>
+  <SubTotal>2.651</SubTotal>
+  <GrandTotal>10.009</GrandTotal>
+  <Payment>10.010</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>col27-11</ItemID>
+   <ItemTypeID>S</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Cat Lover, Series 27 &amp;#40;Complete Set with Stand and Accessories&amp;#41;</ItemName>
+   <ItemTypeName>Set</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>3.787</Price>
+   <SalePrice>2.651</SalePrice>
+   <Condition>N</Condition>
+   <Completeness>S</Completeness>
+   <Remarks>FG_A17</Remarks>
+   <LotID>479913022</LotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

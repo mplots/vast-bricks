@@ -1,20 +1,19 @@
-FROM --platform=linux/amd64 alpine:3.21.3
+# Upstream builds the Linux release on an Ubuntu runner against glibc and OpenSSL 3; musl cannot load it.
+FROM --platform=linux/amd64 ubuntu:24.04
 
-RUN apk add --no-cache \
-    curl \
-    unzip \
-    bash \
-    libc6-compat \
-    ca-certificates \
-    tar
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends curl ca-certificates libssl3t64 \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /opt/bricksync
 
-RUN curl -L -o bricksync.zip https://github.com/ZZJHONS/Bricksync/releases/download/v1.7.4-Feb2nd2024/bricksync-linux64.zip \
-    && unzip bricksync.zip \
-    && tar -xzf bricksync-linux64-1.7.4-30.tar.gz \
-    && rm bricksync.zip \
-    && rm bricksync-linux64-1.7.4-30.tar.gz \
+ARG BRICKSYNC_RELEASE=v1.7.4-261028
+ARG BRICKSYNC_SHA256=7d15a1a2e3ac254ca6365f166ea230b9fb0bed2d064b2e5520bc4001680e1c66
+
+RUN curl -fL -o bricksync.tar.gz "https://github.com/ZZJHONS/Bricksync/releases/download/${BRICKSYNC_RELEASE}/bricksync-linux64.tar.gz" \
+    && echo "${BRICKSYNC_SHA256}  bricksync.tar.gz" | sha256sum -c - \
+    && tar -xzf bricksync.tar.gz \
+    && rm bricksync.tar.gz \
     && mv bricksync-linux64/* . \
     && rmdir bricksync-linux64 \
     && mkdir -p /opt/bricksync/defaults \
@@ -65,10 +64,26 @@ bridge_pid="$!"
 ./bricksync < "$INPUT_FIFO" &
 bricksync_pid="$!"
 
-wait "$bricksync_pid"
-status="$?"
+# Closes BrickSync's stdin. Its exit blocks on the stdin lock its reader thread holds while waiting for input, so it
+# can only finish once that read sees end of file, and the bridge and its cat both hold the write end open.
+stop_bridge() {
+  bridge_children="$(pgrep -P "$bridge_pid" || true)"
+  kill "$bridge_pid" 2>/dev/null || true
+  [ -z "$bridge_children" ] || kill $bridge_children 2>/dev/null || true
+}
 
-kill "$bridge_pid" 2>/dev/null || true
+# BrickSync saves its state and stops cleanly on SIGTERM, but as PID 1 this shell would never pass docker stop on.
+trap 'kill -TERM "$bricksync_pid" 2>/dev/null || true; stop_bridge' TERM INT
+
+# A forwarded signal interrupts the wait before BrickSync has finished, so wait again until it has exited.
+status=0
+wait "$bricksync_pid" || status="$?"
+while kill -0 "$bricksync_pid" 2>/dev/null; do
+  status=0
+  wait "$bricksync_pid" || status="$?"
+done
+
+stop_bridge
 wait "$bridge_pid" 2>/dev/null || true
 
 exit "$status"

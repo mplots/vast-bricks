@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickLink</Service>
+  <OrderID>28793529</OrderID>
+  <OrderDate>1751983189</OrderDate>
+  <Customer>katerinacivariv</Customer>
+  <SubTotal>10.266</SubTotal>
+  <GrandTotal>13.446</GrandTotal>
+  <Payment>13.450</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>sc118</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Mercedes-AMG SL 63 Driver</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>2.242</Price>
+   <SalePrice>1.794</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>FG_A06</Remarks>
+   <LotID>463231088</LotID>
+  </Item>
+  <Item>
+   <ItemID>cty1876</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Adventurer - Male, Dark Tan Vest over Orange Shirt, Light Bluish Gray Legs, Black Hair</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>3</Qty>
+   <Price>1.738</Price>
+   <SalePrice>1.390</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>FG_A02</Remarks>
+   <LotID>469795281</LotID>
+  </Item>
+  <Item>
+   <ItemID>cty1871</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Soapbox Race Reporter - Male, Orange Jacket with Panels and Zipper, Dark Blue Legs, Reddish Brown Tousled Hair</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>2.897</Price>
+   <SalePrice>2.318</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>FG_A10</Remarks>
+   <LotID>470849080</LotID>
+  </Item>
+  <Item>
+   <ItemID>cty1743</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Race Truck Driver - Male, Black Jacket over Dark Turquoise Shirt with Hawk Head Logo, Dark Blue Legs, Reddish Brown Flat Cap, Beard, Glasses</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>2.480</Price>
+   <SalePrice>1.984</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>FG_A12</Remarks>
+   <LotID>473357982</LotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

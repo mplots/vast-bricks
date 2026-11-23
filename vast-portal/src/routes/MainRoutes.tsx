@@ -21,6 +21,7 @@ const MaintenanceComingSoon2 = Loadable(lazy(() => import('pages/maintenance/com
 const SamplePage = Loadable(lazy(() => import('pages/extra-pages/sample-page')));
 const ContactUS = Loadable(lazy(() => import('pages/contact-us')));
 const ProductsPage = Loadable(lazy(() => import('pages/products')));
+const PartFinderPage = Loadable(lazy(() => import('pages/part-finder')));
 const AccountingPage = Loadable(lazy(() => import('pages/accounting')));
 const ArchivesPage = Loadable(lazy(() => import('pages/archives')));
 const DashboardPage = Loadable(lazy(() => import('pages/dashboard')));
@@ -55,6 +56,10 @@ const MainRoutes = {
         {
           path: 'products',
           element: <ProductsPage />
+        },
+        {
+          path: 'part-finder',
+          element: <PartFinderPage />
         },
         {
           path: 'accounting',

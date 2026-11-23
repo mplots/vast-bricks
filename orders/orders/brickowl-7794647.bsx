@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickOwl</Service>
+  <OrderID>7794647</OrderID>
+  <OrderDate>1785740859</OrderDate>
+  <Customer>Thibeault Lefever</Customer>
+  <SubTotal>42.450</SubTotal>
+  <GrandTotal>48.000</GrandTotal>
+  <Payment>48.000</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>min110</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>LEGO Fox Skin Minifigure</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>1.484</Price>
+   <Condition>U</Condition>
+   <Remarks>UFG_C014</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>527898297</LotID>
+   <OwlID>1167005</OwlID>
+   <OwlLotID>223351505</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>son028</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>LEGO Tails with Angry Expression Minifigure</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>5.109</Price>
+   <Condition>U</Condition>
+   <Remarks>UFG_A140</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>525341385</LotID>
+   <OwlID>1247213</OwlID>
+   <OwlLotID>221193191</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>33085</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>3</ColorID>
+   <ItemName>LEGO Yellow Banana (33085)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.074</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_N088</Remarks>
+   <OrigQty>4</OrigQty>
+   <LotID>518364634</LotID>
+   <OwlID>285127</OwlID>
+   <OwlLotID>214231067</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>sh0611</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>LEGO Hulk (Large) with White Jumpsuit Minifigure</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>17.492</Price>
+   <Condition>U</Condition>
+   <Remarks>BD_E04</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>525904879</LotID>
+   <OwlID>31113</OwlID>
+   <OwlLotID>221638657</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>sh0658</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>LEGO Batgirl with Gray Rebirth Suit Minifigure</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>4.843</Price>
+   <Condition>U</Condition>
+   <Remarks>UFG_A149</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>525341394</LotID>
+   <OwlID>142284</OwlID>
+   <OwlLotID>221193181</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>34684pb01</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>1</ColorID>
+   <ItemName>LEGO White Octagonal Shield with \u2018NEVER STOP\u2019 Sign (44156)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>White</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>1.027</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_N082</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>533391470</LotID>
+   <OwlID>288456</OwlID>
+   <OwlLotID>227551971</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>75902pb21</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>LEGO Dark Stone Gray Round Shield with Curved Face with Captain America Star in Dark Blue Circle and Weathering (75902)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>1.366</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_N073</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>532905525</LotID>
+   <OwlID>927731</OwlID>
+   <OwlLotID>227293469</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>colmar09</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>LEGO Zombie Captain America Minifigure</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>5.692</Price>
+   <Condition>U</Condition>
+   <Remarks>UFG_A134</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>525227107</LotID>
+   <OwlID>1006035</OwlID>
+   <OwlLotID>221084751</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>mnn005</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>LEGO Minion Stuart with Overalls Minifigure</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>5.366</Price>
+   <Condition>U</Condition>
+   <Remarks>UFG_C035</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>528144845</LotID>
+   <OwlID>231223</OwlID>
+   <OwlLotID>223480817</OwlLotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

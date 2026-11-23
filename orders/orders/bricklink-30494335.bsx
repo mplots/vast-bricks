@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickLink</Service>
+  <OrderID>30494335</OrderID>
+  <OrderDate>1768684744</OrderDate>
+  <Customer>DimaPro9579</Customer>
+  <SubTotal>18.015</SubTotal>
+  <GrandTotal>25.585</GrandTotal>
+  <Payment>29.730</Payment>
+  <Currency>USD</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>2540</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Plate, Modified 1 x 2 with Bar Handle on Side - Free Ends</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>3</Qty>
+   <Price>0.027</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/466051099&quot;&gt;</Comments>
+   <Remarks>MA_A01</Remarks>
+   <LotID>466051099</LotID>
+  </Item>
+  <Item>
+   <ItemID>3023</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>88</ColorID>
+   <ItemName>Plate 1 x 2</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Reddish Brown</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.040</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/509465676&quot;&gt;</Comments>
+   <Remarks>MA_M58</Remarks>
+   <LotID>509465676</LotID>
+  </Item>
+  <Item>
+   <ItemID>njo0006</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Cole - The Golden Weapons</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>3.309</Price>
+   <Condition>U</Condition>
+   <LotID>518405424</LotID>
+  </Item>
+  <Item>
+   <ItemID>njo0006</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Cole - The Golden Weapons</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>3.309</Price>
+   <Condition>U</Condition>
+   <LotID>518405425</LotID>
+  </Item>
+  <Item>
+   <ItemID>njo0007</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Kai - The Golden Weapons</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>2.910</Price>
+   <Condition>U</Condition>
+   <LotID>518405430</LotID>
+  </Item>
+  <Item>
+   <ItemID>njo0004</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Jay - The Golden Weapons</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>2.828</Price>
+   <Condition>U</Condition>
+   <LotID>518405432</LotID>
+  </Item>
+  <Item>
+   <ItemID>njo0006</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Cole - The Golden Weapons</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>3.309</Price>
+   <Condition>U</Condition>
+   <LotID>518405470</LotID>
+  </Item>
+  <Item>
+   <ItemID>njo0034</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Jay ZX</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>2.189</Price>
+   <Condition>U</Condition>
+   <LotID>518420275</LotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

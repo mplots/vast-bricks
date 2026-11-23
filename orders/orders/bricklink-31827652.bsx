@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickLink</Service>
+  <OrderID>31827652</OrderID>
+  <OrderDate>1781079867</OrderDate>
+  <Customer>plutokrat</Customer>
+  <SubTotal>7.576</SubTotal>
+  <GrandTotal>17.145</GrandTotal>
+  <Payment>17.150</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>14719</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Tile 2 x 2 Corner</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.118</Price>
+   <SalePrice>0.106</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_L52</Remarks>
+   <LotID>486000434</LotID>
+  </Item>
+  <Item>
+   <ItemID>15573</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Plate, Modified 1 x 2 with 1 Stud with Groove and Bottom Stud Holder &amp;#40;Jumper&amp;#41;</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>10</Qty>
+   <Price>0.060</Price>
+   <SalePrice>0.054</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_H43</Remarks>
+   <LotID>491759871</LotID>
+  </Item>
+  <Item>
+   <ItemID>69729</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Tile 2 x 6</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.286</Price>
+   <SalePrice>0.257</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_N29</Remarks>
+   <LotID>511321459</LotID>
+  </Item>
+  <Item>
+   <ItemID>27263</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Tile, Modified Facet 2 x 2</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.086</Price>
+   <SalePrice>0.077</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_N46</Remarks>
+   <LotID>511831880</LotID>
+  </Item>
+  <Item>
+   <ItemID>4599b</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Tap 1 x 1 without Hole in Nozzle End</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>10</Qty>
+   <Price>0.021</Price>
+   <SalePrice>0.019</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>MB_F51</Remarks>
+   <LotID>518364439</LotID>
+  </Item>
+  <Item>
+   <ItemID>4282</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Plate 2 x 16</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.236</Price>
+   <SalePrice>0.212</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_B14</Remarks>
+   <LotID>519107736</LotID>
+  </Item>
+  <Item>
+   <ItemID>6636</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Tile 1 x 6</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>8</Qty>
+   <Price>0.115</Price>
+   <SalePrice>0.104</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_D01</Remarks>
+   <LotID>519673161</LotID>
+  </Item>
+  <Item>
+   <ItemID>4162</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Tile 1 x 8</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>10</Qty>
+   <Price>0.149</Price>
+   <SalePrice>0.134</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_C14</Remarks>
+   <LotID>519673167</LotID>
+  </Item>
+  <Item>
+   <ItemID>87079</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Tile 2 x 4</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>10</Qty>
+   <Price>0.165</Price>
+   <SalePrice>0.148</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_D02</Remarks>
+   <LotID>519673179</LotID>
+  </Item>
+  <Item>
+   <ItemID>3069</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Tile 1 x 2</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>6</Qty>
+   <Price>0.093</Price>
+   <SalePrice>0.084</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>MB_B53</Remarks>
+   <LotID>519673187</LotID>
+  </Item>
+  <Item>
+   <ItemID>3068</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Tile 2 x 2</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.108</Price>
+   <SalePrice>0.097</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>MA_T19</Remarks>
+   <LotID>520258313</LotID>
+  </Item>
+  <Item>
+   <ItemID>2431</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Tile 1 x 4</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>10</Qty>
+   <Price>0.107</Price>
+   <SalePrice>0.096</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>MA_T23</Remarks>
+   <LotID>520258337</LotID>
+  </Item>
+  <Item>
+   <ItemID>3032</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Plate 4 x 6</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.126</Price>
+   <SalePrice>0.113</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_C16</Remarks>
+   <LotID>522283113</LotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

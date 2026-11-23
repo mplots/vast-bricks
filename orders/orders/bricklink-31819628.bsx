@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickLink</Service>
+  <OrderID>31819628</OrderID>
+  <OrderDate>1780993385</OrderDate>
+  <Customer>JoshwithGod</Customer>
+  <SubTotal>0.248</SubTotal>
+  <GrandTotal>6.588</GrandTotal>
+  <Payment>6.590</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>48729b</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>88</ColorID>
+   <ItemName>Bar   1L with Clip Mechanical Claw - Cut Edges and Hole on Side</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Reddish Brown</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.069</Price>
+   <SalePrice>0.062</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_M51</Remarks>
+   <LotID>508321641</LotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

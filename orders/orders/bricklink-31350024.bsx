@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickLink</Service>
+  <OrderID>31350024</OrderID>
+  <OrderDate>1776181722</OrderDate>
+  <Customer>arciks</Customer>
+  <SubTotal>1.329</SubTotal>
+  <GrandTotal>1.329</GrandTotal>
+  <Payment>1.330</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>4865b</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Panel 1 x 2 x 1 with Rounded Corners</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>3</Qty>
+   <Price>0.037</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_L03</Remarks>
+   <LotID>463230925</LotID>
+  </Item>
+  <Item>
+   <ItemID>43722</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Wedge, Plate 3 x 2 Right</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.063</Price>
+   <Condition>N</Condition>
+   <Remarks>DA_G13</Remarks>
+   <LotID>464949094</LotID>
+  </Item>
+  <Item>
+   <ItemID>3023</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Plate 1 x 2</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.040</Price>
+   <Condition>U</Condition>
+   <Remarks>DB_A01</Remarks>
+   <LotID>518617720</LotID>
+  </Item>
+  <Item>
+   <ItemID>4073</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>12</ColorID>
+   <ItemName>Plate, Round 1 x 1</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Trans-Clear</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.027</Price>
+   <Condition>U</Condition>
+   <Remarks>MB_A50</Remarks>
+   <LotID>518750355</LotID>
+  </Item>
+  <Item>
+   <ItemID>3024</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>12</ColorID>
+   <ItemName>Plate 1 x 1</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Trans-Clear</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.051</Price>
+   <Condition>U</Condition>
+   <Remarks>MB_B35</Remarks>
+   <LotID>519119038</LotID>
+  </Item>
+  <Item>
+   <ItemID>3068</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Tile 2 x 2</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.097</Price>
+   <Condition>U</Condition>
+   <Remarks>MA_T21</Remarks>
+   <LotID>520258316</LotID>
+  </Item>
+  <Item>
+   <ItemID>2817</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Plate, Modified 2 x 2 with Pin Holes</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>3</Qty>
+   <Price>0.025</Price>
+   <Condition>U</Condition>
+   <Remarks>MB_B16</Remarks>
+   <LotID>520448363</LotID>
+  </Item>
+  <Item>
+   <ItemID>18654</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Technic, Liftarm Thick 1 x 1 &amp;#40;Spacer&amp;#41;</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>3</Qty>
+   <Price>0.032</Price>
+   <Condition>U</Condition>
+   <Remarks>MB_C01</Remarks>
+   <LotID>523405000</LotID>
+  </Item>
+  <Item>
+   <ItemID>15100</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Technic, Pin with Friction Ridges and Pin Hole</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.076</Price>
+   <Condition>U</Condition>
+   <Remarks>MB_C59</Remarks>
+   <LotID>523463474</LotID>
+  </Item>
+  <Item>
+   <ItemID>63864</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Tile 1 x 3</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.122</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_O03</Remarks>
+   <LotID>524170957</LotID>
+  </Item>
+  <Item>
+   <ItemID>79741</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>95</ColorID>
+   <ItemName>Minifigure, Utensil Fork</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Flat Silver</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.073</Price>
+   <Condition>U</Condition>
+   <Remarks>MB_F53</Remarks>
+   <LotID>533813249</LotID>
+  </Item>
+  <Item>
+   <ItemID>24482</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Minifigure, Weapon Spear Tip with Fins</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.081</Price>
+   <Condition>U</Condition>
+   <Remarks>MB_F37</Remarks>
+   <LotID>534074219</LotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

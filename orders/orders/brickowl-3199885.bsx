@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickOwl</Service>
+  <OrderID>3199885</OrderID>
+  <OrderDate>1765429673</OrderDate>
+  <Customer>https:\/\/evil.com https:\/\/evil.com</Customer>
+  <SubTotal>1.170</SubTotal>
+  <GrandTotal>5.400</GrandTotal>
+  <Payment>5.400</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>18674</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>36</ColorID>
+   <ItemName>LEGO Bright Green Tile 2 x 2 Round with Stud (18674)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Bright Green</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.075</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_I31</Remarks>
+   <OrigQty>3</OrigQty>
+   <LotID>491920521</LotID>
+   <OwlID>627945</OwlID>
+   <OwlLotID>193079443</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>37775</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>98</ColorID>
+   <ItemName>LEGO Transparent Orange Small Flame with Pin (37775)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Trans-Orange</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.031</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_E53</Remarks>
+   <OrigQty>6</OrigQty>
+   <LotID>477278649</LotID>
+   <OwlID>995147</OwlID>
+   <OwlLotID>184951941</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>79389</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>LEGO Medium Stone Gray Bracket 1 x 1 with 1 x 2 Plate Down (79389)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.142</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_J15</Remarks>
+   <OrigQty>16</OrigQty>
+   <LotID>473228691</LotID>
+   <OwlID>773418</OwlID>
+   <OwlLotID>182431255</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>4073</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>5</ColorID>
+   <ItemName>LEGO Red Plate 1 x 1 Round (6141 \/ 30057)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Red</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.019</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_J15</Remarks>
+   <OrigQty>14</OrigQty>
+   <LotID>470849138</LotID>
+   <OwlID>961948</OwlID>
+   <OwlLotID>181157125</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>99780</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>LEGO Medium Stone Gray Bracket 1 x 2 with 1 x 2 Up (99780)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.060</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_H11</Remarks>
+   <OrigQty>19</OrigQty>
+   <LotID>470792710</LotID>
+   <OwlID>414759</OwlID>
+   <OwlLotID>181120729</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>3068</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>1</ColorID>
+   <ItemName>LEGO White Tile 2 x 2 with Groove (3068 \/ 88409)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>White</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.067</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_D43</Remarks>
+   <OrigQty>13</OrigQty>
+   <LotID>464420218</LotID>
+   <OwlID>462122</OwlID>
+   <OwlLotID>176680963</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>15712</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>1</ColorID>
+   <ItemName>LEGO White Tile 1 x 1 with Clip (Raised &amp;quot;C&amp;quot;) (15712 \/ 44842)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>White</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.057</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_E46</Remarks>
+   <OrigQty>4</OrigQty>
+   <LotID>464420231</LotID>
+   <OwlID>859237</OwlID>
+   <OwlLotID>176680875</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>14719</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>1</ColorID>
+   <ItemName>LEGO White Tile 2 x 2 Corner (14719)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>White</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.097</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_E45</Remarks>
+   <OrigQty>3</OrigQty>
+   <LotID>464420233</LotID>
+   <OwlID>332970</OwlID>
+   <OwlLotID>176680865</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>3020</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>LEGO Medium Stone Gray Plate 2 x 4 (3020 \/ 5584)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.058</Price>
+   <Condition>N</Condition>
+   <Remarks>DA_OP1</Remarks>
+   <OrigQty>56</OrigQty>
+   <LotID>463231077</LotID>
+   <OwlID>80025</OwlID>
+   <OwlLotID>175978743</OwlLotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

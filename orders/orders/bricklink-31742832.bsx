@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickLink</Service>
+  <OrderID>31742832</OrderID>
+  <OrderDate>1780223078</OrderDate>
+  <Customer>Lanaos</Customer>
+  <SubTotal>1.254</SubTotal>
+  <GrandTotal>8.472</GrandTotal>
+  <Payment>8.470</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>3068pb1906</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>88</ColorID>
+   <ItemName>Tile 2 x 2 with Black Eyebrows, Dark Brown and White Eyes, Angry Frown with Lower Fangs on Bright Light Yellow Background Pattern &amp;#40;Super Mario Galoomba Face&amp;#41;</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Reddish Brown</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.187</Price>
+   <SalePrice>0.168</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_A024</Remarks>
+   <LotID>537742862</LotID>
+  </Item>
+  <Item>
+   <ItemID>66858</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Legs with Plate Round 2 x 2 and Axle Hole - 2 Feet</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.396</Price>
+   <SalePrice>0.356</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_A081</Remarks>
+   <LotID>537807683</LotID>
+  </Item>
+  <Item>
+   <ItemID>66858</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>1</ColorID>
+   <ItemName>Legs with Plate Round 2 x 2 and Axle Hole - 2 Feet</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>White</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.489</Price>
+   <SalePrice>0.440</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_A089</Remarks>
+   <LotID>537807685</LotID>
+  </Item>
+  <Item>
+   <ItemID>3068pb1524</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Tile 2 x 2 with Super Mario Scanner Code Thwimp Pattern &amp;#40;Sticker&amp;#41; - Set 71386</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.106</Price>
+   <SalePrice>0.095</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_A037</Remarks>
+   <LotID>538235903</LotID>
+  </Item>
+  <Item>
+   <ItemID>3068pb1905</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>88</ColorID>
+   <ItemName>Tile 2 x 2 with Super Mario Scanner Code Galoomba Pattern &amp;#40;Sticker&amp;#41; - Set 71394</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Reddish Brown</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.215</Price>
+   <SalePrice>0.193</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_A054</Remarks>
+   <LotID>538243875</LotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

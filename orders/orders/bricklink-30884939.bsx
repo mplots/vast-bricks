@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickLink</Service>
+  <OrderID>30884939</OrderID>
+  <OrderDate>1771888889</OrderDate>
+  <Customer>Daniele8807</Customer>
+  <SubTotal>13.863</SubTotal>
+  <GrandTotal>22.781</GrandTotal>
+  <Payment>22.780</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>3023</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>3</ColorID>
+   <ItemName>Plate 1 x 2</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>6</Qty>
+   <Price>0.029</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/463231023&quot;&gt;</Comments>
+   <Remarks>DA_A17</Remarks>
+   <LotID>463231023</LotID>
+  </Item>
+  <Item>
+   <ItemID>63868</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>3</ColorID>
+   <ItemName>Plate, Modified 1 x 2 with Clip on End &amp;#40;Horizontal Grip&amp;#41;</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.041</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/477278652&quot;&gt;</Comments>
+   <Remarks>MA_J12</Remarks>
+   <LotID>477278652</LotID>
+  </Item>
+  <Item>
+   <ItemID>4073</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>115</ColorID>
+   <ItemName>Plate, Round 1 x 1</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Pearl Gold</ColorName>
+   <Status>I</Status>
+   <Qty>5</Qty>
+   <Price>0.017</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/477278654&quot;&gt;</Comments>
+   <Remarks>MA_E55</Remarks>
+   <LotID>477278654</LotID>
+  </Item>
+  <Item>
+   <ItemID>63864</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>3</ColorID>
+   <ItemName>Tile 1 x 3</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>3</Qty>
+   <Price>0.108</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;amp;path=/cart/480390419&quot; /&gt;</Comments>
+   <Remarks>MA_L37</Remarks>
+   <LotID>480390419</LotID>
+  </Item>
+  <Item>
+   <ItemID>85984</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>88</ColorID>
+   <ItemName>Slope 30 1 x 2 x 2/3</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Reddish Brown</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.050</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/491759863&quot;&gt;</Comments>
+   <Remarks>MA_H56</Remarks>
+   <LotID>491759863</LotID>
+  </Item>
+  <Item>
+   <ItemID>79194</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>12</ColorID>
+   <ItemName>Plate, Round 1 x 1 with Bar Handle on Long Stem</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Trans-Clear</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.065</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/511543636&quot;&gt;</Comments>
+   <Remarks>MA_M27</Remarks>
+   <LotID>511543636</LotID>
+  </Item>
+  <Item>
+   <ItemID>15210</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>1</ColorID>
+   <ItemName>Road Sign 2 x 2 Square with Open O Clip</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>White</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.063</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/513386973&quot;&gt;</Comments>
+   <Remarks>MA_N09</Remarks>
+   <LotID>513386973</LotID>
+  </Item>
+  <Item>
+   <ItemID>18674</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>3</ColorID>
+   <ItemName>Tile, Round 2 x 2 with Open Stud</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.144</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/515001418&quot;&gt;</Comments>
+   <Remarks>MA_O23</Remarks>
+   <LotID>515001418</LotID>
+  </Item>
+  <Item>
+   <ItemID>3062</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>3</ColorID>
+   <ItemName>Brick, Round  1 x 1</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>3</Qty>
+   <Price>0.022</Price>
+   <Condition>U</Condition>
+   <Remarks>MB_D11</Remarks>
+   <LotID>523655198</LotID>
+  </Item>
+  <Item>
+   <ItemID>hp295</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Professor Quirinus Quirrell - 20th Anniversary Pearl Gold</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>12.488</Price>
+   <Condition>U</Condition>
+   <Remarks>UFG_139</Remarks>
+   <LotID>525227112</LotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

@@ -1,0 +1,1078 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickLink</Service>
+  <OrderID>30732163</OrderID>
+  <OrderDate>1770582597</OrderDate>
+  <Customer>samu1730</Customer>
+  <SubTotal>11.476</SubTotal>
+  <GrandTotal>19.837</GrandTotal>
+  <Payment>148.150</Payment>
+  <Currency>DKK</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>15573</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Plate, Modified 1 x 2 with 1 Stud with Groove and Bottom Stud Holder &amp;#40;Jumper&amp;#41;</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>8</Qty>
+   <Price>0.039</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/463230879&quot;&gt;</Comments>
+   <Remarks>MA_L50</Remarks>
+   <LotID>463230879</LotID>
+  </Item>
+  <Item>
+   <ItemID>20482</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Tile, Round 1 x 1 with Bar and Small Pin Hole</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.036</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/463230884&quot;&gt;</Comments>
+   <Remarks>MA_D55</Remarks>
+   <LotID>463230884</LotID>
+  </Item>
+  <Item>
+   <ItemID>26047</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Plate, Round 1 x 1 with Bar Handle</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.080</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/463230910&quot;&gt;</Comments>
+   <Remarks>MA_E17</Remarks>
+   <LotID>463230910</LotID>
+  </Item>
+  <Item>
+   <ItemID>85861</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Plate, Round 1 x 1 with Open Stud</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.036</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/463230936&quot;&gt;</Comments>
+   <Remarks>MA_B12</Remarks>
+   <LotID>463230936</LotID>
+  </Item>
+  <Item>
+   <ItemID>29120</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>3</ColorID>
+   <ItemName>Wedge 2 x 1 x 2/3 Left</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.232</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/463230942&quot;&gt;</Comments>
+   <Remarks>MA_B20</Remarks>
+   <LotID>463230942</LotID>
+  </Item>
+  <Item>
+   <ItemID>36840</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>3</ColorID>
+   <ItemName>Bracket 1 x 1 - 1 x 1 Inverted</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.112</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/463230947&quot;&gt;</Comments>
+   <Remarks>MA_B07</Remarks>
+   <LotID>463230947</LotID>
+  </Item>
+  <Item>
+   <ItemID>3749</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>2</ColorID>
+   <ItemName>Technic, Axle  1L with Pin without Friction Ridges with Round Hole</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Tan</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.030</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/463230953&quot;&gt;</Comments>
+   <Remarks>DA_P10</Remarks>
+   <LotID>463230953</LotID>
+  </Item>
+  <Item>
+   <ItemID>85861</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Plate, Round 1 x 1 with Open Stud</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>8</Qty>
+   <Price>0.042</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/463230986&quot;&gt;</Comments>
+   <Remarks>MA_I05</Remarks>
+   <LotID>463230986</LotID>
+  </Item>
+  <Item>
+   <ItemID>32828</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Bar   1L with 1 x 1 Round Plate with Hollow Stud</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.062</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/463231004&quot;&gt;</Comments>
+   <Remarks>MA_D24</Remarks>
+   <LotID>463231004</LotID>
+  </Item>
+  <Item>
+   <ItemID>29119</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>3</ColorID>
+   <ItemName>Wedge 2 x 1 x 2/3 Right</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.228</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/463231040&quot;&gt;</Comments>
+   <Remarks>MA_D12</Remarks>
+   <LotID>463231040</LotID>
+  </Item>
+  <Item>
+   <ItemID>3024</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Plate 1 x 1</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.051</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/463231052&quot;&gt;</Comments>
+   <Remarks>MA_A17</Remarks>
+   <LotID>463231052</LotID>
+  </Item>
+  <Item>
+   <ItemID>28802</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Bracket 1 x 2 - 1 x 4 with Rounded Corners at the Bottom</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.028</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/463231093&quot;&gt;</Comments>
+   <Remarks>MA_O37</Remarks>
+   <LotID>463231093</LotID>
+  </Item>
+  <Item>
+   <ItemID>78329</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Plate 1 x 5</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.157</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/463231100&quot;&gt;</Comments>
+   <Remarks>DA_P12</Remarks>
+   <LotID>463231100</LotID>
+  </Item>
+  <Item>
+   <ItemID>11477</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Slope, Curved 2 x 1 x 2/3</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.059</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/463231117&quot;&gt;</Comments>
+   <Remarks>DA_C18</Remarks>
+   <LotID>463231117</LotID>
+  </Item>
+  <Item>
+   <ItemID>35480</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Plate, Round 1 x 2 with Open Studs</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>3</Qty>
+   <Price>0.061</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/463231145&quot;&gt;</Comments>
+   <Remarks>DA_I17</Remarks>
+   <LotID>463231145</LotID>
+  </Item>
+  <Item>
+   <ItemID>34103</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Plate, Modified 1 x 3 with 2 Studs &amp;#40;Double Jumper&amp;#41;</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>6</Qty>
+   <Price>0.083</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/463231148&quot;&gt;</Comments>
+   <Remarks>DA_C03</Remarks>
+   <LotID>463231148</LotID>
+  </Item>
+  <Item>
+   <ItemID>99780</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Bracket 1 x 2 - 1 x 2 Inverted</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>8</Qty>
+   <Price>0.048</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/463231155&quot;&gt;</Comments>
+   <Remarks>DA_O06</Remarks>
+   <LotID>463231155</LotID>
+  </Item>
+  <Item>
+   <ItemID>24307</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Wedge, Plate 2 x 2  Right</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.105</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/463231175&quot;&gt;</Comments>
+   <Remarks>MA_P28</Remarks>
+   <LotID>463231175</LotID>
+  </Item>
+  <Item>
+   <ItemID>24299</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Wedge, Plate 2 x 2  Left</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.111</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/463231183&quot;&gt;</Comments>
+   <Remarks>MA_N52</Remarks>
+   <LotID>463231183</LotID>
+  </Item>
+  <Item>
+   <ItemID>4081b</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Plate, Modified 1 x 1 with Light Attachment - Thick Ring</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>5</Qty>
+   <Price>0.037</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/464420355&quot;&gt;</Comments>
+   <Remarks>MA_G29</Remarks>
+   <LotID>464420355</LotID>
+  </Item>
+  <Item>
+   <ItemID>24201</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Slope, Curved 2 x 1 x 2/3 Inverted</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.096</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/464420368&quot;&gt;</Comments>
+   <Remarks>MA_D36</Remarks>
+   <LotID>464420368</LotID>
+  </Item>
+  <Item>
+   <ItemID>43723</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Wedge, Plate 3 x 2 Left</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.061</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/464949093&quot;&gt;</Comments>
+   <Remarks>DA_I19</Remarks>
+   <LotID>464949093</LotID>
+  </Item>
+  <Item>
+   <ItemID>43722</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Wedge, Plate 3 x 2 Right</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.062</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/464949094&quot;&gt;</Comments>
+   <Remarks>DA_G13</Remarks>
+   <LotID>464949094</LotID>
+  </Item>
+  <Item>
+   <ItemID>27263</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Tile, Modified Facet 2 x 2</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.072</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/469795279&quot;&gt;</Comments>
+   <Remarks>MA_J01</Remarks>
+   <LotID>469795279</LotID>
+  </Item>
+  <Item>
+   <ItemID>79194</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Plate, Round 1 x 1 with Bar Handle on Long Stem</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.279</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/477278582&quot;&gt;</Comments>
+   <Remarks>MA_E53</Remarks>
+   <LotID>477278582</LotID>
+  </Item>
+  <Item>
+   <ItemID>35480</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>3</ColorID>
+   <ItemName>Plate, Round 1 x 2 with Open Studs</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.114</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/477278614&quot;&gt;</Comments>
+   <Remarks>MA_K11</Remarks>
+   <LotID>477278614</LotID>
+  </Item>
+  <Item>
+   <ItemID>54200</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>3</ColorID>
+   <ItemName>Slope 30 1 x 1 x 2/3</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.025</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/477278658&quot;&gt;</Comments>
+   <Remarks>MA_J10</Remarks>
+   <LotID>477278658</LotID>
+  </Item>
+  <Item>
+   <ItemID>24246</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>3</ColorID>
+   <ItemName>Tile, Round 1 x 1 Half Circle Extended</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.031</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/478227841&quot;&gt;</Comments>
+   <Remarks>MA_H30</Remarks>
+   <LotID>478227841</LotID>
+  </Item>
+  <Item>
+   <ItemID>15573</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>3</ColorID>
+   <ItemName>Plate, Modified 1 x 2 with 1 Stud with Groove and Bottom Stud Holder &amp;#40;Jumper&amp;#41;</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.040</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/479559300&quot;&gt;</Comments>
+   <Remarks>MA_E05</Remarks>
+   <LotID>479559300</LotID>
+  </Item>
+  <Item>
+   <ItemID>4070</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Brick, Modified 1 x 1 with Headlight</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>8</Qty>
+   <Price>0.104</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/480390396&quot;&gt;</Comments>
+   <Remarks>MA_L34</Remarks>
+   <LotID>480390396</LotID>
+  </Item>
+  <Item>
+   <ItemID>32064</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Technic, Brick 1 x 2 with Axle Hole</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.032</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/480940208&quot;&gt;</Comments>
+   <Remarks>MA_D55</Remarks>
+   <LotID>480940208</LotID>
+  </Item>
+  <Item>
+   <ItemID>6091</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Slope, Curved 2 x 1 x 1 1/3 with Recessed Stud</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.072</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/483472254&quot;&gt;</Comments>
+   <Remarks>MA_J34</Remarks>
+   <LotID>483472254</LotID>
+  </Item>
+  <Item>
+   <ItemID>3029</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Plate 4 x 12</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.454</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/483472269&quot;&gt;</Comments>
+   <Remarks>DA_L02</Remarks>
+   <LotID>483472269</LotID>
+  </Item>
+  <Item>
+   <ItemID>32556</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>2</ColorID>
+   <ItemName>Technic, Pin 3L without Friction Ridges</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Tan</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.028</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/486000392&quot;&gt;</Comments>
+   <Remarks>MA_K36</Remarks>
+   <LotID>486000392</LotID>
+  </Item>
+  <Item>
+   <ItemID>3701</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Technic, Brick 1 x 4 with Holes</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.111</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/486000429&quot;&gt;</Comments>
+   <Remarks>MA_K44</Remarks>
+   <LotID>486000429</LotID>
+  </Item>
+  <Item>
+   <ItemID>11458</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Plate, Modified 1 x 2 with Pin Hole on Top</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.187</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/486000435&quot;&gt;</Comments>
+   <Remarks>MA_K52</Remarks>
+   <LotID>486000435</LotID>
+  </Item>
+  <Item>
+   <ItemID>29120</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Wedge 2 x 1 x 2/3 Left</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.117</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/491920526&quot;&gt;</Comments>
+   <Remarks>MA_J47</Remarks>
+   <LotID>491920526</LotID>
+  </Item>
+  <Item>
+   <ItemID>29119</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Wedge 2 x 1 x 2/3 Right</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.116</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/491920527&quot;&gt;</Comments>
+   <Remarks>MA_J49</Remarks>
+   <LotID>491920527</LotID>
+  </Item>
+  <Item>
+   <ItemID>32523</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Technic, Liftarm Thick 1 x 3</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.077</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/504378458&quot;&gt;</Comments>
+   <Remarks>MA_N55</Remarks>
+   <LotID>504378458</LotID>
+  </Item>
+  <Item>
+   <ItemID>36840</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Bracket 1 x 1 - 1 x 1 Inverted</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.107</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/507011782&quot;&gt;</Comments>
+   <Remarks>MA_L05</Remarks>
+   <LotID>507011782</LotID>
+  </Item>
+  <Item>
+   <ItemID>61252</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Plate, Modified 1 x 1 with Open O Clip &amp;#40;Horizontal Grip&amp;#41;</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.035</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/509465708&quot;&gt;</Comments>
+   <Remarks>MA_M60</Remarks>
+   <LotID>509465708</LotID>
+  </Item>
+  <Item>
+   <ItemID>60470b</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Plate, Modified 1 x 2 with 2 Open O Clips &amp;#40;Horizontal Grip&amp;#41;</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.038</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/511831859&quot;&gt;</Comments>
+   <Remarks>MA_N35</Remarks>
+   <LotID>511831859</LotID>
+  </Item>
+  <Item>
+   <ItemID>1900</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>67</ColorID>
+   <ItemName>Wheel Cover 6 Spoke - for Wheel 72206pb01</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Metallic Silver</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.154</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/511831884&quot;&gt;</Comments>
+   <Remarks>MA_N48</Remarks>
+   <LotID>511831884</LotID>
+  </Item>
+  <Item>
+   <ItemID>25269</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>110</ColorID>
+   <ItemName>Tile, Round 1 x 1 Quarter</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Bright Light Orange</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.024</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/515001360&quot;&gt;</Comments>
+   <Remarks>MA_P35</Remarks>
+   <LotID>515001360</LotID>
+  </Item>
+  <Item>
+   <ItemID>18677</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Plate, Modified 1 x 2 with Pin Hole on Bottom</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.054</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;amp;path=/cart/&quot; /&gt;</Comments>
+   <Remarks>MA_L18</Remarks>
+   <LotID>516942524</LotID>
+  </Item>
+  <Item>
+   <ItemID>30162</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Minifigure, Utensil Binoculars Town</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.131</Price>
+   <Condition>U</Condition>
+   <Remarks>MA_R36</Remarks>
+   <LotID>518364407</LotID>
+  </Item>
+  <Item>
+   <ItemID>4592c02</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Antenna Small Base with Black Lever &amp;#40;4592 / 4593&amp;#41;</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>3</Qty>
+   <Price>0.020</Price>
+   <Condition>U</Condition>
+   <Remarks>MA_R28</Remarks>
+   <LotID>518364447</LotID>
+  </Item>
+  <Item>
+   <ItemID>3023</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Plate 1 x 2</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>5</Qty>
+   <Price>0.038</Price>
+   <Condition>U</Condition>
+   <Remarks>MA_S01</Remarks>
+   <LotID>518617720</LotID>
+  </Item>
+  <Item>
+   <ItemID>3020</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Plate 2 x 4</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>3</Qty>
+   <Price>0.039</Price>
+   <Condition>U</Condition>
+   <Remarks>DB_A12</Remarks>
+   <LotID>518617723</LotID>
+  </Item>
+  <Item>
+   <ItemID>3623</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Plate 1 x 3</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>3</Qty>
+   <Price>0.071</Price>
+   <Condition>U</Condition>
+   <Remarks>MA_S06</Remarks>
+   <LotID>518617724</LotID>
+  </Item>
+  <Item>
+   <ItemID>3022</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Plate 2 x 2</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>3</Qty>
+   <Price>0.030</Price>
+   <Condition>U</Condition>
+   <Remarks>DB_A14</Remarks>
+   <LotID>518617725</LotID>
+  </Item>
+  <Item>
+   <ItemID>3460</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Plate 1 x 8</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.087</Price>
+   <Condition>U</Condition>
+   <Remarks>DB_A20</Remarks>
+   <LotID>518617726</LotID>
+  </Item>
+  <Item>
+   <ItemID>3795</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Plate 2 x 6</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.052</Price>
+   <Condition>U</Condition>
+   <Remarks>DB_B13</Remarks>
+   <LotID>518617730</LotID>
+  </Item>
+  <Item>
+   <ItemID>3710</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>3</ColorID>
+   <ItemName>Plate 1 x 4</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.027</Price>
+   <Condition>U</Condition>
+   <Remarks>DB_A06</Remarks>
+   <LotID>518617844</LotID>
+  </Item>
+  <Item>
+   <ItemID>4073</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>12</ColorID>
+   <ItemName>Plate, Round 1 x 1</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Trans-Clear</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.027</Price>
+   <Condition>U</Condition>
+   <Remarks>MA_R50</Remarks>
+   <LotID>518750355</LotID>
+  </Item>
+  <Item>
+   <ItemID>3005</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Brick 1 x 1</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.045</Price>
+   <Condition>U</Condition>
+   <Remarks>MA_S24</Remarks>
+   <LotID>518936903</LotID>
+  </Item>
+  <Item>
+   <ItemID>3010</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>3</ColorID>
+   <ItemName>Brick 1 x 4</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.037</Price>
+   <Condition>U</Condition>
+   <Remarks>DB_C01</Remarks>
+   <LotID>518959188</LotID>
+  </Item>
+  <Item>
+   <ItemID>3010</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Brick 1 x 4</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.118</Price>
+   <Condition>U</Condition>
+   <Remarks>DB_C02</Remarks>
+   <LotID>518959189</LotID>
+  </Item>
+  <Item>
+   <ItemID>54200</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Slope 30 1 x 1 x 2/3</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.019</Price>
+   <Condition>U</Condition>
+   <Remarks>MA_S32</Remarks>
+   <LotID>519113056</LotID>
+  </Item>
+  <Item>
+   <ItemID>3070</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>3</ColorID>
+   <ItemName>Tile 1 x 1</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>7</Qty>
+   <Price>0.034</Price>
+   <Condition>U</Condition>
+   <Remarks>MA_S40</Remarks>
+   <LotID>519119069</LotID>
+  </Item>
+  <Item>
+   <ItemID>3622</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>3</ColorID>
+   <ItemName>Brick 1 x 3</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.030</Price>
+   <Condition>U</Condition>
+   <Remarks>DB_C04</Remarks>
+   <LotID>519122812</LotID>
+  </Item>
+  <Item>
+   <ItemID>2420</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Plate 2 x 2 Corner</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>9</Qty>
+   <Price>0.038</Price>
+   <Condition>U</Condition>
+   <Remarks>MA_S45</Remarks>
+   <LotID>519293192</LotID>
+  </Item>
+  <Item>
+   <ItemID>32028</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Plate, Modified 1 x 2 with Door Rail</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.051</Price>
+   <Condition>U</Condition>
+   <Remarks>MA_S48</Remarks>
+   <LotID>519293202</LotID>
+  </Item>
+  <Item>
+   <ItemID>15573</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Plate, Modified 1 x 2 with 1 Stud with Groove and Bottom Stud Holder &amp;#40;Jumper&amp;#41;</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.034</Price>
+   <Condition>U</Condition>
+   <Remarks>MA_S49</Remarks>
+   <LotID>519293208</LotID>
+  </Item>
+  <Item>
+   <ItemID>15573</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>3</ColorID>
+   <ItemName>Plate, Modified 1 x 2 with 1 Stud with Groove and Bottom Stud Holder &amp;#40;Jumper&amp;#41;</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.029</Price>
+   <Condition>U</Condition>
+   <Remarks>MA_S53</Remarks>
+   <LotID>519293228</LotID>
+  </Item>
+  <Item>
+   <ItemID>4162</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>3</ColorID>
+   <ItemName>Tile 1 x 8</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.103</Price>
+   <Condition>U</Condition>
+   <Remarks>DB_C14</Remarks>
+   <LotID>519673170</LotID>
+  </Item>
+  <Item>
+   <ItemID>87079</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>3</ColorID>
+   <ItemName>Tile 2 x 4</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.108</Price>
+   <Condition>U</Condition>
+   <Remarks>MA_S33</Remarks>
+   <LotID>519673178</LotID>
+  </Item>
+  <Item>
+   <ItemID>3069</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Tile 1 x 2</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.061</Price>
+   <Condition>U</Condition>
+   <Remarks>MA_S59</Remarks>
+   <LotID>519673188</LotID>
+  </Item>
+  <Item>
+   <ItemID>3068</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>3</ColorID>
+   <ItemName>Tile 2 x 2</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.045</Price>
+   <Condition>U</Condition>
+   <Remarks>MA_T21</Remarks>
+   <LotID>520258320</LotID>
+  </Item>
+  <Item>
+   <ItemID>2431</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>3</ColorID>
+   <ItemName>Tile 1 x 4</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.048</Price>
+   <Condition>U</Condition>
+   <Remarks>MA_T22</Remarks>
+   <LotID>520258336</LotID>
+  </Item>
+  <Item>
+   <ItemID>48336</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Plate, Modified 1 x 2 with Bar Handle on Side - Closed Ends</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.023</Price>
+   <Condition>U</Condition>
+   <Remarks>MA_T28</Remarks>
+   <LotID>520448380</LotID>
+  </Item>
+  <Item>
+   <ItemID>85861</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Plate, Round 1 x 1 with Open Stud</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.038</Price>
+   <Condition>U</Condition>
+   <Remarks>MA_R48</Remarks>
+   <LotID>522042755</LotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickOwl</Service>
+  <OrderID>8865241</OrderID>
+  <OrderDate>1751052463</OrderDate>
+  <Customer>Michael Wisijahn</Customer>
+  <SubTotal>10.610</SubTotal>
+  <GrandTotal>14.940</GrandTotal>
+  <Payment>14.940</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>3068</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>LEGO Black Tile 2 x 2 with Groove (3068 \/ 88409)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>10</Qty>
+   <Price>0.109</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_L20</Remarks>
+   <OrigQty>20</OrigQty>
+   <LotID>463231135</LotID>
+   <OwlID>462122</OwlID>
+   <OwlLotID>175978805</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>34103</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>LEGO Black Plate 1 x 3 with 2 Studs (34103)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>10</Qty>
+   <Price>0.093</Price>
+   <Condition>N</Condition>
+   <Remarks>DA_C03</Remarks>
+   <OrigQty>40</OrigQty>
+   <LotID>463231148</LotID>
+   <OwlID>237366</OwlID>
+   <OwlLotID>175978845</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>87079</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>LEGO Black Tile 2 x 4 (87079)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.196</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_F31</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>477278624</LotID>
+   <OwlID>26386</OwlID>
+   <OwlLotID>184952063</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>76797</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>1</ColorID>
+   <ItemName>LEGO White Slope 1 x 3 x 3 Curved Round Quarter  (76797)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>White</ColorName>
+   <Status>I</Status>
+   <Qty>8</Qty>
+   <Price>0.319</Price>
+   <Condition>N</Condition>
+   <Remarks>DA_D11</Remarks>
+   <OrigQty>42</OrigQty>
+   <LotID>468661946</LotID>
+   <OwlID>481101</OwlID>
+   <OwlLotID>179714229</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>67361</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>1</ColorID>
+   <ItemName>LEGO White Tail (67361)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>White</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>5.840</Price>
+   <Condition>N</Condition>
+   <Remarks>DA_J10</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>480940294</LotID>
+   <OwlID>551025</OwlID>
+   <OwlLotID>187051125</OwlLotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickLink</Service>
+  <OrderID>28487723</OrderID>
+  <OrderDate>1748737725</OrderDate>
+  <Customer>MIghtyMrMIke</Customer>
+  <SubTotal>9.531</SubTotal>
+  <GrandTotal>14.806</GrandTotal>
+  <Payment>14.810</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>hrz001</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Aloy - Open Mouth Smile / Lopsided Closed Mouth</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>8.781</Price>
+   <SalePrice>6.147</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>FG_A15</Remarks>
+   <LotID>477278556</LotID>
+  </Item>
+  <Item>
+   <ItemID>5884</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>88</ColorID>
+   <ItemName>Minifigure, Weapon Bow, Recurve with Ornate Limbs and 2 Small Pin Holes, Arrow Drawn &amp;#40;Horizon Hunter Bow&amp;#41;</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Reddish Brown</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>4.232</Price>
+   <SalePrice>2.962</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_A49</Remarks>
+   <LotID>477278561</LotID>
+  </Item>
+  <Item>
+   <ItemID>4502a</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>5</ColorID>
+   <ItemName>Minifigure, Plume Feather Small</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Red</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.301</Price>
+   <SalePrice>0.211</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>SA_I30</Remarks>
+   <LotID>477278575</LotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

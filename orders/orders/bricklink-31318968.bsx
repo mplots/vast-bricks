@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickLink</Service>
+  <OrderID>31318968</OrderID>
+  <OrderDate>1775891105</OrderDate>
+  <Customer>Pomes</Customer>
+  <SubTotal>6.323</SubTotal>
+  <GrandTotal>12.912</GrandTotal>
+  <Payment>12.910</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>85861</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>5</ColorID>
+   <ItemName>Plate, Round 1 x 1 with Open Stud</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Red</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.042</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_H06</Remarks>
+   <LotID>464420248</LotID>
+  </Item>
+  <Item>
+   <ItemID>21459</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>115</ColorID>
+   <ItemName>Minifigure, Weapon Sword, Shamshir / Katana &amp;#40;Square Guard&amp;#41; with Capped Pommel and Holes in Crossguard and Blade</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Pearl Gold</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.048</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_J49</Remarks>
+   <LotID>484143710</LotID>
+  </Item>
+  <Item>
+   <ItemID>njo0942</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Zane - Dragons Rising, Tunic with Large Armor Plates, Head Wrap</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>1.509</Price>
+   <Condition>U</Condition>
+   <Remarks>UFG_A018</Remarks>
+   <LotID>524821324</LotID>
+  </Item>
+  <Item>
+   <ItemID>njo0896</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Kai - Dragons Rising, Tournament Armor, Scabbard</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>2.510</Price>
+   <Condition>U</Condition>
+   <Remarks>UFG_A144</Remarks>
+   <LotID>525341389</LotID>
+  </Item>
+  <Item>
+   <ItemID>njo0811</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Kai - Dragons Rising, Tunic, Hood</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>1.832</Price>
+   <Condition>U</Condition>
+   <Remarks>UFG_B035</Remarks>
+   <LotID>525363638</LotID>
+  </Item>
+  <Item>
+   <ItemID>36017</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>115</ColorID>
+   <ItemName>Minifigure, Weapon Sword Hilt with Dragon Head</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Pearl Gold</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.146</Price>
+   <Condition>U</Condition>
+   <Remarks>MB_F13</Remarks>
+   <LotID>532745751</LotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

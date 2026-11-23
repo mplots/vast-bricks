@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickLink</Service>
+  <OrderID>31656563</OrderID>
+  <OrderDate>1779273224</OrderDate>
+  <Customer>Stakta</Customer>
+  <SubTotal>3.983</SubTotal>
+  <GrandTotal>9.912</GrandTotal>
+  <Payment>9.910</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>3070</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Tile 1 x 1</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>70</Qty>
+   <Price>0.059</Price>
+   <SalePrice>0.053</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_P30</Remarks>
+   <LotID>463230909</LotID>
+  </Item>
+  <Item>
+   <ItemID>3024</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>7</ColorID>
+   <ItemName>Plate 1 x 1</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Blue</ColorName>
+   <Status>I</Status>
+   <Qty>5</Qty>
+   <Price>0.046</Price>
+   <SalePrice>0.041</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_P24</Remarks>
+   <LotID>463230956</LotID>
+  </Item>
+  <Item>
+   <ItemID>3023</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>98</ColorID>
+   <ItemName>Plate 1 x 2</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Trans-Orange</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.033</Price>
+   <SalePrice>0.030</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>MB_B04</Remarks>
+   <LotID>518617829</LotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

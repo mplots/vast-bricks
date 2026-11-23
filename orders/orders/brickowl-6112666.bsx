@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickOwl</Service>
+  <OrderID>6112666</OrderID>
+  <OrderDate>1777291142</OrderDate>
+  <Customer>Paolo Zanetta</Customer>
+  <SubTotal>0.700</SubTotal>
+  <GrandTotal>7.120</GrandTotal>
+  <Payment>7.120</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>5093</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>34</ColorID>
+   <ItemName>LEGO Lime Slope 2 x 2 x 0.6 Curved Angled Right (5093)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Lime</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.327</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_O43</Remarks>
+   <OrigQty>2</OrigQty>
+   <LotID>513912506</LotID>
+   <OwlID>230058</OwlID>
+   <OwlLotID>209958231</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>7302</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>34</ColorID>
+   <ItemName>LEGO Lime Slope 0.7 x 3 Curved (7302)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Lime</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.375</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_O49</Remarks>
+   <OrigQty>12</OrigQty>
+   <LotID>513912514</LotID>
+   <OwlID>1118557</OwlID>
+   <OwlLotID>209958257</OwlLotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

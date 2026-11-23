@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickLink</Service>
+  <OrderID>32148856</OrderID>
+  <OrderDate>1784710635</OrderDate>
+  <Customer>NISMO400R</Customer>
+  <SubTotal>1.023</SubTotal>
+  <GrandTotal>8.610</GrandTotal>
+  <Payment>8.610</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>32184</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Technic, Axle and Pin Connector Perpendicular 3L with Center Pin Hole</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.121</Price>
+   <SalePrice>0.115</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_A35</Remarks>
+   <LotID>475396999</LotID>
+  </Item>
+  <Item>
+   <ItemID>2412b</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Tile, Modified 1 x 2 Grille with Bottom Groove</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.022</Price>
+   <SalePrice>0.021</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_C12</Remarks>
+   <LotID>519282173</LotID>
+  </Item>
+  <Item>
+   <ItemID>3069</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>12</ColorID>
+   <ItemName>Tile 1 x 2</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Trans-Clear</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.110</Price>
+   <SalePrice>0.105</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_H111</Remarks>
+   <LotID>521630906</LotID>
+  </Item>
+  <Item>
+   <ItemID>3941</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Brick, Round 2 x 2 with Axle Hole</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>10</Qty>
+   <Price>0.052</Price>
+   <SalePrice>0.049</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_A007</Remarks>
+   <LotID>523655191</LotID>
+  </Item>
+  <Item>
+   <ItemID>34103</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Plate, Modified 1 x 3 with 2 Studs &amp;#40;Double Jumper&amp;#41;</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.100</Price>
+   <SalePrice>0.095</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_N42</Remarks>
+   <LotID>524170960</LotID>
+  </Item>
+  <Item>
+   <ItemID>34103</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Plate, Modified 1 x 3 with 2 Studs &amp;#40;Double Jumper&amp;#41;</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.094</Price>
+   <SalePrice>0.089</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_M003</Remarks>
+   <LotID>545112390</LotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

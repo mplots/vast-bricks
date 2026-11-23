@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickLink</Service>
+  <OrderID>31713105</OrderID>
+  <OrderDate>1779894284</OrderDate>
+  <Customer>chefluisfrancis</Customer>
+  <SubTotal>16.588</SubTotal>
+  <GrandTotal>23.549</GrandTotal>
+  <Payment>23.550</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>3626pb0633</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>3</ColorID>
+   <ItemName>Minifigure, Head Female Black Eyebrows and Eyelashes, Dark Orange Lips, Open Mouth Smile with Teeth Pattern</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.268</Price>
+   <SalePrice>0.241</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_E14 (02)</Remarks>
+   <LotID>518672731</LotID>
+  </Item>
+  <Item>
+   <ItemID>3626pb0705</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>90</ColorID>
+   <ItemName>Minifigure, Head Dual Sided Black Eyebrows, Trimmed Moustache and Goatee, Medium Nougat Cheek Lines, Determined Grin / Angry Bared Teeth Pattern</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Nougat</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>1.081</Price>
+   <SalePrice>0.973</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_E11 (04)</Remarks>
+   <LotID>519769599</LotID>
+  </Item>
+  <Item>
+   <ItemID>11692pb02c01</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>80</ColorID>
+   <ItemName>Torso, Modified Short with Armor Breastplate with Shoulder Ridges, Rivets and Ninja Skull with Crossed Swords Pattern / Orange Arms / Reddish Brown Hands</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Green</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>3.281</Price>
+   <SalePrice>2.953</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_B23</Remarks>
+   <LotID>519962215</LotID>
+  </Item>
+  <Item>
+   <ItemID>973pb0989c01</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>63</ColorID>
+   <ItemName>Torso Police Flight Suit Jacket with Name Tag and Badge, Zippered Pockets Pattern / Dark Blue Arms / Dark Bluish Gray Hands</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Blue</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.300</Price>
+   <SalePrice>0.270</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_B25</Remarks>
+   <LotID>519962246</LotID>
+  </Item>
+  <Item>
+   <ItemID>pyroraptor01</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>68</ColorID>
+   <ItemName>Dinosaur Pyroraptor</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Orange</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>10.072</Price>
+   <SalePrice>9.065</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_E05</Remarks>
+   <LotID>525904880</LotID>
+  </Item>
+  <Item>
+   <ItemID>19730</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>156</ColorID>
+   <ItemName>Minifigure, Headgear Helmet Rectangular &amp;#40;Minecraft&amp;#41;</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Medium Azure</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>1.253</Price>
+   <SalePrice>1.128</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>MB_A20</Remarks>
+   <LotID>529518039</LotID>
+  </Item>
+  <Item>
+   <ItemID>11402c</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>95</ColorID>
+   <ItemName>Minifigure, Utensil Tool Oil Can - Ribbed Handle</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Flat Silver</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.086</Price>
+   <SalePrice>0.077</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>MB_F31</Remarks>
+   <LotID>533571800</LotID>
+  </Item>
+  <Item>
+   <ItemID>11402h</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Minifigure, Utensil Tool Cross Pein Hammer - 3-Rib Handle</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.122</Price>
+   <SalePrice>0.110</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>MB_F46</Remarks>
+   <LotID>533813260</LotID>
+  </Item>
+  <Item>
+   <ItemID>11402i</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Minifigure, Utensil Tool Box Wrench - 3-Rib Handle</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.525</Price>
+   <SalePrice>0.472</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>MB_F48</Remarks>
+   <LotID>533813262</LotID>
+  </Item>
+  <Item>
+   <ItemID>973pb2912c01</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>69</ColorID>
+   <ItemName>Torso Vest with Zipper, Pockets and Pouches Over Dark Azure Shirt Pattern / Dark Azure Arms / Yellow Hands</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Tan</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.388</Price>
+   <SalePrice>0.349</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_B05</Remarks>
+   <LotID>534542540</LotID>
+  </Item>
+  <Item>
+   <ItemID>973pb3230c01</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Torso Suit Jacket with Dark Tan Checkered Lines over Dark Red Vest and White Shirt with Collar, Tie Pattern / Black Arms / Light Nougat Hands</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>1.055</Price>
+   <SalePrice>0.950</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_B13</Remarks>
+   <LotID>534542624</LotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

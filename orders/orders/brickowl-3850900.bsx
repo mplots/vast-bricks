@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickOwl</Service>
+  <OrderID>3850900</OrderID>
+  <OrderDate>1787757030</OrderDate>
+  <Customer>Tatjana Djatlovska</Customer>
+  <SubTotal>3.420</SubTotal>
+  <GrandTotal>6.140</GrandTotal>
+  <Payment>6.140</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>18651</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>LEGO Black Axle 2L with Friction Pin (18651)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>3</Qty>
+   <Price>0.032</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_P08</Remarks>
+   <OrigQty>13</OrigQty>
+   <LotID>516942494</LotID>
+   <OwlID>187507</OwlID>
+   <OwlLotID>212940451</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>65414</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>LEGO Medium Stone Gray Technic Differential (65414)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>1.009</Price>
+   <Condition>U</Condition>
+   <Remarks>BD_H17</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>545557034</LotID>
+   <OwlID>953110</OwlID>
+   <OwlLotID>236187285</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>65249</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>1</ColorID>
+   <ItemName>LEGO White Axle 2 with Pin without Friction (65249)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>White</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.074</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_C36</Remarks>
+   <OrigQty>29</OrigQty>
+   <LotID>473357913</LotID>
+   <OwlID>982038</OwlID>
+   <OwlLotID>182487923</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>69778</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>7</ColorID>
+   <ItemName>LEGO Blue Gear with 12 Teeth (69778)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Blue</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.426</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_M02</Remarks>
+   <OrigQty>14</OrigQty>
+   <LotID>489204319</LotID>
+   <OwlID>1298881</OwlID>
+   <OwlLotID>191582539</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>69779</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>153</ColorID>
+   <ItemName>LEGO Dark Azure Gear with 20 Teeth (69779)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Azure</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.540</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_G50</Remarks>
+   <OrigQty>5</OrigQty>
+   <LotID>487648009</LotID>
+   <OwlID>982249</OwlID>
+   <OwlLotID>190613375</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>4368</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>LEGO Medium Stone Gray Engine Crank Offset with Axle Hole (4368)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.295</Price>
+   <Condition>N</Condition>
+   <Remarks>DA_L09</Remarks>
+   <OrigQty>27</OrigQty>
+   <LotID>489204311</LotID>
+   <OwlID>790911</OwlID>
+   <OwlLotID>191582519</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>32524</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>LEGO Black Beam 7 (32524)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>3</Qty>
+   <Price>0.098</Price>
+   <Condition>N</Condition>
+   <Remarks>DA_TU3</Remarks>
+   <OrigQty>43</OrigQty>
+   <LotID>475397033</LotID>
+   <OwlID>413097</OwlID>
+   <OwlLotID>183555385</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>18948</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>1</ColorID>
+   <ItemName>LEGO White Switch Shifter with Axle Holes (18948 \/ 49136)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>White</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.079</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_A115</Remarks>
+   <OrigQty>4</OrigQty>
+   <LotID>539943394</LotID>
+   <OwlID>961187</OwlID>
+   <OwlLotID>232226719</OwlLotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

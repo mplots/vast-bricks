@@ -1,0 +1,430 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickLink</Service>
+  <OrderID>31738787</OrderID>
+  <OrderDate>1780172910</OrderDate>
+  <Customer>Miguel49</Customer>
+  <SubTotal>26.889</SubTotal>
+  <GrandTotal>33.649</GrandTotal>
+  <Payment>33.650</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>98136</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>115</ColorID>
+   <ItemName>Snake, Raised</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Pearl Gold</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.377</Price>
+   <SalePrice>0.339</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>MB_A18</Remarks>
+   <LotID>518364529</LotID>
+  </Item>
+  <Item>
+   <ItemID>3626px288</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>3</ColorID>
+   <ItemName>Minifigure, Head Dark Bluish Gray Thick Eyebrows, Angular Beard and Thick Sideburns, Lopsided Open Mouth Smile with White Teeth Pattern</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.339</Price>
+   <SalePrice>0.305</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_E11 (02)</Remarks>
+   <LotID>518672718</LotID>
+  </Item>
+  <Item>
+   <ItemID>3626pb0894</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>3</ColorID>
+   <ItemName>Minifigure, Head Beard Stubble, Black Angry Eyebrows and Scowl, White Pupils Pattern</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.258</Price>
+   <SalePrice>0.232</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_E11 (02)</Remarks>
+   <LotID>518672725</LotID>
+  </Item>
+  <Item>
+   <ItemID>970c00</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>69</ColorID>
+   <ItemName>Hips  and Legs Plain</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Tan</ColorName>
+   <Status>I</Status>
+   <Qty>6</Qty>
+   <Price>0.391</Price>
+   <SalePrice>0.352</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>MB_A34</Remarks>
+   <LotID>519287443</LotID>
+  </Item>
+  <Item>
+   <ItemID>3626pb0526</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>3</ColorID>
+   <ItemName>Minifigure, Head Black Eyebrows, Dark Orange Scar Across Left Eye, Nougat Cheek Line and Chin Dimple, Scowl Pattern</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.599</Price>
+   <SalePrice>0.539</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_E11 (04)</Remarks>
+   <LotID>519769595</LotID>
+  </Item>
+  <Item>
+   <ItemID>3626pb1213</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>3</ColorID>
+   <ItemName>Minifigure, Head Black Eyebrows, Moustache and Angular Beard, Medium Nougat Wrinkles, Open Mouth Smile with Teeth Pattern</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.369</Price>
+   <SalePrice>0.332</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_E13 (07)</Remarks>
+   <LotID>519769603</LotID>
+  </Item>
+  <Item>
+   <ItemID>3626pb1748</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>3</ColorID>
+   <ItemName>Minifigure, Head Moustache Brown Bushy, Black Eyebrows, Cheek Lines, Smile, White Pupils Pattern</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.326</Price>
+   <SalePrice>0.293</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_E11 (06)</Remarks>
+   <LotID>519769619</LotID>
+  </Item>
+  <Item>
+   <ItemID>970c69pb01</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>88</ColorID>
+   <ItemName>Hips and Dark Tan Legs with Reddish Brown Roman Sword Belt with Gold Medallions Pattern</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Reddish Brown</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.856</Price>
+   <SalePrice>0.770</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>MA_T06</Remarks>
+   <LotID>519848101</LotID>
+  </Item>
+  <Item>
+   <ItemID>sw1116</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Imperial Scout Trooper - Male, Dual Molded Helmet, Light Nougat Head, Cheek Lines</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>5.366</Price>
+   <SalePrice>4.829</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>UFG_A129</Remarks>
+   <LotID>525227102</LotID>
+  </Item>
+  <Item>
+   <ItemID>3626pb2236</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>90</ColorID>
+   <ItemName>Minifigure, Head Dual Sided Black Eyebrows, Upper Eyelids, Medium Nougat Jowl Lines, Chin Dimple and Wrinkles, Furrowed Brow, Stern with Raised Eyebrow Left / Angry Open Mouth Scowl with Teeth Pattern</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Nougat</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.778</Price>
+   <SalePrice>0.700</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_E11 (09)</Remarks>
+   <LotID>528142652</LotID>
+  </Item>
+  <Item>
+   <ItemID>3626pb3013</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>90</ColorID>
+   <ItemName>Minifigure, Head Dual Sided Black Eyebrows, Medium Nougat Chin Dimple, Firm / Smile with Teeth and Raised Left Eyebrow Pattern</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Nougat</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.833</Price>
+   <SalePrice>0.750</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_E13 (01)</Remarks>
+   <LotID>528142669</LotID>
+  </Item>
+  <Item>
+   <ItemID>3626pb1657</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>90</ColorID>
+   <ItemName>Minifigure, Head Dual Sided Female Dark Brown Eyebrows, Black Eyelashes, Nougat Lips, Neutral with Dimple / Open Mouth Scowl with Teeth Pattern</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Nougat</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.993</Price>
+   <SalePrice>0.894</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_E13 (01)</Remarks>
+   <LotID>528142670</LotID>
+  </Item>
+  <Item>
+   <ItemID>3626pb2750</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>3</ColorID>
+   <ItemName>Minifigure, Head Dual Sided Black Eyebrows, Moustache, Goatee, Beard and Sideburns, Medium Nougat Dimples, Open Mouth with Teeth / Frown and Closed Eyes Pattern</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.626</Price>
+   <SalePrice>0.563</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_E12 (01)</Remarks>
+   <LotID>528142677</LotID>
+  </Item>
+  <Item>
+   <ItemID>3626pb2840</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>90</ColorID>
+   <ItemName>Minifigure, Head Dual Sided Black Eyebrows, Dark Orange Cheek Lines, Frown Left Eyebrow Raised / Open Scowl Pattern</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Nougat</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.776</Price>
+   <SalePrice>0.698</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_E12 (01)</Remarks>
+   <LotID>528142679</LotID>
+  </Item>
+  <Item>
+   <ItemID>970c00</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>77</ColorID>
+   <ItemName>Hips  and Legs Plain</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Pearl Dark Gray</ColorName>
+   <Status>I</Status>
+   <Qty>5</Qty>
+   <Price>0.611</Price>
+   <SalePrice>0.550</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>MB_A32</Remarks>
+   <LotID>530167055</LotID>
+  </Item>
+  <Item>
+   <ItemID>970c00</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>88</ColorID>
+   <ItemName>Hips  and Legs Plain</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Reddish Brown</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.432</Price>
+   <SalePrice>0.389</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>MB_E60</Remarks>
+   <LotID>530167056</LotID>
+  </Item>
+  <Item>
+   <ItemID>970c00</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>59</ColorID>
+   <ItemName>Hips  and Legs Plain</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Red</ColorName>
+   <Status>I</Status>
+   <Qty>3</Qty>
+   <Price>0.514</Price>
+   <SalePrice>0.463</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>MA_T26</Remarks>
+   <LotID>530167060</LotID>
+  </Item>
+  <Item>
+   <ItemID>3626pb2124</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>90</ColorID>
+   <ItemName>Minifigure, Head Dual Sided Reddish Brown Eyebrows and Stubble, Medium Nougat Sideburns, Moustache, Cheek Lines, and Chin Dimple, Grin / Determined Pattern</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Nougat</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.462</Price>
+   <SalePrice>0.416</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_E12 (04)</Remarks>
+   <LotID>530439916</LotID>
+  </Item>
+  <Item>
+   <ItemID>3626pb0852</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>3</ColorID>
+   <ItemName>Minifigure, Head Male Brown Beard and Eyebrows, Goatee, Pupils, Teeth Pattern</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.253</Price>
+   <SalePrice>0.228</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_E13 (06)</Remarks>
+   <LotID>530439932</LotID>
+  </Item>
+  <Item>
+   <ItemID>3626pb3677</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>241</ColorID>
+   <ItemName>Minifigure, Head Dual Sided Black Eyebrows, Medium Nougat Cheek Lines, Lopsided Open Mouth Smile / Closed Eyes, Singing Pattern</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Medium Tan</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.460</Price>
+   <SalePrice>0.414</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_E11 (03)</Remarks>
+   <LotID>530445279</LotID>
+  </Item>
+  <Item>
+   <ItemID>3626pb2456</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>3</ColorID>
+   <ItemName>Minifigure, Head Dark Brown Beard Stubble, Dark Brown Eyebrows, Left Raised, Open Mouth, Teeth and Tongue, Scared Pattern</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.399</Price>
+   <SalePrice>0.359</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_E13 (02)</Remarks>
+   <LotID>530445281</LotID>
+  </Item>
+  <Item>
+   <ItemID>3626pb2527</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>3</ColorID>
+   <ItemName>Minifigure, Head Gray Eyebrows, Moustache, Stubble, Sad Face Pattern</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.371</Price>
+   <SalePrice>0.334</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_E12 (09)</Remarks>
+   <LotID>530445287</LotID>
+  </Item>
+  <Item>
+   <ItemID>3626pb1911</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>3</ColorID>
+   <ItemName>Minifigure, Head Dark Tan Eyebrows, Moustache, Stubble and Sideburns with Light Bluish Gray Highlights, Chin Dimple, Lopsided Grin Pattern</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.425</Price>
+   <SalePrice>0.382</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_E11 (03)</Remarks>
+   <LotID>530512381</LotID>
+  </Item>
+  <Item>
+   <ItemID>3626pb2483</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>90</ColorID>
+   <ItemName>Minifigure, Head Reddish Brown Eyebrows, Dark Orange Spots, Medium Nougat Goatee Stubble Pattern</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Nougat</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.946</Price>
+   <SalePrice>0.851</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_E11 (10)</Remarks>
+   <LotID>530512393</LotID>
+  </Item>
+  <Item>
+   <ItemID>3626pb2156</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>90</ColorID>
+   <ItemName>Minifigure, Head Dark Bluish Gray Eyebrows, Dark Orange Jowel Lines, Chin Dimple, and Wrinkles, Frown Pattern</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Nougat</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.665</Price>
+   <SalePrice>0.599</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_E12 (02)</Remarks>
+   <LotID>530512399</LotID>
+  </Item>
+  <Item>
+   <ItemID>3626pb0495</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>3</ColorID>
+   <ItemName>Minifigure, Head Dark Brown Eyebrows, Black Beard Stubble, Dark Orange Scuff Mark, Lopsided Grin Pattern</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.302</Price>
+   <SalePrice>0.272</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_E13 (08)</Remarks>
+   <LotID>530512418</LotID>
+  </Item>
+  <Item>
+   <ItemID>973c000</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>115</ColorID>
+   <ItemName>Torso Plain  / &amp;#40;Same Color&amp;#41; Arms / &amp;#40;Same Color&amp;#41; Hands</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Pearl Gold</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>1.410</Price>
+   <SalePrice>1.269</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_B26</Remarks>
+   <LotID>534542675</LotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

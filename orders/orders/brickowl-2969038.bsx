@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickOwl</Service>
+  <OrderID>2969038</OrderID>
+  <OrderDate>1788649569</OrderDate>
+  <Customer>Jeremy Dillig</Customer>
+  <SubTotal>0.990</SubTotal>
+  <GrandTotal>7.090</GrandTotal>
+  <Payment>7.090</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>3665</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>7</ColorID>
+   <ItemName>LEGO Blue Slope 1 x 2 (45\u00b0) Inverted (3665)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Blue</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.022</Price>
+   <Condition>U</Condition>
+   <Remarks>CM_A011</Remarks>
+   <OrigQty>2</OrigQty>
+   <LotID>556756385</LotID>
+   <OwlID>320373</OwlID>
+   <OwlLotID>245369081</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>13792</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>77</ColorID>
+   <ItemName>LEGO Pearl Dark Gray Welding Mask (13792)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Pearl Dark Gray</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.858</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_N028</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>526581264</LotID>
+   <OwlID>893233</OwlID>
+   <OwlLotID>222168741</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>30553</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>LEGO Medium Stone Gray Hinge Arm with Two Fingers and Axle Hole (30553)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.048</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_M008</Remarks>
+   <OrigQty>5</OrigQty>
+   <LotID>523405030</LotID>
+   <OwlID>811360</OwlID>
+   <OwlLotID>219778017</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>2412b</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>LEGO Black Tile 1 x 2 Grille (with Bottom Groove) (2412 \/ 30244)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.021</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_H102</Remarks>
+   <OrigQty>46</OrigQty>
+   <LotID>519282172</LotID>
+   <OwlID>363948</OwlID>
+   <OwlLotID>214914943</OwlLotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

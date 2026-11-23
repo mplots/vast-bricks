@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickLink</Service>
+  <OrderID>32466549</OrderID>
+  <OrderDate>1788205301</OrderDate>
+  <Customer>maczkodavid</Customer>
+  <SubTotal>10.201</SubTotal>
+  <GrandTotal>16.492</GrandTotal>
+  <Payment>16.490</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>sw1168</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Imperial Stormtrooper - Female, Dual Molded Helmet with Light Bluish Gray Panels on Back, Light Nougat Head, Angry Smile</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>4.364</Price>
+   <SalePrice>4.669</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>UFG_A057</Remarks>
+   <LotID>525103376</LotID>
+  </Item>
+  <Item>
+   <ItemID>sw1167</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Imperial Stormtrooper - Male, Dual Molded Helmet with Light Bluish Gray Panels on Back, Reddish Brown Head, Grimace</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>4.187</Price>
+   <SalePrice>4.480</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>UFG_A103</Remarks>
+   <LotID>525227076</LotID>
+  </Item>
+  <Item>
+   <ItemID>2645</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>59</ColorID>
+   <ItemName>Mini Doll, Hair Female Long, Parted on Side, Swept Back over Forehead, Hole on Top</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Red</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.983</Price>
+   <SalePrice>1.052</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_N028</Remarks>
+   <LotID>526581261</LotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

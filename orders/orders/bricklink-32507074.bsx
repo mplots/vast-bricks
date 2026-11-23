@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickLink</Service>
+  <OrderID>32507074</OrderID>
+  <OrderDate>1788641309</OrderDate>
+  <Customer>Vaultkeeper</Customer>
+  <SubTotal>5.069</SubTotal>
+  <GrandTotal>5.738</GrandTotal>
+  <Payment>5.740</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>6636</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>88</ColorID>
+   <ItemName>Tile 1 x 6</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Reddish Brown</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.096</Price>
+   <SalePrice>0.106</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_I08</Remarks>
+   <LotID>519673165</LotID>
+  </Item>
+  <Item>
+   <ItemID>mnn009</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Minion Stuart - Bright Light Orange Jumpsuit</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>3.222</Price>
+   <SalePrice>3.544</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>UFG_C035</Remarks>
+   <LotID>528144846</LotID>
+  </Item>
+  <Item>
+   <ItemID>cty1727</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Alien - Minifigure Head, Tentacles</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>1.290</Price>
+   <SalePrice>1.419</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>UFG_C044</Remarks>
+   <LotID>529140023</LotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

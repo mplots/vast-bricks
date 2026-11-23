@@ -1,0 +1,739 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickOwl</Service>
+  <OrderID>1957037</OrderID>
+  <OrderDate>1789932631</OrderDate>
+  <Customer>Morten Gorm Givskov</Customer>
+  <SubTotal>26.850</SubTotal>
+  <GrandTotal>36.110</GrandTotal>
+  <Payment>36.110</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>522</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>LEGO Black Standard Cape with Standard Fabric (20458 \/ 50231)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>2.541</Price>
+   <Condition>U</Condition>
+   <Remarks>BD_E20</Remarks>
+   <OrigQty>2</OrigQty>
+   <LotID>534405272</LotID>
+   <OwlID>411487</OwlID>
+   <OwlLotID>228171557</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>3626pb3346</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>16</ColorID>
+   <ItemName>LEGO Transparent Neon Green Ghose Skull Face (28621 \/ 71212)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Trans-Neon Green</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.430</Price>
+   <Condition>U</Condition>
+   <Remarks>BD_E12 (02)</Remarks>
+   <OrigQty>2</OrigQty>
+   <LotID>530439928</LotID>
+   <OwlID>623741</OwlID>
+   <OwlLotID>225229773</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>3626pb2768</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>154</ColorID>
+   <ItemName>LEGO Lavender Head with Tusks Medium Lavender Tattoos (Rumble Keeper) (3626 \/ 71542)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Lavender</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.392</Price>
+   <Condition>U</Condition>
+   <Remarks>BD_E13 (03)</Remarks>
+   <OrigQty>2</OrigQty>
+   <LotID>530442884</LotID>
+   <OwlID>956926</OwlID>
+   <OwlLotID>225232993</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>3626pb1918</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>3</ColorID>
+   <ItemName>LEGO Yellow Great White Shark Army Minifigure Head (3626 \/ 34082)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.391</Price>
+   <Condition>U</Condition>
+   <Remarks>BD_E13 (02)</Remarks>
+   <OrigQty>3</OrigQty>
+   <LotID>519769591</LotID>
+   <OwlID>402624</OwlID>
+   <OwlLotID>215439377</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>3626pb1937</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>3</ColorID>
+   <ItemName>LEGO Yellow Head with Grimace and Black Goatee (3626 \/ 34011)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.341</Price>
+   <Condition>U</Condition>
+   <Remarks>BD_E13 (10)</Remarks>
+   <OrigQty>2</OrigQty>
+   <LotID>519769630</LotID>
+   <OwlID>629330</OwlID>
+   <OwlLotID>215439379</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>3626pb1889</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>3</ColorID>
+   <ItemName>LEGO Yellow Dual Sided Kai Head with Scar and Bandage Strip (3626 \/ 33812)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.236</Price>
+   <Condition>U</Condition>
+   <Remarks>BD_E13 (07)</Remarks>
+   <OrigQty>4</OrigQty>
+   <LotID>530439937</LotID>
+   <OwlID>453858</OwlID>
+   <OwlLotID>225229719</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>3626pb2424</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>3</ColorID>
+   <ItemName>LEGO Yellow Wu Minifigure Head (3626 \/ 45086)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.896</Price>
+   <Condition>U</Condition>
+   <Remarks>BD_E13 (04)</Remarks>
+   <OrigQty>2</OrigQty>
+   <LotID>519769640</LotID>
+   <OwlID>205157</OwlID>
+   <OwlLotID>215439399</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>65183</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>LEGO Black Shoulder Armor with Double Scabbard and Bar Hole (65183 \/ 78133)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.548</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_H052</Remarks>
+   <OrigQty>2</OrigQty>
+   <LotID>534407636</LotID>
+   <OwlID>859713</OwlID>
+   <OwlLotID>228172043</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>970c00pb1591</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>63</ColorID>
+   <ItemName>LEGO Dark Blue Wolf Mask Warrior Legs (73200 \/ 105531)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Blue</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.363</Price>
+   <Condition>U</Condition>
+   <Remarks>BD_E16 (04)</Remarks>
+   <OrigQty>2</OrigQty>
+   <LotID>531359758</LotID>
+   <OwlID>1057349</OwlID>
+   <OwlLotID>226049545</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>970c00pb0768</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>120</ColorID>
+   <ItemName>LEGO Dark Brown Hips and Legs with Dark Orange Belt (34478 \/ 73200)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Brown</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.342</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_G078</Remarks>
+   <OrigQty>2</OrigQty>
+   <LotID>519848131</LotID>
+   <OwlID>854749</OwlID>
+   <OwlLotID>215482329</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>3626pb1890</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>3</ColorID>
+   <ItemName>LEGO Yellow Lloyd with Tan hair Minifigure Head (3626 \/ 33869)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>3</Qty>
+   <Price>0.218</Price>
+   <Condition>U</Condition>
+   <Remarks>BD_E13 (10)</Remarks>
+   <OrigQty>5</OrigQty>
+   <LotID>519769625</LotID>
+   <OwlID>707823</OwlID>
+   <OwlLotID>215439367</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>973pb3399c01</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>7</ColorID>
+   <ItemName>LEGO Blue Jay Minifig Torso (3814 \/ 76382)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Blue</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.352</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_B16</Remarks>
+   <OrigQty>2</OrigQty>
+   <LotID>519962255</LotID>
+   <OwlID>129777</OwlID>
+   <OwlLotID>215550407</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>970c00pb1458</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>LEGO Black Legs with Pattern (73200 \/ 101615)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.495</Price>
+   <Condition>U</Condition>
+   <Remarks>BD_E16 (09)</Remarks>
+   <OrigQty>4</OrigQty>
+   <LotID>531359775</LotID>
+   <OwlID>1352605</OwlID>
+   <OwlLotID>226049541</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>26007</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>5</ColorID>
+   <ItemName>LEGO Red Samurai Hat (3616 \/ 26007)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Red</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.310</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_N024</Remarks>
+   <OrigQty>4</OrigQty>
+   <LotID>529330632</LotID>
+   <OwlID>151779</OwlID>
+   <OwlLotID>224378937</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>76918</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>LEGO Black Scuba Regulator and Air Tank with Scabbard and Belt (76918)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>3</Qty>
+   <Price>0.489</Price>
+   <Condition>U</Condition>
+   <Remarks>BD_E20</Remarks>
+   <OrigQty>3</OrigQty>
+   <LotID>534405270</LotID>
+   <OwlID>1258367</OwlID>
+   <OwlLotID>228171587</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>86124</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>50</ColorID>
+   <ItemName>LEGO Transparent Dark Pink Shoulder Armor with Crystal Shards and 2 Back Studs (86124)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Trans-Dark Pink</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.791</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_N114</Remarks>
+   <OrigQty>2</OrigQty>
+   <LotID>534405311</LotID>
+   <OwlID>259511</OwlID>
+   <OwlLotID>228171597</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>973pb4747c01</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>77</ColorID>
+   <ItemName>LEGO Pearl Dark Gray Crystalized General Torso (3814 \/ 76382)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Pearl Dark Gray</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.817</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_B01</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>541324133</LotID>
+   <OwlID>1351044</OwlID>
+   <OwlLotID>233049093</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>973pb2827c01</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>55</ColorID>
+   <ItemName>LEGO Sand Blue Minifig Torso Scuba Suit with Utility Belt Print with 3 Pouches Front, 3 Pouches Back (3814 \/ 76382)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Sand Blue</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.374</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_B24</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>519962232</LotID>
+   <OwlID>941920</OwlID>
+   <OwlLotID>215550395</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>3626pb2249</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>3</ColorID>
+   <ItemName>LEGO Yellow Nya as Samurai X Minifigure Head (3626 \/ 49569)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.329</Price>
+   <Condition>U</Condition>
+   <Remarks>BD_E12 (10)</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>530445289</LotID>
+   <OwlID>287021</OwlID>
+   <OwlLotID>225232959</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>3626pb1892</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>3</ColorID>
+   <ItemName>LEGO Yellow Head Reddish Brown Eyebrows and Freckles Pattern (3626 \/ 33849)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>3</Qty>
+   <Price>0.297</Price>
+   <Condition>U</Condition>
+   <Remarks>BD_E14 (01)</Remarks>
+   <OrigQty>3</OrigQty>
+   <LotID>530439927</LotID>
+   <OwlID>419741</OwlID>
+   <OwlLotID>225229721</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>970c00pb0232</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>LEGO Black Razar Legs (12946 \/ 73200)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.194</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_N070</Remarks>
+   <OrigQty>2</OrigQty>
+   <LotID>519848149</LotID>
+   <OwlID>277773</OwlID>
+   <OwlLotID>215482293</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>970c01pb19</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>115</ColorID>
+   <ItemName>LEGO Pearl Gold Minifigure Hips and Legs with Gold Scaled Armor (13115 \/ 73200)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Pearl Gold</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.188</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_G083</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>541324125</LotID>
+   <OwlID>328591</OwlID>
+   <OwlLotID>233049061</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>3626pb1292</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>LEGO Dark Stone Gray Saber Tooth Tiger Tribe Warrior with Minifigure Head (3626 \/ 19659)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.269</Price>
+   <Condition>U</Condition>
+   <Remarks>BD_E11 (05)</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>519769609</LotID>
+   <OwlID>640593</OwlID>
+   <OwlLotID>215439329</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>12550pb03</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>LEGO Black Raven Mask with Silver Beak and Red Markings (12550 \/ 12845)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.165</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_H055</Remarks>
+   <OrigQty>2</OrigQty>
+   <LotID>519743726</LotID>
+   <OwlID>740958</OwlID>
+   <OwlLotID>215439197</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>2555</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>LEGO Dark Stone Gray Tile 1 x 1 with Clip (No Cut in Center) (2555 \/ 12825)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.081</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_N008</Remarks>
+   <OrigQty>9</OrigQty>
+   <LotID>523699851</LotID>
+   <OwlID>369885</OwlID>
+   <OwlLotID>219988787</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>12549pb04</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>1</ColorID>
+   <ItemName>LEGO White Eagle Mask with Gold Tiara and Blue Feathers (12549 \/ 12849)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>White</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.149</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_N073</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>549477661</LotID>
+   <OwlID>348248</OwlID>
+   <OwlLotID>239344053</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>98313</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>LEGO Black Mechanical Arm with Thick Support (49753 \/ 76116)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>6</Qty>
+   <Price>0.028</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_M116</Remarks>
+   <OrigQty>6</OrigQty>
+   <LotID>523655246</LotID>
+   <OwlID>60308</OwlID>
+   <OwlLotID>219941137</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>3626pb0898</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>105</ColorID>
+   <ItemName>LEGO Bright Light Blue Eris With Pearl Gold Shoulder Armor and Chi Head (3626 \/ 12858)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Bright Light Blue</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.169</Price>
+   <Condition>U</Condition>
+   <Remarks>BD_E13 (01)</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>549477646</LotID>
+   <OwlID>647161</OwlID>
+   <OwlLotID>239344069</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>970c00pb0318</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>5</ColorID>
+   <ItemName>LEGO Red Minifigure Hips and Legs with Belt, Armor with Scales and Gold Knee Pads (17537 \/ 73200)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Red</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.173</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_H036</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>519287449</LotID>
+   <OwlID>804716</OwlID>
+   <OwlLotID>214915705</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>3941</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>12</ColorID>
+   <ItemName>LEGO Transparent Brick 2 x 2 Round (3941 \/ 6143)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Trans-Clear</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.084</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_A009</Remarks>
+   <OrigQty>9</OrigQty>
+   <LotID>523655195</LotID>
+   <OwlID>997602</OwlID>
+   <OwlLotID>219941077</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>3622</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>2</ColorID>
+   <ItemName>LEGO Tan Brick 1 x 3 (3622)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Tan</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.046</Price>
+   <Condition>U</Condition>
+   <Remarks>BD_M19</Remarks>
+   <OrigQty>25</OrigQty>
+   <LotID>519122815</LotID>
+   <OwlID>367537</OwlID>
+   <OwlLotID>214732359</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>3069</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>88</ColorID>
+   <ItemName>LEGO Reddish Brown Tile 1 x 2 with Groove (3069 \/ 113477)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Reddish Brown</ColorName>
+   <Status>I</Status>
+   <Qty>6</Qty>
+   <Price>0.065</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_H101</Remarks>
+   <OrigQty>12</OrigQty>
+   <LotID>519673192</LotID>
+   <OwlID>487300</OwlID>
+   <OwlLotID>215276849</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>3004</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>69</ColorID>
+   <ItemName>LEGO Dark Tan Brick 1 x 2 with Bottom Tube (3004)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Tan</ColorName>
+   <Status>I</Status>
+   <Qty>6</Qty>
+   <Price>0.047</Price>
+   <Condition>U</Condition>
+   <Remarks>BD_M05</Remarks>
+   <OrigQty>29</OrigQty>
+   <LotID>550872405</LotID>
+   <OwlID>442413</OwlID>
+   <OwlLotID>240690391</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>6541</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>103</ColorID>
+   <ItemName>LEGO Bright Light Yellow Brick 1 x 1 with Hole (6541)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Bright Light Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>3</Qty>
+   <Price>0.056</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_A087</Remarks>
+   <OrigQty>3</OrigQty>
+   <LotID>537807689</LotID>
+   <OwlID>668419</OwlID>
+   <OwlLotID>230452005</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>17485pb007</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>7</ColorID>
+   <ItemName>LEGO Blue Brick 2 x 2 Round with Holes with Toad Torso with White and Gold (17485 \/ 68969)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Blue</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.441</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_N102</Remarks>
+   <OrigQty>3</OrigQty>
+   <LotID>537821385</LotID>
+   <OwlID>203669</OwlID>
+   <OwlLotID>230462341</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>66855pb04</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>1</ColorID>
+   <ItemName>LEGO White Brick 3 x 3 x 2 Cube with 2 x 2 Studs on Top with Blue Circles (66855 \/ 79532)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>White</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.374</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_B71</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>539207028</LotID>
+   <OwlID>1013786</OwlID>
+   <OwlLotID>231600237</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>3068pb1370</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>69</ColorID>
+   <ItemName>LEGO Dark Tan Tile 2 x 2 with Hammer Turntable Scanner Code with Groove (3068 \/ 69494)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Tan</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.171</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_A016</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>537664972</LotID>
+   <OwlID>167629</OwlID>
+   <OwlLotID>230360247</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>77095pb01</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>1</ColorID>
+   <ItemName>LEGO White Large Left Wing with Blue Side (77095)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>White</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.675</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_N109</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>560303911</LotID>
+   <OwlID>869428</OwlID>
+   <OwlLotID>247969335</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>77090pb01</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>1</ColorID>
+   <ItemName>LEGO White Large Right Wing with Blue Side (77090)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>White</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.619</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_A074</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>560303907</LotID>
+   <OwlID>229255</OwlID>
+   <OwlLotID>247969333</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>11211pb03</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>90</ColorID>
+   <ItemName>LEGO Light Flesh Brick 1 x 2 with Studs on One Side with Toadette Face with Bottom Tube (11211 \/ 72282)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Nougat</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.261</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_N059</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>549031993</LotID>
+   <OwlID>976251</OwlID>
+   <OwlLotID>239154155</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>3068pb1375</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>68</ColorID>
+   <ItemName>LEGO Dark Orange Tile 2 x 2 with Paragoomba Face Looking Left with Groove (3068 \/ 68912)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Orange</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.145</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_A016</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>537660224</LotID>
+   <OwlID>400597</OwlID>
+   <OwlLotID>230358599</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>3003pb131</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>2</ColorID>
+   <ItemName>LEGO Tan Brick 2 x 2 with Poison Mushroom Eyes (3003 \/ 76906)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Tan</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.184</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_A045</Remarks>
+   <OrigQty>2</OrigQty>
+   <LotID>537821377</LotID>
+   <OwlID>311630</OwlID>
+   <OwlLotID>230462349</OwlLotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

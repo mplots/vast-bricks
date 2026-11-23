@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickOwl</Service>
+  <OrderID>8170410</OrderID>
+  <OrderDate>1780425426</OrderDate>
+  <Customer>Maty\u00e1\u0161 Horehle\u010f</Customer>
+  <SubTotal>2.260</SubTotal>
+  <GrandTotal>7.400</GrandTotal>
+  <Payment>7.400</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>3626pb2259</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>90</ColorID>
+   <ItemName>LEGO Light Flesh Horace Slughorn Minifigure Head (3626 \/ 68544)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Nougat</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>1.237</Price>
+   <Condition>U</Condition>
+   <Remarks>BD_E12 (08)</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>530442892</LotID>
+   <OwlID>110641</OwlID>
+   <OwlLotID>225232961</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>18822</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>59</ColorID>
+   <ItemName>LEGO Dark Red Turban without Hole (18822 \/ 86224)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Red</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>1.024</Price>
+   <Condition>U</Condition>
+   <Remarks>MB_E29</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>526581271</LotID>
+   <OwlID>487819</OwlID>
+   <OwlLotID>222168749</OwlLotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

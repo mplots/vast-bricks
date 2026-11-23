@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickLink</Service>
+  <OrderID>29634148</OrderID>
+  <OrderDate>1760748689</OrderDate>
+  <Customer>justpoorboy</Customer>
+  <SubTotal>13.660</SubTotal>
+  <GrandTotal>20.565</GrandTotal>
+  <Payment>23.950</Payment>
+  <Currency>USD</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>6636</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Tile 1 x 6</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.139</Price>
+   <SalePrice>0.097</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>DA_E04</Remarks>
+   <LotID>463231097</LotID>
+  </Item>
+  <Item>
+   <ItemID>min010</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Zombie - Dark Purple Legs</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>1.653</Price>
+   <SalePrice>1.157</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>DA_A07</Remarks>
+   <LotID>464612739</LotID>
+  </Item>
+  <Item>
+   <ItemID>col27-12</ItemID>
+   <ItemTypeID>S</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Steampunk Inventor, Series 27 &amp;#40;Complete Set with Stand and Accessories&amp;#41;</ItemName>
+   <ItemTypeName>Set</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>3.922</Price>
+   <SalePrice>2.745</SalePrice>
+   <Condition>N</Condition>
+   <Completeness>S</Completeness>
+   <Remarks>FG_C06</Remarks>
+   <LotID>465133571</LotID>
+  </Item>
+  <Item>
+   <ItemID>col27-7</ItemID>
+   <ItemTypeID>S</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Longboarder, Series 27 &amp;#40;Complete Set with Stand and Accessories&amp;#41;</ItemName>
+   <ItemTypeName>Set</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>3.072</Price>
+   <SalePrice>2.150</SalePrice>
+   <Condition>N</Condition>
+   <Completeness>S</Completeness>
+   <Remarks>FG_C11</Remarks>
+   <LotID>465449732</LotID>
+  </Item>
+  <Item>
+   <ItemID>col27-8</ItemID>
+   <ItemTypeID>S</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Bogeyman, Series 27 &amp;#40;Complete Set with Stand and Accessories&amp;#41;</ItemName>
+   <ItemTypeName>Set</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>3.662</Price>
+   <SalePrice>2.563</SalePrice>
+   <Condition>N</Condition>
+   <Completeness>S</Completeness>
+   <Remarks>FG_C09</Remarks>
+   <LotID>465656775</LotID>
+  </Item>
+  <Item>
+   <ItemID>col27-4</ItemID>
+   <ItemTypeID>S</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Astronomer Kid, Series 27 &amp;#40;Complete Set with Stand and Accessories&amp;#41;</ItemName>
+   <ItemTypeName>Set</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>3.138</Price>
+   <SalePrice>2.197</SalePrice>
+   <Condition>N</Condition>
+   <Completeness>S</Completeness>
+   <Remarks>FG_C10</Remarks>
+   <LotID>466081091</LotID>
+  </Item>
+  <Item>
+   <ItemID>col27-6</ItemID>
+   <ItemTypeID>S</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Pterodactyl Costume Fan, Series 27 &amp;#40;Complete Set with Stand and Accessories&amp;#41;</ItemName>
+   <ItemTypeName>Set</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>3.493</Price>
+   <SalePrice>2.445</SalePrice>
+   <Condition>N</Condition>
+   <Completeness>S</Completeness>
+   <Remarks>FG_A15</Remarks>
+   <LotID>479221123</LotID>
+  </Item>
+  <Item>
+   <ItemID>4162</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Tile 1 x 8</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.156</Price>
+   <SalePrice>0.109</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>DA_C09</Remarks>
+   <LotID>486000443</LotID>
+  </Item>
+  <Item>
+   <ItemID>38648c01</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Minifigure, Utensil Magnifying Glass Thick Frame and Hollow Handle with Trans-Clear Lens</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.141</Price>
+   <SalePrice>0.099</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_L33</Remarks>
+   <LotID>500626773</LotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

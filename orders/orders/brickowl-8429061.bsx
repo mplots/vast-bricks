@@ -1,0 +1,399 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickOwl</Service>
+  <OrderID>8429061</OrderID>
+  <OrderDate>1786723537</OrderDate>
+  <Customer>Rotem Levy-Guri</Customer>
+  <SubTotal>32.350</SubTotal>
+  <GrandTotal>39.150</GrandTotal>
+  <Payment>39.150</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>3069pb1016</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>2</ColorID>
+   <ItemName>LEGO Tan Tile 1 x 2 with &amp;#039;THE DARK MARK&amp;#039; and Book Page with Groove (3069 \/ 78547)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Tan</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.323</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_A049</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>548571819</LotID>
+   <OwlID>188993</OwlID>
+   <OwlLotID>238838115</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>24324</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>88</ColorID>
+   <ItemName>LEGO Reddish Brown Book Half with Two Studs (24324 \/ 28684)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Reddish Brown</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.158</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_H030</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>548558201</LotID>
+   <OwlID>306687</OwlID>
+   <OwlLotID>238832273</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>24093</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>88</ColorID>
+   <ItemName>LEGO Reddish Brown Book Cover (24093 \/ 29167)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Reddish Brown</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.171</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_M52</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>509465677</LotID>
+   <OwlID>335303</OwlID>
+   <OwlLotID>205157035</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>32607</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>36</ColorID>
+   <ItemName>LEGO Bright Green Plate 1 x 1 Plant with 3 Leaves (32607)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Bright Green</ColorName>
+   <Status>I</Status>
+   <Qty>10</Qty>
+   <Price>0.029</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_I34</Remarks>
+   <OrigQty>12</OrigQty>
+   <LotID>491920520</LotID>
+   <OwlID>885757</OwlID>
+   <OwlLotID>193079475</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>njo0821</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>LEGO Rapton with Shoulder Armor Minifigure</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>1.707</Price>
+   <Condition>U</Condition>
+   <Remarks>UFG_B043</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>525363646</LotID>
+   <OwlID>920977</OwlID>
+   <OwlLotID>221193157</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>970c00pb0689</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>LEGO Black Hips and Legs with Dark Red Diamond Pattern, Armor and Belt (33831 \/ 34785)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.241</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_G082</Remarks>
+   <OrigQty>3</OrigQty>
+   <LotID>519848140</LotID>
+   <OwlID>462637</OwlID>
+   <OwlLotID>215482311</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>coldnd01</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>LEGO Dwarf Barbarian Minifigure</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>2.769</Price>
+   <Condition>U</Condition>
+   <Remarks>UFG_A161</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>525341406</LotID>
+   <OwlID>373832</OwlID>
+   <OwlLotID>221193023</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>coldnd06</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>LEGO Aarakocra Ranger Minifigure</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>2.856</Price>
+   <Condition>U</Condition>
+   <Remarks>UFG_A012</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>524697572</LotID>
+   <OwlID>1235653</OwlID>
+   <OwlLotID>220701937</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>coldnd11</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>LEGO Szass Tam Minifigure</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>2.901</Price>
+   <Condition>U</Condition>
+   <Remarks>UFG_A006</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>524697566</LotID>
+   <OwlID>957067</OwlID>
+   <OwlLotID>220701943</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>coldnd08</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>LEGO Strahd von Zarovich Minifigure</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>3.029</Price>
+   <Condition>U</Condition>
+   <Remarks>UFG_B058</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>526150257</LotID>
+   <OwlID>1115742</OwlID>
+   <OwlLotID>221806161</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>coldnd07</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>LEGO Mind Flayer Minifigure</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>3.046</Price>
+   <Condition>U</Condition>
+   <Remarks>UFG_A009</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>524697569</LotID>
+   <OwlID>816936</OwlID>
+   <OwlLotID>220701939</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>970c00pb1102</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>120</ColorID>
+   <ItemName>LEGO Dark Brown Vaughn Geist Minifigure Hips and Legs (68110 \/ 73200)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Brown</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.680</Price>
+   <Condition>U</Condition>
+   <Remarks>BD_E16 (05)</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>531359765</LotID>
+   <OwlID>327153</OwlID>
+   <OwlLotID>226049471</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>973pb4666c01</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>150</ColorID>
+   <ItemName>LEGO Medium Dark Flesh Professor Mad-Eye Moody Minifig Torso (3814 \/ 76382)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Medium Nougat</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>1.627</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_B03</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>534542518</LotID>
+   <OwlID>749335</OwlID>
+   <OwlLotID>228274043</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>973pb3522c01</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>68</ColorID>
+   <ItemName>LEGO Dark Orange Hercules Minifig Torso (3814 \/ 88585)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Orange</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.747</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_B21</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>534763572</LotID>
+   <OwlID>908461</OwlID>
+   <OwlLotID>228392901</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>4498</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>LEGO Black Arrow Quiver (4498 \/ 88413)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.432</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_N096</Remarks>
+   <OrigQty>3</OrigQty>
+   <LotID>534405312</LotID>
+   <OwlID>173046</OwlID>
+   <OwlLotID>228171551</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>27145</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>68</ColorID>
+   <ItemName>LEGO Dark Orange Utility Belt (27145 \/ 28791)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Orange</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.312</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_H042</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>535243569</LotID>
+   <OwlID>756059</OwlID>
+   <OwlLotID>228729503</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>3626pb2293</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>90</ColorID>
+   <ItemName>LEGO Light Flesh Princess Leia Minifigure Head (3626 \/ 47183)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Nougat</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>1.244</Price>
+   <Condition>U</Condition>
+   <Remarks>BD_E13 (08)</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>530512420</LotID>
+   <OwlID>919066</OwlID>
+   <OwlLotID>225264427</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>3626pb3673</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>4</ColorID>
+   <ItemName>LEGO Orange Tiefling Sorcerer Male Head (3626 \/ 108143)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Orange</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.285</Price>
+   <Condition>U</Condition>
+   <Remarks>BD_E13 (04)</Remarks>
+   <OrigQty>2</OrigQty>
+   <LotID>530439945</LotID>
+   <OwlID>1192762</OwlID>
+   <OwlLotID>225229775</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>5829pb01</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>5</ColorID>
+   <ItemName>LEGO Red Baby Dragon with Folded Wings with Black Eyes (5829 \/ 108202)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Red</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>2.232</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_N042</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>529137861</LotID>
+   <OwlID>907846</OwlID>
+   <OwlLotID>224227949</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>5502</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>115</ColorID>
+   <ItemName>LEGO Pearl Gold Baby Dragon with Spread Wings (5502)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Pearl Gold</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>1.836</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_N045</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>529137832</LotID>
+   <OwlID>556178</OwlID>
+   <OwlLotID>224227947</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>coldnd09</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>LEGO Elf Bard Minifigure</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>2.900</Price>
+   <Condition>U</Condition>
+   <Remarks>UFG_A011</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>524697571</LotID>
+   <OwlID>1014886</OwlID>
+   <OwlLotID>220701941</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>coldnd03</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>LEGO Tiefling Sorcerer Minifigure</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>2.560</Price>
+   <Condition>U</Condition>
+   <Remarks>UFG_A024</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>524821330</LotID>
+   <OwlID>613236</OwlID>
+   <OwlLotID>220815419</OwlLotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

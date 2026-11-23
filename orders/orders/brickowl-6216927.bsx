@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickOwl</Service>
+  <OrderID>6216927</OrderID>
+  <OrderDate>1784061083</OrderDate>
+  <Customer>Bas Esselbrugge</Customer>
+  <SubTotal>9.740</SubTotal>
+  <GrandTotal>15.420</GrandTotal>
+  <Payment>15.420</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>970c00pb0091</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>5</ColorID>
+   <ItemName>LEGO Red Minifigure Hips and Legs with Dark Red Sash (93755 \/ 94300)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Red</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.347</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_H035</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>519287448</LotID>
+   <OwlID>314929</OwlID>
+   <OwlLotID>214915697</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>970c00pb0127</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>1</ColorID>
+   <ItemName>LEGO White Minifigure Hips and Legs with Zane ZX Design (13569 \/ 99364)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>White</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.331</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_N050</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>549477670</LotID>
+   <OwlID>156048</OwlID>
+   <OwlLotID>239344107</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>98130pb01</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>LEGO Dark Stone Gray Kendo Helmet with White Grille (98130 \/ 99201)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.303</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_H033</Remarks>
+   <OrigQty>2</OrigQty>
+   <LotID>518364413</LotID>
+   <OwlID>534684</OwlID>
+   <OwlLotID>214231415</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>970c00pb0589</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>1</ColorID>
+   <ItemName>LEGO White Zane Legs (26616 \/ 73200)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>White</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.295</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_G082</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>519848143</LotID>
+   <OwlID>384901</OwlID>
+   <OwlLotID>215482305</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>973pb0995c01</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>1</ColorID>
+   <ItemName>LEGO White Zane ZX Torso Assembly (76382 \/ 88585)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>White</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.579</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_B41</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>549477671</LotID>
+   <OwlID>104955</OwlID>
+   <OwlLotID>239344113</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>3626pb0521</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>3</ColorID>
+   <ItemName>LEGO Yellow Minifigure Head with Angry Scowl (13794 \/ 93621)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>1.920</Price>
+   <Condition>U</Condition>
+   <Remarks>BD_E11 (01)</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>549477668</LotID>
+   <OwlID>81651</OwlID>
+   <OwlLotID>239344065</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>3626pb0654</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>3</ColorID>
+   <ItemName>LEGO Yellow Young Lloyd Head (10931 \/ 98717)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>5.657</Price>
+   <Condition>U</Condition>
+   <Remarks>BD_E13 (01)</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>549477635</LotID>
+   <OwlID>160232</OwlID>
+   <OwlLotID>239344067</OwlLotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

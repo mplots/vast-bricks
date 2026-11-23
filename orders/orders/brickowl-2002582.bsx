@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickOwl</Service>
+  <OrderID>2002582</OrderID>
+  <OrderDate>1762733272</OrderDate>
+  <Customer>Shiro Yoshie</Customer>
+  <SubTotal>3.340</SubTotal>
+  <GrandTotal>7.610</GrandTotal>
+  <Payment>7.610</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>3386</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>152</ColorID>
+   <ItemName>LEGO Light Aqua Brick 1 x 1 x 0.7 Round with Side Stud (3386)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Aqua</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.117</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_F40</Remarks>
+   <OrigQty>4</OrigQty>
+   <LotID>482159002</LotID>
+   <OwlID>1123554</OwlID>
+   <OwlLotID>187696459</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>3386</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>LEGO Medium Stone Gray Brick 1 x 1 x 0.7 Round with Side Stud (3386)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.165</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_F57</Remarks>
+   <OrigQty>14</OrigQty>
+   <LotID>463230957</LotID>
+   <OwlID>1123554</OwlID>
+   <OwlLotID>175978839</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>3171</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>156</ColorID>
+   <ItemName>LEGO Medium Azure Claw with Clip (Angled) (3171)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Medium Azure</ColorName>
+   <Status>I</Status>
+   <Qty>12</Qty>
+   <Price>0.204</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_I57</Remarks>
+   <OrigQty>12</OrigQty>
+   <LotID>491920497</LotID>
+   <OwlID>1352080</OwlID>
+   <OwlLotID>193079471</OwlLotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

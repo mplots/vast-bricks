@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickLink</Service>
+  <OrderID>30629888</OrderID>
+  <OrderDate>1769771787</OrderDate>
+  <Customer>abod</Customer>
+  <SubTotal>6.519</SubTotal>
+  <GrandTotal>13.636</GrandTotal>
+  <Payment>16.320</Payment>
+  <Currency>USD</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>98132</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>115</ColorID>
+   <ItemName>Minifigure Armor Shoulder Pads Stepped with Scabbard for 2 Katanas</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Pearl Gold</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.418</Price>
+   <SalePrice>0.376</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>MA_R20</Remarks>
+   <LotID>518364506</LotID>
+  </Item>
+  <Item>
+   <ItemID>njo0044</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Zane Kendo</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>4.563</Price>
+   <SalePrice>4.107</SalePrice>
+   <Condition>U</Condition>
+   <LotID>518405418</LotID>
+  </Item>
+  <Item>
+   <ItemID>njo0053</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Zane ZX</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>2.262</Price>
+   <SalePrice>2.036</SalePrice>
+   <Condition>U</Condition>
+   <LotID>518653216</LotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

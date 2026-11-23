@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickOwl</Service>
+  <OrderID>1569386</OrderID>
+  <OrderDate>1775590054</OrderDate>
+  <Customer>John van den Bos</Customer>
+  <SubTotal>3.670</SubTotal>
+  <GrandTotal>9.350</GrandTotal>
+  <Payment>9.350</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>3626pb3180</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>155</ColorID>
+   <ItemName>LEGO Olive Green Orc Head (3626)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Olive Green</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>3.665</Price>
+   <Condition>U</Condition>
+   <Remarks>DB_E13 (09)</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>530512426</LotID>
+   <OwlID>1106807</OwlID>
+   <OwlLotID>225264471</OwlLotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

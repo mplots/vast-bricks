@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickLink</Service>
+  <OrderID>32019626</OrderID>
+  <OrderDate>1783247591</OrderDate>
+  <Customer>Rp9310W</Customer>
+  <SubTotal>22.191</SubTotal>
+  <GrandTotal>41.934</GrandTotal>
+  <Payment>41.930</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>min103</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Explorer</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>1.966</Price>
+   <SalePrice>2.379</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>UFG_A046</Remarks>
+   <LotID>525103365</LotID>
+  </Item>
+  <Item>
+   <ItemID>min216</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Garrett</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>4.975</Price>
+   <SalePrice>6.020</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>UFG_A167</Remarks>
+   <LotID>525341412</LotID>
+  </Item>
+  <Item>
+   <ItemID>min208</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Steve - A Minecraft Movie</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>4.228</Price>
+   <SalePrice>5.116</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>UFG_A172</Remarks>
+   <LotID>525341417</LotID>
+  </Item>
+  <Item>
+   <ItemID>min217</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Henry</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>2.841</Price>
+   <SalePrice>3.437</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>UFG_B011</Remarks>
+   <LotID>525363614</LotID>
+  </Item>
+  <Item>
+   <ItemID>min117</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Piglin - Pearl Gold Legs</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>2.304</Price>
+   <SalePrice>2.788</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>UFG_B059</Remarks>
+   <LotID>526150258</LotID>
+  </Item>
+  <Item>
+   <ItemID>18787</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>115</ColorID>
+   <ItemName>Minifigure, Weapon Sword Pixelated &amp;#40;Minecraft&amp;#41;</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Pearl Gold</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.244</Price>
+   <SalePrice>0.295</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_N065</Remarks>
+   <LotID>532745732</LotID>
+  </Item>
+  <Item>
+   <ItemID>65505c</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>95</ColorID>
+   <ItemName>Minifigure, Weapon Sickle Pixelated &amp;#40;Minecraft&amp;#41;</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Flat Silver</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.255</Price>
+   <SalePrice>0.308</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_N071</Remarks>
+   <LotID>532745747</LotID>
+  </Item>
+  <Item>
+   <ItemID>65505d</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>95</ColorID>
+   <ItemName>Minifigure, Weapon Cutlass Pixelated &amp;#40;Minecraft&amp;#41;</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Flat Silver</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.290</Price>
+   <SalePrice>0.351</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_N073</Remarks>
+   <LotID>532745749</LotID>
+  </Item>
+  <Item>
+   <ItemID>19723</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>115</ColorID>
+   <ItemName>Minifigure Armor Breastplate Rectangular &amp;#40;Minecraft&amp;#41;</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Pearl Gold</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>2.236</Price>
+   <SalePrice>2.705</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_N120</Remarks>
+   <LotID>534407614</LotID>
+  </Item>
+  <Item>
+   <ItemID>23766pb004</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>1</ColorID>
+   <ItemName>Minifigure, Head, Modified Cube Tall with Raised Rectangle with Pixelated Dark Brown Unibrow, Red and Black Eyes, and Dark Tan Nose Pattern &amp;#40;Minecraft Iron Golem&amp;#41;</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>White</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.383</Price>
+   <SalePrice>0.463</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_B36</Remarks>
+   <LotID>535306280</LotID>
+  </Item>
+  <Item>
+   <ItemID>30350bpb076</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Tile, Modified 2 x 3 with 2 Clips with Pixelated Skull and Crossbones Minecraft Pattern</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.235</Price>
+   <SalePrice>0.284</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_A017</Remarks>
+   <LotID>537647723</LotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

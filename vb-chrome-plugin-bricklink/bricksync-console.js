@@ -361,7 +361,9 @@
         // seeing why it is not happening, which a silent throttle otherwise keeps to itself.
         const invoicesButton = createElement('button', buttonStyle(), 'Invoices');
         invoicesButton.title = 'Send BrickLink VAT invoices the platform is missing, now';
-        headerActions.append(resetButton, invoicesButton, settingsButton);
+        const bsxButton = createElement('button', buttonStyle(), 'BSX');
+        bsxButton.title = 'Run add, merge or loadprices on pasted BSX content';
+        headerActions.append(resetButton, bsxButton, invoicesButton, settingsButton);
         header.append(closeButton, title, compactMasterSwitch, compactEnvironment.element, headerActions);
 
         const body = createElement('div', {
@@ -435,7 +437,41 @@
         const sendButton = createElement('button', buttonStyle(), 'Send');
         commandRow.append(commandInput, sendButton);
 
-        body.append(settingsPanel, status, logOutput, commandRow);
+        // BrickSync takes a BSX only as a file path, so the paste goes to the server, which writes it to a file the
+        // container can read and runs the command on that.
+        const bsxPanel = createElement('div', {
+            display: 'none',
+            flexDirection: 'column',
+            gap: '6px',
+            flex: '0 0 auto'
+        });
+        const bsxInput = document.createElement('textarea');
+        bsxInput.placeholder = 'Paste .bsx file content';
+        bsxInput.spellcheck = false;
+        Object.assign(bsxInput.style, {
+            boxSizing: 'border-box',
+            width: '100%',
+            height: '110px',
+            resize: 'vertical',
+            padding: '6px 8px',
+            border: '1px solid #4b5563',
+            borderRadius: '4px',
+            background: '#1f2937',
+            color: '#f9fafb',
+            font: '11px Menlo, Consolas, monospace'
+        });
+        const bsxActions = createElement('div', { display: 'flex', gap: '6px' });
+        [['add', 'Add'], ['merge', 'Merge'], ['loadprices', 'Load prices']].forEach(([command, label]) => {
+            const button = createElement('button', buttonStyle(), label);
+            button.addEventListener('click', () => sendBsxCommand(command).catch(showError));
+            bsxActions.append(button);
+        });
+        const downloadButton = createElement('button', { ...buttonStyle(), marginLeft: 'auto' }, 'Download inventory');
+        downloadButton.addEventListener('click', () => downloadInventory().catch(showError));
+        bsxActions.append(downloadButton);
+        bsxPanel.append(bsxInput, bsxActions);
+
+        body.append(settingsPanel, bsxPanel, status, logOutput, commandRow);
         panel.append(header, body);
         panel.append(openConsoleButton);
         document.body.appendChild(masterPanel);
@@ -453,6 +489,8 @@
         let awaitingMasterStatusOutput = false;
         let masterStatusLoading = false;
         let hiddenState = settings.hidden;
+        // An error from a button stays readable for a while instead of being replaced by the next log refresh.
+        let statusHeldUntil = 0;
 
         restorePanelLayout(settings);
         applyHidden(settings.hidden);
@@ -532,6 +570,7 @@
             compactMasterSwitch.style.display = hidden ? 'inline-flex' : 'none';
             compactEnvironment.element.style.display = hidden ? 'flex' : 'none';
             resetButton.style.display = hidden ? 'none' : '';
+            bsxButton.style.display = hidden ? 'none' : '';
             invoicesButton.style.display = hidden ? 'none' : '';
             settingsButton.style.display = hidden ? 'none' : '';
             headerActions.style.display = hidden ? 'none' : 'flex';
@@ -719,7 +758,10 @@
                     renderAnsiLogs(logOutput, logs);
                     logOutput.scrollTop = wasNearBottom ? logOutput.scrollHeight : previousScrollTop;
                 }
-                status.textContent = `Logs: ${new Date().toLocaleTimeString()}`;
+                if (Date.now() > statusHeldUntil) {
+                    status.style.color = '#9ca3af';
+                    status.textContent = `Logs: ${new Date().toLocaleTimeString()}`;
+                }
             } catch (error) {
                 if (currentSettings().apiBaseUrl !== current.apiBaseUrl) return;
                 markMasterStateUnavailable();
@@ -805,6 +847,66 @@
             commandInput.value = '';
             status.textContent = `Sent: ${command}`;
             await refreshLogs();
+        }
+
+        function showError(error) {
+            status.style.color = '#f87171';
+            status.textContent = error.message || String(error);
+            statusHeldUntil = Date.now() + 15000;
+        }
+
+        async function sendBsxCommand(command) {
+            const bsx = bsxInput.value.trim();
+            if (!bsx) {
+                throw new Error('Paste a .bsx file first');
+            }
+            // Checked here as the server checks it, so a paste it would refuse never gets as far as the confirmation.
+            // BrickLink's own XML is the likely mistake: it looks alike, but BrickSync reads only BrickStore's format.
+            if (!/<BrickStoreXML/i.test(bsx)) {
+                throw new Error(/<INVENTORY/.test(bsx)
+                    ? 'This is BrickLink XML. add, merge and loadprices need a BrickStore .bsx file (<BrickStoreXML>)'
+                    : 'Paste the content of a BrickStore .bsx file (<BrickStoreXML>)');
+            }
+            const lots = (bsx.match(/<Item>/g) || []).length;
+            if (!window.confirm(`Run ${command} with ${lots} lot(s) from the pasted BSX?`)) return;
+
+            const current = currentSettings();
+            await saveSettings(current);
+            status.textContent = `Sending: ${command} (${lots} lots)`;
+            const body = await requestJson(`${current.apiBaseUrl}/api/bricksync/file-commands`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Api-Key': current.apiKey
+                },
+                body: JSON.stringify({ command, bsx })
+            });
+            status.textContent = `Sent: ${body.command}`;
+            await refreshLogs();
+        }
+
+        /** Has BrickSync back up its current inventory and saves that BSX file through the browser. */
+        async function downloadInventory() {
+            const current = currentSettings();
+            await saveSettings(current);
+            status.textContent = 'Downloading inventory: waiting for BrickSync...';
+            const body = await requestJson(`${current.apiBaseUrl}/api/bricksync/inventory-backup`, {
+                method: 'POST',
+                headers: {
+                    Accept: 'application/json',
+                    'X-Api-Key': current.apiKey
+                }
+            });
+            const url = URL.createObjectURL(new Blob([body.bsx], { type: 'application/xml' }));
+            const link = createElement('a', { display: 'none' });
+            link.href = url;
+            link.download = body.fileName;
+            document.body.append(link);
+            link.click();
+            link.remove();
+            window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+            const lots = (body.bsx.match(/<Item>/g) || []).length;
+            status.textContent = `Downloaded ${body.fileName} (${lots} lots)`;
         }
 
         async function toggleMasterMode() {
@@ -915,6 +1017,10 @@
             if (event.key !== 'Enter') return;
             event.preventDefault();
             sendCommand().catch(error => status.textContent = error.message);
+        });
+        bsxButton.addEventListener('click', () => {
+            bsxPanel.style.display = bsxPanel.style.display === 'none' ? 'flex' : 'none';
+            if (bsxPanel.style.display === 'flex') bsxInput.focus();
         });
         settingsButton.addEventListener('click', () => {
             settingsPanel.style.display = settingsPanel.style.display === 'none' ? 'grid' : 'none';

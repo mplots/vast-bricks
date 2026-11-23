@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickOwl</Service>
+  <OrderID>6835362</OrderID>
+  <OrderDate>1782898848</OrderDate>
+  <Customer>G\u013cebs Goman\u010denko</Customer>
+  <SubTotal>11.380</SubTotal>
+  <GrandTotal>12.380</GrandTotal>
+  <Payment>12.380</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>sh0943</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>LEGO Miles Morales (Spider-Man) with Dark Red Hood Minifigure</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>3.323</Price>
+   <Condition>N</Condition>
+   <Remarks>FG_B06</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>521161719</LotID>
+   <OwlID>991441</OwlID>
+   <OwlLotID>217361621</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>92081</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>LEGO Black Short Combed Hair (92081)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.408</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_O25</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>524638311</LotID>
+   <OwlID>550103</OwlID>
+   <OwlLotID>220680753</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>3027</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>LEGO Dark Stone Gray Plate 6 x 16 (3027)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.718</Price>
+   <Condition>U</Condition>
+   <Remarks>BD_D03</Remarks>
+   <OrigQty>2</OrigQty>
+   <LotID>523254199</LotID>
+   <OwlID>102605</OwlID>
+   <OwlLotID>219654249</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>970c00pb1055</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>LEGO Dark Stone Gray Minifigure Hips and Legs with Black Belt and Silver Chain (57025 \/ 73200)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.662</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_G086</Remarks>
+   <OrigQty>2</OrigQty>
+   <LotID>519848112</LotID>
+   <OwlID>285989</OwlID>
+   <OwlLotID>215482367</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>973pb4153c01</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>LEGO Black Torso with jacket (3814)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.298</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_B19</Remarks>
+   <OrigQty>2</OrigQty>
+   <LotID>534542549</LotID>
+   <OwlID>800029</OwlID>
+   <OwlLotID>228273949</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>3626pb2749</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>3</ColorID>
+   <ItemName>LEGO Yellow Head with Dark Purple Snake Tattoo, Right Eyebrow Scar, Open Mouth with Fangs (3626)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.255</Price>
+   <Condition>U</Condition>
+   <Remarks>BD_E12 (02)</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>530512401</LotID>
+   <OwlID>269271</OwlID>
+   <OwlLotID>225264449</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>87544</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>LEGO Medium Stone Gray Panel 1 x 2 x 3 with Side Supports (35340 \/ 87544)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.059</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_P57</Remarks>
+   <OrigQty>4</OrigQty>
+   <LotID>524638267</LotID>
+   <OwlID>730588</OwlID>
+   <OwlLotID>220680737</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>15573</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>6</ColorID>
+   <ItemName>LEGO Green Plate 1 x 2 with 1 Stud (with Groove and Bottom Stud Holder) (15573)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Green</ColorName>
+   <Status>I</Status>
+   <Qty>5</Qty>
+   <Price>0.038</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_C16</Remarks>
+   <OrigQty>5</OrigQty>
+   <LotID>463230904</LotID>
+   <OwlID>893367</OwlID>
+   <OwlLotID>175978609</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>87580</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>LEGO Medium Stone Gray Plate 2 x 2 with Groove and 1 Center Stud (23893 \/ 87580)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.038</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_M119</Remarks>
+   <OrigQty>5</OrigQty>
+   <LotID>523699806</LotID>
+   <OwlID>374469</OwlID>
+   <OwlLotID>219988917</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>87580</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>LEGO Medium Stone Gray Plate 2 x 2 with Groove and 1 Center Stud (23893 \/ 87580)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.066</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_F40</Remarks>
+   <OrigQty>2</OrigQty>
+   <LotID>521161803</LotID>
+   <OwlID>374469</OwlID>
+   <OwlLotID>217361591</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>60616</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>88</ColorID>
+   <ItemName>LEGO Reddish Brown Door 1 x 4 x 6 with Stud Handle (35291 \/ 60616)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Reddish Brown</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.342</Price>
+   <Condition>N</Condition>
+   <Remarks>DA_J18</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>524638383</LotID>
+   <OwlID>755387</OwlID>
+   <OwlLotID>220680707</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>60596</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>LEGO Medium Stone Gray Door Frame 1 x 4 x 6 (Single Sided) (40289 \/ 60596)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.173</Price>
+   <Condition>N</Condition>
+   <Remarks>DA_D04</Remarks>
+   <OrigQty>1</OrigQty>
+   <LotID>500626710</LotID>
+   <OwlID>693022</OwlID>
+   <OwlLotID>198369311</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>6112</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>LEGO Black Brick 1 x 12 (6112)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>3</Qty>
+   <Price>0.262</Price>
+   <Condition>N</Condition>
+   <Remarks>DA_C13</Remarks>
+   <OrigQty>3</OrigQty>
+   <LotID>480390349</LotID>
+   <OwlID>783190</OwlID>
+   <OwlLotID>186794125</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>6111</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>LEGO Black Brick 1 x 10 (6111)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>6</Qty>
+   <Price>0.256</Price>
+   <Condition>N</Condition>
+   <Remarks>DA_M12</Remarks>
+   <OrigQty>6</OrigQty>
+   <LotID>480390364</LotID>
+   <OwlID>119483</OwlID>
+   <OwlLotID>186794123</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>3069px7</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>6</ColorID>
+   <ItemName>LEGO Green Tile 1 x 2 with 100 Cash with Groove (3069bpx7 \/ 82317)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Green</ColorName>
+   <Status>I</Status>
+   <Qty>10</Qty>
+   <Price>0.115</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_A037</Remarks>
+   <OrigQty>13</OrigQty>
+   <LotID>518364546</LotID>
+   <OwlID>710227</OwlID>
+   <OwlLotID>214231061</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>30132</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>LEGO Dark Stone Gray Revolver with Large Barrel (Solid Handle) (30132 \/ 88419)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.147</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_N113</Remarks>
+   <OrigQty>2</OrigQty>
+   <LotID>534074241</LotID>
+   <OwlID>297160</OwlID>
+   <OwlLotID>227889191</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>90398</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>LEGO Dark Stone Gray Statuette (53017 \/ 90398)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.340</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_H042</Remarks>
+   <OrigQty>2</OrigQty>
+   <LotID>535180414</LotID>
+   <OwlID>234865</OwlID>
+   <OwlLotID>228695835</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>4449</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>88</ColorID>
+   <ItemName>LEGO Reddish Brown Suitcase (Small) (4449)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Reddish Brown</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.119</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_H007</Remarks>
+   <OrigQty>4</OrigQty>
+   <LotID>518364615</LotID>
+   <OwlID>985272</OwlID>
+   <OwlLotID>214231135</OwlLotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

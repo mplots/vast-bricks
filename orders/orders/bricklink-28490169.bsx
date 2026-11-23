@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickLink</Service>
+  <OrderID>28490169</OrderID>
+  <OrderDate>1748771166</OrderDate>
+  <Customer>SurersBuilds</Customer>
+  <SubTotal>6.671</SubTotal>
+  <GrandTotal>7.248</GrandTotal>
+  <Payment>7.250</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>3024</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>110</ColorID>
+   <ItemName>Plate 1 x 1</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Bright Light Orange</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.037</Price>
+   <SalePrice>0.026</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>TA13</Remarks>
+   <LotID>463230976</LotID>
+  </Item>
+  <Item>
+   <ItemID>3020</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Plate 2 x 4</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.058</Price>
+   <SalePrice>0.041</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>DA_D04</Remarks>
+   <LotID>463231077</LotID>
+  </Item>
+  <Item>
+   <ItemID>3623</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Plate 1 x 3</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.064</Price>
+   <SalePrice>0.045</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_D06</Remarks>
+   <LotID>463231158</LotID>
+  </Item>
+  <Item>
+   <ItemID>3020</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>1</ColorID>
+   <ItemName>Plate 2 x 4</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>White</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.092</Price>
+   <SalePrice>0.064</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>DA_C05</Remarks>
+   <LotID>463231160</LotID>
+  </Item>
+  <Item>
+   <ItemID>3023</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>12</ColorID>
+   <ItemName>Plate 1 x 2</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Trans-Clear</ColorName>
+   <Status>I</Status>
+   <Qty>6</Qty>
+   <Price>0.101</Price>
+   <SalePrice>0.071</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>SA_B54</Remarks>
+   <LotID>464420240</LotID>
+  </Item>
+  <Item>
+   <ItemID>3024</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>12</ColorID>
+   <ItemName>Plate 1 x 1</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Trans-Clear</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.065</Price>
+   <SalePrice>0.045</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>SA_D41</Remarks>
+   <LotID>464612648</LotID>
+  </Item>
+  <Item>
+   <ItemID>3023</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>15</ColorID>
+   <ItemName>Plate 1 x 2</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Trans-Light Blue</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.086</Price>
+   <SalePrice>0.060</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_D28</Remarks>
+   <LotID>464663271</LotID>
+  </Item>
+  <Item>
+   <ItemID>98138</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>50</ColorID>
+   <ItemName>Tile, Round 1 x 1</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Trans-Dark Pink</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.027</Price>
+   <SalePrice>0.019</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>SA_E54</Remarks>
+   <LotID>466051013</LotID>
+  </Item>
+  <Item>
+   <ItemID>25269</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>156</ColorID>
+   <ItemName>Tile, Round 1 x 1 Quarter</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Medium Azure</ColorName>
+   <Status>I</Status>
+   <Qty>8</Qty>
+   <Price>0.020</Price>
+   <SalePrice>0.014</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_A58</Remarks>
+   <LotID>466051040</LotID>
+  </Item>
+  <Item>
+   <ItemID>5841</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>15</ColorID>
+   <ItemName>Slope, Curved 2 x 1 with Recessed Stud</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Trans-Light Blue</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.343</Price>
+   <SalePrice>0.240</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_E03</Remarks>
+   <LotID>468580259</LotID>
+  </Item>
+  <Item>
+   <ItemID>54200</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>15</ColorID>
+   <ItemName>Slope 30 1 x 1 x 2/3</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Trans-Light Blue</ColorName>
+   <Status>I</Status>
+   <Qty>8</Qty>
+   <Price>0.032</Price>
+   <SalePrice>0.022</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_E04</Remarks>
+   <LotID>468580304</LotID>
+  </Item>
+  <Item>
+   <ItemID>93273</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>167</ColorID>
+   <ItemName>Slope, Curved 4 x 1 x 2/3 Double</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Reddish Orange</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.695</Price>
+   <SalePrice>0.486</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>DA_E16</Remarks>
+   <LotID>469855153</LotID>
+  </Item>
+  <Item>
+   <ItemID>3023</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Plate 1 x 2</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.054</Price>
+   <SalePrice>0.038</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_G26</Remarks>
+   <LotID>469855170</LotID>
+  </Item>
+  <Item>
+   <ItemID>3022</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Plate 2 x 2</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.036</Price>
+   <SalePrice>0.025</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>SA_G25</Remarks>
+   <LotID>470792713</LotID>
+  </Item>
+  <Item>
+   <ItemID>79389</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Bracket 1 x 1 - 1 x 2</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>16</Qty>
+   <Price>0.146</Price>
+   <SalePrice>0.102</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_J15</Remarks>
+   <LotID>473228691</LotID>
+  </Item>
+  <Item>
+   <ItemID>60474</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>156</ColorID>
+   <ItemName>Plate, Round 4 x 4 with Hole</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Medium Azure</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.041</Price>
+   <SalePrice>0.029</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>DA_H09</Remarks>
+   <LotID>474159395</LotID>
+  </Item>
+  <Item>
+   <ItemID>49307</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>220</ColorID>
+   <ItemName>Slope, Curved 1 x 1 x 2/3 Double</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Coral</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.034</Price>
+   <SalePrice>0.024</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>SA_H44</Remarks>
+   <LotID>474159401</LotID>
+  </Item>
+  <Item>
+   <ItemID>32474</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>1</ColorID>
+   <ItemName>Technic Ball Joint</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>White</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.133</Price>
+   <SalePrice>0.093</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>TB04</Remarks>
+   <LotID>474159416</LotID>
+  </Item>
+  <Item>
+   <ItemID>3070</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>156</ColorID>
+   <ItemName>Tile 1 x 1</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Medium Azure</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.037</Price>
+   <SalePrice>0.026</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_A56</Remarks>
+   <LotID>474159417</LotID>
+  </Item>
+  <Item>
+   <ItemID>3069</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>156</ColorID>
+   <ItemName>Tile 1 x 2</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Medium Azure</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.042</Price>
+   <SalePrice>0.029</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>TB08</Remarks>
+   <LotID>474159418</LotID>
+  </Item>
+  <Item>
+   <ItemID>99781</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>153</ColorID>
+   <ItemName>Bracket 1 x 2 - 1 x 2</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Azure</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.057</Price>
+   <SalePrice>0.040</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_H02</Remarks>
+   <LotID>477278627</LotID>
+  </Item>
+  <Item>
+   <ItemID>33909</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>1</ColorID>
+   <ItemName>Tile, Modified 2 x 2 with Studs on Edge</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>White</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.082</Price>
+   <SalePrice>0.057</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>SA_I07</Remarks>
+   <LotID>477278628</LotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

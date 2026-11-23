@@ -603,5 +603,16 @@
   "job-tally-skipped-fresh": "jau aktuālas",
   "shipping-prices-trackable": "Izsekojams",
   "shipping-prices-not-trackable": "Nav izsekojams",
-  "shipping-prices-days": "{days} dienas"
+  "shipping-prices-days": "{days} dienas",
+  "part-finder": "Detaļu meklētājs",
+  "part-finder-part": "Detaļa un krāsa",
+  "part-finder-type": "Ievadiet detaļu un krāsu",
+  "part-finder-no-parts": "Neviena pārdošanā esoša komplekta detaļa neatbilst",
+  "part-finder-set-count": "{count, plural, one {# komplekts} other {# komplekti}}",
+  "part-finder-no-sets": "Neviens pārdošanā esošs komplekts nesatur šo detaļu.",
+  "part-finder-set": "Komplekts",
+  "part-finder-quantity": "Komplektā",
+  "part-finder-stores": "Veikali",
+  "part-finder-pieces": "{count} gab.",
+  "part-finder-error": "Detaļas neizdevās ielādēt."
 }

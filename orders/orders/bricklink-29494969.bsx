@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickLink</Service>
+  <OrderID>29494969</OrderID>
+  <OrderDate>1759256623</OrderDate>
+  <Customer>elvman</Customer>
+  <SubTotal>8.770</SubTotal>
+  <GrandTotal>9.418</GrandTotal>
+  <Payment>9.420</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>73825</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>1</ColorID>
+   <ItemName>Bracket 1 x 1 - 1 x 2 Inverted</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>White</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.207</Price>
+   <SalePrice>0.145</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_I47</Remarks>
+   <LotID>463231118</LotID>
+  </Item>
+  <Item>
+   <ItemID>63965</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Bar   6L with Stop Ring</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>8</Qty>
+   <Price>0.077</Price>
+   <SalePrice>0.054</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_B23</Remarks>
+   <LotID>464949087</LotID>
+  </Item>
+  <Item>
+   <ItemID>23945pb03</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>12</ColorID>
+   <ItemName>Minifigure, Utensil Hourglass with Molded Pearl Gold Sand Pattern</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Trans-Clear</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.548</Price>
+   <SalePrice>0.384</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_A01</Remarks>
+   <LotID>466051016</LotID>
+  </Item>
+  <Item>
+   <ItemID>30104</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Chain 21 Links &amp;#40;16-17L&amp;#41;</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>7</Qty>
+   <Price>0.590</Price>
+   <SalePrice>0.413</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_C11</Remarks>
+   <LotID>466051050</LotID>
+  </Item>
+  <Item>
+   <ItemID>89522</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>115</ColorID>
+   <ItemName>Horn, Unicorn / Spiral</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Pearl Gold</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.061</Price>
+   <SalePrice>0.043</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_E07</Remarks>
+   <LotID>468580282</LotID>
+  </Item>
+  <Item>
+   <ItemID>79389</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Bracket 1 x 1 - 1 x 2</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.170</Price>
+   <SalePrice>0.119</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_F47</Remarks>
+   <LotID>468662022</LotID>
+  </Item>
+  <Item>
+   <ItemID>6636</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>69</ColorID>
+   <ItemName>Tile 1 x 6</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Tan</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.083</Price>
+   <SalePrice>0.058</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_G09</Remarks>
+   <LotID>469795258</LotID>
+  </Item>
+  <Item>
+   <ItemID>x127c40pb01</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>String with End Studs &amp;#40;40L Overall&amp;#41; with &amp;#40;Same Color&amp;#41; Studs Pattern</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>2.179</Price>
+   <SalePrice>1.525</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>DA_E05</Remarks>
+   <LotID>469795273</LotID>
+  </Item>
+  <Item>
+   <ItemID>30374</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Bar   4L &amp;#40;Lightsaber Blade / Wand&amp;#41;</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.058</Price>
+   <SalePrice>0.041</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_I11</Remarks>
+   <LotID>469795276</LotID>
+  </Item>
+  <Item>
+   <ItemID>87747</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Barb / Claw / Horn / Tooth - Medium</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.028</Price>
+   <SalePrice>0.020</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_J26</Remarks>
+   <LotID>470792725</LotID>
+  </Item>
+  <Item>
+   <ItemID>87994</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Bar   3L &amp;#40;Bar Arrow&amp;#41;</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.061</Price>
+   <SalePrice>0.043</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_D34</Remarks>
+   <LotID>470849158</LotID>
+  </Item>
+  <Item>
+   <ItemID>1751</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Tile 4 x 4</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.646</Price>
+   <SalePrice>0.452</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>DA_E04</Remarks>
+   <LotID>473357964</LotID>
+  </Item>
+  <Item>
+   <ItemID>30357</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>6</ColorID>
+   <ItemName>Plate, Round Corner 3 x 3</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Green</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.056</Price>
+   <SalePrice>0.039</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_A53</Remarks>
+   <LotID>477278641</LotID>
+  </Item>
+  <Item>
+   <ItemID>6003</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>6</ColorID>
+   <ItemName>Plate, Round Corner 6 x 6</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Green</ColorName>
+   <Status>I</Status>
+   <Qty>8</Qty>
+   <Price>0.061</Price>
+   <SalePrice>0.043</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>DA_J02</Remarks>
+   <LotID>479559354</LotID>
+  </Item>
+  <Item>
+   <ItemID>3622</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>150</ColorID>
+   <ItemName>Brick 1 x 3</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Medium Nougat</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.112</Price>
+   <SalePrice>0.078</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_E35</Remarks>
+   <LotID>480940170</LotID>
+  </Item>
+  <Item>
+   <ItemID>36841</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>88</ColorID>
+   <ItemName>Bracket 1 x 1 - 1 x 1</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Reddish Brown</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.153</Price>
+   <SalePrice>0.107</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_D59</Remarks>
+   <LotID>480940197</LotID>
+  </Item>
+  <Item>
+   <ItemID>64727</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Minifigure, Weapon Sword, Spike Flexible 3.5L with Bar End</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.103</Price>
+   <SalePrice>0.072</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_G33</Remarks>
+   <LotID>487648000</LotID>
+  </Item>
+  <Item>
+   <ItemID>62462</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>5</ColorID>
+   <ItemName>Technic, Pin Connector Round 2L with Slot &amp;#40;Pin Joiner Round&amp;#41;</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Red</ColorName>
+   <Status>I</Status>
+   <Qty>3</Qty>
+   <Price>0.076</Price>
+   <SalePrice>0.053</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_J38</Remarks>
+   <LotID>487648031</LotID>
+  </Item>
+  <Item>
+   <ItemID>3039</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>88</ColorID>
+   <ItemName>Slope 45 2 x 2</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Reddish Brown</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.045</Price>
+   <SalePrice>0.032</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_H48</Remarks>
+   <LotID>491759864</LotID>
+  </Item>
+  <Item>
+   <ItemID>11213</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>6</ColorID>
+   <ItemName>Plate, Round 6 x 6 with Hole</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Green</ColorName>
+   <Status>I</Status>
+   <Qty>3</Qty>
+   <Price>0.202</Price>
+   <SalePrice>0.141</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>DA_N02</Remarks>
+   <LotID>491920507</LotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

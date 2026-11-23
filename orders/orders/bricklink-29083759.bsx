@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickLink</Service>
+  <OrderID>29083759</OrderID>
+  <OrderDate>1755010151</OrderDate>
+  <Customer>aviadh</Customer>
+  <SubTotal>2.261</SubTotal>
+  <GrandTotal>8.819</GrandTotal>
+  <Payment>8.820</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>3034</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Plate 2 x 8</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.150</Price>
+   <SalePrice>0.120</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>DA_B14</Remarks>
+   <LotID>463231055</LotID>
+  </Item>
+  <Item>
+   <ItemID>3034</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Plate 2 x 8</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.126</Price>
+   <SalePrice>0.101</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>DA_B01</Remarks>
+   <LotID>464420364</LotID>
+  </Item>
+  <Item>
+   <ItemID>22885</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>1</ColorID>
+   <ItemName>Brick, Modified 1 x 2 x 1 2/3 with Studs on Side</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>White</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.104</Price>
+   <SalePrice>0.083</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_E02</Remarks>
+   <LotID>468580270</LotID>
+  </Item>
+  <Item>
+   <ItemID>3034</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>63</ColorID>
+   <ItemName>Plate 2 x 8</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Blue</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.122</Price>
+   <SalePrice>0.098</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>DA_F13</Remarks>
+   <LotID>470849067</LotID>
+  </Item>
+  <Item>
+   <ItemID>60479</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Plate 1 x 12</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.150</Price>
+   <SalePrice>0.120</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>DA_F14</Remarks>
+   <LotID>470849071</LotID>
+  </Item>
+  <Item>
+   <ItemID>22885</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Brick, Modified 1 x 2 x 1 2/3 with Studs on Side</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.205</Price>
+   <SalePrice>0.164</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_E52</Remarks>
+   <LotID>480940140</LotID>
+  </Item>
+  <Item>
+   <ItemID>60479</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>1</ColorID>
+   <ItemName>Plate 1 x 12</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>White</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.176</Price>
+   <SalePrice>0.141</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>DA_L10</Remarks>
+   <LotID>486000379</LotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

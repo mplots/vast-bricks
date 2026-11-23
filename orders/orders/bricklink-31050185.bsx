@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickLink</Service>
+  <OrderID>31050185</OrderID>
+  <OrderDate>1773339141</OrderDate>
+  <Customer>volt21</Customer>
+  <SubTotal>1.794</SubTotal>
+  <GrandTotal>1.794</GrandTotal>
+  <Payment>1.790</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>3626pb1326</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>3</ColorID>
+   <ItemName>Minifigure, Head Dual Sided Female Dark Red Eyebrows, Dark Tan Lips, Smile / Bright Light Orange Mask, White Eyes, Open Mouth Pattern</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.645</Price>
+   <Condition>U</Condition>
+   <Remarks>SA_A53</Remarks>
+   <LotID>519769612</LotID>
+  </Item>
+  <Item>
+   <ItemID>973pb3419c01</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>89</ColorID>
+   <ItemName>Torso Ninjago Snake with Light Blue Gem and Black Scales with Gold Spikes Pattern &amp;#40;Pythor&amp;#41; / Black Arms / Black Hands</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Purple</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>1.091</Price>
+   <Condition>U</Condition>
+   <Remarks>MA_T18</Remarks>
+   <LotID>519962261</LotID>
+  </Item>
+  <Item>
+   <ItemID>47905</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>2</ColorID>
+   <ItemName>Brick, Modified 1 x 1 with Studs on 2 Sides, Opposite</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Tan</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.058</Price>
+   <Condition>U</Condition>
+   <Remarks>MB_D27</Remarks>
+   <LotID>523521894</LotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

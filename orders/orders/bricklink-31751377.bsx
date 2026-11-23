@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickLink</Service>
+  <OrderID>31751377</OrderID>
+  <OrderDate>1780299299</OrderDate>
+  <Customer>ddroba</Customer>
+  <SubTotal>4.464</SubTotal>
+  <GrandTotal>6.545</GrandTotal>
+  <Payment>6.540</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>25269</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>4</ColorID>
+   <ItemName>Tile, Round 1 x 1 Quarter</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Orange</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.030</Price>
+   <SalePrice>0.027</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_P29</Remarks>
+   <LotID>473228684</LotID>
+  </Item>
+  <Item>
+   <ItemID>77240stk01</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Sticker Sheet for Set 77240 - &amp;#40;10113745/6548397&amp;#41;</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>1.719</Price>
+   <SalePrice>1.547</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>PA_E00</Remarks>
+   <LotID>513386989</LotID>
+  </Item>
+  <Item>
+   <ItemID>sw1113</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Din Grogu / The Child / &apos;Baby Yoda&apos;</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>2.309</Price>
+   <SalePrice>2.078</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>UFG_C031</Remarks>
+   <LotID>527898314</LotID>
+  </Item>
+  <Item>
+   <ItemID>970c00pb1014</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>69</ColorID>
+   <ItemName>Hips and Legs with Black Belt, Copper Trim and Dark Bluish Gray Splotches Pattern</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Tan</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.516</Price>
+   <SalePrice>0.464</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_E16 (05)</Remarks>
+   <LotID>531359766</LotID>
+  </Item>
+  <Item>
+   <ItemID>15619</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>80</ColorID>
+   <ItemName>Minifigure Bandana Ninja</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Green</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.178</Price>
+   <SalePrice>0.160</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>MB_A26</Remarks>
+   <LotID>535180419</LotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

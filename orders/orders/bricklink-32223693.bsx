@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickLink</Service>
+  <OrderID>32223693</OrderID>
+  <OrderDate>1785573394</OrderDate>
+  <Customer>welvet</Customer>
+  <SubTotal>35.891</SubTotal>
+  <GrandTotal>49.037</GrandTotal>
+  <Payment>49.040</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>53401</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Train, Track Plastic (RC Trains) Straight</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>23</Qty>
+   <Price>1.196</Price>
+   <SalePrice>1.136</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_C↓</Remarks>
+   <LotID>527900542</LotID>
+  </Item>
+  <Item>
+   <ItemID>53400</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Train, Track Plastic &amp;#40;RC Trains&amp;#41; Curve</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>32</Qty>
+   <Price>0.321</Price>
+   <SalePrice>0.305</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_D↓</Remarks>
+   <LotID>527900543</LotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

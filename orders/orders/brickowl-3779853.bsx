@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickOwl</Service>
+  <OrderID>3779853</OrderID>
+  <OrderDate>1783722319</OrderDate>
+  <Customer>D\u0101vis Bodnieks</Customer>
+  <SubTotal>1.970</SubTotal>
+  <GrandTotal>4.690</GrandTotal>
+  <Payment>4.690</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>32062</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>5</ColorID>
+   <ItemName>LEGO Red Axle 2 with Grooves (32062)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Red</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.015</Price>
+   <Condition>U</Condition>
+   <Remarks>BD_D11</Remarks>
+   <OrigQty>369</OrigQty>
+   <LotID>523405093</LotID>
+   <OwlID>515411</OwlID>
+   <OwlLotID>219778063</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>64682</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>LEGO Black Curved Panel 18 Right (64682)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.833</Price>
+   <Condition>U</Condition>
+   <Remarks>BD_H20</Remarks>
+   <OrigQty>3</OrigQty>
+   <LotID>545246119</LotID>
+   <OwlID>943067</OwlID>
+   <OwlLotID>235949987</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>64392</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>LEGO Black Curved Panel 17 Left (64392)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.769</Price>
+   <Condition>U</Condition>
+   <Remarks>BD_I01</Remarks>
+   <OrigQty>3</OrigQty>
+   <LotID>545246120</LotID>
+   <OwlID>619303</OwlID>
+   <OwlLotID>235949985</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>25214</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>LEGO Medium Stone Gray Brick 1 x 1 Round Elbow (90\u00b0) with Axle Holes (25214)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.177</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_G043</Remarks>
+   <OrigQty>2</OrigQty>
+   <LotID>540990468</LotID>
+   <OwlID>379359</OwlID>
+   <OwlLotID>232813217</OwlLotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

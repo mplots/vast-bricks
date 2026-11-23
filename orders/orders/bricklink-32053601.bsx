@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickLink</Service>
+  <OrderID>32053601</OrderID>
+  <OrderDate>1783616814</OrderDate>
+  <Customer>Arkans</Customer>
+  <SubTotal>7.224</SubTotal>
+  <GrandTotal>15.264</GrandTotal>
+  <Payment>15.260</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>3068</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Tile 2 x 2</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.110</Price>
+   <Condition>N</Condition>
+   <Remarks>DA_R19</Remarks>
+   <LotID>463231135</LotID>
+  </Item>
+  <Item>
+   <ItemID>3003</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>3</ColorID>
+   <ItemName>Brick 2 x 2</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.052</Price>
+   <Condition>N</Condition>
+   <Remarks>DA_C19</Remarks>
+   <LotID>466051004</LotID>
+  </Item>
+  <Item>
+   <ItemID>63864</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>3</ColorID>
+   <ItemName>Tile 1 x 3</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>3</Qty>
+   <Price>0.110</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_L37</Remarks>
+   <LotID>480390419</LotID>
+  </Item>
+  <Item>
+   <ItemID>6536</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Technic, Axle and Pin Connector Perpendicular</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>12</Qty>
+   <Price>0.029</Price>
+   <Condition>N</Condition>
+   <Remarks>DA_P16</Remarks>
+   <LotID>487647993</LotID>
+  </Item>
+  <Item>
+   <ItemID>30104</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Chain 21 Links &amp;#40;16-17L&amp;#41;</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>5</Qty>
+   <Price>0.484</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_H023</Remarks>
+   <LotID>518364486</LotID>
+  </Item>
+  <Item>
+   <ItemID>cty0027a</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Police - City Leather Jacket with Gold Badge and &amp;#39;POLICE&amp;#39; on Back, White Helmet, Trans-Brown Visor, Silver Sunglasses</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.885</Price>
+   <Condition>U</Condition>
+   <Remarks>UFG_A040</Remarks>
+   <LotID>518405465</LotID>
+  </Item>
+  <Item>
+   <ItemID>3623</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>3</ColorID>
+   <ItemName>Plate 1 x 3</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.048</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_H061</Remarks>
+   <LotID>518617847</LotID>
+  </Item>
+  <Item>
+   <ItemID>cty0212</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Police - City Shirt with Dark Blue Tie and Gold Badge, Black Legs, Dark Orange Short Tousled Hair</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>1.399</Price>
+   <Condition>U</Condition>
+   <Remarks>UFG_A030</Remarks>
+   <LotID>518653217</LotID>
+  </Item>
+  <Item>
+   <ItemID>3622</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>3</ColorID>
+   <ItemName>Brick 1 x 3</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.031</Price>
+   <Condition>U</Condition>
+   <Remarks>BD_C04</Remarks>
+   <LotID>519122812</LotID>
+  </Item>
+  <Item>
+   <ItemID>32014</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Technic, Axle and Pin Connector Angled #6 - 90 degrees</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>5</Qty>
+   <Price>0.059</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_G016</Remarks>
+   <LotID>523404945</LotID>
+  </Item>
+  <Item>
+   <ItemID>32013</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Technic, Axle and Pin Connector Angled #1</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>5</Qty>
+   <Price>0.031</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_G031</Remarks>
+   <LotID>523404948</LotID>
+  </Item>
+  <Item>
+   <ItemID>60483</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Technic, Liftarm Thick 1 x 2 - Axle Hole</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.044</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_C21</Remarks>
+   <LotID>523404973</LotID>
+  </Item>
+  <Item>
+   <ItemID>42003</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Technic, Axle and Pin Connector Perpendicular 3L with 2 Pin Holes</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.029</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_A049</Remarks>
+   <LotID>523405011</LotID>
+  </Item>
+  <Item>
+   <ItemID>4265c</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Technic Bush 1/2 Smooth</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>10</Qty>
+   <Price>0.019</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_M035</Remarks>
+   <LotID>523405023</LotID>
+  </Item>
+  <Item>
+   <ItemID>6538c</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Technic, Axle Connector 2L &amp;#40;Smooth with x Hole + Orientation&amp;#41;</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.033</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_G039</Remarks>
+   <LotID>523405026</LotID>
+  </Item>
+  <Item>
+   <ItemID>32054</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Technic, Pin 3L with Friction Ridges and Stop Bush</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>10</Qty>
+   <Price>0.020</Price>
+   <Condition>U</Condition>
+   <Remarks>BD_F14</Remarks>
+   <LotID>523405061</LotID>
+  </Item>
+  <Item>
+   <ItemID>3713</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>5</ColorID>
+   <ItemName>Technic Bush</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Red</ColorName>
+   <Status>I</Status>
+   <Qty>10</Qty>
+   <Price>0.017</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_M045</Remarks>
+   <LotID>523405074</LotID>
+  </Item>
+  <Item>
+   <ItemID>3705</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Technic, Axle  4L</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.020</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_M050</Remarks>
+   <LotID>523453187</LotID>
+  </Item>
+  <Item>
+   <ItemID>10247</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Plate, Modified 2 x 2 with Pin Hole - Full Cross Support Underneath</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.035</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_I08</Remarks>
+   <LotID>524352414</LotID>
+  </Item>
+  <Item>
+   <ItemID>2819</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Technic, Steering Wheel Small, 3 Studs Diameter</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.127</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_B60</Remarks>
+   <LotID>538858806</LotID>
+  </Item>
+  <Item>
+   <ItemID>10247</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Plate, Modified 2 x 2 with Pin Hole - Full Cross Support Underneath</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.025</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_G011</Remarks>
+   <LotID>539943489</LotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

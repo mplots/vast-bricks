@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickOwl</Service>
+  <OrderID>4350227</OrderID>
+  <OrderDate>1747930422</OrderDate>
+  <Customer>Audrey Langenberger</Customer>
+  <SubTotal>0.530</SubTotal>
+  <GrandTotal>5.890</GrandTotal>
+  <Payment>5.890</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>3069pb1323</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>17</ColorID>
+   <ItemName>LEGO Transparent Red Tile 1 x 2 with Gold Circuitry and White Bars with Groove (3069)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Trans-Red</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.526</Price>
+   <Condition>N</Condition>
+   <Remarks>SA_G34</Remarks>
+   <OrigQty>2</OrigQty>
+   <LotID>470792740</LotID>
+   <OwlID>585417</OwlID>
+   <OwlLotID>181120643</OwlLotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

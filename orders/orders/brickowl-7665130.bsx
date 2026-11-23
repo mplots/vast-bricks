@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickOwl</Service>
+  <OrderID>7665130</OrderID>
+  <OrderDate>1751181263</OrderDate>
+  <Customer>Peter Sim</Customer>
+  <SubTotal>7.270</SubTotal>
+  <GrandTotal>10.850</GrandTotal>
+  <Payment>10.850</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>110049pb01</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>50</ColorID>
+   <ItemName>LEGO Transparent Dark Pink Cyber Brain with White</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Trans-Dark Pink</ColorName>
+   <Status>I</Status>
+   <Qty>3</Qty>
+   <Price>2.422</Price>
+   <Condition>N</Condition>
+   <Remarks>DA_F02</Remarks>
+   <OrigQty>3</OrigQty>
+   <LotID>470792739</LotID>
+   <OwlID>1295604</OwlID>
+   <OwlLotID>181120611</OwlLotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

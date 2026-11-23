@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickLink</Service>
+  <OrderID>30264233</OrderID>
+  <OrderDate>1766793091</OrderDate>
+  <Customer>lough</Customer>
+  <SubTotal>1.612</SubTotal>
+  <GrandTotal>5.698</GrandTotal>
+  <Payment>5.700</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>52107</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Brick, Modified 1 x 2 with Studs on 2 Sides</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.139</Price>
+   <SalePrice>0.118</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>DA_L04</Remarks>
+   <LotID>468662030</LotID>
+  </Item>
+  <Item>
+   <ItemID>3039</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Slope 45 2 x 2</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.069</Price>
+   <SalePrice>0.059</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>DA_E02</Remarks>
+   <LotID>469855210</LotID>
+  </Item>
+  <Item>
+   <ItemID>3069</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Tile 1 x 2</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>6</Qty>
+   <Price>0.084</Price>
+   <SalePrice>0.071</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_F43</Remarks>
+   <LotID>470849112</LotID>
+  </Item>
+  <Item>
+   <ItemID>3701</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Technic, Brick 1 x 4 with Holes</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.121</Price>
+   <SalePrice>0.103</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_C50</Remarks>
+   <LotID>480390380</LotID>
+  </Item>
+  <Item>
+   <ItemID>6636</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Tile 1 x 6</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.155</Price>
+   <SalePrice>0.132</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_F54</Remarks>
+   <LotID>482159006</LotID>
+  </Item>
+  <Item>
+   <ItemID>3660</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Slope, Inverted 45 2 x 2 with Flat Bottom Pin</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.050</Price>
+   <SalePrice>0.043</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_F59</Remarks>
+   <LotID>482159014</LotID>
+  </Item>
+  <Item>
+   <ItemID>3832</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Plate 2 x 10</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.153</Price>
+   <SalePrice>0.130</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>DA_H11</Remarks>
+   <LotID>491759868</LotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

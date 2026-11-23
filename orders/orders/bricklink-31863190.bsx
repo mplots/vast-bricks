@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickLink</Service>
+  <OrderID>31863190</OrderID>
+  <OrderDate>1781464157</OrderDate>
+  <Customer>Spin.jet</Customer>
+  <SubTotal>10.344</SubTotal>
+  <GrandTotal>13.345</GrandTotal>
+  <Payment>13.340</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>3710</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>2</ColorID>
+   <ItemName>Plate 1 x 4</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Tan</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.056</Price>
+   <SalePrice>0.050</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>DA_A13</Remarks>
+   <LotID>464663288</LotID>
+  </Item>
+  <Item>
+   <ItemID>3660</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>2</ColorID>
+   <ItemName>Slope, Inverted 45 2 x 2 with Flat Bottom Pin</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Tan</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.046</Price>
+   <SalePrice>0.041</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>DA_A15</Remarks>
+   <LotID>464663290</LotID>
+  </Item>
+  <Item>
+   <ItemID>3004</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>2</ColorID>
+   <ItemName>Brick 1 x 2</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Tan</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.066</Price>
+   <SalePrice>0.059</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_B03</Remarks>
+   <LotID>464663297</LotID>
+  </Item>
+  <Item>
+   <ItemID>14716</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>88</ColorID>
+   <ItemName>Brick 1 x 1 x 3</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Reddish Brown</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.061</Price>
+   <SalePrice>0.055</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_M35</Remarks>
+   <LotID>511321503</LotID>
+  </Item>
+  <Item>
+   <ItemID>19807a</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>115</ColorID>
+   <ItemName>Minifigure, Weapon Shuriken Throwing Star with Textured Grips</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Pearl Gold</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.038</Price>
+   <SalePrice>0.034</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_N075</Remarks>
+   <LotID>518364559</LotID>
+  </Item>
+  <Item>
+   <ItemID>x127c10pb01</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>String with End Studs &amp;#40;10L Overall&amp;#41; with &amp;#40;Same Color&amp;#41; Studs Pattern</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.618</Price>
+   <SalePrice>0.556</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_H009</Remarks>
+   <LotID>518364600</LotID>
+  </Item>
+  <Item>
+   <ItemID>4477</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>88</ColorID>
+   <ItemName>Plate 1 x 10</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Reddish Brown</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.086</Price>
+   <SalePrice>0.077</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_B02</Remarks>
+   <LotID>518617816</LotID>
+  </Item>
+  <Item>
+   <ItemID>3023</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>88</ColorID>
+   <ItemName>Plate 1 x 2</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Reddish Brown</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.041</Price>
+   <SalePrice>0.037</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_F46</Remarks>
+   <LotID>521161817</LotID>
+  </Item>
+  <Item>
+   <ItemID>3024</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>88</ColorID>
+   <ItemName>Plate 1 x 1</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Reddish Brown</ColorName>
+   <Status>I</Status>
+   <Qty>5</Qty>
+   <Price>0.042</Price>
+   <SalePrice>0.038</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_N12</Remarks>
+   <LotID>521161818</LotID>
+  </Item>
+  <Item>
+   <ItemID>4477</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>88</ColorID>
+   <ItemName>Plate 1 x 10</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Reddish Brown</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.098</Price>
+   <SalePrice>0.088</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>DA_J14</Remarks>
+   <LotID>521161826</LotID>
+  </Item>
+  <Item>
+   <ItemID>3460</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>88</ColorID>
+   <ItemName>Plate 1 x 8</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Reddish Brown</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.099</Price>
+   <SalePrice>0.089</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>DA_D12</Remarks>
+   <LotID>524638394</LotID>
+  </Item>
+  <Item>
+   <ItemID>19807a</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>95</ColorID>
+   <ItemName>Minifigure, Weapon Shuriken Throwing Star with Textured Grips</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Flat Silver</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.053</Price>
+   <SalePrice>0.048</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_N075</Remarks>
+   <LotID>532905530</LotID>
+  </Item>
+  <Item>
+   <ItemID>37341c</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>115</ColorID>
+   <ItemName>Minifigure, Weapon Sword Blade with Bar, Square Crossguard</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Pearl Gold</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.171</Price>
+   <SalePrice>0.154</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_N078</Remarks>
+   <LotID>532905568</LotID>
+  </Item>
+  <Item>
+   <ItemID>njo0763</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Zane - Crystalized</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>8.795</Price>
+   <SalePrice>7.916</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>UFG_C069</Remarks>
+   <LotID>534861414</LotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

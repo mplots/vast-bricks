@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickLink</Service>
+  <OrderID>32391176</OrderID>
+  <OrderDate>1787404647</OrderDate>
+  <Customer>chrisclmbl</Customer>
+  <SubTotal>3.170</SubTotal>
+  <GrandTotal>11.761</GrandTotal>
+  <Payment>11.760</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>3010</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>2</ColorID>
+   <ItemName>Brick 1 x 4</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Tan</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.112</Price>
+   <SalePrice>0.106</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_K31</Remarks>
+   <LotID>480940199</LotID>
+  </Item>
+  <Item>
+   <ItemID>3005</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>69</ColorID>
+   <ItemName>Brick 1 x 1</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Tan</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.064</Price>
+   <SalePrice>0.061</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_N12</Remarks>
+   <LotID>511321474</LotID>
+  </Item>
+  <Item>
+   <ItemID>3010</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>69</ColorID>
+   <ItemName>Brick 1 x 4</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Tan</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.085</Price>
+   <SalePrice>0.081</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_N14</Remarks>
+   <LotID>518959187</LotID>
+  </Item>
+  <Item>
+   <ItemID>3008</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>2</ColorID>
+   <ItemName>Brick 1 x 8</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Tan</ColorName>
+   <Status>I</Status>
+   <Qty>15</Qty>
+   <Price>0.174</Price>
+   <SalePrice>0.165</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_N20</Remarks>
+   <LotID>552454099</LotID>
+  </Item>
+  <Item>
+   <ItemID>3009</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>69</ColorID>
+   <ItemName>Brick 1 x 6</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Tan</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.130</Price>
+   <SalePrice>0.123</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_N13</Remarks>
+   <LotID>552454108</LotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

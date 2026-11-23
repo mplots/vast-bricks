@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickOwl</Service>
+  <OrderID>8274059</OrderID>
+  <OrderDate>1770470645</OrderDate>
+  <Customer>Dan Hicks</Customer>
+  <SubTotal>17.600</SubTotal>
+  <GrandTotal>25.540</GrandTotal>
+  <Payment>22.170</Payment>
+  <Currency>GBP</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>njo0036</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>LEGO Fang-Suei Minifigure</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>3.995</Price>
+   <Condition>U</Condition>
+   <OrigQty>1</OrigQty>
+   <LotID>518405423</LotID>
+   <OwlID>646385</OwlID>
+   <OwlLotID>214248803</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>njo0035</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>LEGO Snappa Minifigure</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>2.698</Price>
+   <Condition>U</Condition>
+   <OrigQty>1</OrigQty>
+   <LotID>518405471</LotID>
+   <OwlID>718255</OwlID>
+   <OwlLotID>214248801</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>njo0033</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>LEGO Rattla (Gray) Minifigure</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>2.654</Price>
+   <Condition>U</Condition>
+   <OrigQty>1</OrigQty>
+   <LotID>518405435</LotID>
+   <OwlID>824933</OwlID>
+   <OwlLotID>214248797</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>njo0024</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>LEGO Kruncha with Armor and Vertical Hands Minifigure</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>3.690</Price>
+   <Condition>U</Condition>
+   <OrigQty>1</OrigQty>
+   <LotID>518405428</LotID>
+   <OwlID>178270</OwlID>
+   <OwlLotID>214248789</OwlLotID>
+  </Item>
+  <Item>
+   <ItemID>njo0005</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>LEGO Chopov with Armor and Helmet Minifigure</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>4.558</Price>
+   <Condition>U</Condition>
+   <OrigQty>1</OrigQty>
+   <LotID>518405421</LotID>
+   <OwlID>821452</OwlID>
+   <OwlLotID>214248769</OwlLotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

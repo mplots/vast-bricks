@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickLink</Service>
+  <OrderID>31990584</OrderID>
+  <OrderDate>1782912393</OrderDate>
+  <Customer>Toastender</Customer>
+  <SubTotal>19.460</SubTotal>
+  <GrandTotal>27.040</GrandTotal>
+  <Payment>27.040</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>71752</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Brick, Modified 2 x 2 x 2/3 Ribbed with Axle Hole</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>7</Qty>
+   <Price>0.094</Price>
+   <SalePrice>0.085</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_J27</Remarks>
+   <LotID>464420345</LotID>
+  </Item>
+  <Item>
+   <ItemID>drm007</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Night Hunter</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>6.608</Price>
+   <SalePrice>5.947</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>FG_D04</Remarks>
+   <LotID>466051109</LotID>
+  </Item>
+  <Item>
+   <ItemID>30374</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>159</ColorID>
+   <ItemName>Bar   4L &amp;#40;Lightsaber Blade / Wand&amp;#41;</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Glow In Dark White</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.286</Price>
+   <SalePrice>0.257</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_O08</Remarks>
+   <LotID>514481642</LotID>
+  </Item>
+  <Item>
+   <ItemID>gs001</ItemID>
+   <ItemTypeID>M</ItemTypeID>
+   <ColorID>0</ColorID>
+   <ItemName>Alien Buggoid, Olive Green</ItemName>
+   <ItemTypeName>Minifig</ItemTypeName>
+   <ColorName>(Not Applicable)</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>3.232</Price>
+   <SalePrice>2.909</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>UFG_A109</Remarks>
+   <LotID>518405426</LotID>
+  </Item>
+  <Item>
+   <ItemID>57900</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>1</ColorID>
+   <ItemName>Minifigure, Headgear Helmet SW Imperial Pilot</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>White</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.419</Price>
+   <SalePrice>0.377</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_H019</Remarks>
+   <LotID>519743748</LotID>
+  </Item>
+  <Item>
+   <ItemID>5264</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Plate, Round 1 x 1 with Clip on Bottom</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>7</Qty>
+   <Price>0.438</Price>
+   <SalePrice>0.394</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_M27</Remarks>
+   <LotID>524170974</LotID>
+  </Item>
+  <Item>
+   <ItemID>3626pb3351</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>12</ColorID>
+   <ItemName>Minifigure, Head without Face with Gold Bands with Hollow Circles, Silver Swirls, Red and Light Aqua Smoke on Opposite Sides Pattern &amp;#40;HP Remembrall&amp;#41;</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Trans-Clear</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.661</Price>
+   <SalePrice>0.595</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_E11 (01)</Remarks>
+   <LotID>530512379</LotID>
+  </Item>
+  <Item>
+   <ItemID>3626pb3349</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>12</ColorID>
+   <ItemName>Minifigure, Head without Face with Copper, Gold, and Dark Orange Leaves, Tan Label with Script Writing Pattern</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Trans-Clear</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.425</Price>
+   <SalePrice>0.382</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_E11 (07)</Remarks>
+   <LotID>530996192</LotID>
+  </Item>
+  <Item>
+   <ItemID>68495pb02</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>12</ColorID>
+   <ItemName>Minifigure, Utensil Stein / Cup with Molded Trans-Bright Green Drink Pattern</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Trans-Clear</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.653</Price>
+   <SalePrice>0.588</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_N084</Remarks>
+   <LotID>533813209</LotID>
+  </Item>
+  <Item>
+   <ItemID>68495pb01</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>12</ColorID>
+   <ItemName>Minifigure, Utensil Stein / Cup with Molded Trans-Orange Drink Pattern</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Trans-Clear</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.725</Price>
+   <SalePrice>0.652</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_N083</Remarks>
+   <LotID>533813210</LotID>
+  </Item>
+  <Item>
+   <ItemID>22385pb011</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>19</ColorID>
+   <ItemName>Tile, Modified 2 x 3 Pentagonal with Nexo Power Shield Pattern - Phoenix Blaze</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Trans-Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.166</Price>
+   <SalePrice>0.149</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_A054</Remarks>
+   <LotID>538243872</LotID>
+  </Item>
+  <Item>
+   <ItemID>67471pb01</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>159</ColorID>
+   <ItemName>Anglerfish with Molded Lime Eyes, Fins and Teeth Pattern</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Glow In Dark White</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>3.573</Price>
+   <SalePrice>3.216</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_B77</Remarks>
+   <LotID>539207062</LotID>
+  </Item>
+  <Item>
+   <ItemID>65416</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Technic, Steering Brake Disk 6 x 6</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.425</Price>
+   <SalePrice>0.382</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_G110</Remarks>
+   <LotID>545112378</LotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

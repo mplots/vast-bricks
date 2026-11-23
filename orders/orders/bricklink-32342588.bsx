@@ -1,0 +1,1300 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickLink</Service>
+  <OrderID>32342588</OrderID>
+  <OrderDate>1786878215</OrderDate>
+  <Customer>s1k.runr</Customer>
+  <SubTotal>39.143</SubTotal>
+  <GrandTotal>61.479</GrandTotal>
+  <Payment>61.480</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>3678b</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Slope 65 2 x 2 x 2 with Bottom Tube</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.131</Price>
+   <SalePrice>0.151</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_A03</Remarks>
+   <LotID>464420289</LotID>
+  </Item>
+  <Item>
+   <ItemID>3023</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>59</ColorID>
+   <ItemName>Plate 1 x 2</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Red</ColorName>
+   <Status>I</Status>
+   <Qty>5</Qty>
+   <Price>0.030</Price>
+   <SalePrice>0.034</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_G12</Remarks>
+   <LotID>464612698</LotID>
+  </Item>
+  <Item>
+   <ItemID>3021</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>59</ColorID>
+   <ItemName>Plate 2 x 3</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Red</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.208</Price>
+   <SalePrice>0.239</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_H54</Remarks>
+   <LotID>464612700</LotID>
+  </Item>
+  <Item>
+   <ItemID>3062</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Brick, Round  1 x 1</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>6</Qty>
+   <Price>0.050</Price>
+   <SalePrice>0.057</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_E52</Remarks>
+   <LotID>470849153</LotID>
+  </Item>
+  <Item>
+   <ItemID>32531</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Technic, Brick 4 x 6 Open Center</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.309</Price>
+   <SalePrice>0.355</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>DA_K14</Remarks>
+   <LotID>480940287</LotID>
+  </Item>
+  <Item>
+   <ItemID>4162</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>59</ColorID>
+   <ItemName>Tile 1 x 8</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Red</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.138</Price>
+   <SalePrice>0.159</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>DA_L02</Remarks>
+   <LotID>483472285</LotID>
+  </Item>
+  <Item>
+   <ItemID>6632</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Technic, Liftarm Thin 1 x 3 - Axle Holes</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>6</Qty>
+   <Price>0.064</Price>
+   <SalePrice>0.073</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_K59</Remarks>
+   <LotID>487648055</LotID>
+  </Item>
+  <Item>
+   <ItemID>2357</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>63</ColorID>
+   <ItemName>Brick 2 x 2 Corner</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Blue</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.146</Price>
+   <SalePrice>0.167</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_K24</Remarks>
+   <LotID>500626758</LotID>
+  </Item>
+  <Item>
+   <ItemID>44302</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Hinge Plate 1 x 2 Locking with 2 Fingers on End</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.030</Price>
+   <SalePrice>0.034</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_O26</Remarks>
+   <LotID>515001382</LotID>
+  </Item>
+  <Item>
+   <ItemID>3023</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>63</ColorID>
+   <ItemName>Plate 1 x 2</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Blue</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.022</Price>
+   <SalePrice>0.026</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_A04</Remarks>
+   <LotID>518617742</LotID>
+  </Item>
+  <Item>
+   <ItemID>3020</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Plate 2 x 4</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>13</Qty>
+   <Price>0.037</Price>
+   <SalePrice>0.043</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_K07</Remarks>
+   <LotID>518617752</LotID>
+  </Item>
+  <Item>
+   <ItemID>3623</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Plate 1 x 3</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.050</Price>
+   <SalePrice>0.058</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_J12</Remarks>
+   <LotID>518617753</LotID>
+  </Item>
+  <Item>
+   <ItemID>3460</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Plate 1 x 8</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>11</Qty>
+   <Price>0.089</Price>
+   <SalePrice>0.103</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_J08</Remarks>
+   <LotID>518617755</LotID>
+  </Item>
+  <Item>
+   <ItemID>3023</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Plate 1 x 2</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>29</Qty>
+   <Price>0.037</Price>
+   <SalePrice>0.043</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_I14</Remarks>
+   <LotID>518617777</LotID>
+  </Item>
+  <Item>
+   <ItemID>3710</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Plate 1 x 4</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>9</Qty>
+   <Price>0.047</Price>
+   <SalePrice>0.054</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_J04</Remarks>
+   <LotID>518617778</LotID>
+  </Item>
+  <Item>
+   <ItemID>3021</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Plate 2 x 3</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>6</Qty>
+   <Price>0.038</Price>
+   <SalePrice>0.044</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_J12</Remarks>
+   <LotID>518617785</LotID>
+  </Item>
+  <Item>
+   <ItemID>3795</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Plate 2 x 6</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>13</Qty>
+   <Price>0.053</Price>
+   <SalePrice>0.061</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_L17</Remarks>
+   <LotID>518617786</LotID>
+  </Item>
+  <Item>
+   <ItemID>3623</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>1</ColorID>
+   <ItemName>Plate 1 x 3</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>White</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.041</Price>
+   <SalePrice>0.047</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_J10</Remarks>
+   <LotID>518617836</LotID>
+  </Item>
+  <Item>
+   <ItemID>4477</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>1</ColorID>
+   <ItemName>Plate 1 x 10</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>White</ColorName>
+   <Status>I</Status>
+   <Qty>8</Qty>
+   <Price>0.077</Price>
+   <SalePrice>0.088</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_J15</Remarks>
+   <LotID>518617839</LotID>
+  </Item>
+  <Item>
+   <ItemID>3034</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>1</ColorID>
+   <ItemName>Plate 2 x 8</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>White</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.093</Price>
+   <SalePrice>0.106</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_L18</Remarks>
+   <LotID>518617859</LotID>
+  </Item>
+  <Item>
+   <ItemID>3832</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Plate 2 x 10</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>9</Qty>
+   <Price>0.088</Price>
+   <SalePrice>0.101</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_K14</Remarks>
+   <LotID>518617870</LotID>
+  </Item>
+  <Item>
+   <ItemID>4282</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Plate 2 x 16</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>8</Qty>
+   <Price>0.189</Price>
+   <SalePrice>0.218</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_L10</Remarks>
+   <LotID>518617874</LotID>
+  </Item>
+  <Item>
+   <ItemID>4073</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Plate, Round 1 x 1</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>16</Qty>
+   <Price>0.020</Price>
+   <SalePrice>0.023</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_H046</Remarks>
+   <LotID>518750347</LotID>
+  </Item>
+  <Item>
+   <ItemID>3003</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>2</ColorID>
+   <ItemName>Brick 2 x 2</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Tan</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.033</Price>
+   <SalePrice>0.038</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_N17</Remarks>
+   <LotID>518936916</LotID>
+  </Item>
+  <Item>
+   <ItemID>3001</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>1</ColorID>
+   <ItemName>Brick 2 x 4</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>White</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.067</Price>
+   <SalePrice>0.077</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_B15</Remarks>
+   <LotID>518936935</LotID>
+  </Item>
+  <Item>
+   <ItemID>3010</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>63</ColorID>
+   <ItemName>Brick 1 x 4</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Blue</ColorName>
+   <Status>I</Status>
+   <Qty>3</Qty>
+   <Price>0.083</Price>
+   <SalePrice>0.095</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_C01</Remarks>
+   <LotID>518959186</LotID>
+  </Item>
+  <Item>
+   <ItemID>54200</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>1</ColorID>
+   <ItemName>Slope 30 1 x 1 x 2/3</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>White</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.021</Price>
+   <SalePrice>0.024</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_H088</Remarks>
+   <LotID>519113048</LotID>
+  </Item>
+  <Item>
+   <ItemID>3008</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>1</ColorID>
+   <ItemName>Brick 1 x 8</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>White</ColorName>
+   <Status>I</Status>
+   <Qty>5</Qty>
+   <Price>0.108</Price>
+   <SalePrice>0.124</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_O04</Remarks>
+   <LotID>519122834</LotID>
+  </Item>
+  <Item>
+   <ItemID>2456</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Brick 2 x 6</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.115</Price>
+   <SalePrice>0.132</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_C11</Remarks>
+   <LotID>519280711</LotID>
+  </Item>
+  <Item>
+   <ItemID>3004</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>1</ColorID>
+   <ItemName>Brick 1 x 2</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>White</ColorName>
+   <Status>I</Status>
+   <Qty>10</Qty>
+   <Price>0.028</Price>
+   <SalePrice>0.032</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_M04</Remarks>
+   <LotID>519280729</LotID>
+  </Item>
+  <Item>
+   <ItemID>2412b</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Tile, Modified 1 x 2 Grille with Bottom Groove</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.018</Price>
+   <SalePrice>0.021</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_H102</Remarks>
+   <LotID>519282172</LotID>
+  </Item>
+  <Item>
+   <ItemID>2420</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>63</ColorID>
+   <ItemName>Plate 2 x 2 Corner</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Blue</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.058</Price>
+   <SalePrice>0.067</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_H106</Remarks>
+   <LotID>519293200</LotID>
+  </Item>
+  <Item>
+   <ItemID>4162</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Tile 1 x 8</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>5</Qty>
+   <Price>0.126</Price>
+   <SalePrice>0.145</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_I11</Remarks>
+   <LotID>519673167</LotID>
+  </Item>
+  <Item>
+   <ItemID>3069</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>63</ColorID>
+   <ItemName>Tile 1 x 2</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Blue</ColorName>
+   <Status>I</Status>
+   <Qty>6</Qty>
+   <Price>0.045</Price>
+   <SalePrice>0.051</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_T033</Remarks>
+   <LotID>519673194</LotID>
+  </Item>
+  <Item>
+   <ItemID>2431</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Tile 1 x 4</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.087</Price>
+   <SalePrice>0.100</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_I11</Remarks>
+   <LotID>520258339</LotID>
+  </Item>
+  <Item>
+   <ItemID>4032</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>88</ColorID>
+   <ItemName>Plate, Round 2 x 2 with Axle Hole</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Reddish Brown</ColorName>
+   <Status>I</Status>
+   <Qty>6</Qty>
+   <Price>0.022</Price>
+   <SalePrice>0.025</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_B40</Remarks>
+   <LotID>520448374</LotID>
+  </Item>
+  <Item>
+   <ItemID>3032</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>1</ColorID>
+   <ItemName>Plate 4 x 6</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>White</ColorName>
+   <Status>I</Status>
+   <Qty>3</Qty>
+   <Price>0.117</Price>
+   <SalePrice>0.135</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_C16</Remarks>
+   <LotID>522283114</LotID>
+  </Item>
+  <Item>
+   <ItemID>3036</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Plate 6 x 8</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.262</Price>
+   <SalePrice>0.301</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_C18</Remarks>
+   <LotID>522283122</LotID>
+  </Item>
+  <Item>
+   <ItemID>3036</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Plate 6 x 8</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.218</Price>
+   <SalePrice>0.251</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_C17</Remarks>
+   <LotID>522283125</LotID>
+  </Item>
+  <Item>
+   <ItemID>3031</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Plate 4 x 4</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>8</Qty>
+   <Price>0.076</Price>
+   <SalePrice>0.087</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_C18</Remarks>
+   <LotID>522283130</LotID>
+  </Item>
+  <Item>
+   <ItemID>3030</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Plate 4 x 10</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.126</Price>
+   <SalePrice>0.144</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_D06</Remarks>
+   <LotID>523254211</LotID>
+  </Item>
+  <Item>
+   <ItemID>3035</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Plate 4 x 8</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.176</Price>
+   <SalePrice>0.202</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_D07</Remarks>
+   <LotID>523254215</LotID>
+  </Item>
+  <Item>
+   <ItemID>62462</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Technic, Pin Connector Round 2L with Slot &amp;#40;Pin Joiner Round&amp;#41;</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.056</Price>
+   <SalePrice>0.065</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_B84</Remarks>
+   <LotID>523404942</LotID>
+  </Item>
+  <Item>
+   <ItemID>63965</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Bar   6L with Stop Ring</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.058</Price>
+   <SalePrice>0.067</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_M004</Remarks>
+   <LotID>523404956</LotID>
+  </Item>
+  <Item>
+   <ItemID>32316</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Technic, Liftarm Thick 1 x 5</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.039</Price>
+   <SalePrice>0.045</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_D14</Remarks>
+   <LotID>523404961</LotID>
+  </Item>
+  <Item>
+   <ItemID>60484</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Technic, Liftarm, Modified T-Shape Thick 3 x 3</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>5</Qty>
+   <Price>0.049</Price>
+   <SalePrice>0.056</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_C40</Remarks>
+   <LotID>523404984</LotID>
+  </Item>
+  <Item>
+   <ItemID>32316</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Technic, Liftarm Thick 1 x 5</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.041</Price>
+   <SalePrice>0.047</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_H17</Remarks>
+   <LotID>523405008</LotID>
+  </Item>
+  <Item>
+   <ItemID>32002</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Technic, Pin 3/4</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>10</Qty>
+   <Price>0.047</Price>
+   <SalePrice>0.054</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_M034</Remarks>
+   <LotID>523405014</LotID>
+  </Item>
+  <Item>
+   <ItemID>62462</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Technic, Pin Connector Round 2L with Slot &amp;#40;Pin Joiner Round&amp;#41;</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>3</Qty>
+   <Price>0.062</Price>
+   <SalePrice>0.071</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_M002</Remarks>
+   <LotID>523405025</LotID>
+  </Item>
+  <Item>
+   <ItemID>63965</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Bar   6L with Stop Ring</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.087</Price>
+   <SalePrice>0.100</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_M016</Remarks>
+   <LotID>523405041</LotID>
+  </Item>
+  <Item>
+   <ItemID>32062</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>5</ColorID>
+   <ItemName>Technic, Axle  2L Notched</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Red</ColorName>
+   <Status>I</Status>
+   <Qty>9</Qty>
+   <Price>0.012</Price>
+   <SalePrice>0.014</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_D11</Remarks>
+   <LotID>523405093</LotID>
+  </Item>
+  <Item>
+   <ItemID>3708</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Technic, Axle 12L</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>5</Qty>
+   <Price>0.135</Price>
+   <SalePrice>0.156</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_C08</Remarks>
+   <LotID>523453172</LotID>
+  </Item>
+  <Item>
+   <ItemID>60208</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>69</ColorID>
+   <ItemName>Wheel 31mm D. x 15mm Technic</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Tan</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>2.516</Price>
+   <SalePrice>2.893</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_D02</Remarks>
+   <LotID>523459619</LotID>
+  </Item>
+  <Item>
+   <ItemID>32018</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Technic, Brick 1 x 14 with Holes</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.214</Price>
+   <SalePrice>0.246</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_G04</Remarks>
+   <LotID>523461103</LotID>
+  </Item>
+  <Item>
+   <ItemID>6232</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Brick, Modified 2 x 2 with Pin and Axle Hole</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.022</Price>
+   <SalePrice>0.025</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_M055</Remarks>
+   <LotID>523463449</LotID>
+  </Item>
+  <Item>
+   <ItemID>32064</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Technic, Brick 1 x 2 with Axle Hole</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>14</Qty>
+   <Price>0.020</Price>
+   <SalePrice>0.023</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_B65</Remarks>
+   <LotID>523473762</LotID>
+  </Item>
+  <Item>
+   <ItemID>32000</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Technic, Brick 1 x 2 with Holes</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.036</Price>
+   <SalePrice>0.041</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_A120</Remarks>
+   <LotID>523473768</LotID>
+  </Item>
+  <Item>
+   <ItemID>6541</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Technic, Brick 1 x 1 with Hole</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>8</Qty>
+   <Price>0.034</Price>
+   <SalePrice>0.039</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_A086</Remarks>
+   <LotID>523473781</LotID>
+  </Item>
+  <Item>
+   <ItemID>3701</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Technic, Brick 1 x 4 with Holes</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>8</Qty>
+   <Price>0.051</Price>
+   <SalePrice>0.059</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_C34</Remarks>
+   <LotID>523473789</LotID>
+  </Item>
+  <Item>
+   <ItemID>30364</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Hinge Brick 1 x 2 Locking with 1 Finger Vertical End</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.038</Price>
+   <SalePrice>0.044</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_M072</Remarks>
+   <LotID>523473793</LotID>
+  </Item>
+  <Item>
+   <ItemID>44302</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Hinge Plate 1 x 2 Locking with 2 Fingers on End</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>6</Qty>
+   <Price>0.026</Price>
+   <SalePrice>0.030</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_M080</Remarks>
+   <LotID>523480218</LotID>
+  </Item>
+  <Item>
+   <ItemID>6632</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Technic, Liftarm Thin 1 x 3 - Axle Holes</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>6</Qty>
+   <Price>0.050</Price>
+   <SalePrice>0.057</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_M082</Remarks>
+   <LotID>523480226</LotID>
+  </Item>
+  <Item>
+   <ItemID>6632</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>3</ColorID>
+   <ItemName>Technic, Liftarm Thin 1 x 3 - Axle Holes</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Yellow</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.040</Price>
+   <SalePrice>0.046</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_M076</Remarks>
+   <LotID>523480233</LotID>
+  </Item>
+  <Item>
+   <ItemID>3941</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>7</ColorID>
+   <ItemName>Brick, Round 2 x 2 with Axle Hole</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Blue</ColorName>
+   <Status>I</Status>
+   <Qty>5</Qty>
+   <Price>0.038</Price>
+   <SalePrice>0.044</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_A004</Remarks>
+   <LotID>523655190</LotID>
+  </Item>
+  <Item>
+   <ItemID>3062</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Brick, Round  1 x 1</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>8</Qty>
+   <Price>0.037</Price>
+   <SalePrice>0.043</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_M096</Remarks>
+   <LotID>523655204</LotID>
+  </Item>
+  <Item>
+   <ItemID>3937</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Hinge Brick 1 x 2 Base</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.080</Price>
+   <SalePrice>0.092</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_N002</Remarks>
+   <LotID>523699818</LotID>
+  </Item>
+  <Item>
+   <ItemID>4081b</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Plate, Modified 1 x 1 with Light Attachment - Thick Ring</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.022</Price>
+   <SalePrice>0.026</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_N003</Remarks>
+   <LotID>523699830</LotID>
+  </Item>
+  <Item>
+   <ItemID>32278</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>1</ColorID>
+   <ItemName>Technic, Liftarm Thick 1 x 15</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>White</ColorName>
+   <Status>I</Status>
+   <Qty>3</Qty>
+   <Price>0.349</Price>
+   <SalePrice>0.401</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_F08</Remarks>
+   <LotID>536904387</LotID>
+  </Item>
+  <Item>
+   <ItemID>32525</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Technic, Liftarm Thick 1 x 11</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>6</Qty>
+   <Price>0.177</Price>
+   <SalePrice>0.203</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_F13</Remarks>
+   <LotID>536920389</LotID>
+  </Item>
+  <Item>
+   <ItemID>40490</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Technic, Liftarm Thick 1 x 9</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.077</Price>
+   <SalePrice>0.088</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_F16</Remarks>
+   <LotID>536920397</LotID>
+  </Item>
+  <Item>
+   <ItemID>3010</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>1</ColorID>
+   <ItemName>Brick 1 x 4</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>White</ColorName>
+   <Status>I</Status>
+   <Qty>8</Qty>
+   <Price>0.057</Price>
+   <SalePrice>0.066</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_L05</Remarks>
+   <LotID>539342627</LotID>
+  </Item>
+  <Item>
+   <ItemID>32531</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Technic, Brick 4 x 6 Open Center</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.272</Price>
+   <SalePrice>0.313</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_H07</Remarks>
+   <LotID>540900262</LotID>
+  </Item>
+  <Item>
+   <ItemID>50950</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>1</ColorID>
+   <ItemName>Slope, Curved 3 x 1</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>White</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.040</Price>
+   <SalePrice>0.046</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_G058</Remarks>
+   <LotID>545112348</LotID>
+  </Item>
+  <Item>
+   <ItemID>2431</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Tile 1 x 4</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>5</Qty>
+   <Price>0.093</Price>
+   <SalePrice>0.106</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_I10</Remarks>
+   <LotID>545112357</LotID>
+  </Item>
+  <Item>
+   <ItemID>3068</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Tile 2 x 2</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>6</Qty>
+   <Price>0.083</Price>
+   <SalePrice>0.096</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_T002</Remarks>
+   <LotID>546748986</LotID>
+  </Item>
+  <Item>
+   <ItemID>6636</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>1</ColorID>
+   <ItemName>Tile 1 x 6</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>White</ColorName>
+   <Status>I</Status>
+   <Qty>10</Qty>
+   <Price>0.069</Price>
+   <SalePrice>0.079</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_T011</Remarks>
+   <LotID>546937790</LotID>
+  </Item>
+  <Item>
+   <ItemID>6636</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>63</ColorID>
+   <ItemName>Tile 1 x 6</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Blue</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.055</Price>
+   <SalePrice>0.064</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_I09</Remarks>
+   <LotID>546937792</LotID>
+  </Item>
+  <Item>
+   <ItemID>4162</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>59</ColorID>
+   <ItemName>Tile 1 x 8</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Red</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.129</Price>
+   <SalePrice>0.148</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_C14</Remarks>
+   <LotID>547102842</LotID>
+  </Item>
+  <Item>
+   <ItemID>3666</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Plate 1 x 6</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>32</Qty>
+   <Price>0.062</Price>
+   <SalePrice>0.071</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_J05</Remarks>
+   <LotID>548093088</LotID>
+  </Item>
+  <Item>
+   <ItemID>4477</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Plate 1 x 10</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>3</Qty>
+   <Price>0.093</Price>
+   <SalePrice>0.106</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_J15</Remarks>
+   <LotID>548254448</LotID>
+  </Item>
+  <Item>
+   <ItemID>3004</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>59</ColorID>
+   <ItemName>Brick 1 x 2</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Red</ColorName>
+   <Status>I</Status>
+   <Qty>6</Qty>
+   <Price>0.043</Price>
+   <SalePrice>0.049</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_T097</Remarks>
+   <LotID>551172415</LotID>
+  </Item>
+  <Item>
+   <ItemID>43722</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Wedge, Plate 3 x 2 Right</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>3</Qty>
+   <Price>0.089</Price>
+   <SalePrice>0.103</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_T107</Remarks>
+   <LotID>551326275</LotID>
+  </Item>
+  <Item>
+   <ItemID>43723</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Wedge, Plate 3 x 2 Left</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>3</Qty>
+   <Price>0.089</Price>
+   <SalePrice>0.103</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_T109</Remarks>
+   <LotID>551326286</LotID>
+  </Item>
+  <Item>
+   <ItemID>3003</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Brick 2 x 2</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.047</Price>
+   <SalePrice>0.054</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_O03</Remarks>
+   <LotID>552139759</LotID>
+  </Item>
+  <Item>
+   <ItemID>3009</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Brick 1 x 6</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>9</Qty>
+   <Price>0.144</Price>
+   <SalePrice>0.165</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_O05</Remarks>
+   <LotID>552454107</LotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickLink</Service>
+  <OrderID>32138388</OrderID>
+  <OrderDate>1784582769</OrderDate>
+  <Customer>ElisaMissa</Customer>
+  <SubTotal>0.299</SubTotal>
+  <GrandTotal>4.801</GrandTotal>
+  <Payment>4.800</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>3020</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>69</ColorID>
+   <ItemName>Plate 2 x 4</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Tan</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.043</Price>
+   <SalePrice>0.041</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_A10</Remarks>
+   <LotID>518617768</LotID>
+  </Item>
+  <Item>
+   <ItemID>3069</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>14</ColorID>
+   <ItemName>Tile 1 x 2</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Trans-Dark Blue</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.057</Price>
+   <SalePrice>0.054</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_T037</Remarks>
+   <LotID>519673189</LotID>
+  </Item>
+  <Item>
+   <ItemID>2417</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>6</ColorID>
+   <ItemName>Plant Leaves 6 x 5</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Green</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.215</Price>
+   <SalePrice>0.204</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_P06</Remarks>
+   <LotID>524638298</LotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

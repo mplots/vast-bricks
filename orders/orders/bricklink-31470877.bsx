@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickLink</Service>
+  <OrderID>31470877</OrderID>
+  <OrderDate>1777406364</OrderDate>
+  <Customer>BrixEstByKlara</Customer>
+  <SubTotal>3.014</SubTotal>
+  <GrandTotal>9.692</GrandTotal>
+  <Payment>9.690</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>13786pb06</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>110</ColorID>
+   <ItemName>Cat, Standing with Black Eyes, Bright Pink Nose, White Muzzle and Chest, Blue Collar with Gold Tag Pattern &amp;#40;Disney Sox&amp;#41;</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Bright Light Orange</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>2.235</Price>
+   <SalePrice>2.011</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>MB_E45</Remarks>
+   <LotID>529137837</LotID>
+  </Item>
+  <Item>
+   <ItemID>3626pb2550</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>152</ColorID>
+   <ItemName>Minifigure, Head Dual Sided Alien with Bright Light Yellow Headband, Black Eyebrows, Yellow Eyes, Metallic Light Blue Face Paint Triangles, Lopsided Open Mouth Smile with Teeth / Closed Eyes and Singing Pattern</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Aqua</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>1.114</Price>
+   <SalePrice>1.003</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BD_E12 (03)</Remarks>
+   <LotID>530439944</LotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

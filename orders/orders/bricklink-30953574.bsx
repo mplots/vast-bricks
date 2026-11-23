@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickLink</Service>
+  <OrderID>30953574</OrderID>
+  <OrderDate>1772467182</OrderDate>
+  <Customer>erkiperkiman</Customer>
+  <SubTotal>0.645</SubTotal>
+  <GrandTotal>6.352</GrandTotal>
+  <Payment>7.510</Payment>
+  <Currency>USD</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>92950</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Arch 1 x 6 Raised Arch</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.054</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/463231199&quot;&gt;</Comments>
+   <Remarks>MA_D04</Remarks>
+   <LotID>463231199</LotID>
+  </Item>
+  <Item>
+   <ItemID>32474</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Technic Ball Joint</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.101</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/464663349&quot;&gt;</Comments>
+   <Remarks>MA_H04</Remarks>
+   <LotID>464663349</LotID>
+  </Item>
+  <Item>
+   <ItemID>63868</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Plate, Modified 1 x 2 with Clip on End &amp;#40;Horizontal Grip&amp;#41;</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.028</Price>
+   <Condition>N</Condition>
+   <Comments>&lt;img src=&quot;//queue.simpleanalyticscdn.com/noscript.gif?hostname=splash.vastbricks.com&amp;path=/cart/513386956&quot;&gt;</Comments>
+   <Remarks>MA_O34</Remarks>
+   <LotID>513386956</LotID>
+  </Item>
+  <Item>
+   <ItemID>2456</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Brick 2 x 6</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.154</Price>
+   <Condition>U</Condition>
+   <Remarks>DB_C10</Remarks>
+   <LotID>519280709</LotID>
+  </Item>
+  <Item>
+   <ItemID>32474</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>34</ColorID>
+   <ItemName>Technic Ball Joint</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Lime</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.072</Price>
+   <Condition>U</Condition>
+   <Remarks>MB_B55</Remarks>
+   <LotID>523405066</LotID>
+  </Item>
+  <Item>
+   <ItemID>61252</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Plate, Modified 1 x 1 with Open O Clip &amp;#40;Horizontal Grip&amp;#41;</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>3</Qty>
+   <Price>0.024</Price>
+   <Condition>U</Condition>
+   <Remarks>MB_D37</Remarks>
+   <LotID>523521932</LotID>
+  </Item>
+  <Item>
+   <ItemID>60478</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Plate, Modified 1 x 2 with Bar Handle on End</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.020</Price>
+   <Condition>U</Condition>
+   <Remarks>MB_D51</Remarks>
+   <LotID>523655224</LotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

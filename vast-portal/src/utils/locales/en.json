@@ -603,5 +603,16 @@
   "job-tally-skipped-fresh": "already up to date",
   "shipping-prices-trackable": "Trackable",
   "shipping-prices-not-trackable": "Not trackable",
-  "shipping-prices-days": "{days} days"
+  "shipping-prices-days": "{days} days",
+  "part-finder": "Part finder",
+  "part-finder-part": "Part and color",
+  "part-finder-type": "Type a part and color",
+  "part-finder-no-parts": "No part in a set for sale matches",
+  "part-finder-set-count": "{count, plural, one {# set} other {# sets}}",
+  "part-finder-no-sets": "No set for sale contains this part.",
+  "part-finder-set": "Set",
+  "part-finder-quantity": "In set",
+  "part-finder-stores": "Stores",
+  "part-finder-pieces": "{count} pcs",
+  "part-finder-error": "Parts could not be loaded."
 }

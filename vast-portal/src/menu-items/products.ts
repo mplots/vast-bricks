@@ -1,9 +1,10 @@
-import { MonitorMobbile } from 'iconsax-reactjs';
+import { MonitorMobbile, SearchNormal1 } from 'iconsax-reactjs';
 
 import { NavItemType } from 'types/menu';
 
 const icons = {
-  products: MonitorMobbile
+  products: MonitorMobbile,
+  partFinder: SearchNormal1
 };
 
 const productsMenu: NavItemType = {
@@ -17,6 +18,13 @@ const productsMenu: NavItemType = {
       type: 'item',
       url: '/products',
       icon: icons.products
+    },
+    {
+      id: 'part-finder',
+      title: 'part-finder',
+      type: 'item',
+      url: '/part-finder',
+      icon: icons.partFinder
     }
   ]
 };

@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickLink</Service>
+  <OrderID>31672392</OrderID>
+  <OrderDate>1779447499</OrderDate>
+  <Customer>Spin.jet</Customer>
+  <SubTotal>5.340</SubTotal>
+  <GrandTotal>7.421</GrandTotal>
+  <Payment>7.420</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>25411</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>120</ColorID>
+   <ItemName>Minifigure, Hair Tousled and Spiked Up Very High</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Brown</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.705</Price>
+   <SalePrice>0.635</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>MB_A55</Remarks>
+   <LotID>519743728</LotID>
+  </Item>
+  <Item>
+   <ItemID>25405pb01</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Minifigure, Hair Female Wavy Ponytail with Long Bangs with Silver Band Pattern</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.876</Price>
+   <SalePrice>0.788</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>MB_A07</Remarks>
+   <LotID>519743776</LotID>
+  </Item>
+  <Item>
+   <ItemID>25378</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Minifigure, Hair Tousled with Long Bangs</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.732</Price>
+   <SalePrice>0.659</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>MB_E32</Remarks>
+   <LotID>526581300</LotID>
+  </Item>
+  <Item>
+   <ItemID>25409</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>2</ColorID>
+   <ItemName>Minifigure, Hair Mid-Length Tousled with Side Part</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Tan</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.613</Price>
+   <SalePrice>0.552</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>MB_E14</Remarks>
+   <LotID>529518023</LotID>
+  </Item>
+  <Item>
+   <ItemID>25412</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>120</ColorID>
+   <ItemName>Minifigure, Hair Tousled and Sticking Out on Both Sides</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Brown</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.963</Price>
+   <SalePrice>0.867</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>MB_A10</Remarks>
+   <LotID>529518043</LotID>
+  </Item>
+  <Item>
+   <ItemID>25379</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>95</ColorID>
+   <ItemName>Minifigure, Hair Flat Top with Straight Even Sections</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Flat Silver</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.579</Price>
+   <SalePrice>0.521</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>MB_E56</Remarks>
+   <LotID>529809923</LotID>
+  </Item>
+  <Item>
+   <ItemID>15428</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>1</ColorID>
+   <ItemName>Minifigure Hood Folded Down</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>White</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>1.465</Price>
+   <SalePrice>1.319</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>MB_F58</Remarks>
+   <LotID>534405303</LotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

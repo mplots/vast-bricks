@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickLink</Service>
+  <OrderID>31689556</OrderID>
+  <OrderDate>1779645187</OrderDate>
+  <Customer>GGgame</Customer>
+  <SubTotal>0.959</SubTotal>
+  <GrandTotal>3.574</GrandTotal>
+  <Payment>3.580</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>92946</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Slope 45 2 x 1 with 2/3 Cutout</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.041</Price>
+   <SalePrice>0.037</SalePrice>
+   <Condition>N</Condition>
+   <Remarks>MA_K36</Remarks>
+   <LotID>486000438</LotID>
+  </Item>
+  <Item>
+   <ItemID>4449</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Minifigure, Utensil Briefcase / Suitcase</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.160</Price>
+   <SalePrice>0.144</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>MB_A08</Remarks>
+   <LotID>518364609</LotID>
+  </Item>
+  <Item>
+   <ItemID>30228</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Minifigure, Utensil Tool Motor Hammer / Jackhammer</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.042</Price>
+   <SalePrice>0.038</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>MB_A08</Remarks>
+   <LotID>518364611</LotID>
+  </Item>
+  <Item>
+   <ItemID>93106</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Minifigure, Utensil Metal Detector, no Stud on Search Head</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.101</Price>
+   <SalePrice>0.091</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>MB_F22</Remarks>
+   <LotID>533031918</LotID>
+  </Item>
+  <Item>
+   <ItemID>93551pb01</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>150</ColorID>
+   <ItemName>Minifigure, Utensil Paint Palette with Yellow, Blue, Green and Red Paint Spots Pattern</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Medium Nougat</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.391</Price>
+   <SalePrice>0.352</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>MB_F26</Remarks>
+   <LotID>533391482</LotID>
+  </Item>
+  <Item>
+   <ItemID>11402c</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Minifigure, Utensil Tool Oil Can - Ribbed Handle</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.085</Price>
+   <SalePrice>0.076</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>MB_F16</Remarks>
+   <LotID>533571799</LotID>
+  </Item>
+  <Item>
+   <ItemID>35809pb01</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>152</ColorID>
+   <ItemName>Minifigure, Utensil Pen with Molded Dark Purple Tip and Cap Pattern</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Aqua</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.073</Price>
+   <SalePrice>0.066</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>MB_F41</Remarks>
+   <LotID>533813240</LotID>
+  </Item>
+  <Item>
+   <ItemID>85940</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Technic, Liftarm, Modified Bar Angled 1 x 2</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>2</Qty>
+   <Price>0.025</Price>
+   <SalePrice>0.023</SalePrice>
+   <Condition>U</Condition>
+   <Remarks>BM_G053</Remarks>
+   <LotID>539943455</LotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

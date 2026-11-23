@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickLink</Service>
+  <OrderID>32696417</OrderID>
+  <OrderDate>1790753534</OrderDate>
+  <Customer>theoni</Customer>
+  <SubTotal>45.384</SubTotal>
+  <GrandTotal>58.260</GrandTotal>
+  <Payment>58.260</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>15100</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Technic, Pin with Friction Ridges and Pin Hole</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>20</Qty>
+   <Price>0.099</Price>
+   <Condition>N</Condition>
+   <Remarks>DA_H15</Remarks>
+   <LotID>471498962</LotID>
+  </Item>
+  <Item>
+   <ItemID>2391</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Technic, Liftarm, Modified Perpendicular Holes Thick 1 x 7</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <Status>I</Status>
+   <Qty>10</Qty>
+   <Price>0.585</Price>
+   <Condition>N</Condition>
+   <Remarks>DA_E16</Remarks>
+   <LotID>487395606</LotID>
+  </Item>
+  <Item>
+   <ItemID>6612</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>1</ColorID>
+   <ItemName>Technic, Liftarm, Modified Perpendicular Holes Thick 1 x 9</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>White</ColorName>
+   <Status>I</Status>
+   <Qty>6</Qty>
+   <Price>0.878</Price>
+   <Condition>N</Condition>
+   <Remarks>DA_M02</Remarks>
+   <LotID>489204289</LotID>
+  </Item>
+  <Item>
+   <ItemID>6612</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>5</ColorID>
+   <ItemName>Technic, Liftarm, Modified Perpendicular Holes Thick 1 x 9</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Red</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.784</Price>
+   <Condition>N</Condition>
+   <Remarks>DA_N07</Remarks>
+   <LotID>504378423</LotID>
+  </Item>
+  <Item>
+   <ItemID>2477</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>5</ColorID>
+   <ItemName>Technic, Liftarm, Modified Perpendicular Holes Bent Thick L-Shape 3 x 5</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Red</ColorName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.568</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_M21</Remarks>
+   <LotID>504378440</LotID>
+  </Item>
+  <Item>
+   <ItemID>15100</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>63</ColorID>
+   <ItemName>Technic, Pin with Friction Ridges and Pin Hole</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Blue</ColorName>
+   <Status>I</Status>
+   <Qty>10</Qty>
+   <Price>0.102</Price>
+   <Condition>N</Condition>
+   <Remarks>MA_O29</Remarks>
+   <LotID>514481597</LotID>
+  </Item>
+  <Item>
+   <ItemID>73507</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Technic, Liftarm, Modified Perpendicular Holes Thick 1 x 11</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>10</Qty>
+   <Price>0.406</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_K01</Remarks>
+   <LotID>539178906</LotID>
+  </Item>
+  <Item>
+   <ItemID>71710</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Technic, Liftarm, Modified Perpendicular Holes Thick 1 x 15</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>10</Qty>
+   <Price>0.788</Price>
+   <Condition>U</Condition>
+   <Remarks>BD_G15</Remarks>
+   <LotID>539943459</LotID>
+  </Item>
+  <Item>
+   <ItemID>4526</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Technic, Liftarm, Modified Frame Thick 3 x 13 Open Center</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>8</Qty>
+   <Price>1.118</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_D18</Remarks>
+   <LotID>539943465</LotID>
+  </Item>
+  <Item>
+   <ItemID>2477</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>11</ColorID>
+   <ItemName>Technic, Liftarm, Modified Perpendicular Holes Bent Thick L-Shape 3 x 5</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Black</ColorName>
+   <Status>I</Status>
+   <Qty>6</Qty>
+   <Price>0.829</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_D19</Remarks>
+   <LotID>539943477</LotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>

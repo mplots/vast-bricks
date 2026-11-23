@@ -40,6 +40,26 @@ public class BrickSyncController {
         return ResponseEntity.accepted().body(new BrickSyncCommandResponse(true, request.getCommand().trim()));
     }
 
+    /**
+     * Runs add, merge or loadprices on pasted BSX content. BrickSync takes those only as a file path, so the content
+     * is written where the container can read it and the command is sent with that path.
+     */
+    @PostMapping("/file-commands")
+    public ResponseEntity<BrickSyncCommandResponse> sendFileCommand(
+            @RequestHeader(value = API_KEY_HEADER, required = false) String apiKey,
+            @RequestBody BrickSyncFileCommandRequest request) {
+        requireApiKey(apiKey);
+        String sent = service.sendFileCommand(request.getCommand(), request.getBsx());
+        return ResponseEntity.accepted().body(new BrickSyncCommandResponse(true, sent));
+    }
+
+    /** BrickSync's current inventory as a BSX file. A POST because it has BrickSync write a backup to produce it. */
+    @PostMapping("/inventory-backup")
+    public BrickSyncBackupResponse backupInventory(@RequestHeader(value = API_KEY_HEADER, required = false) String apiKey) {
+        requireApiKey(apiKey);
+        return service.backupInventory();
+    }
+
     @GetMapping("/logs")
     public BrickSyncLogsResponse getLogs(
             @RequestHeader(value = API_KEY_HEADER, required = false) String apiKey,

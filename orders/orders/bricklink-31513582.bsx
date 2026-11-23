@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStoreXML>
+<BrickStoreXML>
+ <Order>
+  <Service>BrickLink</Service>
+  <OrderID>31513582</OrderID>
+  <OrderDate>1777840763</OrderDate>
+  <Customer>DarkPhoenix</Customer>
+  <SubTotal>2.288</SubTotal>
+  <GrandTotal>10.125</GrandTotal>
+  <Payment>10.130</Payment>
+  <Currency>EUR</Currency>
+ </Order>
+ <Inventory>
+  <Item>
+   <ItemID>86125c</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>115</ColorID>
+   <ItemName>Minifigure, Weapon Sword with Serrated Blade with Dragon Head &amp;#40;Ninjago Sword of Fire&amp;#41;</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Pearl Gold</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.144</Price>
+   <Condition>U</Condition>
+   <Remarks>MB_F10</Remarks>
+   <LotID>532745760</LotID>
+  </Item>
+  <Item>
+   <ItemID>65272pb01</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>16</ColorID>
+   <ItemName>Minifigure, Weapon Sword with Serrated Blade and Molded White Hilt with Wide Angled Pommel Pattern &amp;#40;Ninjago Key-Tana&amp;#41;</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Trans-Neon Green</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.677</Price>
+   <Condition>U</Condition>
+   <Remarks>MB_F11</Remarks>
+   <LotID>532905543</LotID>
+  </Item>
+  <Item>
+   <ItemID>86146</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>50</ColorID>
+   <ItemName>Minifigure, Weapon Sword Hilt with Crystal Shard</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Trans-Dark Pink</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>1.039</Price>
+   <Condition>U</Condition>
+   <Remarks>MB_F15</Remarks>
+   <LotID>532905544</LotID>
+  </Item>
+  <Item>
+   <ItemID>973pb3769c01</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>47</ColorID>
+   <ItemName>Torso Ninjago Black Breastplate with Silver Straps, Pixelated Flask, Skull, and Heart Pattern / Dark Pink Arms / Black Hands</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Pink</ColorName>
+   <Status>I</Status>
+   <Qty>1</Qty>
+   <Price>0.428</Price>
+   <Condition>U</Condition>
+   <Remarks>BM_B10</Remarks>
+   <LotID>534542592</LotID>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStore" Version="1" >
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,13,14,9,10,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,12,11</ColumnOrder>
+   <ColumnWidths>48,45,75,218,40,110,40,61,61,40,40,61,61,89,89,40,61,40,61,40,61,0,0,0,0,0,0,40,40,61,61</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,40,40,61,0,0,0,40,61,40,61,40,61,61,61,61,61,75,40,40,40,61,61</ColumnWidthsHidden>
+   <SortColumn>8</SortColumn>
+   <SortDirection>D</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStoreXML>
